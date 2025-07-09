@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
+import WelcomeFlow from '@/components/onboarding/WelcomeFlow';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { 
@@ -12,6 +13,7 @@ import {
   Star,
   TrendingUp
 } from 'lucide-react';
+import WellnessWidget from '@/components/wellness/WellnessWidget';
 
 interface DashboardStats {
   loyaltyPoints: number;
@@ -30,6 +32,7 @@ const Dashboard: React.FC = () => {
   });
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -47,6 +50,11 @@ const Dashboard: React.FC = () => {
         .single();
 
       setProfile(profileData);
+
+      // Check if this is a new user (no full_name set)
+      if (!profileData?.full_name) {
+        setShowWelcome(true);
+      }
 
       // Load dashboard stats
       const [eventsResult, challengesResult, postsResult] = await Promise.all([
@@ -125,7 +133,15 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <>
+      {showWelcome && (
+        <WelcomeFlow onComplete={() => {
+          setShowWelcome(false);
+          loadDashboardData(); // Refresh data after profile completion
+        }} />
+      )}
+      
+      <div className="space-y-6">
       {/* Welcome Section */}
       <div className="floating-card">
         <div className="flex items-center space-x-4">
@@ -174,32 +190,7 @@ const Dashboard: React.FC = () => {
 
       {/* Quick Actions */}
       <div className="grid md:grid-cols-2 gap-6">
-        <Card className="glass-card border-0">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <TrendingUp className="w-5 h-5 text-primary" />
-              <span>Weekly Progress</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Steps Challenge</span>
-                  <span>7,500 / 10,000</span>
-                </div>
-                <Progress value={75} className="h-2" />
-              </div>
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Social Connections</span>
-                  <span>12 / 15</span>
-                </div>
-                <Progress value={80} className="h-2" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <WellnessWidget />
 
         <Card className="glass-card border-0">
           <CardHeader>
@@ -228,7 +219,8 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

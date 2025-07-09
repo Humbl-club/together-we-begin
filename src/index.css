@@ -1,96 +1,86 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
+/* HUMBL Girls Club Design System */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 314 100% 98%;
+    --foreground: 314 12% 9%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 314 50% 97%;
+    --card-foreground: 314 12% 9%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 314 100% 98%;
+    --popover-foreground: 314 12% 9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 314 85% 65%;
+    --primary-foreground: 314 100% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 314 20% 90%;
+    --secondary-foreground: 314 12% 25%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 314 20% 94%;
+    --muted-foreground: 314 8% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 314 60% 88%;
+    --accent-foreground: 314 12% 15%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 314 100% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 314 30% 85%;
+    --input: 314 30% 85%;
+    --ring: 314 85% 65%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* HUMBL Brand Colors */
+    --humbl-pink: 314 85% 65%;
+    --humbl-purple: 280 85% 70%;
+    --humbl-lavender: 260 60% 85%;
+    --humbl-rose: 340 75% 80%;
+    --humbl-cream: 45 50% 95%;
+    
+    /* Glassmorphism */
+    --glass-bg: 314 50% 97% / 0.6;
+    --glass-border: 314 30% 85% / 0.3;
+    --glass-shadow: 314 20% 40% / 0.1;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 314 25% 8%;
+    --foreground: 314 20% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 314 25% 10%;
+    --card-foreground: 314 20% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 314 25% 8%;
+    --popover-foreground: 314 20% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 314 85% 65%;
+    --primary-foreground: 314 25% 8%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 314 15% 15%;
+    --secondary-foreground: 314 20% 85%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 314 15% 12%;
+    --muted-foreground: 314 10% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 314 25% 18%;
+    --accent-foreground: 314 20% 85%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 314 20% 95%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 314 15% 18%;
+    --input: 314 15% 18%;
+    --ring: 314 85% 65%;
+
+    --glass-bg: 314 25% 10% / 0.7;
+    --glass-border: 314 15% 25% / 0.3;
+    --glass-shadow: 0 0% 0% / 0.3;
   }
 }
 
@@ -100,6 +90,56 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    background: linear-gradient(135deg, 
+      hsl(var(--humbl-pink) / 0.1) 0%, 
+      hsl(var(--humbl-purple) / 0.1) 35%,
+      hsl(var(--humbl-lavender) / 0.1) 70%,
+      hsl(var(--humbl-rose) / 0.1) 100%
+    );
+    min-height: 100vh;
   }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/60 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
+  }
+  
+  .glass-button {
+    @apply bg-white/20 dark:bg-white/10 backdrop-blur-md border border-white/30 dark:border-white/20 hover:bg-white/30 dark:hover:bg-white/20 transition-all duration-300;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent;
+  }
+  
+  .floating-card {
+    @apply glass-card rounded-3xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl;
+  }
+
+  .auth-container {
+    @apply min-h-screen flex items-center justify-center p-4;
+    background: linear-gradient(135deg, 
+      hsl(var(--humbl-pink) / 0.2) 0%, 
+      hsl(var(--humbl-purple) / 0.2) 100%
+    );
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  @apply w-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary/50;
 }

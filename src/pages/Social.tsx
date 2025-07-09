@@ -230,7 +230,7 @@ const Social: React.FC = () => {
         .from('post_comments')
         .select(`
           *,
-          profiles!post_comments_user_id_fkey (full_name, username, avatar_url)
+          profiles (full_name, username, avatar_url)
         `)
         .eq('post_id', postId)
         .order('created_at', { ascending: true });

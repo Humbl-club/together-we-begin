@@ -111,7 +111,7 @@ const Profile: React.FC = () => {
         .select(`
           id,
           completion_date,
-          challenges (
+          challenges!challenge_participations_challenge_id_fkey (
             title,
             badge_name,
             points_reward

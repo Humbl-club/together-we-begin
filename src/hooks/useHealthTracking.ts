@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -8,6 +8,10 @@ interface HealthData {
   calories: number;
   distance: number;
   activeMinutes: number;
+  heartRate?: number;
+  workouts: number;
+  waterGlasses: number;
+  sleepHours: number;
   lastUpdated: Date;
 }
 
@@ -15,6 +19,8 @@ interface HealthGoals {
   dailySteps: number;
   weeklyExercise: number;
   monthlyDistance: number;
+  dailyWater: number;
+  minSleep: number;
 }
 
 export const useHealthTracking = () => {
@@ -23,13 +29,19 @@ export const useHealthTracking = () => {
     calories: 0,
     distance: 0,
     activeMinutes: 0,
+    heartRate: undefined,
+    workouts: 0,
+    waterGlasses: 0,
+    sleepHours: 0,
     lastUpdated: new Date()
   });
   
   const [healthGoals, setHealthGoals] = useState<HealthGoals>({
     dailySteps: 10000,
     weeklyExercise: 150,
-    monthlyDistance: 50
+    monthlyDistance: 50,
+    dailyWater: 8,
+    minSleep: 8
   });
   
   const [isConnected, setIsConnected] = useState(false);
@@ -43,12 +55,17 @@ export const useHealthTracking = () => {
     }
   }, [user]);
 
-  const checkHealthKitConnection = async () => {
+  const checkHealthKitConnection = useCallback(async () => {
     try {
+      setLoading(true);
       // Check if device supports health data
       if ('permissions' in navigator && 'query' in navigator.permissions) {
-        const permission = await navigator.permissions.query({ name: 'sensors' as any });
-        setIsConnected(permission.state === 'granted');
+        try {
+          const permission = await navigator.permissions.query({ name: 'accelerometer' as any });
+          setIsConnected(permission.state === 'granted');
+        } catch {
+          setIsConnected(false);
+        }
       }
       
       // Try to access step counter API if available
@@ -56,13 +73,11 @@ export const useHealthTracking = () => {
         try {
           const sensor = new (window as any).Accelerometer({ frequency: 60 });
           sensor.addEventListener('reading', () => {
-            // Basic step counting simulation
             updateStepsFromSensor();
           });
           sensor.start();
           setIsConnected(true);
         } catch (error) {
-          // Fallback to manual tracking or mock data
           setIsConnected(false);
         }
       }
@@ -72,20 +87,26 @@ export const useHealthTracking = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const updateStepsFromSensor = () => {
-    // Simulate step counting - in a real app this would come from device sensors
-    const mockSteps = Math.floor(Math.random() * 1000) + 5000;
+  const updateHealthData = useCallback((newData: Partial<HealthData>) => {
     setHealthData(prev => ({
       ...prev,
+      ...newData,
+      lastUpdated: new Date()
+    }));
+  }, []);
+
+  const updateStepsFromSensor = useCallback(() => {
+    // Simulate step counting - in a real app this would come from device sensors
+    const mockSteps = Math.floor(Math.random() * 1000) + 5000;
+    updateHealthData({
       steps: mockSteps,
       calories: Math.floor(mockSteps * 0.04),
       distance: mockSteps * 0.0008, // km
       activeMinutes: Math.floor(mockSteps / 100),
-      lastUpdated: new Date()
-    }));
-  };
+    });
+  }, [updateHealthData]);
 
   const syncChallengeProgress = async (challengeId: string, progressData: any) => {
     try {
@@ -124,6 +145,10 @@ export const useHealthTracking = () => {
         return Math.min((healthData.activeMinutes / healthGoals.weeklyExercise) * 100, 100);
       case 'monthlyDistance':
         return Math.min((healthData.distance / healthGoals.monthlyDistance) * 100, 100);
+      case 'dailyWater':
+        return Math.min((healthData.waterGlasses / healthGoals.dailyWater) * 100, 100);
+      case 'minSleep':
+        return Math.min((healthData.sleepHours / healthGoals.minSleep) * 100, 100);
       default:
         return 0;
     }
@@ -138,7 +163,7 @@ export const useHealthTracking = () => {
     }, 30000); // Update every 30 seconds
 
     return () => clearInterval(interval);
-  }, [isConnected]);
+  }, [isConnected, updateStepsFromSensor]);
 
   return {
     healthData,
@@ -146,8 +171,10 @@ export const useHealthTracking = () => {
     isConnected,
     loading,
     updateGoals,
+    updateHealthData,
     syncChallengeProgress,
     getProgressPercentage,
-    checkHealthKitConnection
+    checkHealthKitConnection,
+    updateStepsFromSensor
   };
 };

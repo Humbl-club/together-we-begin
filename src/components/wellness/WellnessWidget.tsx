@@ -1,10 +1,11 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
-import { useHealthTracking } from '@/hooks/useHealthTracking';
-import { Activity, Target, TrendingUp, Heart } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { useState } from "react";
+import { useHealthTracking } from "@/hooks/useHealthTracking";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Activity, Heart, Footprints, Clock, Smartphone, SmartphoneNfc, Target, Droplets, Moon, TrendingUp } from "lucide-react";
+import { HealthDataInput } from "./HealthDataInput";
 
 interface WellnessWidgetProps {
   onChallengeSync?: (challengeId: string) => void;

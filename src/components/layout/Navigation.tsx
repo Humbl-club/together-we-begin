@@ -18,7 +18,8 @@ export const Navigation: React.FC = () => {
   const { user, signOut, isAdmin } = useAuth();
   const location = useLocation();
 
-  if (!user) return null;
+  // Temporarily disabled for testing
+  // if (!user) return null;
 
   const navItems = [
     { href: '/dashboard', icon: Home, label: 'Home' },

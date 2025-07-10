@@ -60,8 +60,9 @@ const Challenges: React.FC = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Temporarily load data even without user for testing
+    fetchChallenges();
     if (user) {
-      fetchChallenges();
       fetchUserProfile();
       subscribeToRealtime();
     }

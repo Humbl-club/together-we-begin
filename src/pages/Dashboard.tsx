@@ -35,19 +35,22 @@ const Dashboard: React.FC = () => {
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      loadDashboardData();
-    }
+    // Temporarily load data even without user for testing
+    loadDashboardData();
   }, [user]);
 
   const loadDashboardData = async () => {
     try {
-      // Load user profile
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user?.id)
-        .single();
+      // Load user profile (skip if no user for testing)
+      let profileData = null;
+      if (user?.id) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        profileData = data;
+      }
 
       setProfile(profileData);
 

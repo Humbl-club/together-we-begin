@@ -54,9 +54,10 @@ const Social: React.FC = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Temporarily load data even without user for testing
+    fetchPosts();
+    fetchStories();
     if (user) {
-      fetchPosts();
-      fetchStories();
       subscribeToRealtime();
     }
   }, [user]);

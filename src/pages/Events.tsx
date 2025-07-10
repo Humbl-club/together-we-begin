@@ -55,8 +55,9 @@ const Events: React.FC = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Temporarily load data even without user for testing
+    fetchEvents();
     if (user) {
-      fetchEvents();
       fetchUserProfile();
       subscribeToRealtime();
     }

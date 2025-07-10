@@ -22,9 +22,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     );
   }
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
+  // Temporarily disabled login requirement for testing
+  // if (!user) {
+  //   return <Navigate to="/auth" replace />;
+  // }
 
   return (
     <div className="min-h-screen pb-20 md:pb-0 md:pl-24">

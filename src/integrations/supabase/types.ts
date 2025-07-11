@@ -341,6 +341,39 @@ export type Database = {
           },
         ]
       }
+      integration_settings: {
+        Row: {
+          calendar_sync: boolean | null
+          created_at: string
+          fitness_tracker_token: string | null
+          fitness_tracker_type: string | null
+          id: string
+          social_media_crosspost: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          calendar_sync?: boolean | null
+          created_at?: string
+          fitness_tracker_token?: string | null
+          fitness_tracker_type?: string | null
+          id?: string
+          social_media_crosspost?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          calendar_sync?: boolean | null
+          created_at?: string
+          fitness_tracker_token?: string | null
+          fitness_tracker_type?: string | null
+          id?: string
+          social_media_crosspost?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       invites: {
         Row: {
           code: string
@@ -457,6 +490,69 @@ export type Database = {
           participant_1?: string
           participant_2?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          content: string | null
+          created_at: string
+          data: Json | null
+          id: string
+          read_at: string | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          read_at?: string | null
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      performance_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          load_time_ms: number
+          page_url: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          load_time_ms: number
+          page_url: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          load_time_ms?: number
+          page_url?: string
+          user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -630,6 +726,33 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       social_posts: {
         Row: {
           comments_count: number | null
@@ -679,6 +802,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      story_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          reaction: string
+          story_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reaction: string
+          story_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reaction?: string
+          story_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_analytics: {
+        Row: {
+          challenges_completed: number | null
+          comments_made: number | null
+          created_at: string
+          date: string
+          events_attended: number | null
+          id: string
+          messages_sent: number | null
+          posts_created: number | null
+          posts_liked: number | null
+          session_duration_minutes: number | null
+          stories_viewed: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenges_completed?: number | null
+          comments_made?: number | null
+          created_at?: string
+          date?: string
+          events_attended?: number | null
+          id?: string
+          messages_sent?: number | null
+          posts_created?: number | null
+          posts_liked?: number | null
+          session_duration_minutes?: number | null
+          stories_viewed?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenges_completed?: number | null
+          comments_made?: number | null
+          created_at?: string
+          date?: string
+          events_attended?: number | null
+          id?: string
+          messages_sent?: number | null
+          posts_created?: number | null
+          posts_liked?: number | null
+          session_duration_minutes?: number | null
+          stories_viewed?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

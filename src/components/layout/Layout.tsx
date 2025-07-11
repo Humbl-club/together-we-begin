@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -13,21 +12,19 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="glass-card rounded-3xl p-8 text-center">
-          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-editorial-hero">
+        <div className="editorial-card rounded-xl p-8 text-center max-w-sm">
+          <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-muted-foreground font-light tracking-wide">Loading your experience...</p>
         </div>
       </div>
     );
   }
 
-  // All security disabled for testing - no authentication required
-
   return (
-    <div className="min-h-screen pb-20 md:pb-0 md:pl-24">
+    <div className="min-h-screen pb-20 md:pb-0 md:pl-24 bg-editorial-subtle">
       <Navigation />
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto px-4 py-6 max-w-7xl">
         {children}
       </main>
     </div>

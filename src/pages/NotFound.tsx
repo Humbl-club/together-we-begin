@@ -1,5 +1,9 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Home, ArrowLeft } from 'lucide-react';
 
 const NotFound = () => {
   const location = useLocation();
@@ -12,14 +16,24 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </a>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-editorial-hero p-4">
+      <Card className="editorial-card max-w-md w-full text-center">
+        <CardContent className="p-8">
+          <div className="w-16 h-16 mx-auto mb-6 bg-editorial-sage rounded-xl flex items-center justify-center">
+            <Home className="w-8 h-8 text-editorial-charcoal" />
+          </div>
+          <h1 className="text-2xl editorial-heading mb-4 text-foreground">Page Not Found</h1>
+          <p className="text-muted-foreground mb-6 font-light leading-relaxed">
+            The page you're looking for doesn't exist or has been moved.
+          </p>
+          <Button asChild className="bg-editorial-charcoal hover:bg-editorial-navy text-white">
+            <Link to="/dashboard">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Return Home
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };

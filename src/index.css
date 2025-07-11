@@ -3,84 +3,92 @@
 @tailwind components;
 @tailwind utilities;
 
-/* HUMBL Girls Club Design System */
+/* Editorial Magazine Design System */
 @layer base {
   :root {
-    --background: 314 100% 98%;
-    --foreground: 314 12% 9%;
+    /* Base Editorial Colors - Sophisticated neutrals */
+    --background: 0 0% 99%;
+    --foreground: 210 11% 15%;
 
-    --card: 314 50% 97%;
-    --card-foreground: 314 12% 9%;
+    --card: 0 0% 98%;
+    --card-foreground: 210 11% 15%;
 
-    --popover: 314 100% 98%;
-    --popover-foreground: 314 12% 9%;
+    --popover: 0 0% 99%;
+    --popover-foreground: 210 11% 15%;
 
-    --primary: 314 85% 65%;
-    --primary-foreground: 314 100% 98%;
+    /* Editorial Primary - Deep charcoal with warmth */
+    --primary: 210 15% 25%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 314 20% 90%;
-    --secondary-foreground: 314 12% 25%;
+    /* Sophisticated Secondary - Warm grey */
+    --secondary: 30 8% 92%;
+    --secondary-foreground: 210 11% 15%;
 
-    --muted: 314 20% 94%;
-    --muted-foreground: 314 8% 45%;
+    /* Muted - Refined neutral */
+    --muted: 210 11% 95%;
+    --muted-foreground: 210 8% 50%;
 
-    --accent: 314 60% 88%;
-    --accent-foreground: 314 12% 15%;
+    /* Accent - Subtle warmth */
+    --accent: 25 15% 90%;
+    --accent-foreground: 210 11% 15%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 314 100% 98%;
+    /* Error handling */
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 314 30% 85%;
-    --input: 314 30% 85%;
-    --ring: 314 85% 65%;
+    /* Interactive elements */
+    --border: 210 11% 88%;
+    --input: 210 11% 88%;
+    --ring: 210 15% 25%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
-    /* HUMBL Brand Colors */
-    --humbl-pink: 314 85% 65%;
-    --humbl-purple: 280 85% 70%;
-    --humbl-lavender: 260 60% 85%;
-    --humbl-rose: 340 75% 80%;
-    --humbl-cream: 45 50% 95%;
+    /* Editorial Brand Colors - Sophisticated palette */
+    --editorial-charcoal: 210 15% 25%;
+    --editorial-warm-grey: 30 8% 92%;
+    --editorial-cream: 45 25% 97%;
+    --editorial-sage: 140 20% 85%;
+    --editorial-blush: 15 30% 90%;
+    --editorial-navy: 220 25% 20%;
     
-    /* Glassmorphism */
-    --glass-bg: 314 50% 97% / 0.6;
-    --glass-border: 314 30% 85% / 0.3;
-    --glass-shadow: 314 20% 40% / 0.1;
+    /* Glass effects */
+    --glass-bg: 0 0% 98% / 0.8;
+    --glass-border: 210 11% 88% / 0.4;
+    --glass-shadow: 210 25% 25% / 0.1;
   }
 
   .dark {
-    --background: 314 25% 8%;
-    --foreground: 314 20% 95%;
+    --background: 210 15% 8%;
+    --foreground: 210 11% 92%;
 
-    --card: 314 25% 10%;
-    --card-foreground: 314 20% 95%;
+    --card: 210 15% 10%;
+    --card-foreground: 210 11% 92%;
 
-    --popover: 314 25% 8%;
-    --popover-foreground: 314 20% 95%;
+    --popover: 210 15% 8%;
+    --popover-foreground: 210 11% 92%;
 
-    --primary: 314 85% 65%;
-    --primary-foreground: 314 25% 8%;
+    --primary: 210 11% 85%;
+    --primary-foreground: 210 15% 8%;
 
-    --secondary: 314 15% 15%;
-    --secondary-foreground: 314 20% 85%;
+    --secondary: 210 15% 15%;
+    --secondary-foreground: 210 11% 85%;
 
-    --muted: 314 15% 12%;
-    --muted-foreground: 314 10% 60%;
+    --muted: 210 15% 12%;
+    --muted-foreground: 210 8% 55%;
 
-    --accent: 314 25% 18%;
-    --accent-foreground: 314 20% 85%;
+    --accent: 210 15% 18%;
+    --accent-foreground: 210 11% 85%;
 
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 314 20% 95%;
+    --destructive: 0 55% 45%;
+    --destructive-foreground: 210 11% 92%;
 
-    --border: 314 15% 18%;
-    --input: 314 15% 18%;
-    --ring: 314 85% 65%;
+    --border: 210 15% 18%;
+    --input: 210 15% 18%;
+    --ring: 210 11% 85%;
 
-    --glass-bg: 314 25% 10% / 0.7;
-    --glass-border: 314 15% 25% / 0.3;
-    --glass-shadow: 0 0% 0% / 0.3;
+    --glass-bg: 210 15% 10% / 0.8;
+    --glass-border: 210 15% 25% / 0.4;
+    --glass-shadow: 0 0% 0% / 0.4;
   }
 }
 
@@ -92,40 +100,55 @@
   body {
     @apply bg-background text-foreground font-sans;
     background: linear-gradient(135deg, 
-      hsl(var(--humbl-pink) / 0.1) 0%, 
-      hsl(var(--humbl-purple) / 0.1) 35%,
-      hsl(var(--humbl-lavender) / 0.1) 70%,
-      hsl(var(--humbl-rose) / 0.1) 100%
+      hsl(var(--editorial-cream) / 0.6) 0%, 
+      hsl(var(--editorial-warm-grey) / 0.4) 35%,
+      hsl(var(--editorial-sage) / 0.3) 70%,
+      hsl(var(--editorial-blush) / 0.4) 100%
     );
     min-height: 100vh;
+    font-weight: 300;
+    letter-spacing: 0.01em;
   }
 }
 
 @layer components {
+  /* Editorial Magazine Cards */
+  .editorial-card {
+    @apply bg-card/80 dark:bg-card/40 backdrop-blur-md border border-border/50 shadow-sm hover:shadow-lg transition-all duration-300;
+  }
+  
+  /* Sophisticated Glass Effects */
   .glass-card {
-    @apply bg-white/60 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
+    @apply bg-card/60 dark:bg-card/40 backdrop-blur-xl border border-border/30 shadow-xl;
   }
   
   .glass-button {
-    @apply bg-white/20 dark:bg-white/10 backdrop-blur-md border border-white/30 dark:border-white/20 hover:bg-white/30 dark:hover:bg-white/20 transition-all duration-300;
+    @apply bg-card/20 dark:bg-card/10 backdrop-blur-md border border-border/30 hover:bg-card/30 dark:hover:bg-card/20 transition-all duration-300;
   }
   
-  .gradient-text {
-    @apply bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent;
+  /* Editorial Typography */
+  .editorial-heading {
+    @apply font-light tracking-tight text-foreground;
   }
   
+  .editorial-subheading {
+    @apply font-normal text-muted-foreground tracking-wide;
+  }
+  
+  /* Refined Cards */
   .floating-card {
-    @apply glass-card rounded-3xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl;
+    @apply editorial-card rounded-xl p-6 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl;
   }
 
+  /* Editorial Auth Container */
   .auth-container {
     @apply min-h-screen flex items-center justify-center p-4;
     background: linear-gradient(135deg, 
-      hsl(var(--humbl-pink) / 0.2) 0%, 
-      hsl(var(--humbl-purple) / 0.2) 100%
+      hsl(var(--editorial-cream)) 0%, 
+      hsl(var(--editorial-warm-grey)) 50%,
+      hsl(var(--editorial-sage)) 100%
     );
   }
-}
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {

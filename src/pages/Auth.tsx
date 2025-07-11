@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -20,10 +19,10 @@ const Auth: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="auth-container">
-        <div className="floating-card max-w-md mx-auto text-center">
-          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-editorial-hero">
+        <div className="editorial-card max-w-md mx-auto text-center p-8">
+          <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-muted-foreground font-light">Preparing your experience...</p>
         </div>
       </div>
     );
@@ -60,7 +59,7 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="auth-container">
+    <div className="min-h-screen bg-editorial-hero flex items-center justify-center p-4">
       {renderCurrentStep()}
     </div>
   );

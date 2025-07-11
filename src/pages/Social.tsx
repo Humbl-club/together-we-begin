@@ -11,6 +11,9 @@ import { Heart, MessageCircle, Share2, Camera, MoreHorizontal, Flag } from 'luci
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
+import { RichTextEditor } from '@/components/editor/RichTextEditor';
+import { AdvancedSearch, type SearchableItem } from '@/components/search/AdvancedSearch';
+import { useContentModeration, ReportModal, ContentWarning } from '@/components/moderation/ContentModeration';
 
 interface Post {
   id: string;
@@ -48,6 +51,10 @@ const Social: React.FC = () => {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(true);
   const [showComments, setShowComments] = useState<string | null>(null);
+  const [searchItems, setSearchItems] = useState<SearchableItem[]>([]);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [reportingPostId, setReportingPostId] = useState<string>('');
+  const [contentWarning, setContentWarning] = useState<{ flags: any, show: boolean }>({ flags: {}, show: false });
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const { user, isAdmin } = useAuth();

@@ -32,7 +32,7 @@ const Dashboard: React.FC = () => {
   });
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [showWelcome, setShowWelcome] = useState(false);
+  const [showWelcome] = useState(false); // Disabled for testing
 
   useEffect(() => {
     // Temporarily load data even without user for testing
@@ -54,10 +54,7 @@ const Dashboard: React.FC = () => {
 
       setProfile(profileData);
 
-      // Check if this is a new user (no full_name set)
-      if (!profileData?.full_name) {
-        setShowWelcome(true);
-      }
+      // Welcome flow disabled for testing
 
       // Load dashboard stats
       const [eventsResult, challengesResult, postsResult] = await Promise.all([
@@ -137,12 +134,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      {showWelcome && (
-        <WelcomeFlow onComplete={() => {
-          setShowWelcome(false);
-          loadDashboardData(); // Refresh data after profile completion
-        }} />
-      )}
+      {/* Welcome flow disabled for testing */}
       
       <div className="space-y-6">
       {/* Welcome Section */}

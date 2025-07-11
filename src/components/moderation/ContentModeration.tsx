@@ -75,8 +75,21 @@ export const ReportModal = ({ isOpen, onClose, contentId, contentType, onReport 
     setIsSubmitting(true)
     
     try {
-      // For now, we'll just call the onReport callback
-      // Later we can create a content_reports table
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('User not authenticated')
+
+      // Submit report to database
+      const { error } = await supabase
+        .from('content_reports')
+        .insert({
+          reporter_id: user.id,
+          reported_content_type: contentType,
+          reported_content_id: contentId,
+          reason,
+          description: details || null
+        })
+
+      if (error) throw error
 
       onReport(reason, details)
       toast({
@@ -85,6 +98,7 @@ export const ReportModal = ({ isOpen, onClose, contentId, contentType, onReport 
       })
       onClose()
     } catch (error) {
+      console.error('Failed to submit report:', error)
       toast({
         title: "Failed to submit report",
         variant: "destructive"

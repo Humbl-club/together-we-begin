@@ -12,6 +12,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Camera, Star, Trophy, MapPin, Instagram, Edit3, Save, X } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
+import { PrivacyControls } from '@/components/profile/PrivacyControls';
+import { ProfileVerification } from '@/components/profile/ProfileVerification';
+import { DirectMessaging } from '@/components/messaging/DirectMessaging';
 
 interface UserProfile {
   id: string;
@@ -444,9 +447,12 @@ const Profile: React.FC = () => {
 
       {!editing && (
         <Tabs defaultValue="activity" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="activity">Recent Activity</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="activity">Activity</TabsTrigger>
             <TabsTrigger value="achievements">Achievements</TabsTrigger>
+            <TabsTrigger value="verification">Verification</TabsTrigger>
+            <TabsTrigger value="privacy">Privacy</TabsTrigger>
+            <TabsTrigger value="messages">Messages</TabsTrigger>
           </TabsList>
           
           <TabsContent value="activity" className="space-y-4">
@@ -530,6 +536,31 @@ const Profile: React.FC = () => {
                     </p>
                   )}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="verification" className="space-y-4">
+            <ProfileVerification 
+              userId={user!.id}
+              currentVerificationLevel="unverified"
+              onVerificationUpdate={(level) => {
+                console.log('Verification updated:', level)
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="privacy" className="space-y-4">
+            <PrivacyControls userId={user!.id} />
+          </TabsContent>
+
+          <TabsContent value="messages" className="space-y-4">
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle>Direct Messages</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <DirectMessaging currentUserId={user!.id} />
               </CardContent>
             </Card>
           </TabsContent>

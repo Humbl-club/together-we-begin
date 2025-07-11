@@ -43,11 +43,40 @@ export const PrivacyControls = ({ userId }: PrivacyControlsProps) => {
 
   const loadPrivacySettings = async () => {
     try {
-      // For now, we'll use localStorage to store privacy settings
-      // Later this can be moved to a dedicated table
-      const stored = localStorage.getItem(`privacy_settings_${userId}`)
-      if (stored) {
-        setSettings(JSON.parse(stored))
+      const { data, error } = await supabase
+        .from('privacy_settings')
+        .select('*')
+        .eq('user_id', userId)
+        .single()
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Failed to load privacy settings:', error)
+        return
+      }
+
+      if (data) {
+        setSettings({
+          profile_visibility: data.profile_visibility as 'public' | 'members_only' | 'private',
+          allow_direct_messages: data.allow_messages !== 'none',
+          show_location: data.allow_location_sharing,
+          show_activity_status: data.show_activity_status,
+          allow_event_invites: data.allow_friend_requests,
+          allow_group_invites: data.allow_friend_requests,
+          blocked_users: []
+        })
+      }
+
+      // Load blocked users
+      const { data: blockedData } = await supabase
+        .from('blocked_users')
+        .select('blocked_id')
+        .eq('blocker_id', userId)
+
+      if (blockedData) {
+        setSettings(prev => ({
+          ...prev,
+          blocked_users: blockedData.map(item => item.blocked_id)
+        }))
       }
     } catch (error) {
       console.error('Failed to load privacy settings:', error)
@@ -59,15 +88,25 @@ export const PrivacyControls = ({ userId }: PrivacyControlsProps) => {
   const savePrivacySettings = async () => {
     setIsSaving(true)
     try {
-      // For now, store in localStorage
-      // Later this can be moved to a dedicated table
-      localStorage.setItem(`privacy_settings_${userId}`, JSON.stringify(settings))
+      const { error } = await supabase
+        .from('privacy_settings')
+        .upsert({
+          user_id: userId,
+          profile_visibility: settings.profile_visibility,
+          allow_messages: settings.allow_direct_messages ? 'everyone' : 'none',
+          allow_location_sharing: settings.show_location,
+          show_activity_status: settings.show_activity_status,
+          allow_friend_requests: settings.allow_event_invites
+        })
+
+      if (error) throw error
       
       toast({
         title: "Privacy settings updated",
         description: "Your privacy preferences have been saved."
       })
     } catch (error) {
+      console.error('Failed to save privacy settings:', error)
       toast({
         title: "Failed to save settings",
         variant: "destructive"
@@ -82,23 +121,56 @@ export const PrivacyControls = ({ userId }: PrivacyControlsProps) => {
   }
 
   const blockUser = async (targetUserId: string) => {
-    const updatedBlocked = [...settings.blocked_users, targetUserId]
-    setSettings(prev => ({ ...prev, blocked_users: updatedBlocked }))
-    
-    toast({
-      title: "User blocked",
-      description: "This user will no longer be able to contact you."
-    })
+    try {
+      const { error } = await supabase
+        .from('blocked_users')
+        .insert({
+          blocker_id: userId,
+          blocked_id: targetUserId
+        })
+
+      if (error) throw error
+
+      const updatedBlocked = [...settings.blocked_users, targetUserId]
+      setSettings(prev => ({ ...prev, blocked_users: updatedBlocked }))
+      
+      toast({
+        title: "User blocked",
+        description: "This user will no longer be able to contact you."
+      })
+    } catch (error) {
+      console.error('Failed to block user:', error)
+      toast({
+        title: "Failed to block user",
+        variant: "destructive"
+      })
+    }
   }
 
   const unblockUser = async (targetUserId: string) => {
-    const updatedBlocked = settings.blocked_users.filter(id => id !== targetUserId)
-    setSettings(prev => ({ ...prev, blocked_users: updatedBlocked }))
-    
-    toast({
-      title: "User unblocked",
-      description: "This user can now contact you again."
-    })
+    try {
+      const { error } = await supabase
+        .from('blocked_users')
+        .delete()
+        .eq('blocker_id', userId)
+        .eq('blocked_id', targetUserId)
+
+      if (error) throw error
+
+      const updatedBlocked = settings.blocked_users.filter(id => id !== targetUserId)
+      setSettings(prev => ({ ...prev, blocked_users: updatedBlocked }))
+      
+      toast({
+        title: "User unblocked",
+        description: "This user can now contact you again."
+      })
+    } catch (error) {
+      console.error('Failed to unblock user:', error)
+      toast({
+        title: "Failed to unblock user",
+        variant: "destructive"
+      })
+    }
   }
 
   if (isLoading) {

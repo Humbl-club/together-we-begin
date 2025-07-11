@@ -218,7 +218,18 @@ const Profile: React.FC = () => {
   if (loading && !profile) {
     return (
       <div className="container max-w-4xl mx-auto p-4">
-        <div className="text-center">Loading profile...</div>
+        <Card className="glass-card">
+          <CardContent className="text-center py-12">
+            <div className="animate-pulse space-y-4">
+              <div className="w-24 h-24 bg-muted rounded-full mx-auto"></div>
+              <div className="space-y-2">
+                <div className="h-6 bg-muted rounded w-48 mx-auto"></div>
+                <div className="h-4 bg-muted rounded w-32 mx-auto"></div>
+              </div>
+            </div>
+            <p className="text-muted-foreground mt-4">Loading profile...</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -227,8 +238,15 @@ const Profile: React.FC = () => {
     return (
       <div className="container max-w-4xl mx-auto p-4">
         <Card className="glass-card">
-          <CardContent className="text-center py-12">
-            <p className="text-muted-foreground">Profile not found</p>
+          <CardContent className="text-center py-12 space-y-4">
+            <div className="w-16 h-16 bg-muted rounded-full mx-auto opacity-50"></div>
+            <div>
+              <h3 className="text-lg font-semibold">Profile not found</h3>
+              <p className="text-muted-foreground">We couldn't load your profile. Please try refreshing the page.</p>
+            </div>
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Refresh Page
+            </Button>
           </CardContent>
         </Card>
       </div>

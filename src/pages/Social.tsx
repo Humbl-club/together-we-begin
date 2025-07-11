@@ -94,25 +94,51 @@ const Social: React.FC = () => {
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch posts and profiles separately
+      const { data: postsData, error: postsError } = await supabase
         .from('social_posts')
-        .select(`
-          *,
-          profiles (full_name, username, avatar_url),
-          post_likes!fk_post_likes_post_id (user_id)
-        `)
+        .select('*')
         .eq('is_story', false)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (postsError) throw postsError;
 
-      const postsWithLikes = data?.map(post => ({
-        ...post,
-        user_liked: post.post_likes?.some((like: any) => like.user_id === user?.id) || false
-      })) || [];
+      // Fetch profiles for these posts
+      const userIds = [...new Set(postsData?.map(post => post.user_id) || [])];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, username, avatar_url')
+        .in('id', userIds);
 
-      setPosts(postsWithLikes);
+      if (profilesError) throw profilesError;
+
+      // Fetch likes for these posts
+      const postIds = postsData?.map(post => post.id) || [];
+      const { data: likesData, error: likesError } = await supabase
+        .from('post_likes')
+        .select('post_id, user_id')
+        .in('post_id', postIds);
+
+      if (likesError) throw likesError;
+
+      // Combine the data
+      const postsWithProfiles = postsData?.map(post => {
+        const profile = profilesData?.find(p => p.id === post.user_id) || {
+          full_name: 'Unknown User',
+          username: 'unknown',
+          avatar_url: null
+        };
+        const postLikes = likesData?.filter(like => like.post_id === post.id) || [];
+        
+        return {
+          ...post,
+          profiles: profile,
+          user_liked: postLikes.some(like => like.user_id === user?.id)
+        };
+      }) || [];
+
+      setPosts(postsWithProfiles);
     } catch (error) {
       console.error('Error fetching posts:', error);
       toast({
@@ -127,19 +153,41 @@ const Social: React.FC = () => {
 
   const fetchStories = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch stories and profiles separately
+      const { data: storiesData, error: storiesError } = await supabase
         .from('social_posts')
-        .select(`
-          *,
-          profiles (full_name, username, avatar_url)
-        `)
+        .select('*')
         .eq('is_story', true)
         .eq('status', 'active')
         .gt('expires_at', new Date().toISOString())
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setStories(data || []);
+      if (storiesError) throw storiesError;
+
+      // Fetch profiles for these stories
+      const userIds = [...new Set(storiesData?.map(story => story.user_id) || [])];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, username, avatar_url')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Combine the data
+      const storiesWithProfiles = storiesData?.map(story => {
+        const profile = profilesData?.find(p => p.id === story.user_id) || {
+          full_name: 'Unknown User',
+          username: 'unknown',
+          avatar_url: null
+        };
+        
+        return {
+          ...story,
+          profiles: profile
+        };
+      }) || [];
+
+      setStories(storiesWithProfiles);
     } catch (error) {
       console.error('Error fetching stories:', error);
     }
@@ -234,17 +282,39 @@ const Social: React.FC = () => {
 
   const fetchComments = async (postId: string) => {
     try {
-      const { data, error } = await supabase
+      // Fetch comments and profiles separately
+      const { data: commentsData, error: commentsError } = await supabase
         .from('post_comments')
-        .select(`
-          *,
-          profiles (full_name, username, avatar_url)
-        `)
+        .select('*')
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
-      setComments(data || []);
+      if (commentsError) throw commentsError;
+
+      // Fetch profiles for these comments
+      const userIds = [...new Set(commentsData?.map(comment => comment.user_id) || [])];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, username, avatar_url')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Combine the data
+      const commentsWithProfiles = commentsData?.map(comment => {
+        const profile = profilesData?.find(p => p.id === comment.user_id) || {
+          full_name: 'Unknown User',
+          username: 'unknown',
+          avatar_url: null
+        };
+        
+        return {
+          ...comment,
+          profiles: profile
+        };
+      }) || [];
+
+      setComments(commentsWithProfiles);
     } catch (error) {
       console.error('Error fetching comments:', error);
     }
@@ -336,7 +406,21 @@ const Social: React.FC = () => {
   if (loading && posts.length === 0) {
     return (
       <div className="container max-w-2xl mx-auto p-4">
-        <div className="text-center">Loading social feed...</div>
+        <Card className="glass-card">
+          <CardContent className="text-center py-12">
+            <div className="animate-pulse space-y-6">
+              <div className="space-y-3">
+                <div className="h-4 bg-muted rounded w-3/4 mx-auto"></div>
+                <div className="h-4 bg-muted rounded w-1/2 mx-auto"></div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-32 bg-muted rounded"></div>
+                <div className="h-4 bg-muted rounded w-1/4"></div>
+              </div>
+            </div>
+            <p className="text-muted-foreground mt-4">Loading social feed...</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -631,12 +715,21 @@ const Social: React.FC = () => {
           </Card>
         ))}
         
-        {posts.length === 0 && (
+        {posts.length === 0 && !loading && (
           <Card className="glass-card">
-            <CardContent className="text-center py-12">
-              <p className="text-muted-foreground">
-                No posts yet. Be the first to share something with the community!
-              </p>
+            <CardContent className="text-center py-12 space-y-4">
+              <div className="w-16 h-16 bg-gradient-primary rounded-full mx-auto opacity-20 flex items-center justify-center">
+                <Heart className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold">Welcome to the Community!</h3>
+                <p className="text-muted-foreground">
+                  No posts yet. Be the first to share something inspiring with the community!
+                </p>
+              </div>
+              <Button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="bg-gradient-primary">
+                Create Your First Post
+              </Button>
             </CardContent>
           </Card>
         )}

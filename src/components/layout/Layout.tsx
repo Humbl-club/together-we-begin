@@ -22,10 +22,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     );
   }
 
-  // Temporarily disabled login requirement for testing
-  // if (!user) {
-  //   return <Navigate to="/auth" replace />;
-  // }
+  // All security disabled for testing - no authentication required
 
   return (
     <div className="min-h-screen pb-20 md:pb-0 md:pl-24">

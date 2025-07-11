@@ -16,51 +16,38 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Mock user for testing - bypass all authentication
+  const mockUser = {
+    id: 'test-user-id',
+    email: 'test@example.com',
+    aud: 'authenticated',
+    app_metadata: {},
+    user_metadata: { full_name: 'Test User', username: 'testuser' },
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    email_confirmed_at: new Date().toISOString(),
+    phone: null,
+    confirmed_at: new Date().toISOString(),
+    last_sign_in_at: new Date().toISOString(),
+    role: 'authenticated',
+    identities: []
+  } as User;
 
-  useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Check admin status when user logs in
-        if (session?.user) {
-          setTimeout(async () => {
-            try {
-              const { data: roles } = await supabase
-                .from('user_roles')
-                .select('role')
-                .eq('user_id', session.user.id);
-              
-              setIsAdmin(roles?.some(r => r.role === 'admin') || false);
-            } catch (error) {
-              console.error('Failed to check admin status:', error);
-              setIsAdmin(false);
-            }
-          }, 0);
-        } else {
-          setIsAdmin(false);
-        }
-        
-        setLoading(false);
-      }
-    );
+  const mockSession = {
+    access_token: 'mock-access-token',
+    refresh_token: 'mock-refresh-token',
+    expires_in: 3600,
+    expires_at: Date.now() + 3600000,
+    token_type: 'bearer',
+    user: mockUser
+  } as Session;
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+  const [user] = useState<User | null>(mockUser);
+  const [session] = useState<Session | null>(mockSession);
+  const [loading] = useState(false);
+  const [isAdmin] = useState(true); // Make mock user admin for full access
 
-    return () => subscription.unsubscribe();
-  }, []);
+  // Remove all auth listeners and session checks for testing
 
   const signUp = async (email: string, password: string, userData: any) => {
     const redirectUrl = `${window.location.origin}/`;

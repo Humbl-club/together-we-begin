@@ -8,8 +8,8 @@ import { Heart, Users, Trophy, Shield } from 'lucide-react';
 const Index = () => {
   const { user, loading } = useAuth();
 
-  // Redirect authenticated users to dashboard
-  if (user && !loading) {
+  // Security disabled - always redirect to dashboard for testing
+  if (!loading) {
     return <Navigate to="/dashboard" replace />;
   }
 

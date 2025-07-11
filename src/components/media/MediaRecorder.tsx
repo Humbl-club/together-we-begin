@@ -40,7 +40,7 @@ export const MediaRecorder: React.FC<MediaRecorderProps> = ({
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
 
-      const mediaRecorder = new MediaRecorder(stream, {
+      const mediaRecorder = new window.MediaRecorder(stream, {
         mimeType: type === 'video' 
           ? 'video/webm;codecs=vp9,opus' 
           : 'audio/webm;codecs=opus'

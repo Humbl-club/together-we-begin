@@ -99,7 +99,7 @@ const Social: React.FC = () => {
         .select(`
           *,
           profiles (full_name, username, avatar_url),
-          post_likes (user_id)
+          post_likes!fk_post_likes_post_id (user_id)
         `)
         .eq('is_story', false)
         .eq('status', 'active')

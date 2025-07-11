@@ -42,7 +42,7 @@ export const Navigation: React.FC = () => {
         </div>
 
         {/* Navigation Items */}
-        <div className="flex justify-between px-4 md:flex-col md:space-y-3 md:flex-1 md:px-0">
+        <div className="flex justify-evenly md:flex-col md:space-y-3 md:flex-1">
           {navItems.map(({ href, icon: Icon, label }) => (
             <Link
               key={href}

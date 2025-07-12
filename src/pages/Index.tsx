@@ -1,13 +1,12 @@
+
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Activity, Users, Target, Shield, ArrowRight } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Heart, Users, Trophy, Shield } from 'lucide-react';
 
 const Index = () => {
   const { user, loading } = useAuth();
-  const isMobile = useIsMobile();
 
   // Security disabled - always redirect to dashboard for testing
   if (!loading) {
@@ -16,74 +15,71 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-editorial-hero">
-        <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-editorial-hero">
+    <div className="min-h-screen">
       {/* Hero Section */}
       <div className="relative min-h-screen flex items-center justify-center px-4">
-        <div className="absolute inset-0 bg-gradient-to-br from-editorial-cream/80 via-editorial-sage/60 to-editorial-blush/70"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-purple-500/20 to-pink-500/20"></div>
         
-        <div className={`relative z-10 text-center ${isMobile ? 'px-4' : ''} max-w-5xl mx-auto`}>
-          <div className={`${isMobile ? 'mb-8' : 'mb-12'}`}>
-            <div className={`${isMobile ? 'w-12 h-12 mb-6' : 'w-16 h-16 mb-8'} mx-auto bg-editorial-charcoal rounded-xl flex items-center justify-center shadow-lg`}>
-              <span className={`text-white font-light ${isMobile ? 'text-xl' : 'text-2xl'} tracking-tight`}>H</span>
+        <div className="relative z-10 text-center max-w-4xl mx-auto">
+          <div className="mb-8">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-primary to-purple-500 rounded-3xl flex items-center justify-center shadow-2xl">
+              <span className="text-white font-bold text-4xl">H</span>
             </div>
-            <h1 className={`${isMobile ? 'text-3xl' : 'text-4xl md:text-6xl lg:text-7xl'} editorial-heading mb-6 text-editorial-charcoal`}>
-              HUMBL
-              <span className={`block ${isMobile ? 'text-2xl' : 'text-3xl md:text-5xl lg:text-6xl'} mt-2 text-muted-foreground`}>Girls Club</span>
+            <h1 className="text-5xl md:text-7xl font-bold gradient-text mb-6">
+              HUMBL Girls Club
             </h1>
-            <p className={`${isMobile ? 'text-base' : 'text-lg md:text-xl'} text-muted-foreground ${isMobile ? 'mb-8' : 'mb-10'} max-w-2xl mx-auto font-light leading-relaxed`}>
-              An exclusive wellness community for women seeking connection, growth, and inspiration in an elegant, supportive environment.
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              A safe, empowering space for women to connect, grow, and inspire each other. 
+              Join our exclusive community today.
             </p>
           </div>
 
-          <div className={`flex flex-col ${isMobile ? 'gap-3' : 'sm:flex-row gap-4'} justify-center ${isMobile ? 'mb-16' : 'mb-20'}`}>
-            <Button asChild size={isMobile ? "default" : "lg"} className={`bg-editorial-charcoal hover:bg-editorial-navy text-white ${isMobile ? 'text-sm px-6 py-3' : 'text-base px-8 py-6'} rounded-lg font-normal`}>
-              <Link to="/auth">
-                Join Our Community
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-lg px-8 py-6 rounded-2xl">
+              <Link to="/auth">Join the Community</Link>
             </Button>
-            <Button asChild variant="outline" size={isMobile ? "default" : "lg"} className={`${isMobile ? 'text-sm px-6 py-3' : 'text-base px-8 py-6'} rounded-lg font-normal border-editorial-charcoal text-editorial-charcoal hover:bg-editorial-charcoal hover:text-white`}>
-              <Link to="/auth">Member Sign In</Link>
+            <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 rounded-2xl glass-button">
+              <Link to="/auth">Sign In</Link>
             </Button>
           </div>
 
           {/* Features Grid */}
-          <div className={`grid ${isMobile ? 'grid-cols-1 gap-6 mt-12' : 'md:grid-cols-2 lg:grid-cols-4 gap-8 mt-20'}`}>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-20">
             {[
               {
-                icon: Shield,
-                title: 'Curated Community',
-                description: 'Verified women-only space with thoughtful moderation and privacy protection'
+                icon: Heart,
+                title: 'Safe Space',
+                description: 'Women-only community with strict verification and moderation'
               },
               {
                 icon: Users,
-                title: 'Meaningful Connections',
-                description: 'Build authentic relationships with inspiring women who share your values'
+                title: 'Connect',
+                description: 'Build meaningful friendships with like-minded women'
               },
               {
-                icon: Target,
-                title: 'Wellness Journey',
-                description: 'Engage in sophisticated challenges that elevate your mind, body, and spirit'
+                icon: Trophy,
+                title: 'Challenges',
+                description: 'Fun wellness and fitness challenges with rewards'
               },
               {
-                icon: Activity,
-                title: 'Personal Growth',
-                description: 'Access exclusive content, events, and experiences designed for your development'
+                icon: Shield,
+                title: 'Privacy First',
+                description: 'Your data and conversations are protected and secure'
               }
             ].map(({ icon: Icon, title, description }, index) => (
-              <div key={index} className={`editorial-card text-left ${isMobile ? 'p-4' : 'p-6'} rounded-xl hover:shadow-lg transition-all duration-300`}>
-                <div className={`${isMobile ? 'w-8 h-8 mb-3' : 'w-10 h-10 mb-4'} bg-editorial-sage rounded-lg flex items-center justify-center`}>
-                  <Icon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} text-editorial-charcoal`} />
+              <div key={index} className="floating-card text-center">
+                <div className="w-12 h-12 mx-auto mb-4 bg-gradient-to-br from-primary to-purple-500 rounded-2xl flex items-center justify-center">
+                  <Icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-medium ${isMobile ? 'mb-2' : 'mb-3'} text-foreground`}>{title}</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground leading-relaxed font-light`}>{description}</p>
+                <h3 className="text-lg font-semibold mb-2">{title}</h3>
+                <p className="text-sm text-muted-foreground">{description}</p>
               </div>
             ))}
           </div>

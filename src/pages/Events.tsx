@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -54,7 +53,6 @@ const Events: React.FC = () => {
   });
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     // Temporarily load data even without user for testing
@@ -312,11 +310,11 @@ const Events: React.FC = () => {
   });
 
   return (
-    <div className={`container max-w-6xl mx-auto ${isMobile ? 'p-4' : 'p-6'} space-y-6`}>
-      <div className={`flex items-center ${isMobile ? 'flex-col space-y-4 text-center' : 'justify-between'}`}>
+    <div className="container max-w-6xl mx-auto p-4 space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold gradient-text`}>Events</h1>
-          <p className={`text-muted-foreground ${isMobile ? 'text-sm' : ''}`}>Discover and join exclusive community events</p>
+          <h1 className="text-3xl font-bold gradient-text">Events</h1>
+          <p className="text-muted-foreground">Discover and join exclusive community events</p>
         </div>
         
         {isAdmin && (
@@ -326,7 +324,7 @@ const Events: React.FC = () => {
                 Create Event
               </Button>
             </DialogTrigger>
-            <DialogContent className={`${isMobile ? 'max-w-[95vw] p-4' : 'max-w-md'}`}>
+            <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>Create New Event</DialogTitle>
               </DialogHeader>
@@ -362,7 +360,7 @@ const Events: React.FC = () => {
                   />
                 </div>
                 
-                <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="start_time">Start Time</Label>
                     <Input
@@ -384,7 +382,7 @@ const Events: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="price_cents">Price (cents)</Label>
                     <Input
@@ -446,7 +444,7 @@ const Events: React.FC = () => {
         </TabsList>
         
         <TabsContent value="upcoming" className="space-y-6">
-          <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'}`}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {upcomingEvents.map((event) => (
               <Card key={event.id} className="glass-card hover:shadow-lg transition-shadow">
                 <CardHeader>

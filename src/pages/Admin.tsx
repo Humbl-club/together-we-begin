@@ -129,23 +129,14 @@ const Admin: React.FC = () => {
           id,
           content,
           created_at,
-          user_id
+          user_id,
+          profiles (full_name, username)
         `)
         .eq('status', 'flagged')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
-      // For now, set mock profile data for flagged posts
-      const postsWithMockProfiles = (data || []).map(post => ({
-        ...post,
-        profiles: {
-          full_name: 'Sophia Williams',
-          username: 'sophiaw'
-        }
-      }));
-      
-      setFlaggedPosts(postsWithMockProfiles);
+      setFlaggedPosts(data || []);
     } catch (error) {
       console.error('Error fetching flagged posts:', error);
     }

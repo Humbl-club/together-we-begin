@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/components/auth/AuthProvider";
-import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Layout } from "@/components/layout/Layout";
 import NotificationService from "@/services/notificationService";
 import Auth from "./pages/Auth";
@@ -66,20 +65,18 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <ErrorBoundary>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-                <Route path="/social" element={<Layout><Social /></Layout>} />
-                <Route path="/events" element={<Layout><Events /></Layout>} />
-                <Route path="/challenges" element={<Layout><Challenges /></Layout>} />
-                <Route path="/profile" element={<Layout><Profile /></Layout>} />
-                <Route path="/admin" element={<Layout><Admin /></Layout>} />
-                <Route path="/settings" element={<Layout><div className="text-center py-20"><h1 className="text-2xl font-bold gradient-text">Settings Coming Soon</h1></div></Layout>} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </ErrorBoundary>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
+              <Route path="/social" element={<Layout><Social /></Layout>} />
+              <Route path="/events" element={<Layout><Events /></Layout>} />
+              <Route path="/challenges" element={<Layout><Challenges /></Layout>} />
+              <Route path="/profile" element={<Layout><Profile /></Layout>} />
+              <Route path="/admin" element={<Layout><Admin /></Layout>} />
+              <Route path="/settings" element={<Layout><div className="text-center py-20"><h1 className="text-2xl font-bold gradient-text">Settings Coming Soon</h1></div></Layout>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

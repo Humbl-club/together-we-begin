@@ -61,21 +61,11 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				},
-				// Editorial Brand Colors
-				editorial: {
-					charcoal: 'hsl(var(--editorial-charcoal))',
-					'warm-grey': 'hsl(var(--editorial-warm-grey))',
-					cream: 'hsl(var(--editorial-cream))',
-					sage: 'hsl(var(--editorial-sage))',
-					blush: 'hsl(var(--editorial-blush))',
-					navy: 'hsl(var(--editorial-navy))'
 				}
 			},
 			backgroundImage: {
-				'editorial-gradient': 'linear-gradient(135deg, hsl(var(--editorial-cream)), hsl(var(--editorial-warm-grey)))',
-				'editorial-hero': 'linear-gradient(135deg, hsl(var(--editorial-cream) / 0.9), hsl(var(--editorial-sage) / 0.7))',
-				'editorial-subtle': 'linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)))',
+				'gradient-primary': 'linear-gradient(135deg, hsl(var(--humbl-pink)), hsl(var(--humbl-purple)))',
+				'gradient-subtle': 'linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)))',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

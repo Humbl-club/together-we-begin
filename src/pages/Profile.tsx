@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,7 +58,6 @@ const Profile: React.FC = () => {
   const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (user) {
@@ -220,18 +218,7 @@ const Profile: React.FC = () => {
   if (loading && !profile) {
     return (
       <div className="container max-w-4xl mx-auto p-4">
-        <Card className="glass-card">
-          <CardContent className="text-center py-12">
-            <div className="animate-pulse space-y-4">
-              <div className="w-24 h-24 bg-muted rounded-full mx-auto"></div>
-              <div className="space-y-2">
-                <div className="h-6 bg-muted rounded w-48 mx-auto"></div>
-                <div className="h-4 bg-muted rounded w-32 mx-auto"></div>
-              </div>
-            </div>
-            <p className="text-muted-foreground mt-4">Loading profile...</p>
-          </CardContent>
-        </Card>
+        <div className="text-center">Loading profile...</div>
       </div>
     );
   }
@@ -240,15 +227,8 @@ const Profile: React.FC = () => {
     return (
       <div className="container max-w-4xl mx-auto p-4">
         <Card className="glass-card">
-          <CardContent className="text-center py-12 space-y-4">
-            <div className="w-16 h-16 bg-muted rounded-full mx-auto opacity-50"></div>
-            <div>
-              <h3 className="text-lg font-semibold">Profile not found</h3>
-              <p className="text-muted-foreground">We couldn't load your profile. Please try refreshing the page.</p>
-            </div>
-            <Button onClick={() => window.location.reload()} variant="outline">
-              Refresh Page
-            </Button>
+          <CardContent className="text-center py-12">
+            <p className="text-muted-foreground">Profile not found</p>
           </CardContent>
         </Card>
       </div>
@@ -256,7 +236,7 @@ const Profile: React.FC = () => {
   }
 
   return (
-    <div className={`container max-w-4xl mx-auto ${isMobile ? 'p-4' : 'p-6'} space-y-6`}>
+    <div className="container max-w-4xl mx-auto p-4 space-y-6">
       <Card className="glass-card">
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -294,9 +274,9 @@ const Profile: React.FC = () => {
         </CardHeader>
         
         <CardContent className="space-y-6">
-          <div className={`flex ${isMobile ? 'flex-col items-center' : 'items-start'} gap-6`}>
+          <div className="flex items-start gap-6">
             <div className="relative">
-              <Avatar className={`${isMobile ? 'w-20 h-20' : 'w-24 h-24'}`}>
+              <Avatar className="w-24 h-24">
                 <AvatarImage 
                   src={selectedAvatar ? URL.createObjectURL(selectedAvatar) : profile.avatar_url || undefined} 
                 />
@@ -364,7 +344,7 @@ const Profile: React.FC = () => {
                 </>
               ) : (
                 <div className="space-y-4">
-                  <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-4`}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="full_name">Full Name</Label>
                       <Input
@@ -397,7 +377,7 @@ const Profile: React.FC = () => {
                     />
                   </div>
                   
-                  <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-4`}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="location">Location</Label>
                       <Input
@@ -424,7 +404,7 @@ const Profile: React.FC = () => {
           </div>
           
           {!editing && (
-            <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-3 gap-4'}`}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-2">
@@ -467,12 +447,12 @@ const Profile: React.FC = () => {
 
       {!editing && (
         <Tabs defaultValue="activity" className="w-full">
-          <TabsList className={`grid w-full ${isMobile ? 'grid-cols-2' : 'grid-cols-5'}`}>
-            <TabsTrigger value="activity" className={isMobile ? 'text-xs' : ''}>Activity</TabsTrigger>
-            {!isMobile && <TabsTrigger value="achievements">Achievements</TabsTrigger>}
-            <TabsTrigger value="verification" className={isMobile ? 'text-xs' : ''}>Verification</TabsTrigger>
-            {!isMobile && <TabsTrigger value="privacy">Privacy</TabsTrigger>}
-            {!isMobile && <TabsTrigger value="messages">Messages</TabsTrigger>}
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="activity">Activity</TabsTrigger>
+            <TabsTrigger value="achievements">Achievements</TabsTrigger>
+            <TabsTrigger value="verification">Verification</TabsTrigger>
+            <TabsTrigger value="privacy">Privacy</TabsTrigger>
+            <TabsTrigger value="messages">Messages</TabsTrigger>
           </TabsList>
           
           <TabsContent value="activity" className="space-y-4">

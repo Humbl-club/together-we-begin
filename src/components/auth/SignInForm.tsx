@@ -51,13 +51,13 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onSwitchToSignUp }) => {
   };
 
   return (
-    <div className="editorial-card max-w-md mx-auto p-8">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl editorial-heading mb-3 text-foreground">
+    <div className="floating-card max-w-md mx-auto">
+      <div className="text-center mb-6">
+        <h1 className="text-3xl font-bold gradient-text mb-2">
           Welcome Back
         </h1>
-        <p className="text-muted-foreground font-light">
-          Sign in to your account
+        <p className="text-muted-foreground">
+          Sign in to your HUMBL account
         </p>
       </div>
 

@@ -16,13 +16,13 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Mock user for testing - bypass all authentication
+  // Mock user with valid UUID for testing
   const mockUser = {
-    id: 'test-user-id',
+    id: '550e8400-e29b-41d4-a716-446655440000', // Valid UUID
     email: 'test@example.com',
     aud: 'authenticated',
     app_metadata: {},
-    user_metadata: { full_name: 'Test User', username: 'testuser' },
+    user_metadata: { full_name: 'Sophia Williams', username: 'sophiaw' },
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     email_confirmed_at: new Date().toISOString(),

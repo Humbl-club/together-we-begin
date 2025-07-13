@@ -43,7 +43,7 @@ export const Navigation: React.FC = () => {
               <Link
                 key={href}
                 to={href}
-                className={`flex flex-col items-center justify-center touch-target mobile-nav-spacing rounded-xl transition-all duration-200 ${
+                className={`flex flex-col items-center justify-center min-h-[48px] min-w-[48px] p-2 rounded-xl transition-all duration-200 touch-manipulation ${
                   isActive(href)
                     ? 'bg-primary text-primary-foreground shadow-sm scale-105'
                     : 'text-muted-foreground hover:text-foreground hover:bg-accent/50 active:scale-95'
@@ -62,10 +62,10 @@ export const Navigation: React.FC = () => {
             <div className="border-t border-border/20 p-2">
               <Link
                 to="/admin"
-                className={`flex items-center justify-center touch-target p-2 rounded-xl transition-all duration-200 ${
+                className={`flex items-center justify-center min-h-[44px] p-2 rounded-xl transition-all duration-200 touch-manipulation ${
                   isActive('/admin')
                     ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/50 active:scale-95'
                 }`}
               >
                 <Shield className="w-4 h-4 mr-2" />

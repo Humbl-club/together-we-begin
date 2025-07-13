@@ -425,4 +425,30 @@
   .p-fluid-2 { padding: clamp(0.5rem, 2vw, 0.75rem); }
   .p-fluid-4 { padding: clamp(1rem, 4vw, 1.5rem); }
   .p-fluid-6 { padding: clamp(1.5rem, 6vw, 2rem); }
+  
+  /* Haptic feedback simulation */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Safe area handling for mobile navigation */
+  .mobile-nav-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Improved mobile button states */
+  .btn-mobile-optimized {
+    min-height: 48px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 0.75rem;
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .btn-mobile-optimized:active {
+    transform: scale(0.97);
+  }
 }

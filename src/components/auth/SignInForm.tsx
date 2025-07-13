@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from './AuthProvider';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Loader2 } from 'lucide-react';
 
 interface SignInFormProps {
@@ -17,6 +18,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onSwitchToSignUp }) => {
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,19 +53,19 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onSwitchToSignUp }) => {
   };
 
   return (
-    <div className="editorial-card max-w-md mx-auto p-8">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl editorial-heading mb-3 text-foreground">
+    <div className={`editorial-card max-w-md mx-auto ${isMobile ? 'p-6' : 'p-8'}`}>
+      <div className={`text-center ${isMobile ? 'mb-6' : 'mb-8'}`}>
+        <h1 className={`${isMobile ? 'text-xl' : 'text-2xl'} editorial-heading mb-3 text-foreground`}>
           Welcome Back
         </h1>
-        <p className="text-muted-foreground font-light">
+        <p className={`text-muted-foreground font-light ${isMobile ? 'text-sm' : ''}`}>
           Sign in to your account
         </p>
       </div>
 
       <form onSubmit={handleSignIn} className="space-y-4">
         <div>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email" className={isMobile ? 'text-sm font-medium' : ''}>Email</Label>
           <Input
             id="email"
             type="email"
@@ -71,12 +73,13 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onSwitchToSignUp }) => {
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={loading}
-            className="mt-1"
+            className={`mt-1 ${isMobile ? 'min-h-[48px] text-base' : ''}`}
+            placeholder="Enter your email"
           />
         </div>
 
         <div>
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password" className={isMobile ? 'text-sm font-medium' : ''}>Password</Label>
           <Input
             id="password"
             type="password"
@@ -84,14 +87,15 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onSwitchToSignUp }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
             disabled={loading}
-            className="mt-1"
+            className={`mt-1 ${isMobile ? 'min-h-[48px] text-base' : ''}`}
+            placeholder="Enter your password"
           />
         </div>
 
         <Button 
           type="submit" 
           disabled={loading}
-          className="w-full bg-primary hover:bg-primary/90"
+          className={`w-full bg-primary hover:bg-primary/90 transition-all ${isMobile ? 'min-h-[48px] text-base' : ''}`}
         >
           {loading ? (
             <>
@@ -104,13 +108,13 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onSwitchToSignUp }) => {
         </Button>
       </form>
 
-      <div className="mt-6 text-center">
-        <p className="text-sm text-muted-foreground">
+      <div className={`${isMobile ? 'mt-4' : 'mt-6'} text-center`}>
+        <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
           Don't have an account?{' '}
           <button
             type="button"
             onClick={onSwitchToSignUp}
-            className="text-primary hover:text-primary/80 font-medium"
+            className={`text-primary hover:text-primary/80 font-medium min-h-[44px] ${isMobile ? 'text-xs' : ''}`}
           >
             Sign up with invite code
           </button>

@@ -41,27 +41,29 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
 
   return (
     <div className="relative">
-      <div className="cluster justify-between">
-        <div className="cluster">
-          <Avatar className={`w-12 h-12 md:w-16 md:h-16 border-2 border-primary/20 ring-2 ring-primary/10`}>
+      <div className={`${isMobile ? 'flex flex-col space-y-4 text-center' : 'cluster justify-between'}`}>
+        <div className={`${isMobile ? 'flex flex-col items-center space-y-3' : 'cluster'}`}>
+          <Avatar className={`${isMobile ? 'w-16 h-16' : 'w-12 h-12 md:w-16 md:h-16'} border-2 border-primary/20 ring-2 ring-primary/10`}>
             <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
             <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-sm md:text-lg font-medium">
               {initials}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <h1 className="fluid-heading">
+          <div className={isMobile ? 'text-center' : ''}>
+            <h1 className={`${isMobile ? 'text-xl' : 'fluid-heading'} font-medium`}>
               {greeting}, {firstName}
             </h1>
-            <p className="fluid-body text-muted-foreground">
+            <p className={`${isMobile ? 'text-sm' : 'fluid-body'} text-muted-foreground`}>
               Your wellness journey continues
             </p>
           </div>
         </div>
         
-        <Button className="modern-button bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20">
+        <Button 
+          className={`${isMobile ? 'w-full min-h-[48px]' : 'modern-button'} bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all`}
+        >
           <Plus className="w-4 h-4 mr-2" />
-          <span>Share Update</span>
+          <span className={isMobile ? 'text-base' : ''}>Share Update</span>
         </Button>
       </div>
     </div>

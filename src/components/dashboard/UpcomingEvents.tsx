@@ -6,21 +6,21 @@ import { mockEvents } from '@/constants/dashboardData';
 
 const UpcomingEvents: React.FC = () => {
   return (
-    <Card className="editorial-card">
+    <Card className="border-0 bg-card/40 backdrop-blur-sm">
       <CardHeader className="pb-3">
-        <div className="cluster justify-between">
-          <CardTitle className="fluid-subheading font-medium">This Week</CardTitle>
-          <Button variant="ghost" size="sm" className="text-primary modern-button focus-ring">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg font-medium">This Week</CardTitle>
+          <Button variant="ghost" size="sm" className="text-primary">
             View All
             <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="flow-content">
+      <CardContent className="space-y-3">
         {mockEvents.map((event, index) => (
           <div 
             key={index}
-            className={`cluster p-3 rounded-lg transition-all duration-200 hover-scale ${
+            className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
               event.isActive 
                 ? 'bg-gradient-to-r from-primary/5 to-transparent' 
                 : ''

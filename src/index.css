@@ -112,139 +112,175 @@
 }
 
 @layer components {
-  /* Editorial Magazine Cards */
+  /* ===== MODERN CSS APPROACH ===== */
+  
+  /* Editorial Magazine Cards with Container Queries */
   .editorial-card {
     @apply bg-card/80 dark:bg-card/40 backdrop-blur-md border border-border/50 shadow-sm hover:shadow-lg transition-all duration-300;
+    container-type: inline-size;
   }
   
   /* Sophisticated Glass Effects */
   .glass-card {
     @apply bg-card/60 dark:bg-card/40 backdrop-blur-xl border border-border/30 shadow-xl;
+    container-type: inline-size;
   }
   
-  .glass-button {
-    @apply bg-card/20 dark:bg-card/10 backdrop-blur-md border border-border/30 hover:bg-card/30 dark:hover:bg-card/20 transition-all duration-300;
-  }
-  
-  /* Editorial Typography */
-  .editorial-heading {
-    @apply font-light tracking-tight text-foreground;
-  }
-  
-  .editorial-subheading {
-    @apply font-normal text-muted-foreground tracking-wide;
-  }
-  
-  /* Refined Cards */
-  .floating-card {
-    @apply editorial-card rounded-xl p-6 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl;
-  }
-
-  /* ===== RESPONSIVE DESIGN UTILITIES ===== */
-  
-  /* Mobile-first responsive containers */
-  .responsive-container {
-    @apply w-full px-4 sm:px-6 lg:px-8 xl:px-12;
-  }
-  
+  /* Modern Responsive Grid using CSS Grid auto-fit */
   .responsive-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
   }
   
-  /* Mobile-optimized cards */
-  .mobile-card {
-    @apply editorial-card rounded-lg mobile:p-4 sm:p-6 mobile:mx-2 sm:mx-0;
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+    gap: clamp(0.75rem, 2vw, 1rem);
   }
   
-  /* Responsive text scaling */
-  .heading-responsive {
-    @apply text-xl mobile:text-lg sm:text-2xl lg:text-3xl xl:text-4xl font-light tracking-tight;
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    gap: clamp(1rem, 3vw, 2rem);
   }
   
-  .subheading-responsive {
-    @apply text-sm mobile:text-xs sm:text-base lg:text-lg text-muted-foreground;
+  /* Container Query Responsive Card */
+  .adaptive-card {
+    @apply editorial-card;
+    padding: clamp(1rem, 3cqw, 2rem);
   }
   
-  .body-responsive {
-    @apply text-base mobile:text-sm sm:text-base lg:text-lg;
+  /* Container query breakpoints for cards */
+  @container (min-width: 200px) {
+    .adaptive-card {
+      @apply rounded-lg;
+    }
   }
   
-  /* Mobile navigation utilities */
-  .mobile-nav-safe {
-    @apply pb-safe-bottom mobile:pb-20 sm:pb-0;
+  @container (min-width: 400px) {
+    .adaptive-card {
+      @apply rounded-xl;
+      padding: clamp(1.5rem, 4cqw, 2.5rem);
+    }
   }
   
-  .mobile-nav-spacing {
-    @apply mobile:px-2 sm:px-4 mobile:py-2 sm:py-3;
+  /* Fluid Typography System */
+  .fluid-heading {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    line-height: 1.2;
+    font-weight: 300;
+    letter-spacing: -0.02em;
   }
   
-  /* Responsive button sizes */
-  .btn-responsive {
-    @apply mobile:text-sm mobile:px-3 mobile:py-2 sm:text-base sm:px-4 sm:py-2 lg:px-6 lg:py-3;
+  .fluid-subheading {
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    line-height: 1.4;
+    font-weight: 400;
   }
   
-  /* Touch-friendly interactive elements */
-  .touch-target {
-    @apply mobile:min-h-[44px] mobile:min-w-[44px] sm:min-h-[40px] sm:min-w-[40px];
+  .fluid-body {
+    font-size: clamp(0.875rem, 1.5vw, 1.125rem);
+    line-height: 1.6;
   }
   
-  /* Responsive spacing utilities */
-  .spacing-responsive-sm {
-    @apply mobile:space-y-2 sm:space-y-3 lg:space-y-4;
+  /* Modern Navigation with Container Queries */
+  .adaptive-nav {
+    container-type: inline-size;
   }
   
-  .spacing-responsive-md {
-    @apply mobile:space-y-3 sm:space-y-4 lg:space-y-6;
+  @container (max-width: 768px) {
+    .adaptive-nav {
+      /* Mobile nav styles */
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+    }
   }
   
-  .spacing-responsive-lg {
-    @apply mobile:space-y-4 sm:space-y-6 lg:space-y-8;
+  @container (min-width: 769px) {
+    .adaptive-nav {
+      /* Desktop nav styles */
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 5rem;
+    }
   }
   
-  /* Responsive avatar sizes */
-  .avatar-responsive-sm {
-    @apply mobile:w-8 mobile:h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12;
+  /* Intrinsic Web Design - Let content determine layout */
+  .intrinsic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    align-items: start;
   }
   
-  .avatar-responsive-md {
-    @apply mobile:w-12 mobile:h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20;
+  /* Modern aspect ratios */
+  .aspect-card {
+    aspect-ratio: 16 / 10;
+    container-type: inline-size;
   }
   
-  .avatar-responsive-lg {
-    @apply mobile:w-16 mobile:h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28;
+  .aspect-square {
+    aspect-ratio: 1;
+    container-type: inline-size;
   }
   
-  /* Mobile-first flex utilities */
-  .flex-responsive {
-    @apply flex mobile:flex-col sm:flex-row mobile:items-center mobile:space-y-2 sm:space-y-0 sm:space-x-4;
+  /* Logical properties for better i18n support */
+  .flow-content > * + * {
+    margin-block-start: clamp(1rem, 3vw, 2rem);
   }
   
-  .flex-responsive-reverse {
-    @apply flex mobile:flex-col-reverse sm:flex-row mobile:items-center mobile:space-y-reverse mobile:space-y-2 sm:space-y-0 sm:space-x-4;
+  .cluster {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(0.5rem, 2vw, 1rem);
+    align-items: center;
   }
   
-  /* Responsive grid layouts */
-  .grid-responsive-cards {
-    @apply grid mobile:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mobile:gap-3 sm:gap-4 lg:gap-6;
+  .cluster.justify-between {
+    justify-content: space-between;
   }
   
-  .grid-responsive-stats {
-    @apply grid mobile:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 mobile:gap-2 sm:gap-4;
+  /* Modern button with proper touch targets */
+  .modern-button {
+    @apply inline-flex items-center justify-center;
+    min-block-size: 44px; /* iOS minimum touch target */
+    min-inline-size: 44px;
+    padding-inline: clamp(1rem, 3vw, 2rem);
+    padding-block: clamp(0.5rem, 1.5vw, 0.75rem);
+    border-radius: clamp(0.5rem, 1vw, 0.75rem);
+    font-size: clamp(0.875rem, 2vw, 1rem);
+    transition: all 0.2s ease;
   }
   
-  /* Mobile-optimized forms */
-  .form-responsive {
-    @apply space-y-4 mobile:space-y-3;
+  /* Accessible focus states */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
   }
   
-  .input-responsive {
-    @apply mobile:text-base mobile:py-3 sm:text-sm sm:py-2;
+  /* Progressive enhancement for motion */
+  @media (prefers-reduced-motion: no-preference) {
+    .smooth-entrance {
+      animation: fadeInUp 0.6s ease-out;
+    }
   }
   
-  /* Safe area aware layouts */
-  .safe-area-layout {
-    @apply mobile:pt-safe-top mobile:pb-safe-bottom mobile:pl-safe-left mobile:pr-safe-right;
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
+}
 
   /* Editorial Auth Container */
   .auth-container {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
-import { useViewport, useResponsiveValue } from '@/hooks/use-mobile';
+import { useViewport } from '@/hooks/use-mobile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,29 +59,7 @@ const Profile: React.FC = () => {
   const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
-  const { isMobile, isTablet } = useViewport();
-
-  // Responsive values
-  const containerPadding = useResponsiveValue({
-    mobile: 'p-4',
-    tablet: 'p-5', 
-    desktop: 'p-6',
-    default: 'p-6'
-  });
-
-  const cardSpacing = useResponsiveValue({
-    mobile: 'space-y-4',
-    tablet: 'space-y-5',
-    desktop: 'space-y-6', 
-    default: 'space-y-6'
-  });
-
-  const avatarSize = useResponsiveValue({
-    mobile: 'avatar-responsive-lg',
-    tablet: 'avatar-responsive-lg',
-    desktop: 'avatar-responsive-lg',
-    default: 'w-24 h-24'
-  });
+  const { isMobile } = useViewport();
 
   useEffect(() => {
     if (user) {
@@ -278,7 +256,7 @@ const Profile: React.FC = () => {
   }
 
   return (
-    <div className={`responsive-container max-w-4xl mx-auto ${containerPadding} ${cardSpacing}`}>
+    <div className="max-w-4xl mx-auto p-fluid-4 flow-content">
       <Card className="glass-card">
         <CardHeader>
           <div className="flex items-center justify-between">

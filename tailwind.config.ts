@@ -18,32 +18,51 @@ export default {
 			}
 		},
 		extend: {
-			// Enhanced responsive breakpoints for better mobile experience
+			// Modern responsive system
 			screens: {
 				'xs': '475px',
-				'sm': '640px',
+				'sm': '640px', 
 				'md': '768px',
 				'lg': '1024px',
 				'xl': '1280px',
-				'2xl': '1400px',
-				'3xl': '1600px',
-				// Mobile-first approach with max-width breakpoints
-				'mobile-sm': {'max': '374px'},
-				'mobile': {'max': '639px'},
-				'tablet': {'min': '640px', 'max': '1023px'},
-				'desktop': {'min': '1024px'},
+				'2xl': '1536px',
 			},
-			// Enhanced spacing for mobile optimization
+			// Container query support
+			supports: {
+				'container-queries': '@supports (container-type: inline-size)',
+			},
+			// Fluid typography using clamp()
+			fontSize: {
+				'fluid-xs': 'clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem)',
+				'fluid-sm': 'clamp(0.875rem, 0.8rem + 0.375vw, 1rem)',
+				'fluid-base': 'clamp(1rem, 0.9rem + 0.5vw, 1.125rem)',
+				'fluid-lg': 'clamp(1.125rem, 1rem + 0.625vw, 1.25rem)',
+				'fluid-xl': 'clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem)',
+				'fluid-2xl': 'clamp(1.5rem, 1.3rem + 1vw, 2rem)',
+				'fluid-3xl': 'clamp(1.875rem, 1.6rem + 1.375vw, 2.5rem)',
+				'fluid-4xl': 'clamp(2.25rem, 1.9rem + 1.75vw, 3rem)',
+			},
+			// Fluid spacing
 			spacing: {
-				'18': '4.5rem',
-				'88': '22rem',
-				'104': '26rem',
-				'112': '28rem',
-				'128': '32rem',
-				'safe-top': 'env(safe-area-inset-top)',
-				'safe-bottom': 'env(safe-area-inset-bottom)',
-				'safe-left': 'env(safe-area-inset-left)',
-				'safe-right': 'env(safe-area-inset-right)',
+				'fluid-1': 'clamp(0.25rem, 0.2rem + 0.25vw, 0.375rem)',
+				'fluid-2': 'clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem)',
+				'fluid-3': 'clamp(0.75rem, 0.6rem + 0.75vw, 1.125rem)',
+				'fluid-4': 'clamp(1rem, 0.8rem + 1vw, 1.5rem)',
+				'fluid-5': 'clamp(1.25rem, 1rem + 1.25vw, 1.875rem)',
+				'fluid-6': 'clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem)',
+				'fluid-8': 'clamp(2rem, 1.6rem + 2vw, 3rem)',
+				'fluid-10': 'clamp(2.5rem, 2rem + 2.5vw, 3.75rem)',
+				'fluid-12': 'clamp(3rem, 2.4rem + 3vw, 4.5rem)',
+			},
+			// Modern grid systems
+			gridTemplateColumns: {
+				'auto-fit-xs': 'repeat(auto-fit, minmax(200px, 1fr))',
+				'auto-fit-sm': 'repeat(auto-fit, minmax(250px, 1fr))',
+				'auto-fit-md': 'repeat(auto-fit, minmax(300px, 1fr))',
+				'auto-fit-lg': 'repeat(auto-fit, minmax(350px, 1fr))',
+				'auto-fill-xs': 'repeat(auto-fill, minmax(200px, 1fr))',
+				'auto-fill-sm': 'repeat(auto-fill, minmax(250px, 1fr))',
+				'auto-fill-md': 'repeat(auto-fill, minmax(300px, 1fr))',
 			},
 			colors: {
 				border: 'hsl(var(--border))',

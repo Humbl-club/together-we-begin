@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useViewport, useResponsiveValue } from '@/hooks/use-mobile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,7 +59,29 @@ const Profile: React.FC = () => {
   const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
-  const isMobile = useIsMobile();
+  const { isMobile, isTablet } = useViewport();
+
+  // Responsive values
+  const containerPadding = useResponsiveValue({
+    mobile: 'p-4',
+    tablet: 'p-5', 
+    desktop: 'p-6',
+    default: 'p-6'
+  });
+
+  const cardSpacing = useResponsiveValue({
+    mobile: 'space-y-4',
+    tablet: 'space-y-5',
+    desktop: 'space-y-6', 
+    default: 'space-y-6'
+  });
+
+  const avatarSize = useResponsiveValue({
+    mobile: 'avatar-responsive-lg',
+    tablet: 'avatar-responsive-lg',
+    desktop: 'avatar-responsive-lg',
+    default: 'w-24 h-24'
+  });
 
   useEffect(() => {
     if (user) {
@@ -219,17 +241,17 @@ const Profile: React.FC = () => {
 
   if (loading && !profile) {
     return (
-      <div className="container max-w-4xl mx-auto p-4">
+      <div className="responsive-container max-w-4xl mx-auto mobile:p-4 sm:p-6">
         <Card className="glass-card">
-          <CardContent className="text-center py-12">
-            <div className="animate-pulse space-y-4">
-              <div className="w-24 h-24 bg-muted rounded-full mx-auto"></div>
-              <div className="space-y-2">
-                <div className="h-6 bg-muted rounded w-48 mx-auto"></div>
-                <div className="h-4 bg-muted rounded w-32 mx-auto"></div>
+          <CardContent className="text-center mobile:py-8 sm:py-12">
+            <div className="animate-pulse spacing-responsive-md">
+              <div className="mobile:w-16 mobile:h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-muted rounded-full mx-auto"></div>
+              <div className="spacing-responsive-sm">
+                <div className="mobile:h-4 sm:h-5 lg:h-6 bg-muted rounded mobile:w-36 sm:w-48 mx-auto"></div>
+                <div className="mobile:h-3 sm:h-4 bg-muted rounded mobile:w-24 sm:w-32 mx-auto"></div>
               </div>
             </div>
-            <p className="text-muted-foreground mt-4">Loading profile...</p>
+            <p className="text-muted-foreground mt-4 mobile:text-sm sm:text-base">Loading profile...</p>
           </CardContent>
         </Card>
       </div>
@@ -238,15 +260,15 @@ const Profile: React.FC = () => {
 
   if (!profile) {
     return (
-      <div className="container max-w-4xl mx-auto p-4">
+      <div className="responsive-container max-w-4xl mx-auto mobile:p-4 sm:p-6">
         <Card className="glass-card">
-          <CardContent className="text-center py-12 space-y-4">
-            <div className="w-16 h-16 bg-muted rounded-full mx-auto opacity-50"></div>
+          <CardContent className="text-center mobile:py-8 sm:py-12 spacing-responsive-md">
+            <div className="mobile:w-12 mobile:h-12 sm:w-16 sm:h-16 bg-muted rounded-full mx-auto opacity-50"></div>
             <div>
-              <h3 className="text-lg font-semibold">Profile not found</h3>
-              <p className="text-muted-foreground">We couldn't load your profile. Please try refreshing the page.</p>
+              <h3 className="mobile:text-base sm:text-lg font-semibold">Profile not found</h3>
+              <p className="text-muted-foreground mobile:text-sm sm:text-base">We couldn't load your profile. Please try refreshing the page.</p>
             </div>
-            <Button onClick={() => window.location.reload()} variant="outline">
+            <Button onClick={() => window.location.reload()} variant="outline" className="btn-responsive">
               Refresh Page
             </Button>
           </CardContent>
@@ -256,7 +278,7 @@ const Profile: React.FC = () => {
   }
 
   return (
-    <div className={`container max-w-4xl mx-auto ${isMobile ? 'p-4' : 'p-6'} space-y-6`}>
+    <div className={`responsive-container max-w-4xl mx-auto ${containerPadding} ${cardSpacing}`}>
       <Card className="glass-card">
         <CardHeader>
           <div className="flex items-center justify-between">

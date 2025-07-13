@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo, useMemo, useCallback } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAdvancedMobileOptimization } from '@/hooks/useAdvancedMobileOptimization';
+import { useAdvancedQueryOptimization } from '@/hooks/useAdvancedQueryOptimization';
+import { MobileCard } from '@/components/advanced/CompoundMobileCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -36,7 +39,7 @@ interface Profile {
   available_loyalty_points: number;
 }
 
-const Events: React.FC = () => {
+const Events: React.FC = memo(() => {
   const [events, setEvents] = useState<Event[]>([]);
   const [userProfile, setUserProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -52,20 +55,58 @@ const Events: React.FC = () => {
     loyalty_points_price: 0,
     max_capacity: 50
   });
+  
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  
+  // Advanced optimizations
+  const { performanceMetrics, isMobileOptimized } = useAdvancedMobileOptimization();
+  const { fetchEventsOptimized, cacheUtils } = useAdvancedQueryOptimization();
 
+  // Optimized event fetching with advanced caching
+  const fetchEvents = useCallback(async () => {
+    const endMeasure = performanceMetrics.measureInteraction('fetch-events');
+    
+    try {
+      const eventsData = await fetchEventsOptimized(user?.id);
+      setEvents(eventsData || []);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load events",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+      endMeasure();
+    }
+  }, [user?.id, fetchEventsOptimized, performanceMetrics, toast]);
+
+  // Memoized event processing
+  const { upcomingEvents, ongoingEvents } = useMemo(() => {
+    const now = new Date();
+    return {
+      upcomingEvents: events.filter(e => new Date(e.start_time) > now),
+      ongoingEvents: events.filter(e => {
+        const start = new Date(e.start_time);
+        const end = e.end_time ? new Date(e.end_time) : null;
+        return start <= now && (!end || end >= now);
+      })
+    };
+  }, [events]);
+
+  // Effect for initialization
   useEffect(() => {
-    // Temporarily load data even without user for testing
     fetchEvents();
     if (user) {
       fetchUserProfile();
       subscribeToRealtime();
     }
-  }, [user]);
+  }, [user, fetchEvents]);
 
-  const subscribeToRealtime = () => {
+  const subscribeToRealtime = useCallback(() => {
     const channel = supabase
       .channel('events-updates')
       .on('postgres_changes', {
@@ -85,61 +126,26 @@ const Events: React.FC = () => {
       .subscribe();
 
     return () => supabase.removeChannel(channel);
-  };
+  }, [fetchEvents]);
 
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = useCallback(async () => {
+    if (!user) return;
+    
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('available_loyalty_points')
-        .eq('id', user!.id)
-        .single();
+        .eq('id', user.id)
+        .maybeSingle();
 
       if (error) throw error;
       setUserProfile(data);
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }
-  };
+  }, [user]);
 
-  const fetchEvents = async () => {
-    try {
-      const { data: eventsData, error: eventsError } = await supabase
-        .from('events')
-        .select('*')
-        .in('status', ['upcoming', 'ongoing'])
-        .order('start_time', { ascending: true });
-
-      if (eventsError) throw eventsError;
-
-      // Check user registrations
-      const { data: registrations, error: regError } = await supabase
-        .from('event_registrations')
-        .select('event_id, payment_status')
-        .eq('user_id', user!.id);
-
-      if (regError) throw regError;
-
-      const eventsWithRegistration = eventsData?.map(event => ({
-        ...event,
-        user_registered: registrations?.some(reg => reg.event_id === event.id),
-        registration_payment_status: registrations?.find(reg => reg.event_id === event.id)?.payment_status
-      })) || [];
-
-      setEvents(eventsWithRegistration);
-    } catch (error) {
-      console.error('Error fetching events:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load events",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createEvent = async () => {
+  const createEvent = useCallback(async () => {
     if (!newEvent.title || !newEvent.start_time) {
       toast({
         title: "Error",
@@ -153,7 +159,7 @@ const Events: React.FC = () => {
       const eventData = {
         ...newEvent,
         created_by: user!.id,
-        status: 'upcoming' as 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
+        status: 'upcoming' as const
       };
 
       const { error } = await supabase
@@ -178,6 +184,9 @@ const Events: React.FC = () => {
         loyalty_points_price: 0,
         max_capacity: 50
       });
+      
+      // Invalidate cache and refetch
+      cacheUtils.invalidate('events');
       fetchEvents();
     } catch (error) {
       console.error('Error creating event:', error);
@@ -187,9 +196,9 @@ const Events: React.FC = () => {
         variant: "destructive"
       });
     }
-  };
+  }, [newEvent, user, toast, cacheUtils, fetchEvents]);
 
-  const registerForEvent = async (event: Event, paymentMethod: 'card' | 'loyalty') => {
+  const registerForEvent = useCallback(async (event: Event, paymentMethod: 'card' | 'loyalty') => {
     try {
       // Check if user has enough loyalty points
       if (paymentMethod === 'loyalty' && event.loyalty_points_price) {
@@ -254,6 +263,8 @@ const Events: React.FC = () => {
           : "Registration pending payment confirmation"
       });
 
+      // Invalidate cache and refetch
+      cacheUtils.invalidate('events');
       fetchEvents();
       fetchUserProfile();
     } catch (error) {
@@ -264,9 +275,9 @@ const Events: React.FC = () => {
         variant: "destructive"
       });
     }
-  };
+  }, [userProfile, user, toast, cacheUtils, fetchEvents, fetchUserProfile]);
 
-  const getEventStatusBadge = (event: Event) => {
+  const getEventStatusBadge = useCallback((event: Event) => {
     const now = new Date();
     const startTime = new Date(event.start_time);
     const endTime = event.end_time ? new Date(event.end_time) : null;
@@ -278,9 +289,9 @@ const Events: React.FC = () => {
     } else {
       return <Badge className="bg-green-500">Ongoing</Badge>;
     }
-  };
+  }, []);
 
-  const getRegistrationStatus = (event: Event) => {
+  const getRegistrationStatus = useCallback((event: Event) => {
     if (!event.user_registered) return null;
     
     switch (event.registration_payment_status) {
@@ -293,23 +304,15 @@ const Events: React.FC = () => {
       default:
         return <Badge variant="outline">Registered</Badge>;
     }
-  };
+  }, []);
 
   if (loading) {
     return (
-      <div className="container max-w-6xl mx-auto p-4">
+      <div className={`container max-w-6xl mx-auto ${isMobile ? 'p-4' : 'p-6'}`}>
         <div className="text-center">Loading events...</div>
       </div>
     );
   }
-
-  const upcomingEvents = events.filter(e => new Date(e.start_time) > new Date());
-  const ongoingEvents = events.filter(e => {
-    const now = new Date();
-    const start = new Date(e.start_time);
-    const end = e.end_time ? new Date(e.end_time) : null;
-    return start <= now && (!end || end >= now);
-  });
 
   return (
     <div className={`container max-w-6xl mx-auto ${isMobile ? 'px-4 py-4' : 'p-6'} space-y-6`}>
@@ -646,6 +649,6 @@ const Events: React.FC = () => {
       </Tabs>
     </div>
   );
-};
+});
 
 export default Events;

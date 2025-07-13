@@ -859,6 +859,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_dashboard_optimized: {
+        Args: { user_id_param: string }
+        Returns: {
+          user_data: Json
+          stats_data: Json
+          recent_activity: Json
+        }[]
+      }
       has_role: {
         Args: {
           _user_id: string

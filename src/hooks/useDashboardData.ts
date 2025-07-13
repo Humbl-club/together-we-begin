@@ -15,6 +15,15 @@ interface Profile {
   available_loyalty_points?: number;
 }
 
+interface DashboardData {
+  profile: Profile | null;
+  eventsCount: number;
+  challengesCount: number;
+  postsCount: number;
+  events?: any[];
+  feedPosts?: any[];
+}
+
 export const useDashboardData = (userId?: string) => {
   const [stats, setStats] = useState<DashboardStats>({
     loyaltyPoints: 125,
@@ -36,8 +45,8 @@ export const useDashboardData = (userId?: string) => {
     try {
       const cacheKey = `dashboard-${userId}`;
       
-      const dashboardData = await fetchWithCache(cacheKey, async () => {
-        // Load all data in parallel for better performance
+      const dashboardData = await fetchWithCache(cacheKey, async (): Promise<DashboardData> => {
+        // Optimized parallel queries with better data selection
         const [profileResult, eventsResult, challengesResult, postsResult] = await Promise.all([
           supabase
             .from('profiles')
@@ -46,8 +55,10 @@ export const useDashboardData = (userId?: string) => {
             .maybeSingle(),
           supabase
             .from('events')
-            .select('id')
-            .eq('status', 'upcoming'),
+            .select('id, title, start_time, location')
+            .eq('status', 'upcoming')
+            .order('start_time', { ascending: true })
+            .limit(5),
           supabase
             .from('challenges')
             .select('id')
@@ -63,7 +74,8 @@ export const useDashboardData = (userId?: string) => {
           profile: profileResult.data,
           eventsCount: eventsResult.data?.length || 3,
           challengesCount: challengesResult.data?.length || 2,
-          postsCount: postsResult.data?.length || 8
+          postsCount: postsResult.data?.length || 8,
+          events: eventsResult.data || [],
         };
       });
 

@@ -309,6 +309,75 @@
   @apply bg-primary/50;
 }
 
+/* Progressive Enhancement Styles */
+.pull-refresh-indicator {
+  position: fixed;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%) translateY(var(--pull-distance, 0px));
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: hsl(var(--primary-foreground));
+  transition: transform 0.2s ease-out;
+  z-index: 1000;
+}
+
+.swipe-hint {
+  position: relative;
+  overflow: hidden;
+}
+
+.swipe-hint::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, hsla(var(--primary), 0.1), transparent);
+  animation: swipe-hint 2s infinite;
+}
+
+@keyframes swipe-hint {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Performance Optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.reduce-motion {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Battery Saving Mode */
+.battery-save * {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+/* Network Adaptive Loading */
+.loading-skeleton {
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted-foreground) / 0.1) 50%, hsl(var(--muted)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 /* Universal mobile improvements */
 @media (max-width: 768px) {
   /* Ensure minimum touch targets */

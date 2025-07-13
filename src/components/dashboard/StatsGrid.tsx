@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Award, Calendar, Trophy, Users } from 'lucide-react';
@@ -15,8 +15,8 @@ interface StatsGridProps {
   stats: DashboardStats;
 }
 
-const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
-  const statCards = [
+const StatsGrid: React.FC<StatsGridProps> = memo(({ stats }) => {
+  const statCards = useMemo(() => [
     {
       title: 'Points',
       value: stats.loyaltyPoints,
@@ -49,7 +49,7 @@ const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
       change: '+3',
       color: 'text-green-600 dark:text-green-400'
     }
-  ];
+  ], [stats]);
 
   return (
     <div className="stats-grid">
@@ -77,6 +77,6 @@ const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
       ))}
     </div>
   );
-};
+});
 
 export default StatsGrid;

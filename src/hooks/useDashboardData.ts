@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useOptimizedData } from './useOptimizedData';
 
 interface DashboardStats {
   loyaltyPoints: number;
@@ -26,50 +27,60 @@ export const useDashboardData = (userId?: string) => {
     avatar_url: undefined
   });
   const [loading, setLoading] = useState(false);
+  const { fetchWithCache } = useOptimizedData<any>('dashboard', 2 * 60 * 1000); // 2 minute cache
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     if (!userId) return;
     
     setLoading(true);
     try {
-      // Load user profile
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle();
+      const cacheKey = `dashboard-${userId}`;
+      
+      const dashboardData = await fetchWithCache(cacheKey, async () => {
+        // Load all data in parallel for better performance
+        const [profileResult, eventsResult, challengesResult, postsResult] = await Promise.all([
+          supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .maybeSingle(),
+          supabase
+            .from('events')
+            .select('id')
+            .eq('status', 'upcoming'),
+          supabase
+            .from('challenges')
+            .select('id')
+            .eq('status', 'active'),
+          supabase
+            .from('social_posts')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('status', 'active')
+        ]);
 
-      if (profileData) setProfile(profileData);
+        return {
+          profile: profileResult.data,
+          eventsCount: eventsResult.data?.length || 3,
+          challengesCount: challengesResult.data?.length || 2,
+          postsCount: postsResult.data?.length || 8
+        };
+      });
 
-      // Load dashboard stats
-      const [eventsResult, challengesResult, postsResult] = await Promise.all([
-        supabase
-          .from('events')
-          .select('id')
-          .eq('status', 'upcoming'),
-        supabase
-          .from('challenges')
-          .select('id')
-          .eq('status', 'active'),
-        supabase
-          .from('social_posts')
-          .select('id')
-          .eq('user_id', userId)
-          .eq('status', 'active')
-      ]);
+      if (dashboardData.profile) setProfile(dashboardData.profile);
 
       setStats({
-        loyaltyPoints: profileData?.available_loyalty_points || 125,
-        upcomingEvents: eventsResult.data?.length || 3,
-        activeChallenges: challengesResult.data?.length || 2,
-        totalPosts: postsResult.data?.length || 8
+        loyaltyPoints: dashboardData.profile?.available_loyalty_points || 125,
+        upcomingEvents: dashboardData.eventsCount,
+        activeChallenges: dashboardData.challengesCount,
+        totalPosts: dashboardData.postsCount
       });
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId, fetchWithCache]);
 
   useEffect(() => {
     loadDashboardData();

@@ -1,22 +1,23 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useViewport } from '@/hooks/use-mobile';
 import { Navigation } from './Navigation';
+import { OptimizedSkeleton } from '@/components/ui/optimized-skeleton';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children }) => {
+export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   const { user, loading } = useAuth();
-  const { isMobile, isTablet, isDesktop } = useViewport();
+  const { isMobile, isTablet } = useViewport();
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-editorial-hero safe-area-layout">
         <div className="editorial-card rounded-xl p-8 text-center max-w-sm mobile:max-w-xs mobile:p-6">
-          <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <OptimizedSkeleton className="w-6 h-6 rounded-full mx-auto mb-4" />
           <p className="text-muted-foreground font-light tracking-wide mobile:text-sm">
             Loading your experience...
           </p>
@@ -48,4 +49,4 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       </main>
     </div>
   );
-};
+});

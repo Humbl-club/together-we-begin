@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import NotificationService from '@/services/notificationService';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -64,31 +64,43 @@ export const useNotifications = () => {
     };
   }, [user]);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
-    const data = await notificationService.getNotifications(user.id);
-    setNotifications(data);
-    setUnreadCount(data.filter(n => !n.read_at).length);
-    setLoading(false);
-  };
+    try {
+      const data = await notificationService.getNotifications(user.id);
+      setNotifications(data);
+      setUnreadCount(data.filter(n => !n.read_at).length);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user, notificationService]);
 
-  const markAsRead = async (notificationId: string) => {
-    await notificationService.markAsRead(notificationId);
-  };
+  const markAsRead = useCallback(async (notificationId: string) => {
+    try {
+      await notificationService.markAsRead(notificationId);
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  }, [notificationService]);
 
-  const markAllAsRead = async () => {
+  const markAllAsRead = useCallback(async () => {
     if (!user) return;
 
     const unreadIds = notifications
       .filter(n => !n.read_at)
       .map(n => n.id);
 
-    for (const id of unreadIds) {
-      await markAsRead(id);
+    try {
+      // Batch mark as read for better performance
+      await Promise.all(unreadIds.map(id => notificationService.markAsRead(id)));
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
     }
-  };
+  }, [user, notifications, notificationService]);
 
   const requestPermission = async () => {
     if (!user) return false;

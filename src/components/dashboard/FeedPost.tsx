@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,7 @@ interface FeedPostProps {
   };
 }
 
-const FeedPost: React.FC<FeedPostProps> = ({
+const FeedPost: React.FC<FeedPostProps> = memo(({
   author,
   content,
   image,
@@ -31,6 +31,10 @@ const FeedPost: React.FC<FeedPostProps> = ({
   timestamp,
   achievement
 }) => {
+  const authorInitials = useMemo(() => 
+    author.name.split(' ').map(n => n[0]).join(''), [author.name]
+  );
+
   return (
     <Card className="border-0 shadow-none bg-card/50 backdrop-blur-sm">
       <CardContent className="p-6">
@@ -40,7 +44,7 @@ const FeedPost: React.FC<FeedPostProps> = ({
             <Avatar className="h-10 w-10">
               <AvatarImage src={author.avatar} alt={author.name} />
               <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-sm font-medium">
-                {author.name.split(' ').map(n => n[0]).join('')}
+                {authorInitials}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -93,6 +97,6 @@ const FeedPost: React.FC<FeedPostProps> = ({
       </CardContent>
     </Card>
   );
-};
+});
 
 export default FeedPost;

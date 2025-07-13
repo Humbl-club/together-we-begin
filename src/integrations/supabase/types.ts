@@ -859,6 +859,42 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_dashboard_data_v2: {
+        Args: { user_id_param: string }
+        Returns: {
+          user_profile: Json
+          stats: Json
+          recent_events: Json
+          active_challenges: Json
+          recent_posts: Json
+        }[]
+      }
+      get_events_optimized: {
+        Args: {
+          user_id_param?: string
+          status_filter?: string
+          limit_param?: number
+          offset_param?: number
+        }
+        Returns: {
+          id: string
+          title: string
+          description: string
+          start_time: string
+          end_time: string
+          location: string
+          image_url: string
+          price_cents: number
+          loyalty_points_price: number
+          max_capacity: number
+          current_capacity: number
+          status: Database["public"]["Enums"]["event_status"]
+          created_by: string
+          created_at: string
+          is_registered: boolean
+          registration_status: Database["public"]["Enums"]["payment_status"]
+        }[]
+      }
       get_user_dashboard_optimized: {
         Args: { user_id_param: string }
         Returns: {

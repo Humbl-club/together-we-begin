@@ -325,8 +325,8 @@ const Challenges: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container max-w-6xl mx-auto adaptive-card">
-        <div className="text-center smooth-entrance">Loading challenges...</div>
+      <div className="container max-w-6xl mx-auto p-4">
+        <div className="text-center">Loading challenges...</div>
       </div>
     );
   }
@@ -336,11 +336,11 @@ const Challenges: React.FC = () => {
   const completedChallenges = challenges.filter(c => c.user_participation?.completed);
 
   return (
-    <div className="container max-w-6xl mx-auto adaptive-card flow-content">
-      <div className="cluster justify-between">
+    <div className="container max-w-6xl mx-auto p-4 space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="fluid-heading gradient-text">Challenges</h1>
-          <p className="fluid-body text-muted-foreground">Complete challenges and earn loyalty points</p>
+          <h1 className="text-3xl font-bold gradient-text">Challenges</h1>
+          <p className="text-muted-foreground">Complete challenges and earn loyalty points</p>
         </div>
         
         {isAdmin && (

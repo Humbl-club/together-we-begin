@@ -20,13 +20,13 @@ const UpcomingEvents: React.FC = () => {
         {mockEvents.map((event, index) => (
           <div 
             key={index}
-            className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
+            className={`flex items-center space-x-3 p-3 rounded-lg ${
               event.isActive 
                 ? 'bg-gradient-to-r from-primary/5 to-transparent' 
                 : ''
             }`}
           >
-            <div className={`w-2 h-8 rounded-full transition-colors ${
+            <div className={`w-2 h-8 rounded-full ${
               event.isActive ? 'bg-primary' : 'bg-muted'
             }`} />
             <div className="flex-1">

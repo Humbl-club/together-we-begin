@@ -288,12 +288,12 @@ const Admin: React.FC = () => {
 
   if (!isAdmin) {
     return (
-      <div className="container max-w-4xl mx-auto p-4">
-        <Card className="glass-card">
+      <div className="container max-w-4xl mx-auto adaptive-card">
+        <Card className="editorial-card">
           <CardContent className="text-center py-12">
             <Shield className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
-            <p className="text-muted-foreground">
+            <h2 className="fluid-subheading font-semibold mb-2">Access Denied</h2>
+            <p className="fluid-body text-muted-foreground">
               You need admin privileges to access this page.
             </p>
           </CardContent>
@@ -304,18 +304,18 @@ const Admin: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container max-w-6xl mx-auto p-4">
-        <div className="text-center">Loading admin dashboard...</div>
+      <div className="container max-w-6xl mx-auto adaptive-card">
+        <div className="text-center smooth-entrance">Loading admin dashboard...</div>
       </div>
     );
   }
 
   return (
-    <div className="container max-w-6xl mx-auto p-4 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="container max-w-6xl mx-auto adaptive-card flow-content smooth-entrance">
+      <div className="cluster justify-between">
         <div>
-          <h1 className="text-3xl font-bold gradient-text">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Manage your HUMBL community</p>
+          <h1 className="fluid-heading gradient-text">Admin Dashboard</h1>
+          <p className="fluid-body text-muted-foreground">Manage your HUMBL community</p>
         </div>
         <Badge variant="secondary" className="flex items-center gap-2">
           <Shield className="w-4 h-4" />

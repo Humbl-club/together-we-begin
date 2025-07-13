@@ -297,8 +297,8 @@ const Events: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container max-w-6xl mx-auto p-4">
-        <div className="text-center">Loading events...</div>
+      <div className="container max-w-6xl mx-auto adaptive-card">
+        <div className="text-center smooth-entrance">Loading events...</div>
       </div>
     );
   }
@@ -312,11 +312,11 @@ const Events: React.FC = () => {
   });
 
   return (
-    <div className={`container max-w-6xl mx-auto ${isMobile ? 'p-4' : 'p-6'} space-y-6`}>
-      <div className={`flex items-center ${isMobile ? 'flex-col space-y-4 text-center' : 'justify-between'}`}>
+    <div className="container max-w-6xl mx-auto adaptive-card flow-content">
+      <div className="cluster justify-between">
         <div>
-          <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold gradient-text`}>Events</h1>
-          <p className={`text-muted-foreground ${isMobile ? 'text-sm' : ''}`}>Discover and join exclusive community events</p>
+          <h1 className="fluid-heading gradient-text">Events</h1>
+          <p className="fluid-body text-muted-foreground">Discover and join exclusive community events</p>
         </div>
         
         {isAdmin && (

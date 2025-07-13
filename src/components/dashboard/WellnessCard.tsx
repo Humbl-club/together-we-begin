@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -13,7 +13,7 @@ interface WellnessCardProps {
   weeklyProgress: number;
 }
 
-const WellnessCard: React.FC<WellnessCardProps> = ({
+const WellnessCard: React.FC<WellnessCardProps> = memo(({
   steps,
   goalSteps,
   leaderboardPosition,
@@ -21,7 +21,10 @@ const WellnessCard: React.FC<WellnessCardProps> = ({
   challengeName,
   weeklyProgress
 }) => {
-  const progressPercentage = Math.min((steps / goalSteps) * 100, 100);
+  const progressPercentage = useMemo(() => 
+    Math.min((steps / goalSteps) * 100, 100), 
+    [steps, goalSteps]
+  );
   
   return (
     <Card className="border-0 shadow-none bg-gradient-to-br from-primary/5 to-secondary/5 backdrop-blur-sm">
@@ -74,6 +77,6 @@ const WellnessCard: React.FC<WellnessCardProps> = ({
       </CardContent>
     </Card>
   );
-};
+});
 
 export default WellnessCard;

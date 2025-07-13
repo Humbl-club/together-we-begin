@@ -1,9 +1,17 @@
 import React, { memo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export const OptimizedSkeleton = memo(({ className, ...props }: React.ComponentProps<typeof Skeleton>) => (
-  <Skeleton className={className} {...props} />
-));
+interface OptimizedSkeletonProps extends React.ComponentProps<typeof Skeleton> {
+  variant?: 'card' | 'feed' | 'stats' | 'dashboard';
+}
+
+export const OptimizedSkeleton = memo(({ variant = 'card', className, ...props }: OptimizedSkeletonProps) => {
+  if (variant === 'feed') {
+    return <FeedSkeleton />;
+  }
+  
+  return <Skeleton className={className} {...props} />;
+});
 
 export const DashboardSkeleton = memo(() => (
   <div className="flow-content">

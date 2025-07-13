@@ -1,11 +1,31 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sparkles, TrendingUp } from 'lucide-react';
 import FeedPost from './FeedPost';
-import { mockFeedPosts } from '@/constants/dashboardData';
+import { useCommunityFeed } from '@/hooks/useCommunityFeed';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { OptimizedSkeleton } from '@/components/ui/optimized-skeleton';
 
-const CommunityFeed: React.FC = () => {
+const CommunityFeed: React.FC = memo(() => {
+  const { user } = useAuth();
+  const { posts, loading } = useCommunityFeed(user?.id);
+
+  if (loading) {
+    return (
+      <div className="lg:col-span-2 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-light tracking-tight">Community</h2>
+          <div className="flex items-center space-x-2">
+            <Sparkles className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Latest updates</span>
+          </div>
+        </div>
+        <OptimizedSkeleton variant="feed" />
+      </div>
+    );
+  }
+
   return (
     <div className="lg:col-span-2 space-y-4">
       <div className="flex items-center justify-between">
@@ -17,8 +37,17 @@ const CommunityFeed: React.FC = () => {
       </div>
       
       <div className="space-y-4">
-        {mockFeedPosts.map((post, index) => (
-          <FeedPost key={index} {...post} />
+        {posts.map((post) => (
+          <FeedPost 
+            key={post.id} 
+            author={post.user_profile.full_name}
+            avatar={post.user_profile.avatar_url}
+            time={new Date(post.created_at).toLocaleDateString()}
+            content={post.content}
+            image={post.image_urls?.[0]}
+            likes={post.likes_count}
+            comments={post.comments_count}
+          />
         ))}
         
         {/* Load More */}
@@ -34,6 +63,6 @@ const CommunityFeed: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
 export default CommunityFeed;

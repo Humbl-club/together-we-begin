@@ -6,16 +6,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react';
 
 interface FeedPostProps {
-  author: {
-    name: string;
-    avatar?: string;
-    handle: string;
-  };
+  author: string;
+  avatar?: string;
+  time: string;
   content: string;
   image?: string;
   likes: number;
   comments: number;
-  timestamp: string;
   achievement?: {
     type: string;
     title: string;
@@ -24,15 +21,20 @@ interface FeedPostProps {
 
 const FeedPost: React.FC<FeedPostProps> = memo(({
   author,
+  avatar,
+  time,
   content,
   image,
   likes,
   comments,
-  timestamp,
   achievement
 }) => {
   const authorInitials = useMemo(() => 
-    author.name.split(' ').map(n => n[0]).join(''), [author.name]
+    author.split(' ').map(n => n[0]).join(''), [author]
+  );
+
+  const authorHandle = useMemo(() => 
+    author.toLowerCase().replace(/\s+/g, ''), [author]
   );
 
   return (
@@ -42,14 +44,14 @@ const FeedPost: React.FC<FeedPostProps> = memo(({
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={author.avatar} alt={author.name} />
+              <AvatarImage src={avatar} alt={author} />
               <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-sm font-medium">
                 {authorInitials}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h4 className="font-medium text-sm leading-none">{author.name}</h4>
-              <p className="text-xs text-muted-foreground mt-1">@{author.handle} • {timestamp}</p>
+              <h4 className="font-medium text-sm leading-none">{author}</h4>
+              <p className="text-xs text-muted-foreground mt-1">@{authorHandle} • {time}</p>
             </div>
           </div>
           <Button variant="ghost" size="sm" className="h-8 w-8 p-0">

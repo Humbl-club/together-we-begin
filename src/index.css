@@ -140,6 +140,112 @@
     @apply editorial-card rounded-xl p-6 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl;
   }
 
+  /* ===== RESPONSIVE DESIGN UTILITIES ===== */
+  
+  /* Mobile-first responsive containers */
+  .responsive-container {
+    @apply w-full px-4 sm:px-6 lg:px-8 xl:px-12;
+  }
+  
+  .responsive-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6;
+  }
+  
+  /* Mobile-optimized cards */
+  .mobile-card {
+    @apply editorial-card rounded-lg mobile:p-4 sm:p-6 mobile:mx-2 sm:mx-0;
+  }
+  
+  /* Responsive text scaling */
+  .heading-responsive {
+    @apply text-xl mobile:text-lg sm:text-2xl lg:text-3xl xl:text-4xl font-light tracking-tight;
+  }
+  
+  .subheading-responsive {
+    @apply text-sm mobile:text-xs sm:text-base lg:text-lg text-muted-foreground;
+  }
+  
+  .body-responsive {
+    @apply text-base mobile:text-sm sm:text-base lg:text-lg;
+  }
+  
+  /* Mobile navigation utilities */
+  .mobile-nav-safe {
+    @apply pb-safe-bottom mobile:pb-20 sm:pb-0;
+  }
+  
+  .mobile-nav-spacing {
+    @apply mobile:px-2 sm:px-4 mobile:py-2 sm:py-3;
+  }
+  
+  /* Responsive button sizes */
+  .btn-responsive {
+    @apply mobile:text-sm mobile:px-3 mobile:py-2 sm:text-base sm:px-4 sm:py-2 lg:px-6 lg:py-3;
+  }
+  
+  /* Touch-friendly interactive elements */
+  .touch-target {
+    @apply mobile:min-h-[44px] mobile:min-w-[44px] sm:min-h-[40px] sm:min-w-[40px];
+  }
+  
+  /* Responsive spacing utilities */
+  .spacing-responsive-sm {
+    @apply mobile:space-y-2 sm:space-y-3 lg:space-y-4;
+  }
+  
+  .spacing-responsive-md {
+    @apply mobile:space-y-3 sm:space-y-4 lg:space-y-6;
+  }
+  
+  .spacing-responsive-lg {
+    @apply mobile:space-y-4 sm:space-y-6 lg:space-y-8;
+  }
+  
+  /* Responsive avatar sizes */
+  .avatar-responsive-sm {
+    @apply mobile:w-8 mobile:h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12;
+  }
+  
+  .avatar-responsive-md {
+    @apply mobile:w-12 mobile:h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20;
+  }
+  
+  .avatar-responsive-lg {
+    @apply mobile:w-16 mobile:h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28;
+  }
+  
+  /* Mobile-first flex utilities */
+  .flex-responsive {
+    @apply flex mobile:flex-col sm:flex-row mobile:items-center mobile:space-y-2 sm:space-y-0 sm:space-x-4;
+  }
+  
+  .flex-responsive-reverse {
+    @apply flex mobile:flex-col-reverse sm:flex-row mobile:items-center mobile:space-y-reverse mobile:space-y-2 sm:space-y-0 sm:space-x-4;
+  }
+  
+  /* Responsive grid layouts */
+  .grid-responsive-cards {
+    @apply grid mobile:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mobile:gap-3 sm:gap-4 lg:gap-6;
+  }
+  
+  .grid-responsive-stats {
+    @apply grid mobile:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 mobile:gap-2 sm:gap-4;
+  }
+  
+  /* Mobile-optimized forms */
+  .form-responsive {
+    @apply space-y-4 mobile:space-y-3;
+  }
+  
+  .input-responsive {
+    @apply mobile:text-base mobile:py-3 sm:text-sm sm:py-2;
+  }
+  
+  /* Safe area aware layouts */
+  .safe-area-layout {
+    @apply mobile:pt-safe-top mobile:pb-safe-bottom mobile:pl-safe-left mobile:pr-safe-right;
+  }
+
   /* Editorial Auth Container */
   .auth-container {
     @apply min-h-screen flex items-center justify-center p-4;

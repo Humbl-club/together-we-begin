@@ -18,6 +18,33 @@ export default {
 			}
 		},
 		extend: {
+			// Enhanced responsive breakpoints for better mobile experience
+			screens: {
+				'xs': '475px',
+				'sm': '640px',
+				'md': '768px',
+				'lg': '1024px',
+				'xl': '1280px',
+				'2xl': '1400px',
+				'3xl': '1600px',
+				// Mobile-first approach with max-width breakpoints
+				'mobile-sm': {'max': '374px'},
+				'mobile': {'max': '639px'},
+				'tablet': {'min': '640px', 'max': '1023px'},
+				'desktop': {'min': '1024px'},
+			},
+			// Enhanced spacing for mobile optimization
+			spacing: {
+				'18': '4.5rem',
+				'88': '22rem',
+				'104': '26rem',
+				'112': '28rem',
+				'128': '32rem',
+				'safe-top': 'env(safe-area-inset-top)',
+				'safe-bottom': 'env(safe-area-inset-bottom)',
+				'safe-left': 'env(safe-area-inset-left)',
+				'safe-right': 'env(safe-area-inset-right)',
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',

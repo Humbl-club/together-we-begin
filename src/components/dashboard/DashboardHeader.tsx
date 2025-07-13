@@ -2,7 +2,7 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useViewport, useResponsiveValue } from '@/hooks/use-mobile';
 
 interface Profile {
   full_name?: string;
@@ -14,7 +14,22 @@ interface DashboardHeaderProps {
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ profile }) => {
-  const isMobile = useIsMobile();
+  const { isMobile, isTablet } = useViewport();
+  
+  // Responsive values
+  const avatarSize = useResponsiveValue({
+    mobile: 'avatar-responsive-md',
+    tablet: 'avatar-responsive-md',
+    desktop: 'avatar-responsive-lg',
+    default: 'h-16 w-16'
+  });
+
+  const headingSize = useResponsiveValue({
+    mobile: 'text-xl',
+    tablet: 'text-2xl',
+    desktop: 'text-3xl',
+    default: 'text-3xl'
+  });
   
   const getInitials = (name?: string) => {
     return name?.split(' ').map(n => n[0]).join('') || 'AC';
@@ -24,28 +39,39 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ profile }) => {
     return name?.split(' ')[0] || 'Alexandra';
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   return (
     <div className="relative">
-      <div className={`flex items-center ${isMobile ? 'flex-col space-y-4' : 'justify-between'}`}>
-        <div className={`flex items-center ${isMobile ? 'flex-col space-y-3 text-center' : 'space-x-4'}`}>
-          <Avatar className={`${isMobile ? 'h-12 w-12' : 'h-16 w-16'} border-2 border-primary/20`}>
+      <div className="flex-responsive mobile:text-center mobile:space-y-4 sm:justify-between">
+        <div className="flex-responsive mobile:text-center">
+          <Avatar className={`${avatarSize} border-2 border-primary/20 ring-2 ring-primary/10`}>
             <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
-            <AvatarFallback className={`bg-gradient-to-br from-primary/20 to-secondary/20 ${isMobile ? 'text-base' : 'text-lg'} font-medium`}>
+            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 mobile:text-base sm:text-lg font-medium">
               {getInitials(profile?.full_name)}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-light tracking-tight text-foreground`}>
-              Good morning, {getFirstName(profile?.full_name)}
+          <div className="mobile:text-center sm:text-left">
+            <h1 className={`${headingSize} font-light tracking-tight text-foreground leading-tight`}>
+              {getGreeting()}, {getFirstName(profile?.full_name)}
             </h1>
-            <p className={`text-muted-foreground mt-1 font-light ${isMobile ? 'text-sm' : ''}`}>
+            <p className="text-muted-foreground mt-1 font-light mobile:text-sm sm:text-base">
               Your wellness journey continues
             </p>
           </div>
         </div>
-        <Button className={`bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 ${isMobile ? 'w-full' : ''}`} size={isMobile ? "sm" : "default"}>
+        
+        <Button 
+          className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all duration-200 mobile:w-full sm:w-auto btn-responsive" 
+          size={isMobile ? "sm" : "default"}
+        >
           <Plus className="w-4 h-4 mr-2" />
-          Share Update
+          <span className="mobile:text-sm sm:text-base">Share Update</span>
         </Button>
       </div>
     </div>

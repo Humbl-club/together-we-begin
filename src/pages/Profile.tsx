@@ -294,13 +294,13 @@ const Profile: React.FC = () => {
         </CardHeader>
         
         <CardContent className="space-y-6">
-          <div className={`flex ${isMobile ? 'flex-col items-center' : 'items-start'} gap-6`}>
+            <div className={`flex ${isMobile ? 'flex-col items-center' : 'items-start'} gap-6`}>
             <div className="relative">
-              <Avatar className={`${isMobile ? 'w-20 h-20' : 'w-24 h-24'}`}>
+              <Avatar className={`${isMobile ? 'w-16 h-16' : 'w-24 h-24'}`}>
                 <AvatarImage 
                   src={selectedAvatar ? URL.createObjectURL(selectedAvatar) : profile.avatar_url || undefined} 
                 />
-                <AvatarFallback className="text-2xl">
+                <AvatarFallback className={`${isMobile ? 'text-lg' : 'text-2xl'}`}>
                   {profile.full_name?.charAt(0) || profile.username?.charAt(0) || user?.email?.charAt(0) || '?'}
                 </AvatarFallback>
               </Avatar>
@@ -309,10 +309,10 @@ const Profile: React.FC = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0"
+                  className={`absolute -bottom-2 -right-2 rounded-full ${isMobile ? 'w-7 h-7' : 'w-8 h-8'} p-0 min-h-[44px]`}
                   onClick={() => document.getElementById('avatar-upload')?.click()}
                 >
-                  <Camera className="w-4 h-4" />
+                  <Camera className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
                 </Button>
               )}
               
@@ -364,57 +364,62 @@ const Profile: React.FC = () => {
                 </>
               ) : (
                 <div className="space-y-4">
-                  <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-4`}>
+                  <div className="grid grid-cols-1 gap-4">
                     <div>
-                      <Label htmlFor="full_name">Full Name</Label>
+                      <Label htmlFor="full_name" className={isMobile ? 'text-sm font-medium' : ''}>Full Name</Label>
                       <Input
                         id="full_name"
                         value={editedProfile.full_name || ''}
                         onChange={(e) => setEditedProfile(prev => ({ ...prev, full_name: e.target.value }))}
                         placeholder="Your full name"
+                        className={isMobile ? 'min-h-[44px] text-base' : ''}
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="username">Username</Label>
+                      <Label htmlFor="username" className={isMobile ? 'text-sm font-medium' : ''}>Username</Label>
                       <Input
                         id="username"
                         value={editedProfile.username || ''}
                         onChange={(e) => setEditedProfile(prev => ({ ...prev, username: e.target.value }))}
                         placeholder="Your username"
+                        className={isMobile ? 'min-h-[44px] text-base' : ''}
                       />
                     </div>
                   </div>
                   
                   <div>
-                    <Label htmlFor="bio">Bio</Label>
+                    <Label htmlFor="bio" className={isMobile ? 'text-sm font-medium' : ''}>Bio</Label>
                     <Textarea
                       id="bio"
                       value={editedProfile.bio || ''}
                       onChange={(e) => setEditedProfile(prev => ({ ...prev, bio: e.target.value }))}
                       placeholder="Tell us about yourself"
-                      rows={3}
+                      rows={isMobile ? 3 : 4}
+                      className={isMobile ? 'min-h-[88px] text-base' : ''}
                     />
                   </div>
                   
-                  <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-4`}>
+                  <div className="grid grid-cols-1 gap-4">
                     <div>
-                      <Label htmlFor="location">Location</Label>
+                      <Label htmlFor="location" className={isMobile ? 'text-sm font-medium' : ''}>Location</Label>
                       <Input
                         id="location"
                         value={editedProfile.location || ''}
                         onChange={(e) => setEditedProfile(prev => ({ ...prev, location: e.target.value }))}
                         placeholder="Your location"
+                        className={isMobile ? 'min-h-[44px] text-base' : ''}
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="instagram_handle">Instagram Handle</Label>
+                      <Label htmlFor="instagram_handle" className={isMobile ? 'text-sm font-medium' : ''}>Instagram Handle</Label>
                       <Input
                         id="instagram_handle"
                         value={editedProfile.instagram_handle || ''}
                         onChange={(e) => setEditedProfile(prev => ({ ...prev, instagram_handle: e.target.value }))}
                         placeholder="Your Instagram handle"
+                        className={isMobile ? 'min-h-[44px] text-base' : ''}
                       />
                     </div>
                   </div>
@@ -424,38 +429,38 @@ const Profile: React.FC = () => {
           </div>
           
           {!editing && (
-            <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-3 gap-4'}`}>
-              <Card>
-                <CardContent className="pt-6">
+            <div className={`grid ${isMobile ? 'grid-cols-1 gap-3' : 'grid-cols-1 md:grid-cols-3 gap-4'}`}>
+              <Card className={isMobile ? 'min-h-[80px]' : ''}>
+                <CardContent className={`${isMobile ? 'pt-4 pb-4' : 'pt-6'}`}>
                   <div className="flex items-center gap-2">
-                    <Star className="w-5 h-5 text-amber-500" />
+                    <Star className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} text-amber-500`} />
                     <div>
-                      <p className="text-sm text-muted-foreground">Available Points</p>
-                      <p className="text-2xl font-bold">{profile.available_loyalty_points || 0}</p>
+                      <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>Available Points</p>
+                      <p className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>{profile.available_loyalty_points || 0}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card>
-                <CardContent className="pt-6">
+              <Card className={isMobile ? 'min-h-[80px]' : ''}>
+                <CardContent className={`${isMobile ? 'pt-4 pb-4' : 'pt-6'}`}>
                   <div className="flex items-center gap-2">
-                    <Trophy className="w-5 h-5 text-yellow-500" />
+                    <Trophy className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} text-yellow-500`} />
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Points</p>
-                      <p className="text-2xl font-bold">{profile.total_loyalty_points || 0}</p>
+                      <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>Total Points</p>
+                      <p className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>{profile.total_loyalty_points || 0}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card>
-                <CardContent className="pt-6">
+              <Card className={isMobile ? 'min-h-[80px]' : ''}>
+                <CardContent className={`${isMobile ? 'pt-4 pb-4' : 'pt-6'}`}>
                   <div className="flex items-center gap-2">
-                    <Trophy className="w-5 h-5 text-blue-500" />
+                    <Trophy className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} text-blue-500`} />
                     <div>
-                      <p className="text-sm text-muted-foreground">Challenges</p>
-                      <p className="text-2xl font-bold">{completedChallenges.length}</p>
+                      <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>Challenges</p>
+                      <p className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>{completedChallenges.length}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -467,10 +472,20 @@ const Profile: React.FC = () => {
 
       {!editing && (
         <Tabs defaultValue="activity" className="w-full">
-          <TabsList className={`grid w-full ${isMobile ? 'grid-cols-2' : 'grid-cols-5'}`}>
-            <TabsTrigger value="activity" className={isMobile ? 'text-xs' : ''}>Activity</TabsTrigger>
+          <TabsList className={`grid w-full ${isMobile ? 'grid-cols-2 h-12' : 'grid-cols-5'}`}>
+            <TabsTrigger 
+              value="activity" 
+              className={`${isMobile ? 'text-xs px-2 min-h-[44px]' : ''} transition-all`}
+            >
+              Activity
+            </TabsTrigger>
             {!isMobile && <TabsTrigger value="achievements">Achievements</TabsTrigger>}
-            <TabsTrigger value="verification" className={isMobile ? 'text-xs' : ''}>Verification</TabsTrigger>
+            <TabsTrigger 
+              value="verification" 
+              className={`${isMobile ? 'text-xs px-2 min-h-[44px]' : ''} transition-all`}
+            >
+              {isMobile ? 'Verify' : 'Verification'}
+            </TabsTrigger>
             {!isMobile && <TabsTrigger value="privacy">Privacy</TabsTrigger>}
             {!isMobile && <TabsTrigger value="messages">Messages</TabsTrigger>}
           </TabsList>

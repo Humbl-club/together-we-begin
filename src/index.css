@@ -308,3 +308,121 @@
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-primary/50;
 }
+
+/* Universal mobile improvements */
+@media (max-width: 768px) {
+  /* Ensure minimum touch targets */
+  button, .btn, [role="button"], input[type="button"], input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better mobile scrolling */
+  body {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* Prevent horizontal scroll */
+  body, html {
+    overflow-x: hidden;
+  }
+  
+  /* Mobile-specific padding for containers */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Better mobile typography */
+  h1 { font-size: clamp(1.5rem, 4vw, 2rem); }
+  h2 { font-size: clamp(1.25rem, 3.5vw, 1.75rem); }
+  h3 { font-size: clamp(1.125rem, 3vw, 1.5rem); }
+  
+  /* Mobile-specific animations */
+  .hover\:scale-\[1\.02\]:hover {
+    transform: none;
+  }
+  
+  .active\:scale-\[0\.98\]:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease-out;
+  }
+  
+  /* Better mobile spacing */
+  .space-y-6 > * + * {
+    margin-top: 1rem;
+  }
+  
+  .space-y-4 > * + * {
+    margin-top: 0.75rem;
+  }
+  
+  /* Mobile dialog improvements */
+  [role="dialog"] {
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better mobile form elements */
+  input, textarea, select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+  }
+  
+  /* Mobile tab improvements */
+  [role="tablist"] {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  [role="tablist"]::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Mobile card improvements */
+  .glass-card {
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Better mobile navigation */
+  .navigation-mobile {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: hsl(var(--background) / 0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid hsl(var(--border));
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Mobile-optimized button sizes */
+  .btn-responsive {
+    min-height: 48px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  /* Mobile text improvements */
+  .text-responsive {
+    font-size: clamp(0.875rem, 2vw, 1rem);
+    line-height: 1.5;
+  }
+  
+  /* Mobile spacing utilities */
+  .spacing-responsive-xs { margin: 0.25rem 0; }
+  .spacing-responsive-sm { margin: 0.5rem 0; }
+  .spacing-responsive-md { margin: 1rem 0; }
+  .spacing-responsive-lg { margin: 1.5rem 0; }
+  .spacing-responsive-xl { margin: 2rem 0; }
+  
+  /* Mobile padding utilities */
+  .p-fluid-2 { padding: clamp(0.5rem, 2vw, 0.75rem); }
+  .p-fluid-4 { padding: clamp(1rem, 4vw, 1.5rem); }
+  .p-fluid-6 { padding: clamp(1.5rem, 6vw, 2rem); }
+}

@@ -312,7 +312,7 @@ const Events: React.FC = () => {
   });
 
   return (
-    <div className={`container max-w-6xl mx-auto ${isMobile ? 'p-4' : 'p-6'} space-y-6`}>
+    <div className={`container max-w-6xl mx-auto ${isMobile ? 'px-4 py-4' : 'p-6'} space-y-6`}>
       <div className={`flex items-center ${isMobile ? 'flex-col space-y-4 text-center' : 'justify-between'}`}>
         <div>
           <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold gradient-text`}>Events</h1>
@@ -322,104 +322,113 @@ const Events: React.FC = () => {
         {isAdmin && (
           <Dialog open={showCreateEvent} onOpenChange={setShowCreateEvent}>
             <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90">
+              <Button className={`bg-primary hover:bg-primary/90 ${isMobile ? 'min-h-[44px] w-full' : ''}`}>
                 Create Event
               </Button>
             </DialogTrigger>
-            <DialogContent className={`${isMobile ? 'max-w-[95vw] p-4' : 'max-w-md'}`}>
+            <DialogContent className={`${isMobile ? 'max-w-[95vw] max-h-[90vh] p-4 overflow-y-auto' : 'max-w-md'}`}>
               <DialogHeader>
-                <DialogTitle>Create New Event</DialogTitle>
+                <DialogTitle className={isMobile ? 'text-lg' : ''}>Create New Event</DialogTitle>
               </DialogHeader>
               
-              <div className="space-y-4">
+              <div className={`space-y-${isMobile ? '4' : '4'}`}>
                 <div>
-                  <Label htmlFor="title">Event Title</Label>
+                  <Label htmlFor="title" className={isMobile ? 'text-sm font-medium' : ''}>Event Title</Label>
                   <Input
                     id="title"
                     value={newEvent.title}
                     onChange={(e) => setNewEvent(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="Event title"
+                    className={isMobile ? 'min-h-[44px] text-base' : ''}
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description" className={isMobile ? 'text-sm font-medium' : ''}>Description</Label>
                   <Textarea
                     id="description"
                     value={newEvent.description}
                     onChange={(e) => setNewEvent(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="Event description"
+                    className={isMobile ? 'min-h-[88px] text-base' : ''}
+                    rows={isMobile ? 3 : 4}
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="location">Location</Label>
+                  <Label htmlFor="location" className={isMobile ? 'text-sm font-medium' : ''}>Location</Label>
                   <Input
                     id="location"
                     value={newEvent.location}
                     onChange={(e) => setNewEvent(prev => ({ ...prev, location: e.target.value }))}
                     placeholder="Event location"
+                    className={isMobile ? 'min-h-[44px] text-base' : ''}
                   />
                 </div>
                 
-                <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
+                <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <Label htmlFor="start_time">Start Time</Label>
+                    <Label htmlFor="start_time" className={isMobile ? 'text-sm font-medium' : ''}>Start Time</Label>
                     <Input
                       id="start_time"
                       type="datetime-local"
                       value={newEvent.start_time}
                       onChange={(e) => setNewEvent(prev => ({ ...prev, start_time: e.target.value }))}
+                      className={isMobile ? 'min-h-[44px] text-base' : ''}
                     />
                   </div>
                   
                   <div>
-                    <Label htmlFor="end_time">End Time</Label>
+                    <Label htmlFor="end_time" className={isMobile ? 'text-sm font-medium' : ''}>End Time</Label>
                     <Input
                       id="end_time"
                       type="datetime-local"
                       value={newEvent.end_time}
                       onChange={(e) => setNewEvent(prev => ({ ...prev, end_time: e.target.value }))}
+                      className={isMobile ? 'min-h-[44px] text-base' : ''}
                     />
                   </div>
                 </div>
                 
-                <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
+                <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <Label htmlFor="price_cents">Price (cents)</Label>
+                    <Label htmlFor="price_cents" className={isMobile ? 'text-sm font-medium' : ''}>Price (cents)</Label>
                     <Input
                       id="price_cents"
                       type="number"
                       value={newEvent.price_cents}
                       onChange={(e) => setNewEvent(prev => ({ ...prev, price_cents: parseInt(e.target.value) || 0 }))}
                       placeholder="0"
+                      className={isMobile ? 'min-h-[44px] text-base' : ''}
                     />
                   </div>
                   
                   <div>
-                    <Label htmlFor="loyalty_points_price">Loyalty Points Price</Label>
+                    <Label htmlFor="loyalty_points_price" className={isMobile ? 'text-sm font-medium' : ''}>Loyalty Points Price</Label>
                     <Input
                       id="loyalty_points_price"
                       type="number"
                       value={newEvent.loyalty_points_price}
                       onChange={(e) => setNewEvent(prev => ({ ...prev, loyalty_points_price: parseInt(e.target.value) || 0 }))}
                       placeholder="0"
+                      className={isMobile ? 'min-h-[44px] text-base' : ''}
                     />
                   </div>
                 </div>
                 
                 <div>
-                  <Label htmlFor="max_capacity">Maximum Capacity</Label>
+                  <Label htmlFor="max_capacity" className={isMobile ? 'text-sm font-medium' : ''}>Maximum Capacity</Label>
                   <Input
                     id="max_capacity"
                     type="number"
                     value={newEvent.max_capacity}
                     onChange={(e) => setNewEvent(prev => ({ ...prev, max_capacity: parseInt(e.target.value) || 50 }))}
                     placeholder="50"
+                    className={isMobile ? 'min-h-[44px] text-base' : ''}
                   />
                 </div>
                 
-                <Button onClick={createEvent} className="w-full">
+                <Button onClick={createEvent} className={`w-full ${isMobile ? 'min-h-[48px] text-base' : ''}`}>
                   Create Event
                 </Button>
               </div>
@@ -440,20 +449,30 @@ const Events: React.FC = () => {
       )}
 
       <Tabs defaultValue="upcoming" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="upcoming">Upcoming Events ({upcomingEvents.length})</TabsTrigger>
-          <TabsTrigger value="ongoing">Ongoing Events ({ongoingEvents.length})</TabsTrigger>
+        <TabsList className={`grid w-full grid-cols-2 ${isMobile ? 'h-12' : ''}`}>
+          <TabsTrigger 
+            value="upcoming" 
+            className={`${isMobile ? 'text-xs px-2 min-h-[44px]' : ''} transition-all`}
+          >
+            {isMobile ? `Upcoming (${upcomingEvents.length})` : `Upcoming Events (${upcomingEvents.length})`}
+          </TabsTrigger>
+          <TabsTrigger 
+            value="ongoing" 
+            className={`${isMobile ? 'text-xs px-2 min-h-[44px]' : ''} transition-all`}
+          >
+            {isMobile ? `Ongoing (${ongoingEvents.length})` : `Ongoing Events (${ongoingEvents.length})`}
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="upcoming" className="space-y-6">
           <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'}`}>
             {upcomingEvents.map((event) => (
-              <Card key={event.id} className="glass-card hover:shadow-lg transition-shadow">
-                <CardHeader>
+              <Card key={event.id} className={`glass-card hover:shadow-lg transition-all duration-200 ${isMobile ? 'active:scale-[0.98]' : 'hover:scale-[1.02]'}`}>
+                <CardHeader className={isMobile ? 'pb-3' : ''}>
                   <div className="flex items-start justify-between">
-                    <div className="space-y-2">
-                      <CardTitle className="text-lg">{event.title}</CardTitle>
-                      <div className="flex gap-2">
+                    <div className="space-y-2 flex-1">
+                      <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'} leading-snug`}>{event.title}</CardTitle>
+                      <div className={`flex gap-2 ${isMobile ? 'flex-wrap' : ''}`}>
                         {getEventStatusBadge(event)}
                         {getRegistrationStatus(event)}
                       </div>
@@ -461,14 +480,14 @@ const Events: React.FC = () => {
                   </div>
                 </CardHeader>
                 
-                <CardContent className="space-y-4">
+                <CardContent className={`space-y-${isMobile ? '3' : '4'}`}>
                   {event.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-3">
+                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground line-clamp-2 leading-relaxed`}>
                       {event.description}
                     </p>
                   )}
                   
-                  <div className="space-y-2 text-sm">
+                  <div className={`space-y-${isMobile ? '1.5' : '2'} ${isMobile ? 'text-xs' : 'text-sm'}`}>
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
                       <span>{new Date(event.start_time).toLocaleDateString()}</span>
@@ -562,14 +581,14 @@ const Events: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="ongoing" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'}`}>
             {ongoingEvents.map((event) => (
-              <Card key={event.id} className="glass-card hover:shadow-lg transition-shadow">
-                <CardHeader>
+              <Card key={event.id} className={`glass-card hover:shadow-lg transition-all duration-200 ${isMobile ? 'active:scale-[0.98]' : 'hover:scale-[1.02]'}`}>
+                <CardHeader className={isMobile ? 'pb-3' : ''}>
                   <div className="flex items-start justify-between">
-                    <div className="space-y-2">
-                      <CardTitle className="text-lg">{event.title}</CardTitle>
-                      <div className="flex gap-2">
+                    <div className="space-y-2 flex-1">
+                      <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'} leading-snug`}>{event.title}</CardTitle>
+                      <div className={`flex gap-2 ${isMobile ? 'flex-wrap' : ''}`}>
                         {getEventStatusBadge(event)}
                         {getRegistrationStatus(event)}
                       </div>
@@ -577,14 +596,14 @@ const Events: React.FC = () => {
                   </div>
                 </CardHeader>
                 
-                <CardContent className="space-y-4">
+                <CardContent className={`space-y-${isMobile ? '3' : '4'}`}>
                   {event.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-3">
+                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground line-clamp-2 leading-relaxed`}>
                       {event.description}
                     </p>
                   )}
                   
-                  <div className="space-y-2 text-sm">
+                  <div className={`space-y-${isMobile ? '1.5' : '2'} ${isMobile ? 'text-xs' : 'text-sm'}`}>
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
                       <span>{new Date(event.start_time).toLocaleDateString()}</span>

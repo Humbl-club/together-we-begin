@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { eventBus } from '@/core/EventBus';
 import { PerformanceMonitorService } from '@/services/core/PerformanceMonitorService';
+import { Calendar } from 'lucide-react';
 
 // Ultimate Events Page with enterprise architecture
 const UltimateEventsPage = memo(() => {
@@ -166,64 +167,120 @@ const UltimateEventsPage = memo(() => {
   }
 
   return (
-    <div className="container mx-auto p-4" data-pull-refresh>
-      <MobileCard variant="touch-optimized" className="mb-6">
-        <MobileCard.Header>
-          <h1 className="text-2xl font-bold">Events</h1>
-          <div className="text-sm text-muted-foreground">
+    <div className="responsive-container max-w-7xl mx-auto mobile:p-4 sm:p-6 lg:p-8 safe-area-top mobile-content spacing-responsive-lg animate-fade-in" data-pull-refresh>
+      {/* Header */}
+      <div className="glass-card-enhanced mobile:p-4 sm:p-6 spacing-responsive-sm settings-header">
+        <div className="text-center sm:text-left">
+          <h1 className="font-display mobile:text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-balance bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
+            Events
+          </h1>
+          <p className="text-muted-foreground mobile:text-sm sm:text-base break-words text-balance mt-2">
             Discover and join community events
-          </div>
-        </MobileCard.Header>
-      </MobileCard>
+          </p>
+        </div>
+      </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-          <TabsTrigger value="ongoing">Ongoing</TabsTrigger>
-          <TabsTrigger value="completed">Past</TabsTrigger>
-        </TabsList>
+      {/* Enhanced Tabs with Better Mobile Support */}
+      <div className="glass-card-enhanced mobile:p-2 sm:p-3 rounded-xl">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="premium-tabs grid w-full mobile:grid-cols-3 sm:grid-cols-3 mobile:h-auto sm:h-12 mobile:gap-1 sm:gap-2">
+            <TabsTrigger 
+              value="upcoming" 
+              className="premium-tab mobile:min-h-[48px] sm:min-h-[44px] mobile:text-xs sm:text-sm font-medium touch-manipulation focus-ring"
+            >
+              Upcoming
+            </TabsTrigger>
+            <TabsTrigger 
+              value="ongoing" 
+              className="premium-tab mobile:min-h-[48px] sm:min-h-[44px] mobile:text-xs sm:text-sm font-medium touch-manipulation focus-ring"
+            >
+              Ongoing
+            </TabsTrigger>
+            <TabsTrigger 
+              value="completed" 
+              className="premium-tab mobile:min-h-[48px] sm:min-h-[44px] mobile:text-xs sm:text-sm font-medium touch-manipulation focus-ring"
+            >
+              Past
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value={activeTab} className="space-y-4">
-          {loading ? (
-            <div className="space-y-4">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="loading-skeleton h-32" />
-              ))}
-            </div>
-          ) : events.length === 0 ? (
-            <MobileCard variant="touch-optimized">
-              <MobileCard.Content>
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground mb-4">
-                    No {activeTab} events found
-                  </p>
-                  <Button variant="outline">
+          <TabsContent value={activeTab} className="mobile:mt-4 sm:mt-6 spacing-responsive-md">
+            {loading ? (
+              <div className="spacing-responsive-md stagger-children">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="glass-section mobile:h-32 sm:h-40 rounded-xl animate-pulse" />
+                ))}
+              </div>
+            ) : events.length === 0 ? (
+              <div className="glass-card-enhanced mobile:p-6 sm:p-8 text-center">
+                <div className="spacing-responsive-sm">
+                  <div className="mobile:w-12 mobile:h-12 sm:w-16 sm:h-16 bg-muted rounded-full mx-auto opacity-50 flex items-center justify-center">
+                    <Calendar className="mobile:w-6 mobile:h-6 sm:w-8 sm:h-8" />
+                  </div>
+                  <div>
+                    <h3 className="mobile:text-base sm:text-lg font-semibold">No {activeTab} events found</h3>
+                    <p className="text-muted-foreground mobile:text-sm sm:text-base">
+                      Check back later for new events
+                    </p>
+                  </div>
+                  <Button variant="outline" className="btn-responsive mobile:text-sm sm:text-base">
                     Browse All Events
                   </Button>
                 </div>
-              </MobileCard.Content>
-            </MobileCard>
-          ) : (
-            <Suspense fallback={<div className="loading-skeleton h-96" />}>
-              <VirtualizedList
-                items={events}
-                renderItem={renderEventCard}
-                itemHeight={isMobileOptimized ? 140 : 200}
-                containerHeight={600}
-                className="space-y-4"
-              />
-            </Suspense>
-          )}
-        </TabsContent>
-      </Tabs>
+              </div>
+            ) : (
+              <div className="spacing-responsive-md">
+                <Suspense fallback={
+                  <div className="spacing-responsive-md">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="glass-section mobile:h-32 sm:h-40 rounded-xl animate-pulse" />
+                    ))}
+                  </div>
+                }>
+                  {/* Mobile-optimized event list without virtualization for better mobile performance */}
+                  {isMobileOptimized ? (
+                    <div className="spacing-responsive-md stagger-children">
+                      {events.slice(0, 10).map((event, index) => (
+                        <div key={event.id} className="glass-card-enhanced mobile:p-4 sm:p-6 rounded-xl">
+                          <EventCardPresentation
+                            event={event}
+                            onRegister={handleRegister}
+                            onViewDetails={(id) => console.log('View details:', id)}
+                            variant="compact"
+                          />
+                        </div>
+                      ))}
+                      
+                      {events.length > 10 && (
+                        <div className="text-center">
+                          <Button variant="outline" className="btn-responsive">
+                            Load More Events
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <VirtualizedList
+                      items={events}
+                      renderItem={renderEventCard}
+                      itemHeight={200}
+                      containerHeight={600}
+                      className="spacing-responsive-md"
+                    />
+                  )}
+                </Suspense>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
 
       {/* Enhanced Performance Debug Info */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="fixed bottom-4 right-4 bg-black/80 text-white p-2 rounded text-xs space-y-1">
+        <div className="fixed mobile:bottom-20 sm:bottom-4 right-4 glass-modal p-3 rounded-lg mobile:text-xs sm:text-sm space-y-1 z-40">
           <div>Mobile: {isMobileOptimized ? 'Yes' : 'No'}</div>
           <div>Cache: Active</div>
           <div>Events: Real-time</div>
-          <div>Performance: Monitored</div>
         </div>
       )}
     </div>

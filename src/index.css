@@ -346,8 +346,8 @@
   /* Mobile-First Button Styles */
   .btn-responsive {
     @apply min-h-[44px] px-6 rounded-xl font-medium transition-all duration-200;
-    @apply touch-manipulation tap-highlight-transparent;
-    @apply active:scale-95 active:brightness-95;
+    @apply touch-manipulation active:scale-95 active:brightness-95;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* Mobile Card Enhancements */

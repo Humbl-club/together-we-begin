@@ -222,57 +222,59 @@ const Settings: React.FC = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto mobile:p-4 sm:p-6 lg:p-8 safe-area-top safe-area-bottom spacing-responsive-lg">
+    <div className="max-w-6xl mx-auto mobile:p-4 sm:p-6 lg:p-8 safe-area-top safe-area-bottom spacing-responsive-lg animate-fade-in">
       {/* Header */}
-      <div className="glass-card-enhanced mobile:p-6 sm:p-8 spacing-responsive-md">
+      <div className="glass-card-enhanced mobile:p-6 sm:p-8 spacing-responsive-md settings-header">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mobile:text-center sm:text-left">
-          <div className="p-3 rounded-xl bg-primary/10 backdrop-blur-sm mobile:mx-auto sm:mx-0">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 backdrop-blur-sm mobile:mx-auto sm:mx-0 animate-glow">
             <SettingsIcon className="mobile:w-6 mobile:h-6 sm:w-8 sm:h-8 text-primary" />
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="mobile:text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight break-words">Settings</h1>
-            <p className="text-muted-foreground mobile:text-base sm:text-lg break-words">
-              Customize your HUMBL experience
+            <h1 className="font-display mobile:text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight break-words text-balance bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
+              Settings
+            </h1>
+            <p className="text-muted-foreground mobile:text-base sm:text-lg break-words text-balance mt-2">
+              Customize your HUMBL experience with precision
             </p>
           </div>
         </div>
       </div>
 
       {/* Settings Tabs */}
-      <Tabs defaultValue="notifications" className="spacing-responsive-lg">
-        <div className="glass-card mobile:p-1 sm:p-2 rounded-xl">
+      <Tabs defaultValue="notifications" className="spacing-responsive-lg stagger-children">
+        <div className="premium-tabs mobile:p-1 sm:p-2">
           <TabsList className="grid mobile:grid-cols-3 sm:grid-cols-5 w-full bg-transparent mobile:gap-1 sm:gap-2 mobile:h-auto sm:h-12">
             <TabsTrigger 
               value="notifications" 
-              className="glass-button flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:border-primary/30 transition-all duration-300 touch-manipulation"
+              className="premium-tab flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 transition-all duration-300 touch-manipulation focus-ring"
             >
               <Bell className="mobile:w-4 mobile:h-4 sm:w-4 sm:h-4 flex-shrink-0" />
               <span className="mobile:text-xs mobile:font-medium sm:text-sm mobile:block sm:hidden lg:block">Notifications</span>
             </TabsTrigger>
             <TabsTrigger 
               value="privacy" 
-              className="glass-button flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:border-primary/30 transition-all duration-300 touch-manipulation"
+              className="premium-tab flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 transition-all duration-300 touch-manipulation focus-ring"
             >
               <Shield className="mobile:w-4 mobile:h-4 sm:w-4 sm:h-4 flex-shrink-0" />
               <span className="mobile:text-xs mobile:font-medium sm:text-sm mobile:block sm:hidden lg:block">Privacy</span>
             </TabsTrigger>
             <TabsTrigger 
               value="wellness" 
-              className="glass-button flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:border-primary/30 transition-all duration-300 touch-manipulation"
+              className="premium-tab flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 transition-all duration-300 touch-manipulation focus-ring"
             >
               <Heart className="mobile:w-4 mobile:h-4 sm:w-4 sm:h-4 flex-shrink-0" />
               <span className="mobile:text-xs mobile:font-medium sm:text-sm mobile:block sm:hidden lg:block">Wellness</span>
             </TabsTrigger>
             <TabsTrigger 
               value="social" 
-              className="glass-button flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:border-primary/30 transition-all duration-300 touch-manipulation mobile:col-span-1 sm:col-span-1"
+              className="premium-tab flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 transition-all duration-300 touch-manipulation mobile:col-span-1 sm:col-span-1 focus-ring"
             >
               <Users className="mobile:w-4 mobile:h-4 sm:w-4 sm:h-4 flex-shrink-0" />
               <span className="mobile:text-xs mobile:font-medium sm:text-sm mobile:block sm:hidden lg:block">Social</span>
             </TabsTrigger>
             <TabsTrigger 
               value="appearance" 
-              className="glass-button flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:border-primary/30 transition-all duration-300 touch-manipulation mobile:col-span-2 sm:col-span-1"
+              className="premium-tab flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 transition-all duration-300 touch-manipulation mobile:col-span-2 sm:col-span-1 focus-ring"
             >
               <Eye className="mobile:w-4 mobile:h-4 sm:w-4 sm:h-4 flex-shrink-0" />
               <span className="mobile:text-xs mobile:font-medium sm:text-sm mobile:block sm:hidden lg:block">Appearance</span>

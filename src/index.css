@@ -117,7 +117,8 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
     background: linear-gradient(135deg, 
       hsl(var(--editorial-cream) / 0.6) 0%, 
       hsl(var(--editorial-warm-grey) / 0.4) 35%,
@@ -127,6 +128,19 @@
     min-height: 100vh;
     font-weight: 300;
     letter-spacing: 0.01em;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Premium Typography Classes */
+  .font-display {
+    font-family: 'Playfair Display', serif;
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
 }
 
@@ -465,15 +479,167 @@
       0 0 0 1px hsl(var(--foreground) / 0.05) inset;
   }
 
-  /* Settings specific optimizations */
+  /* Premium Settings Optimizations */
   .settings-item {
-    @apply glass-input mobile:p-3 sm:p-4 rounded-lg transition-all duration-200;
-    @apply hover:shadow-md hover:scale-[1.02] active:scale-[0.98];
-    will-change: transform;
+    @apply glass-input mobile:p-3 sm:p-4 rounded-lg transition-all duration-300;
+    @apply hover:shadow-lg hover:scale-[1.01] active:scale-[0.99];
+    background: linear-gradient(135deg, 
+      hsl(var(--glass-light)) 0%, 
+      hsl(var(--glass-medium)) 100%);
+    border: 1px solid hsl(var(--glass-border));
+    will-change: transform, box-shadow;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .settings-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.05), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .settings-item:hover::before {
+    left: 100%;
+  }
+
+  .settings-item:focus-within {
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: 
+      0 0 0 2px hsl(var(--primary) / 0.1),
+      0 8px 24px hsl(var(--primary) / 0.15);
   }
 
   .settings-switch {
     @apply flex-shrink-0 mobile:scale-110 sm:scale-100;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .settings-switch:focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+
+  /* Enhanced Tab System */
+  .premium-tabs {
+    position: relative;
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--glass-border));
+    border-radius: 1rem;
+    padding: 0.25rem;
+  }
+
+  .premium-tab {
+    @apply relative transition-all duration-300 ease-out;
+    background: transparent;
+    border: none;
+    border-radius: 0.75rem;
+    z-index: 1;
+  }
+
+  .premium-tab[data-state="active"] {
+    background: linear-gradient(135deg, 
+      hsl(var(--primary) / 0.15) 0%, 
+      hsl(var(--primary) / 0.1) 100%);
+    color: hsl(var(--primary));
+    box-shadow: 
+      0 2px 8px hsl(var(--primary) / 0.1),
+      inset 0 1px 0 hsl(var(--primary) / 0.1);
+  }
+
+  .premium-tab:hover:not([data-state="active"]) {
+    background: hsl(var(--muted) / 0.5);
+  }
+
+  /* Enhanced Form Controls */
+  .premium-input {
+    @apply relative;
+    background: hsl(var(--glass-light));
+    border: 1px solid hsl(var(--glass-border));
+    border-radius: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
+  }
+
+  .premium-input:focus {
+    border-color: hsl(var(--primary) / 0.4);
+    background: hsl(var(--glass-hover));
+    box-shadow: 
+      0 0 0 3px hsl(var(--primary) / 0.1),
+      0 4px 12px hsl(var(--primary) / 0.15);
+    transform: translateY(-1px);
+  }
+
+  /* Header Animations */
+  .settings-header {
+    animation: slideDown 0.6s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Staggered Content Animation */
+  .stagger-children > * {
+    animation: fadeInUp 0.6s ease-out;
+    animation-fill-mode: both;
+  }
+
+  .stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+  .stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+  .stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+  .stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Focus Ring for Accessibility */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  /* Enhanced Button Styles */
+  .btn-responsive {
+    @apply min-h-[44px] px-6 rounded-xl font-medium transition-all duration-300;
+    @apply touch-manipulation active:scale-95 focus-ring;
+    @apply hover:shadow-lg hover:scale-105;
+    -webkit-tap-highlight-color: transparent;
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.9) 100%);
+    box-shadow: 
+      0 4px 12px hsl(var(--primary) / 0.25),
+      inset 0 1px 0 hsl(var(--primary-foreground) / 0.1);
+  }
+
+  .btn-responsive:hover {
+    box-shadow: 
+      0 8px 25px hsl(var(--primary) / 0.35),
+      inset 0 1px 0 hsl(var(--primary-foreground) / 0.15);
+  }
+
+  .btn-responsive:active {
+    transform: scale(0.98);
+    transition-duration: 0.1s;
   }
 
   /* Advanced Animations with Reduced Motion Support */

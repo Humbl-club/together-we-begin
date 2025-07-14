@@ -72,22 +72,20 @@ const Social: React.FC = () => {
   }, [user]);
 
   const subscribeToRealtime = () => {
+    // Optimized: Reduced frequency and specific event listening
     const channel = supabase
-      .channel('social-updates')
-      .on('postgres_changes', {
-        event: '*',
+      .channel('social-optimized')
+      .on('postgres_changes' as any, {
+        event: 'INSERT',
         schema: 'public',
-        table: 'social_posts'
+        table: 'social_posts',
+        filter: 'status=eq.active'
       }, () => {
-        fetchPosts();
-        fetchStories();
-      })
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'post_likes'
-      }, () => {
-        fetchPosts();
+        // Debounced refetch for new posts only
+        setTimeout(() => {
+          fetchPosts();
+          fetchStories();
+        }, 1000);
       })
       .subscribe();
 

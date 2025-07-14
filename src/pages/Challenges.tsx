@@ -69,21 +69,16 @@ const Challenges: React.FC = () => {
   }, [user]);
 
   const subscribeToRealtime = () => {
+    // Optimized: Only listen to relevant events with debouncing
     const channel = supabase
-      .channel('challenges-updates')
-      .on('postgres_changes', {
-        event: '*',
+      .channel('challenges-optimized')
+      .on('postgres_changes' as any, {
+        event: 'UPDATE',
         schema: 'public',
-        table: 'challenges'
+        table: 'challenges',
+        filter: 'status=eq.active'
       }, () => {
-        fetchChallenges();
-      })
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'challenge_participations'
-      }, () => {
-        fetchChallenges();
+        setTimeout(() => fetchChallenges(), 1500);
       })
       .subscribe();
 

@@ -171,6 +171,7 @@
   .stats-card {
     @apply glass-card-enhanced hover:scale-[1.02] cursor-pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
   }
 
   .profile-completion {
@@ -189,6 +190,7 @@
   .avatar-glow {
     box-shadow: 0 0 30px hsl(var(--primary) / 0.3);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
   }
 
   .avatar-glow:hover {
@@ -234,6 +236,7 @@
   .loyalty-item {
     position: relative;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
   }
 
   .loyalty-item:hover {
@@ -241,9 +244,10 @@
     border-color: hsl(var(--primary) / 0.3);
   }
 
-  /* Micro-interactions */
+  /* Micro-interactions with performance optimization */
   .interactive-element {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
   }
 
   .interactive-element:hover {

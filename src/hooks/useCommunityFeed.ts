@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useOptimizedData } from './useOptimizedData';
-import { useRealtimeSubscription } from './useRealtimeSubscription';
+import { useOptimizedRealtime } from './useOptimizedRealtime';
 
 interface FeedPost {
   id: string;
@@ -87,13 +87,14 @@ export const useCommunityFeed = (userId?: string) => {
     ));
   };
 
-  // Real-time subscription for new posts
-  useRealtimeSubscription(userId, [
+  // Optimized real-time subscription
+  useOptimizedRealtime(userId, [
     {
       table: 'social_posts',
-      event: 'INSERT',
-      filter: `status=eq.active`,
-      onUpdate: () => fetchPosts()
+      events: ['INSERT'],
+      filter: 'status=eq.active',
+      onUpdate: () => fetchPosts(),
+      debounceMs: 1000
     }
   ]);
 

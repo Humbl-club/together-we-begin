@@ -222,16 +222,16 @@ const Settings: React.FC = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 flow-content">
+    <div className="max-w-6xl mx-auto mobile:p-4 sm:p-6 lg:p-8 safe-area-top safe-area-bottom spacing-responsive-lg">
       {/* Header */}
-      <div className="glass-card-enhanced p-8 mb-6">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="p-3 rounded-xl bg-primary/10 backdrop-blur-sm">
-            <SettingsIcon className="w-8 h-8 text-primary" />
+      <div className="glass-card-enhanced mobile:p-6 sm:p-8 spacing-responsive-md">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mobile:text-center sm:text-left">
+          <div className="p-3 rounded-xl bg-primary/10 backdrop-blur-sm mobile:mx-auto sm:mx-0">
+            <SettingsIcon className="mobile:w-6 mobile:h-6 sm:w-8 sm:h-8 text-primary" />
           </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-            <p className="text-muted-foreground text-lg">
+          <div className="min-w-0 flex-1">
+            <h1 className="mobile:text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight break-words">Settings</h1>
+            <p className="text-muted-foreground mobile:text-base sm:text-lg break-words">
               Customize your HUMBL experience
             </p>
           </div>
@@ -239,114 +239,118 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Settings Tabs */}
-      <Tabs defaultValue="notifications" className="space-y-6">
-        <div className="glass-card p-2 rounded-xl">
-          <TabsList className="grid grid-cols-2 lg:grid-cols-5 w-full bg-transparent gap-2">
+      <Tabs defaultValue="notifications" className="spacing-responsive-lg">
+        <div className="glass-card mobile:p-1 sm:p-2 rounded-xl">
+          <TabsList className="grid mobile:grid-cols-3 sm:grid-cols-5 w-full bg-transparent mobile:gap-1 sm:gap-2 mobile:h-auto sm:h-12">
             <TabsTrigger 
               value="notifications" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:backdrop-blur-sm"
+              className="glass-button flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:border-primary/30 transition-all duration-300 touch-manipulation"
             >
-              <Bell className="w-4 h-4" />
-              <span className="hidden sm:inline">Notifications</span>
+              <Bell className="mobile:w-4 mobile:h-4 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="mobile:text-xs mobile:font-medium sm:text-sm mobile:block sm:hidden lg:block">Notifications</span>
             </TabsTrigger>
             <TabsTrigger 
               value="privacy" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:backdrop-blur-sm"
+              className="glass-button flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:border-primary/30 transition-all duration-300 touch-manipulation"
             >
-              <Shield className="w-4 h-4" />
-              <span className="hidden sm:inline">Privacy</span>
+              <Shield className="mobile:w-4 mobile:h-4 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="mobile:text-xs mobile:font-medium sm:text-sm mobile:block sm:hidden lg:block">Privacy</span>
             </TabsTrigger>
             <TabsTrigger 
               value="wellness" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:backdrop-blur-sm"
+              className="glass-button flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:border-primary/30 transition-all duration-300 touch-manipulation"
             >
-              <Heart className="w-4 h-4" />
-              <span className="hidden sm:inline">Wellness</span>
+              <Heart className="mobile:w-4 mobile:h-4 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="mobile:text-xs mobile:font-medium sm:text-sm mobile:block sm:hidden lg:block">Wellness</span>
             </TabsTrigger>
             <TabsTrigger 
               value="social" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:backdrop-blur-sm"
+              className="glass-button flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:border-primary/30 transition-all duration-300 touch-manipulation mobile:col-span-1 sm:col-span-1"
             >
-              <Users className="w-4 h-4" />
-              <span className="hidden sm:inline">Social</span>
+              <Users className="mobile:w-4 mobile:h-4 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="mobile:text-xs mobile:font-medium sm:text-sm mobile:block sm:hidden lg:block">Social</span>
             </TabsTrigger>
             <TabsTrigger 
               value="appearance" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:backdrop-blur-sm"
+              className="glass-button flex items-center gap-2 mobile:flex-col mobile:gap-1 sm:flex-row sm:gap-2 mobile:min-h-[60px] sm:min-h-[44px] mobile:p-2 sm:p-3 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:border-primary/30 transition-all duration-300 touch-manipulation mobile:col-span-2 sm:col-span-1"
             >
-              <Eye className="w-4 h-4" />
-              <span className="hidden sm:inline">Appearance</span>
+              <Eye className="mobile:w-4 mobile:h-4 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="mobile:text-xs mobile:font-medium sm:text-sm mobile:block sm:hidden lg:block">Appearance</span>
             </TabsTrigger>
           </TabsList>
         </div>
 
         {/* Notifications Settings */}
-        <TabsContent value="notifications" className="space-y-6">
+        <TabsContent value="notifications" className="spacing-responsive-lg">
           <Card className="glass-card-enhanced">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-3">
-                <Bell className="w-6 h-6 text-primary" />
-                Notification Preferences
+            <CardHeader className="mobile:pb-4 sm:pb-6">
+              <CardTitle className="flex items-center gap-3 mobile:text-lg sm:text-xl lg:text-2xl">
+                <Bell className="mobile:w-5 mobile:h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
+                <span className="break-words">Notification Preferences</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg">Push Notifications</h3>
+            <CardContent className="spacing-responsive-lg">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="spacing-responsive-md">
+                  <h3 className="font-semibold mobile:text-base sm:text-lg text-primary">Push Notifications</h3>
                   
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30 backdrop-blur-sm">
-                    <div className="flex items-center gap-3">
-                      <Smartphone className="w-5 h-5 text-muted-foreground" />
-                      <div>
-                        <Label>Enable Push Notifications</Label>
-                        <p className="text-sm text-muted-foreground">Get notifications on your device</p>
+                  <div className="glass-input flex items-center justify-between mobile:p-3 sm:p-4 rounded-lg touch-manipulation">
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <Smartphone className="mobile:w-4 mobile:h-4 sm:w-5 sm:h-5 text-muted-foreground mt-1 flex-shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <Label className="mobile:text-sm sm:text-base font-medium cursor-pointer">Enable Push Notifications</Label>
+                        <p className="mobile:text-xs sm:text-sm text-muted-foreground mt-1 break-words">Get notifications on your device</p>
                       </div>
                     </div>
                     <Switch
                       checked={settings.notifications.push_enabled}
                       onCheckedChange={(checked) => updateSetting('notifications', 'push_enabled', checked)}
+                      className="ml-4 flex-shrink-0"
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30 backdrop-blur-sm">
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-5 h-5 text-muted-foreground" />
-                      <div>
-                        <Label>Event Notifications</Label>
-                        <p className="text-sm text-muted-foreground">New events and reminders</p>
+                  <div className="settings-item flex items-center justify-between touch-manipulation">
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <Calendar className="mobile:w-4 mobile:h-4 sm:w-5 sm:h-5 text-muted-foreground mt-1 flex-shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <Label className="mobile:text-sm sm:text-base font-medium cursor-pointer">Event Notifications</Label>
+                        <p className="mobile:text-xs sm:text-sm text-muted-foreground mt-1 break-words">New events and reminders</p>
                       </div>
                     </div>
                     <Switch
                       checked={settings.notifications.events}
                       onCheckedChange={(checked) => updateSetting('notifications', 'events', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30 backdrop-blur-sm">
-                    <div className="flex items-center gap-3">
-                      <Target className="w-5 h-5 text-muted-foreground" />
-                      <div>
-                        <Label>Challenge Notifications</Label>
-                        <p className="text-sm text-muted-foreground">Challenge updates and achievements</p>
+                  <div className="settings-item flex items-center justify-between touch-manipulation">
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <Target className="mobile:w-4 mobile:h-4 sm:w-5 sm:h-5 text-muted-foreground mt-1 flex-shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <Label className="mobile:text-sm sm:text-base font-medium cursor-pointer">Challenge Notifications</Label>
+                        <p className="mobile:text-xs sm:text-sm text-muted-foreground mt-1 break-words">Challenge updates and achievements</p>
                       </div>
                     </div>
                     <Switch
                       checked={settings.notifications.challenges}
                       onCheckedChange={(checked) => updateSetting('notifications', 'challenges', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30 backdrop-blur-sm">
-                    <div className="flex items-center gap-3">
-                      <MessageSquare className="w-5 h-5 text-muted-foreground" />
-                      <div>
-                        <Label>Message Notifications</Label>
-                        <p className="text-sm text-muted-foreground">Direct messages and replies</p>
+                  <div className="settings-item flex items-center justify-between touch-manipulation">
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <MessageSquare className="mobile:w-4 mobile:h-4 sm:w-5 sm:h-5 text-muted-foreground mt-1 flex-shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <Label className="mobile:text-sm sm:text-base font-medium cursor-pointer">Message Notifications</Label>
+                        <p className="mobile:text-xs sm:text-sm text-muted-foreground mt-1 break-words">Direct messages and replies</p>
                       </div>
                     </div>
                     <Switch
                       checked={settings.notifications.messages}
                       onCheckedChange={(checked) => updateSetting('notifications', 'messages', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
                 </div>

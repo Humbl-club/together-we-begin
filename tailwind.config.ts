@@ -18,14 +18,15 @@ export default {
 			}
 		},
 		extend: {
-			// Modern responsive system
+			// Modern responsive system with mobile-first approach
 			screens: {
+				'mobile': {'max': '767px'}, // mobile-only styles
 				'xs': '475px',
-				'sm': '640px', 
-				'md': '768px',
-				'lg': '1024px',
-				'xl': '1280px',
-				'2xl': '1536px',
+				'sm': '768px', 
+				'md': '1024px',
+				'lg': '1280px',
+				'xl': '1536px',
+				'2xl': '1792px',
 			},
 			// Container query support
 			supports: {

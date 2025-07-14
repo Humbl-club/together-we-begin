@@ -215,7 +215,7 @@ const Social: React.FC = () => {
       // Upload images if any
       if (selectedImages.length > 0) {
         for (const image of selectedImages) {
-          const fileName = `${Date.now()}_${image.name}`;
+          const fileName = `${user.id}/${Date.now()}_${image.name}`;
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('posts')
             .upload(fileName, image);

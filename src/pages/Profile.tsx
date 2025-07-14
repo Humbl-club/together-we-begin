@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { useViewport } from '@/hooks/use-mobile';
+import { useProfileData } from '@/hooks/useProfileData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,238 +12,37 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Star, Trophy, MapPin, Instagram, Edit3, Save, X, CheckCircle } from 'lucide-react';
+import { Camera, MapPin, Instagram, Edit3, Save, X, CheckCircle, Star, Trophy } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PrivacyControls } from '@/components/profile/PrivacyControls';
 import { ProfileVerification } from '@/components/profile/ProfileVerification';
 import { DirectMessaging } from '@/components/messaging/DirectMessaging';
+import { AnimatedStats } from '@/components/profile/AnimatedStats';
+import { ProgressRing } from '@/components/profile/ProgressRing';
 
-interface UserProfile {
-  id: string;
-  full_name: string | null;
-  username: string | null;
-  bio: string | null;
-  avatar_url: string | null;
-  location: string | null;
-  instagram_handle: string | null;
-  available_loyalty_points: number | null;
-  total_loyalty_points: number | null;
-  created_at: string;
-}
-
-interface LoyaltyTransaction {
-  id: string;
-  type: string;
-  points: number;
-  description: string | null;
-  created_at: string;
-  reference_type: string | null;
-}
-
-interface CompletedChallenge {
-  id: string;
-  completion_date: string;
-  challenges: {
-    title: string;
-    badge_name: string | null;
-    points_reward: number | null;
-  };
-}
-
-// Custom hook for count-up animation
-const useCountUp = (end: number, duration: number = 2000) => {
-  const [count, setCount] = useState(0);
-  const countRef = useRef(0);
-  const rafRef = useRef<number>();
-  
-  useEffect(() => {
-    const startTime = Date.now();
-    
-    const animate = () => {
-      const now = Date.now();
-      const progress = Math.min((now - startTime) / duration, 1);
-      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-      
-      countRef.current = Math.floor(easeOutQuart * end);
-      setCount(countRef.current);
-      
-      if (progress < 1) {
-        rafRef.current = requestAnimationFrame(animate);
-      }
-    };
-    
-    rafRef.current = requestAnimationFrame(animate);
-    
-    return () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-    };
-  }, [end, duration]);
-  
-  return count;
-};
-
-// Progress Ring Component
-const ProgressRing: React.FC<{ percentage: number; size?: number; strokeWidth?: number }> = ({ 
-  percentage, 
-  size = 120, 
-  strokeWidth = 8 
-}) => {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const strokeDasharray = circumference;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-  
-  return (
-    <div className="relative inline-flex items-center justify-center">
-      <svg
-        width={size}
-        height={size}
-        className="transform -rotate-90"
-      >
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="hsl(var(--muted))"
-          strokeWidth={strokeWidth}
-          fill="transparent"
-          className="opacity-20"
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="hsl(var(--primary))"
-          strokeWidth={strokeWidth}
-          fill="transparent"
-          strokeDasharray={strokeDasharray}
-          strokeDashoffset={strokeDashoffset}
-          className="transition-all duration-1000 ease-out"
-          style={{
-            filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.3))'
-          }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-2xl font-bold">{Math.round(percentage)}%</span>
-      </div>
-    </div>
-  );
-};
-
-// Animated Stat Card Component
-const AnimatedStatCard: React.FC<{
-  icon: React.ElementType;
-  title: string;
-  value: number;
-  iconColor: string;
-  iconBgColor: string;
-  delay?: number;
-}> = ({ icon: Icon, title, value, iconColor, iconBgColor, delay = 0 }) => {
-  const animatedValue = useCountUp(value, 2000 + delay);
-  
-  return (
-    <Card className="stats-card group">
-      <CardContent className="pt-6">
-        <div className="flex items-center gap-3">
-          <div className={`p-3 rounded-full ${iconBgColor} transform group-hover:scale-110 transition-transform duration-300`}>
-            <Icon className={`w-6 h-6 ${iconColor}`} />
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground font-medium">{title}</p>
-            <p className="text-3xl font-bold">{animatedValue}</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
 
 const Profile: React.FC = () => {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loyaltyTransactions, setLoyaltyTransactions] = useState<LoyaltyTransaction[]>([]);
-  const [completedChallenges, setCompletedChallenges] = useState<CompletedChallenge[]>([]);
-  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
-  const [editedProfile, setEditedProfile] = useState<Partial<UserProfile>>({});
+  const [editedProfile, setEditedProfile] = useState<any>({});
   const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
   const { isMobile } = useViewport();
+  
+  const { 
+    profile, 
+    loyaltyTransactions, 
+    completedChallenges, 
+    loading, 
+    updateProfile 
+  } = useProfileData(user?.id);
 
-  useEffect(() => {
-    if (user) {
-      fetchProfile();
-      fetchLoyaltyTransactions();
-      fetchCompletedChallenges();
+  // Initialize editedProfile when profile loads
+  React.useEffect(() => {
+    if (profile) {
+      setEditedProfile(profile);
     }
-  }, [user]);
-
-  const fetchProfile = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user!.id)
-        .single();
-
-      if (error) throw error;
-
-      setProfile(data);
-      setEditedProfile(data);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load profile",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchLoyaltyTransactions = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('loyalty_transactions')
-        .select('*')
-        .eq('user_id', user!.id)
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-      setLoyaltyTransactions(data || []);
-    } catch (error) {
-      console.error('Error fetching loyalty transactions:', error);
-    }
-  };
-
-  const fetchCompletedChallenges = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('challenge_participations')
-        .select(`
-          id,
-          completion_date,
-          challenges!challenge_participations_challenge_id_fkey (
-            title,
-            badge_name,
-            points_reward
-          )
-        `)
-        .eq('user_id', user!.id)
-        .eq('completed', true)
-        .order('completion_date', { ascending: false });
-
-      if (error) throw error;
-      setCompletedChallenges(data || []);
-    } catch (error) {
-      console.error('Error fetching completed challenges:', error);
-    }
-  };
+  }, [profile]);
 
   const uploadAvatar = async (file: File): Promise<string | null> => {
     try {
@@ -270,48 +70,30 @@ const Profile: React.FC = () => {
   };
 
   const saveProfile = async () => {
-    try {
-      setLoading(true);
+    let avatarUrl = editedProfile.avatar_url;
 
-      let avatarUrl = editedProfile.avatar_url;
-
-      // Upload new avatar if selected
-      if (selectedAvatar) {
-        const uploadedUrl = await uploadAvatar(selectedAvatar);
-        if (uploadedUrl) {
-          avatarUrl = uploadedUrl;
-        }
+    // Upload new avatar if selected
+    if (selectedAvatar) {
+      const uploadedUrl = await uploadAvatar(selectedAvatar);
+      if (uploadedUrl) {
+        avatarUrl = uploadedUrl;
       }
+    }
 
-      const updateData = {
-        ...editedProfile,
-        avatar_url: avatarUrl
-      };
+    const updateData = {
+      ...editedProfile,
+      avatar_url: avatarUrl
+    };
 
-      const { error } = await supabase
-        .from('profiles')
-        .update(updateData)
-        .eq('id', user!.id);
-
-      if (error) throw error;
-
-      setProfile({ ...profile!, ...updateData });
+    const success = await updateProfile(updateData);
+    
+    if (success) {
       setEditing(false);
       setSelectedAvatar(null);
-
       toast({
         title: "Success",
         description: "Profile updated successfully!"
       });
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update profile",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -539,31 +321,11 @@ const Profile: React.FC = () => {
 
       {/* Stats Grid */}
       {!editing && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <AnimatedStatCard
-            icon={Star}
-            title="Available Points"
-            value={profile.available_loyalty_points || 0}
-            iconColor="text-amber-500"
-            iconBgColor="bg-amber-500/20"
-          />
-          
-          <AnimatedStatCard
-            icon={Trophy}
-            title="Total Points"
-            value={profile.total_loyalty_points || 0}
-            iconColor="text-yellow-500"
-            iconBgColor="bg-yellow-500/20"
-            delay={200}
-          />
-          
-          <AnimatedStatCard
-            icon={Trophy}
-            title="Challenges"
-            value={completedChallenges.length}
-            iconColor="text-blue-500"
-            iconBgColor="bg-blue-500/20"
-            delay={400}
+        <div className="mb-8">
+          <AnimatedStats
+            totalPoints={profile.total_loyalty_points || 0}
+            availablePoints={profile.available_loyalty_points || 0}
+            completedChallenges={completedChallenges.length}
           />
         </div>
       )}

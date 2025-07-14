@@ -144,6 +144,59 @@
   }
 }
 
+/* Appearance Settings CSS */
+/* Font Size Classes */
+.font-small {
+  font-size: 14px !important;
+}
+
+.font-medium {
+  font-size: 16px !important;
+}
+
+.font-large {
+  font-size: 18px !important;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  --background: 0 0% 100% !important;
+  --foreground: 0 0% 0% !important;
+  --border: 0 0% 0% !important;
+  --primary: 0 0% 0% !important;
+  --primary-foreground: 0 0% 100% !important;
+}
+
+.high-contrast.dark {
+  --background: 0 0% 0% !important;
+  --foreground: 0 0% 100% !important;
+  --border: 0 0% 100% !important;
+  --primary: 0 0% 100% !important;
+  --primary-foreground: 0 0% 0% !important;
+}
+
+/* Reduced Motion */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Enhanced Glassmorphism Effects */
+.glassmorphism-enabled .glass-card-enhanced {
+  backdrop-filter: blur(20px) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.glassmorphism-enabled.dark .glass-card-enhanced {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
 @layer components {
   /* ===== MODERN CSS APPROACH ===== */
   

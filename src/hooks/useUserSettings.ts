@@ -139,6 +139,9 @@ export const useUserSettings = () => {
       // Apply theme to document
       applyTheme(newSettings.appearance.theme);
       applyGlassmorphism(newSettings.appearance.glassmorphism_enabled);
+      applyFontSize(newSettings.appearance.font_size);
+      applyHighContrast(newSettings.appearance.high_contrast);
+      applyAnimations(newSettings.appearance.animations_enabled);
       
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -221,20 +224,52 @@ export const useUserSettings = () => {
   const applyTheme = (theme: 'light' | 'dark' | 'system') => {
     const root = document.documentElement;
     
+    // Remove existing theme classes
+    root.classList.remove('light', 'dark');
+    
     if (theme === 'system') {
       const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      root.setAttribute('data-theme', systemTheme);
+      root.classList.add(systemTheme);
     } else {
-      root.setAttribute('data-theme', theme);
+      root.classList.add(theme);
     }
+    
+    // Also set data attribute for consistency
+    root.setAttribute('data-theme', theme);
   };
 
   const applyGlassmorphism = (enabled: boolean) => {
     const root = document.documentElement;
     if (enabled) {
       root.classList.add('glassmorphism-enabled');
+      root.style.setProperty('--glass-effects', 'enabled');
     } else {
       root.classList.remove('glassmorphism-enabled');
+      root.style.setProperty('--glass-effects', 'disabled');
+    }
+  };
+
+  const applyFontSize = (size: 'small' | 'medium' | 'large') => {
+    const root = document.documentElement;
+    root.classList.remove('font-small', 'font-medium', 'font-large');
+    root.classList.add(`font-${size}`);
+  };
+
+  const applyHighContrast = (enabled: boolean) => {
+    const root = document.documentElement;
+    if (enabled) {
+      root.classList.add('high-contrast');
+    } else {
+      root.classList.remove('high-contrast');
+    }
+  };
+
+  const applyAnimations = (enabled: boolean) => {
+    const root = document.documentElement;
+    if (enabled) {
+      root.classList.remove('reduce-motion');
+    } else {
+      root.classList.add('reduce-motion');
     }
   };
 
@@ -252,6 +287,22 @@ export const useUserSettings = () => {
     };
     
     setSettings(newSettings);
+    
+    // Apply appearance changes immediately
+    if (section === 'appearance') {
+      if (key === 'theme') {
+        applyTheme(value);
+      } else if (key === 'glassmorphism_enabled') {
+        applyGlassmorphism(value);
+      } else if (key === 'font_size') {
+        applyFontSize(value);
+      } else if (key === 'high_contrast') {
+        applyHighContrast(value);
+      } else if (key === 'animations_enabled') {
+        applyAnimations(value);
+      }
+    }
+    
     saveSettings({ [section]: newSettings[section] });
   };
 

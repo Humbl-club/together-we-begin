@@ -15,6 +15,7 @@ import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { AdvancedSearch, type SearchableItem } from '@/components/search/AdvancedSearch';
 import { useContentModeration, ReportModal, ContentWarning } from '@/components/moderation/ContentModeration';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { dbPerformance } from '@/services/core/DatabasePerformanceService';
 
 interface Post {
   id: string;
@@ -282,17 +283,36 @@ const Social: React.FC = () => {
 
   const fetchComments = async (postId: string) => {
     try {
-      // Fetch comments and profiles separately
+      // Optimized query using new indexes: idx_post_comments_post_id and idx_post_comments_created_at
       const { data: commentsData, error: commentsError } = await supabase
         .from('post_comments')
-        .select('*')
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id
+        `)
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
 
       if (commentsError) throw commentsError;
 
-      // Fetch profiles for these comments
-      const userIds = [...new Set(commentsData?.map(comment => comment.user_id) || [])];
+      if (!commentsData || commentsData.length === 0) {
+        setComments([]);
+        return;
+      }
+
+      // Batch fetch profiles for better performance with Map for O(1) lookups
+      const userIds = [...new Set(commentsData.map(comment => comment.user_id))].filter(Boolean);
+      
+      if (userIds.length === 0) {
+        setComments(commentsData.map(comment => ({
+          ...comment,
+          profiles: { full_name: 'Anonymous User', username: 'anonymous', avatar_url: null }
+        })));
+        return;
+      }
+
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('id, full_name, username, avatar_url')
@@ -300,47 +320,43 @@ const Social: React.FC = () => {
 
       if (profilesError) throw profilesError;
 
-      // Combine the data
-      const commentsWithProfiles = commentsData?.map(comment => {
-        const profile = profilesData?.find(p => p.id === comment.user_id) || {
+      // Use Map for O(1) profile lookups instead of O(n) find operations
+      const profileMap = new Map(profilesData?.map(profile => [profile.id, profile]) || []);
+
+      const commentsWithProfiles = commentsData.map(comment => ({
+        ...comment,
+        profiles: profileMap.get(comment.user_id) || { 
           full_name: 'Unknown User',
           username: 'unknown',
-          avatar_url: null
-        };
-        
-        return {
-          ...comment,
-          profiles: profile
-        };
-      }) || [];
+          avatar_url: null 
+        }
+      }));
 
       setComments(commentsWithProfiles);
     } catch (error) {
       console.error('Error fetching comments:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load comments",
+        variant: "destructive"
+      });
     }
   };
 
   const addComment = async (postId: string) => {
-    if (!newComment.trim()) return;
+    if (!newComment.trim() || !user) return;
 
     try {
-      const { error } = await supabase
-        .from('post_comments')
-        .insert([{
-          post_id: postId,
-          user_id: user!.id,
-          content: newComment.trim()
-        }]);
-
-      if (error) throw error;
+      // Use optimized insertion with performance tracking
+      await dbPerformance.insertCommentOptimized(postId, user.id, newComment);
 
       setNewComment('');
       fetchComments(postId);
       fetchPosts(); // Refresh to update comment count
       
       toast({
-        title: "Success",
-        description: "Comment added successfully!"
+        title: "Comment added",
+        description: "Your comment has been posted successfully"
       });
     } catch (error) {
       console.error('Error adding comment:', error);

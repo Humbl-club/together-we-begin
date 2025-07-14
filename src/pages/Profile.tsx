@@ -19,6 +19,8 @@ import { ProfileVerification } from '@/components/profile/ProfileVerification';
 import { DirectMessaging } from '@/components/messaging/DirectMessaging';
 import { AnimatedStats } from '@/components/profile/AnimatedStats';
 import { ProgressRing } from '@/components/profile/ProgressRing';
+import { AchievementsDisplay } from '@/components/profile/AchievementsDisplay';
+import { LoyaltyTimeline } from '@/components/profile/LoyaltyTimeline';
 
 
 const Profile: React.FC = () => {
@@ -399,84 +401,9 @@ const Profile: React.FC = () => {
             </TabsList>
 
             <TabsContent value="activity" className="space-y-6">
-              <div className="grid lg:grid-cols-2 gap-6">
-                <Card className="glass-card-enhanced">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Star className="w-5 h-5 text-amber-500" />
-                      Loyalty Points History
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {loyaltyTransactions.length === 0 ? (
-                      <div className="text-center py-12">
-                        <Star className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-                        <p className="text-muted-foreground">No loyalty point transactions yet.</p>
-                        <p className="text-sm text-muted-foreground mt-2">Complete challenges and attend events to earn points!</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4 max-h-80 overflow-y-auto">
-                        {loyaltyTransactions.slice(0, 10).map((transaction) => (
-                          <div key={transaction.id} className="flex justify-between items-center p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-                            <div>
-                              <p className="font-medium">{transaction.description || transaction.type}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {new Date(transaction.created_at).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <Badge 
-                              variant={transaction.type === 'earned' ? 'default' : 'secondary'}
-                              className="text-base px-3 py-1"
-                            >
-                              {transaction.type === 'earned' ? '+' : '-'}{transaction.points} points
-                            </Badge>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                <Card className="glass-card-enhanced">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Trophy className="w-5 h-5 text-yellow-500" />
-                      Completed Challenges
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {completedChallenges.length === 0 ? (
-                      <div className="text-center py-12">
-                        <Trophy className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-                        <p className="text-muted-foreground">No completed challenges yet.</p>
-                        <p className="text-sm text-muted-foreground mt-2">Join challenges to showcase your achievements!</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4 max-h-80 overflow-y-auto">
-                        {completedChallenges.map((participation) => (
-                          <div key={participation.id} className="p-4 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors group">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h3 className="font-medium group-hover:text-primary transition-colors">{participation.challenges.title}</h3>
-                                <p className="text-sm text-muted-foreground">
-                                  Completed on {new Date(participation.completion_date).toLocaleDateString()}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                {participation.challenges.badge_name && (
-                                  <Badge variant="outline" className="bg-primary/10">{participation.challenges.badge_name}</Badge>
-                                )}
-                                {participation.challenges.points_reward && (
-                                  <Badge className="bg-amber-500/20 text-amber-700">+{participation.challenges.points_reward} points</Badge>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <AchievementsDisplay challenges={completedChallenges} />
+                <LoyaltyTimeline transactions={loyaltyTransactions} />
               </div>
             </TabsContent>
 

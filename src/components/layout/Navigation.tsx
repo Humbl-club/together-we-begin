@@ -28,11 +28,11 @@ export const Navigation: React.FC = () => {
     { href: '/dashboard', icon: Home, label: 'Home' },
     { href: '/social', icon: Users, label: 'Community' },
     { href: '/events', icon: Calendar, label: 'Events' },
-    { href: '/messages', icon: MessageCircle, label: 'Messages' },
+    { href: '/challenges', icon: Trophy, label: 'Wellness' },
   ];
 
   const secondaryNavItems = [
-    { href: '/challenges', icon: Trophy, label: 'Wellness' },
+    { href: '/messages', icon: MessageCircle, label: 'Messages' },
     { href: '/profile', icon: User, label: 'Profile' },
   ];
 
@@ -80,22 +80,7 @@ export const Navigation: React.FC = () => {
                     <SheetTitle className="font-display text-xl text-center">Menu</SheetTitle>
                   </SheetHeader>
                   
-                  <div className="spacing-responsive-md">
-                    {/* Profile Section */}
-                    <div className="glass-section p-4 rounded-xl mb-4">
-                      <Link 
-                        to="/profile" 
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors touch-manipulation"
-                      >
-                        <User className="w-6 h-6 text-primary" />
-                        <div className="flex-1">
-                          <div className="font-medium">Profile</div>
-                          <div className="text-sm text-muted-foreground">View and edit your profile</div>
-                        </div>
-                      </Link>
-                    </div>
-
+                   <div className="spacing-responsive-md">
                     {/* Settings & More */}
                     <div className="glass-section p-4 rounded-xl mb-4">
                       <div className="space-y-2">
@@ -112,8 +97,8 @@ export const Navigation: React.FC = () => {
                             <div className="flex-1">
                               <div className="font-medium">{label}</div>
                               <div className="text-sm text-muted-foreground">
-                                {href === '/challenges' ? 'Wellness challenges' : 
-                                 href === '/profile' ? 'Your profile settings' :
+                                {href === '/messages' ? 'Direct messages with members' : 
+                                 href === '/profile' ? 'View and edit your profile' :
                                  href === '/admin' ? 'Manage the community' : ''}
                               </div>
                             </div>

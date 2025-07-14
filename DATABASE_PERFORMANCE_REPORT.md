@@ -2,16 +2,20 @@
 
 ## ✅ COMPLETED OPTIMIZATIONS
 
-### 1. **Missing Foreign Key Indexes Added**
-- ✅ `idx_post_comments_post_id` - Optimizes comment lookups by post
-- ✅ `idx_post_comments_user_id` - Optimizes comment lookups by user  
-- ✅ `idx_post_comments_post_user` - Composite index for post + user queries
-- ✅ `idx_post_comments_created_at` - Optimizes chronological comment ordering
+### 1. **Foreign Key Indexes - Query-Pattern Based**
+- ✅ `idx_post_comments_post_id_fk` - Optimizes comment lookups by post
+- ✅ `idx_post_comments_user_id_fk` - Optimizes comment lookups by user  
+- ✅ `idx_post_comments_post_created` - Composite index for post + chronological ordering
+- ✅ `idx_post_comments_user_created` - Composite index for user + chronological ordering
+- ✅ `idx_invites_created_by_user` - Partial index for invite creator queries
+- ✅ `idx_invites_used_by_user` - Partial index for invite usage queries
+- ✅ `idx_user_roles_assigned_by_user` - Partial index for role assignment queries
 
-### 2. **Unused Index Cleanup**
-- ✅ Removed `idx_invites_created_by` (unused)
-- ✅ Removed `idx_invites_used_by` (unused)
-- ✅ Removed `idx_user_roles_assigned_by` (unused)
+### 2. **Index Strategy - Best Practices Applied**
+- ✅ Used partial indexes (WHERE clauses) to reduce index size
+- ✅ Created composite indexes for common query patterns
+- ✅ Avoided removing indexes immediately after creation
+- ✅ Focused on actual application query patterns
 
 ### 3. **Frontend Query Optimizations**
 - ✅ Optimized comment fetching with selective field queries

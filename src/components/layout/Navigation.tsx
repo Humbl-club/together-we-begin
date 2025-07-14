@@ -33,7 +33,6 @@ export const Navigation: React.FC = () => {
 
   const secondaryNavItems = [
     { href: '/messages', icon: MessageCircle, label: 'Messages' },
-    { href: '/profile', icon: User, label: 'Profile' },
   ];
 
   if (isAdmin) {
@@ -81,6 +80,21 @@ export const Navigation: React.FC = () => {
                   </SheetHeader>
                   
                    <div className="spacing-responsive-md">
+                    {/* Profile Section */}
+                    <div className="glass-section p-4 rounded-xl mb-4">
+                      <Link 
+                        to="/profile" 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors touch-manipulation"
+                      >
+                        <User className="w-6 h-6 text-primary" />
+                        <div className="flex-1">
+                          <div className="font-medium">Profile</div>
+                          <div className="text-sm text-muted-foreground">View and edit your profile</div>
+                        </div>
+                      </Link>
+                    </div>
+
                     {/* Settings & More */}
                     <div className="glass-section p-4 rounded-xl mb-4">
                       <div className="space-y-2">

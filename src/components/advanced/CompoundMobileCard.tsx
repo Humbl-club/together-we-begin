@@ -1,143 +1,157 @@
-import React, { createContext, useContext, memo, useMemo } from 'react';
-import { useViewport } from '@/hooks/use-mobile';
-import { Card } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import React, { useState, useRef } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { useAdvancedMobileOptimization } from '@/hooks/useAdvancedMobileOptimization';
 
-// Advanced compound component pattern for mobile-optimized cards
-interface MobileCardContextValue {
-  isMobile: boolean;
-  variant: 'default' | 'compact' | 'touch-optimized';
-}
-
-const MobileCardContext = createContext<MobileCardContextValue | null>(null);
-
-// Main container component
-interface MobileCardProps {
-  variant?: 'default' | 'compact' | 'touch-optimized';
+interface CompoundMobileCardProps {
   children: React.ReactNode;
   className?: string;
+  enableSwipeActions?: boolean;
+  onSwipeLeft?: () => void;
+  onSwipeRight?: () => void;
+  enableLongPress?: boolean;
+  onLongPress?: () => void;
+  variant?: string; // For compatibility
 }
 
-const MobileCard = memo(({ variant = 'default', children, className, ...props }: MobileCardProps) => {
-  const { isMobile } = useViewport();
-  
-  const contextValue = useMemo(() => ({
-    isMobile,
-    variant
-  }), [isMobile, variant]);
+interface CompoundMobileCardComponent extends React.FC<CompoundMobileCardProps> {
+  Header: React.FC<{ children: React.ReactNode }>;
+  Content: React.FC<{ children: React.ReactNode }>;
+}
 
-  const cardClasses = useMemo(() => {
-    const baseClasses = "glass-card transition-all duration-200";
-    const mobileClasses = isMobile 
-      ? "active:scale-[0.98] touch-optimized haptic-feedback" 
-      : "hover:scale-[1.02]";
+const CompoundMobileCardBase: React.FC<CompoundMobileCardProps> = ({
+  children,
+  className = '',
+  enableSwipeActions = false,
+  onSwipeLeft,
+  onSwipeRight,
+  enableLongPress = false,
+  onLongPress,
+  variant, // Accept but ignore for compatibility
+}) => {
+  const { isMobile, isTouch, prefersReducedMotion } = useAdvancedMobileOptimization();
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number; time: number } | null>(null);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [isLongPressing, setIsLongPressing] = useState(false);
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isTouch) return;
     
-    const variantClasses = {
-      'default': isMobile ? 'p-4 rounded-xl' : 'p-6 rounded-xl',
-      'compact': isMobile ? 'p-3 rounded-lg' : 'p-4 rounded-lg',
-      'touch-optimized': isMobile ? 'p-4 rounded-xl min-h-[80px]' : 'p-6 rounded-xl'
-    };
+    const touch = e.touches[0];
+    setTouchStart({
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now(),
+    });
 
-    return cn(baseClasses, mobileClasses, variantClasses[variant], className);
-  }, [isMobile, variant, className]);
+    if (enableLongPress && onLongPress) {
+      longPressTimer.current = setTimeout(() => {
+        setIsLongPressing(true);
+        onLongPress();
+        // Add haptic feedback if available
+        if ('vibrate' in navigator) {
+          navigator.vibrate(50);
+        }
+      }, 500);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStart || !enableSwipeActions) return;
+
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - touchStart.x;
+    const deltaY = Math.abs(touch.clientY - touchStart.y);
+
+    // Cancel long press if user moves too much
+    if (longPressTimer.current && (Math.abs(deltaX) > 10 || deltaY > 10)) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+
+    // Only handle horizontal swipes
+    if (deltaY < 50) {
+      setSwipeOffset(deltaX * 0.3); // Damped movement
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+
+    if (!touchStart || !enableSwipeActions) {
+      setTouchStart(null);
+      setSwipeOffset(0);
+      setIsLongPressing(false);
+      return;
+    }
+
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - touchStart.x;
+    const deltaTime = Date.now() - touchStart.time;
+
+    // Swipe detection
+    if (Math.abs(deltaX) > 100 && deltaTime < 300) {
+      if (deltaX > 0 && onSwipeRight) {
+        onSwipeRight();
+      } else if (deltaX < 0 && onSwipeLeft) {
+        onSwipeLeft();
+      }
+    }
+
+    setTouchStart(null);
+    setSwipeOffset(0);
+    setIsLongPressing(false);
+  };
+
+  const cardStyle = {
+    transform: !prefersReducedMotion && swipeOffset !== 0 ? `translateX(${swipeOffset}px)` : undefined,
+    transition: swipeOffset === 0 ? 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
+    willChange: swipeOffset !== 0 ? 'transform' : undefined,
+  };
+
+  const enhancedClassName = `
+    ${className}
+    ${isMobile ? 'mobile-optimized' : ''}
+    ${isTouch ? 'touch-optimized' : ''}
+    ${isLongPressing ? 'long-pressing' : ''}
+    ${enableSwipeActions ? 'swipe-enabled' : ''}
+  `.trim();
 
   return (
-    <MobileCardContext.Provider value={contextValue}>
-      <Card className={cardClasses} {...props}>
+    <Card
+      ref={cardRef}
+      className={enhancedClassName}
+      style={cardStyle}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      <CardContent className="relative">
         {children}
-      </Card>
-    </MobileCardContext.Provider>
+        {enableSwipeActions && swipeOffset !== 0 && (
+          <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+            <div className={`text-sm font-medium transition-opacity duration-200 ${
+              swipeOffset < -50 ? 'opacity-100 text-destructive' : 'opacity-50 text-muted-foreground'
+            }`}>
+              {swipeOffset < -50 ? '← Delete' : 'Swipe left'}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
-});
-
-// Header component
-interface CardHeaderProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-const Header = memo(({ children, className }: CardHeaderProps) => {
-  const context = useContext(MobileCardContext);
-  if (!context) throw new Error('MobileCard.Header must be used within MobileCard');
-
-  const { isMobile } = context;
-  
-  const headerClasses = useMemo(() => cn(
-    "flex items-center justify-between",
-    isMobile ? "pb-2" : "pb-3",
-    className
-  ), [isMobile, className]);
-
-  return (
-    <div className={headerClasses}>
-      {children}
-    </div>
-  );
-});
-
-// Content component
-interface CardContentProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-const Content = memo(({ children, className }: CardContentProps) => {
-  const context = useContext(MobileCardContext);
-  if (!context) throw new Error('MobileCard.Content must be used within MobileCard');
-
-  const { isMobile, variant } = context;
-  
-  const contentClasses = useMemo(() => {
-    const spacing = {
-      'default': isMobile ? 'space-y-3' : 'space-y-4',
-      'compact': 'space-y-2',
-      'touch-optimized': isMobile ? 'space-y-3' : 'space-y-4'
-    };
-    
-    return cn(spacing[variant], className);
-  }, [isMobile, variant, className]);
-
-  return (
-    <div className={contentClasses}>
-      {children}
-    </div>
-  );
-});
-
-// Action component
-interface CardActionProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-const Action = memo(({ children, className }: CardActionProps) => {
-  const context = useContext(MobileCardContext);
-  if (!context) throw new Error('MobileCard.Action must be used within MobileCard');
-
-  const { isMobile } = context;
-  
-  const actionClasses = useMemo(() => cn(
-    "flex items-center gap-2",
-    isMobile ? "pt-3 border-t" : "pt-4 border-t",
-    className
-  ), [isMobile, className]);
-
-  return (
-    <div className={actionClasses}>
-      {children}
-    </div>
-  );
-});
-
-// Compound component export with proper TypeScript support
-const MobileCardComponent = MobileCard as typeof MobileCard & {
-  Header: typeof Header;
-  Content: typeof Content;
-  Action: typeof Action;
 };
 
-MobileCardComponent.Header = Header;
-MobileCardComponent.Content = Content;
-MobileCardComponent.Action = Action;
+// Create compound component with proper typing
+export const CompoundMobileCard = CompoundMobileCardBase as CompoundMobileCardComponent;
 
-export { MobileCardComponent as MobileCard };
+// Add compound component pattern for compatibility
+CompoundMobileCard.Header = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+CompoundMobileCard.Content = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+
+// Legacy export for backward compatibility
+export const MobileCard = CompoundMobileCard;

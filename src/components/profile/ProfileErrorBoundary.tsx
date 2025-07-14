@@ -23,10 +23,18 @@ const DefaultErrorFallback: React.FC<{ error: Error; retry: () => void }> = ({ e
 
 export const ProfileErrorBoundary: React.FC<ProfileErrorBoundaryProps> = ({ 
   children, 
-  fallback: Fallback = DefaultErrorFallback 
+  fallback 
 }) => {
+  const handleRetry = () => {
+    window.location.reload();
+  };
+
+  const errorFallback = fallback ? 
+    React.createElement(fallback, { error: new Error(), retry: handleRetry }) : 
+    <DefaultErrorFallback error={new Error()} retry={handleRetry} />;
+
   return (
-    <ErrorBoundary fallback={Fallback}>
+    <ErrorBoundary fallback={errorFallback}>
       {children}
     </ErrorBoundary>
   );

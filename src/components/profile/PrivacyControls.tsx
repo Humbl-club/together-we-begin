@@ -214,7 +214,7 @@ export const PrivacyControls = ({ userId }: PrivacyControlsProps) => {
                 <div className="space-y-1">
                   <div>Members Only</div>
                   <div className="text-xs text-muted-foreground">
-                    Only verified community members
+                    Only community members can see your profile
                   </div>
                 </div>
               </SelectItem>

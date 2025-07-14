@@ -60,7 +60,7 @@ const Index = () => {
               {
                 icon: Shield,
                 title: 'Curated Community',
-                description: 'Verified women-only space with thoughtful moderation and privacy protection'
+                description: 'Women-only space with thoughtful moderation and privacy protection'
               },
               {
                 icon: Users,

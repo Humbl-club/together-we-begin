@@ -196,6 +196,16 @@ const Social: React.FC = () => {
 
   const createPost = async (isStory = false) => {
     if (!newPost.trim() && selectedImages.length === 0) return;
+    
+    // Check if user is authenticated
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to create posts",
+        variant: "destructive"
+      });
+      return;
+    }
 
     try {
       setLoading(true);
@@ -221,7 +231,7 @@ const Social: React.FC = () => {
       }
 
       const postData = {
-        user_id: user!.id,
+        user_id: user.id,
         content: newPost.trim() || null,
         image_urls: imageUrls.length > 0 ? imageUrls : null,
         is_story: isStory,

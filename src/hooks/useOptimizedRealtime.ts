@@ -18,7 +18,9 @@ export const useOptimizedRealtime = (
   const timeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !configs.length) {
+      return () => {};
+    }
 
     const realtimeService = RealtimeOptimizationService.getInstance();
     const newUnsubscribers: Array<() => void> = [];

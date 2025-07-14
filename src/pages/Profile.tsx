@@ -595,7 +595,7 @@ const Profile: React.FC = () => {
                 <CardTitle>Direct Messages</CardTitle>
               </CardHeader>
               <CardContent>
-                <DirectMessaging currentUserId={user!.id} />
+                <DirectMessaging />
               </CardContent>
             </Card>
           </TabsContent>

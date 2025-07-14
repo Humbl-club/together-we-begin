@@ -28,28 +28,29 @@ export const Navigation: React.FC = () => {
     { href: '/dashboard', icon: Home, label: 'Home' },
     { href: '/social', icon: Users, label: 'Community' },
     { href: '/events', icon: Calendar, label: 'Events' },
-    { href: '/challenges', icon: Trophy, label: 'Wellness' },
     { href: '/messages', icon: MessageCircle, label: 'Messages' },
+  ];
+
+  const secondaryNavItems = [
+    { href: '/challenges', icon: Trophy, label: 'Wellness' },
     { href: '/profile', icon: User, label: 'Profile' },
   ];
 
   if (isAdmin) {
-    navItems.push({ href: '/admin', icon: Shield, label: 'Admin' });
+    secondaryNavItems.push({ href: '/admin', icon: Shield, label: 'Admin' });
   }
 
   const isActive = (path: string) => location.pathname === path;
 
   // Mobile Navigation with Settings Sheet
   if (isMobile) {
-    const primaryNavItems = navItems.slice(0, 4); // First 4 items
-
     return (
       <>
         <nav className="fixed bottom-0 left-0 right-0 z-50 mobile-nav-safe">
           <div className="glass-nav border-t border-border/20 mx-2 mb-2 rounded-2xl shadow-lg">
             <div className="grid grid-cols-5 gap-1 p-2">
-              {/* First 4 main navigation items */}
-              {primaryNavItems.map(({ href, icon: Icon, label }) => (
+              {/* Main navigation items including Messages */}
+              {navItems.map(({ href, icon: Icon, label }) => (
                 <Link
                   key={href}
                   to={href}
@@ -98,6 +99,27 @@ export const Navigation: React.FC = () => {
                     {/* Settings & More */}
                     <div className="glass-section p-4 rounded-xl mb-4">
                       <div className="space-y-2">
+                        {secondaryNavItems.map(({ href, icon: Icon, label }) => (
+                          <Link 
+                            key={href}
+                            to={href} 
+                            onClick={() => setMobileMenuOpen(false)}
+                            className={`flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors touch-manipulation ${
+                              isActive(href) ? 'bg-primary/20 text-primary' : ''
+                            }`}
+                          >
+                            <Icon className="w-6 h-6" />
+                            <div className="flex-1">
+                              <div className="font-medium">{label}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {href === '/challenges' ? 'Wellness challenges' : 
+                                 href === '/profile' ? 'Your profile settings' :
+                                 href === '/admin' ? 'Manage the community' : ''}
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                        
                         <Link 
                           to="/settings" 
                           onClick={() => setMobileMenuOpen(false)}
@@ -111,23 +133,6 @@ export const Navigation: React.FC = () => {
                             <div className="text-sm text-muted-foreground">Customize your experience</div>
                           </div>
                         </Link>
-
-                        {/* Admin link if admin */}
-                        {isAdmin && (
-                          <Link 
-                            to="/admin" 
-                            onClick={() => setMobileMenuOpen(false)}
-                            className={`flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors touch-manipulation ${
-                              isActive('/admin') ? 'bg-primary/20 text-primary' : ''
-                            }`}
-                          >
-                            <Shield className="w-6 h-6" />
-                            <div className="flex-1">
-                              <div className="font-medium">Admin Panel</div>
-                              <div className="text-sm text-muted-foreground">Manage the community</div>
-                            </div>
-                          </Link>
-                        )}
                       </div>
                     </div>
 
@@ -171,7 +176,7 @@ export const Navigation: React.FC = () => {
 
           {/* Navigation Items */}
           <div className="flex-1 flex flex-col space-y-2 p-2 mt-4">
-            {navItems.map(({ href, icon: Icon, label }) => (
+            {[...navItems, ...secondaryNavItems].map(({ href, icon: Icon, label }) => (
               <Link
                 key={href}
                 to={href}
@@ -225,7 +230,7 @@ export const Navigation: React.FC = () => {
 
         {/* Navigation Items */}
         <div className="flex-1 flex flex-col space-y-3 p-3 mt-6">
-          {navItems.map(({ href, icon: Icon, label }) => (
+          {[...navItems, ...secondaryNavItems].map(({ href, icon: Icon, label }) => (
             <Link
               key={href}
               to={href}

@@ -15,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Camera, MapPin, Instagram, Edit3, Save, X, CheckCircle, Star, Trophy } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PrivacyControls } from '@/components/profile/PrivacyControls';
-import { ProfileVerification } from '@/components/profile/ProfileVerification';
+
 import { DirectMessaging } from '@/components/messaging/DirectMessaging';
 import { AnimatedStats } from '@/components/profile/AnimatedStats';
 import { ProgressRing } from '@/components/profile/ProgressRing';
@@ -396,7 +396,7 @@ const Profile: React.FC = () => {
             <TabsList className="glass-card grid w-full grid-cols-2 lg:grid-cols-4 mb-6 p-1">
               <TabsTrigger value="activity" className="text-xs lg:text-base">Activity</TabsTrigger>
               <TabsTrigger value="privacy" className="text-xs lg:text-base">Privacy</TabsTrigger>
-              <TabsTrigger value="verification" className="text-xs lg:text-base">Verify</TabsTrigger>
+              
               <TabsTrigger value="messages" className="text-xs lg:text-base">Messages</TabsTrigger>
             </TabsList>
 
@@ -418,20 +418,6 @@ const Profile: React.FC = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="verification">
-              <Card className="glass-card border-0">
-                <CardHeader>
-                  <CardTitle className="text-lg lg:text-xl">Profile Verification</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ProfileVerification 
-                    userId={user!.id}
-                    currentVerificationLevel="unverified"
-                    onVerificationUpdate={() => {}}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
 
             <TabsContent value="messages">
               <Card className="glass-card border-0">

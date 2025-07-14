@@ -21,6 +21,9 @@ const buttonVariants = cva(
         editorial: "bg-editorial-charcoal text-white hover:bg-editorial-navy shadow-md font-normal tracking-wide",
         "editorial-outline": "border border-editorial-charcoal text-editorial-charcoal hover:bg-editorial-charcoal hover:text-white font-normal tracking-wide",
         "editorial-ghost": "text-editorial-charcoal hover:bg-editorial-warm-grey font-normal tracking-wide",
+        glass: "glass-button text-foreground hover:text-primary",
+        "glass-primary": "glass-button bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 hover:border-primary/30",
+        "glass-secondary": "glass-button bg-secondary/10 text-secondary-foreground border-secondary/20 hover:bg-secondary/20",
       },
       size: {
         default: "h-10 px-4 py-2",

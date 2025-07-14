@@ -37,17 +37,17 @@ export const Navigation: React.FC = () => {
   if (isMobile) {
     return (
       <nav className="fixed bottom-0 left-0 right-0 z-50 mobile-nav-safe">
-        <div className="editorial-card border-t border-border/20 backdrop-blur-xl mx-2 mb-2 rounded-2xl shadow-lg">
+        <div className="glass-nav border-t border-border/20 mx-2 mb-2 rounded-2xl shadow-lg">
           <div className="grid grid-cols-5 gap-1 p-2">
             {navItems.slice(0, 5).map(({ href, icon: Icon, label }) => (
               <Link
                 key={href}
                 to={href}
-                className={`flex flex-col items-center justify-center min-h-[48px] min-w-[48px] p-2 rounded-xl transition-all duration-200 touch-manipulation ${
-                  isActive(href)
-                    ? 'bg-primary text-primary-foreground shadow-sm scale-105'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/50 active:scale-95'
-                }`}
+                 className={`glass-button flex flex-col items-center justify-center min-h-[48px] min-w-[48px] p-2 rounded-xl transition-all duration-300 touch-manipulation ${
+                   isActive(href)
+                     ? 'bg-primary/20 text-primary border-primary/30 shadow-lg scale-105'
+                     : 'text-muted-foreground hover:text-foreground hover:bg-primary/10 active:scale-95'
+                 }`}
               >
                 <Icon className="w-5 h-5 mb-1" strokeWidth={isActive(href) ? 2.5 : 2} />
                 <span className="text-[10px] font-medium tracking-tight leading-none">
@@ -82,7 +82,7 @@ export const Navigation: React.FC = () => {
   if (isTablet) {
     return (
       <nav className="fixed top-0 left-0 w-16 h-full z-50">
-        <div className="editorial-card h-full border-r border-border/20 backdrop-blur-xl flex flex-col rounded-none">
+        <div className="glass-nav h-full border-r border-border/20 flex flex-col rounded-none">
           {/* Tablet Logo */}
           <div className="p-3 border-b border-border/20">
             <div className="w-10 h-10 bg-editorial-charcoal rounded-lg flex items-center justify-center shadow-md">
@@ -136,7 +136,7 @@ export const Navigation: React.FC = () => {
   // Desktop Navigation (Full)
   return (
     <nav className="fixed top-0 left-0 w-20 h-full z-50">
-      <div className="editorial-card h-full border-r border-border/20 backdrop-blur-xl flex flex-col rounded-none">
+      <div className="glass-nav h-full border-r border-border/20 flex flex-col rounded-none">
         {/* Desktop Logo */}
         <div className="p-4 border-b border-border/20">
           <div className="w-12 h-12 mx-auto bg-editorial-charcoal rounded-lg flex items-center justify-center shadow-md">

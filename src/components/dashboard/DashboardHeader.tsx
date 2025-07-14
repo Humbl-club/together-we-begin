@@ -40,7 +40,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
   }, [profile?.full_name]);
 
   return (
-    <div className="relative">
+    <div className="glass-card-enhanced p-6 mb-6 relative">
       <div className={`${isMobile ? 'flex flex-col space-y-4 text-center' : 'cluster justify-between'}`}>
         <div className={`${isMobile ? 'flex flex-col items-center space-y-3' : 'cluster'}`}>
           <Avatar className={`${isMobile ? 'w-16 h-16' : 'w-12 h-12 md:w-16 md:h-16'} border-2 border-primary/20 ring-2 ring-primary/10`}>
@@ -60,7 +60,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
         </div>
         
         <Button 
-          className={`${isMobile ? 'w-full min-h-[48px]' : 'modern-button'} bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all`}
+          className={`${isMobile ? 'w-full min-h-[48px]' : 'modern-button'} glass-button bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-all`}
         >
           <Plus className="w-4 h-4 mr-2" />
           <span className={isMobile ? 'text-base' : ''}>Share Update</span>

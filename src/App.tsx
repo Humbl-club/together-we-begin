@@ -17,6 +17,7 @@ import Social from "./pages/Social";
 import Events from "./pages/Events";
 import Challenges from "./pages/Challenges";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
@@ -76,7 +77,7 @@ const App = () => {
                 <Route path="/challenges" element={<Layout><Challenges /></Layout>} />
                 <Route path="/profile" element={<Layout><Profile /></Layout>} />
                 <Route path="/admin" element={<Layout><Admin /></Layout>} />
-                <Route path="/settings" element={<Layout><div className="text-center py-20"><h1 className="text-2xl font-bold gradient-text">Settings Coming Soon</h1></div></Layout>} />
+                <Route path="/settings" element={<Layout><Settings /></Layout>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </ErrorBoundary>

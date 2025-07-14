@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useViewport } from '@/hooks/use-mobile';
+import { useNavigate } from 'react-router-dom';
 
 interface Profile {
   full_name?: string;
@@ -15,6 +16,7 @@ interface DashboardHeaderProps {
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
   const { isMobile } = useViewport();
+  const navigate = useNavigate();
   
   const { initials, firstName, greeting } = useMemo(() => {
     const getInitials = (name?: string) => {
@@ -60,6 +62,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
         </div>
         
         <Button 
+          onClick={() => navigate('/social')}
           className={`${isMobile ? 'w-full min-h-[48px]' : 'modern-button'} glass-button bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-all`}
         >
           <Plus className="w-4 h-4 mr-2" />

@@ -13,7 +13,8 @@ import {
   LogOut,
   Shield,
   MoreHorizontal,
-  X
+  X,
+  MessageCircle
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
@@ -28,6 +29,7 @@ export const Navigation: React.FC = () => {
     { href: '/social', icon: Users, label: 'Community' },
     { href: '/events', icon: Calendar, label: 'Events' },
     { href: '/challenges', icon: Trophy, label: 'Wellness' },
+    { href: '/messages', icon: MessageCircle, label: 'Messages' },
     { href: '/profile', icon: User, label: 'Profile' },
   ];
 

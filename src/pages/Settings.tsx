@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MobileToggle } from '@/components/ui/mobile-toggle';
-import { Bell, Shield, Heart, Users, Palette, Save } from 'lucide-react';
+import { Bell, Shield, Heart, Users, Palette, Save, MessageCircle, Lock } from 'lucide-react';
 import { useUserSettings } from '@/hooks/useUserSettings';
 
 const Settings: React.FC = () => {
@@ -41,7 +41,7 @@ const Settings: React.FC = () => {
       </div>
 
       <Tabs defaultValue="notifications" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6">
           <TabsTrigger value="notifications" className="flex items-center gap-2">
             <Bell className="w-4 h-4" />
             <span className="hidden sm:inline">Notifications</span>
@@ -49,6 +49,10 @@ const Settings: React.FC = () => {
           <TabsTrigger value="privacy" className="flex items-center gap-2">
             <Shield className="w-4 h-4" />
             <span className="hidden sm:inline">Privacy</span>
+          </TabsTrigger>
+          <TabsTrigger value="messaging" className="flex items-center gap-2">
+            <MessageCircle className="w-4 h-4" />
+            <span className="hidden sm:inline">Messaging</span>
           </TabsTrigger>
           <TabsTrigger value="wellness" className="flex items-center gap-2">
             <Heart className="w-4 h-4" />
@@ -194,6 +198,68 @@ const Settings: React.FC = () => {
                     checked={settings.social.story_sharing}
                     onCheckedChange={(checked) => updateSetting('social', 'story_sharing', checked)}
                   />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="messaging">
+          <Card className="glass-card-enhanced">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageCircle className="w-5 h-5" />
+                Messaging & Communication
+              </CardTitle>
+              <CardDescription>
+                Control your messaging preferences and encryption settings
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="allowMessages">Allow Direct Messages</Label>
+                    <p className="text-sm text-muted-foreground">Enable direct messaging with other members</p>
+                  </div>
+                  <MobileToggle
+                    checked={settings.social.message_requests}
+                    onCheckedChange={(checked) => updateSetting('social', 'message_requests', checked)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="messagePreview">Message Previews</Label>
+                    <p className="text-sm text-muted-foreground">Show message previews in notifications</p>
+                  </div>
+                  <MobileToggle
+                    checked={settings.notifications.social_interactions}
+                    onCheckedChange={(checked) => updateSetting('notifications', 'social_interactions', checked)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="readReceipts">Read Receipts</Label>
+                    <p className="text-sm text-muted-foreground">Let others know when you've read their messages</p>
+                  </div>
+                  <MobileToggle
+                    checked={true}
+                    onCheckedChange={() => {}}
+                  />
+                </div>
+
+                <div className="p-4 bg-muted/50 rounded-lg border border-primary/20">
+                  <div className="flex items-start gap-3">
+                    <Lock className="w-5 h-5 text-primary mt-0.5" />
+                    <div>
+                      <h4 className="font-medium text-sm">End-to-End Encryption</h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        All messages are encrypted with client-side keys. Even administrators cannot read your conversations.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>

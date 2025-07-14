@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { MobileToggle } from '@/components/ui/mobile-toggle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -304,7 +305,7 @@ const Settings: React.FC = () => {
                         <p className="mobile:text-xs sm:text-sm text-muted-foreground mt-1 break-words">Get notifications on your device</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.notifications.push_enabled}
                       onCheckedChange={(checked) => updateSetting('notifications', 'push_enabled', checked)}
                       className="ml-4 flex-shrink-0"
@@ -319,7 +320,7 @@ const Settings: React.FC = () => {
                         <p className="mobile:text-xs sm:text-sm text-muted-foreground mt-1 break-words">New events and reminders</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.notifications.events}
                       onCheckedChange={(checked) => updateSetting('notifications', 'events', checked)}
                       className="settings-switch ml-4"
@@ -334,7 +335,7 @@ const Settings: React.FC = () => {
                         <p className="mobile:text-xs sm:text-sm text-muted-foreground mt-1 break-words">Challenge updates and achievements</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.notifications.challenges}
                       onCheckedChange={(checked) => updateSetting('notifications', 'challenges', checked)}
                       className="settings-switch ml-4"
@@ -349,7 +350,7 @@ const Settings: React.FC = () => {
                         <p className="mobile:text-xs sm:text-sm text-muted-foreground mt-1 break-words">Direct messages and replies</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.notifications.messages}
                       onCheckedChange={(checked) => updateSetting('notifications', 'messages', checked)}
                       className="settings-switch ml-4"
@@ -368,9 +369,10 @@ const Settings: React.FC = () => {
                         <p className="text-sm text-muted-foreground">Likes, comments, and mentions</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.notifications.social}
                       onCheckedChange={(checked) => updateSetting('notifications', 'social', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
 
@@ -382,9 +384,10 @@ const Settings: React.FC = () => {
                         <p className="text-sm text-muted-foreground">Daily wellness check-ins</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.notifications.wellness_reminders}
                       onCheckedChange={(checked) => updateSetting('notifications', 'wellness_reminders', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
 
@@ -396,9 +399,10 @@ const Settings: React.FC = () => {
                         <p className="text-sm text-muted-foreground">Weekly summary of your activity</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.notifications.weekly_digest}
                       onCheckedChange={(checked) => updateSetting('notifications', 'weekly_digest', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
                 </div>
@@ -482,9 +486,10 @@ const Settings: React.FC = () => {
                         <p className="text-sm text-muted-foreground">Let others see when you're online</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.privacy.show_activity_status}
                       onCheckedChange={(checked) => updateSetting('privacy', 'show_activity_status', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
 
@@ -496,9 +501,10 @@ const Settings: React.FC = () => {
                         <p className="text-sm text-muted-foreground">Share your location in posts</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.privacy.show_location}
                       onCheckedChange={(checked) => updateSetting('privacy', 'show_location', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
 
@@ -510,9 +516,10 @@ const Settings: React.FC = () => {
                         <p className="text-sm text-muted-foreground">Include fitness data in challenges</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.privacy.show_fitness_data}
                       onCheckedChange={(checked) => updateSetting('privacy', 'show_fitness_data', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
                 </div>
@@ -613,9 +620,10 @@ const Settings: React.FC = () => {
                         <p className="text-sm text-muted-foreground">Share anonymized data for research</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.wellness.health_data_sharing}
                       onCheckedChange={(checked) => updateSetting('wellness', 'health_data_sharing', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
                 </div>
@@ -646,9 +654,10 @@ const Settings: React.FC = () => {
                         <p className="text-sm text-muted-foreground">Automatically connect with event participants</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.social.auto_follow_event_attendees}
                       onCheckedChange={(checked) => updateSetting('social', 'auto_follow_event_attendees', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
 
@@ -660,9 +669,10 @@ const Settings: React.FC = () => {
                         <p className="text-sm text-muted-foreground">Automatically post when you earn badges</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.social.share_achievements}
                       onCheckedChange={(checked) => updateSetting('social', 'share_achievements', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
                 </div>
@@ -678,9 +688,10 @@ const Settings: React.FC = () => {
                         <p className="text-sm text-muted-foreground">Let others mention you in stories</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.social.allow_story_mentions}
                       onCheckedChange={(checked) => updateSetting('social', 'allow_story_mentions', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
 
@@ -692,9 +703,10 @@ const Settings: React.FC = () => {
                         <p className="text-sm text-muted-foreground">Review comments before they appear</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.social.comment_moderation}
                       onCheckedChange={(checked) => updateSetting('social', 'comment_moderation', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
                 </div>
@@ -775,9 +787,10 @@ const Settings: React.FC = () => {
                         <p className="text-sm text-muted-foreground">Reduce spacing for more content</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.appearance.compact_mode}
                       onCheckedChange={(checked) => updateSetting('appearance', 'compact_mode', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
 
@@ -789,9 +802,10 @@ const Settings: React.FC = () => {
                         <p className="text-sm text-muted-foreground">Enable beautiful glassmorphism effects</p>
                       </div>
                     </div>
-                    <Switch
+                    <MobileToggle
                       checked={settings.appearance.glassmorphism_effects}
                       onCheckedChange={(checked) => updateSetting('appearance', 'glassmorphism_effects', checked)}
+                      className="settings-switch ml-4"
                     />
                   </div>
                 </div>

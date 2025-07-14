@@ -515,8 +515,64 @@
   }
 
   .settings-switch {
-    @apply flex-shrink-0 mobile:scale-110 sm:scale-100;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply flex-shrink-0 transition-all duration-200 focus-ring;
+  }
+
+  /* Mobile-optimized Switch styles */
+  @media (max-width: 767px) {
+    .settings-switch {
+      transform: scale(0.85);
+    }
+    
+    .settings-switch[data-state="checked"] {
+      background-color: hsl(var(--primary));
+    }
+    
+    .settings-switch[data-state="unchecked"] {
+      background-color: hsl(var(--muted));
+    }
+    
+    /* Custom mobile toggle button */
+    .mobile-toggle {
+      @apply relative inline-flex items-center;
+      width: 44px;
+      height: 24px;
+      background: hsl(var(--muted));
+      border-radius: 12px;
+      border: 1px solid hsl(var(--border));
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      touch-action: manipulation;
+    }
+    
+    .mobile-toggle[data-state="checked"] {
+      background: hsl(var(--primary));
+      border-color: hsl(var(--primary));
+    }
+    
+    .mobile-toggle-thumb {
+      @apply absolute bg-background rounded-full shadow-sm;
+      width: 20px;
+      height: 20px;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 1px 3px hsl(var(--foreground) / 0.1),
+        0 1px 2px hsl(var(--foreground) / 0.06);
+    }
+    
+    .mobile-toggle[data-state="checked"] .mobile-toggle-thumb {
+      transform: translateX(20px);
+    }
+    
+    .mobile-toggle:active .mobile-toggle-thumb {
+      width: 24px;
+    }
+    
+    .mobile-toggle[data-state="checked"]:active .mobile-toggle-thumb {
+      transform: translateX(16px);
+    }
   }
 
   .settings-switch:focus-visible {

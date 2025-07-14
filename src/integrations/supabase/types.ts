@@ -815,6 +815,100 @@ export type Database = {
         }
         Relationships: []
       }
+      user_appearance_settings: {
+        Row: {
+          animations_enabled: boolean
+          created_at: string
+          font_size: string
+          glassmorphism_enabled: boolean
+          high_contrast: boolean
+          id: string
+          theme: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          animations_enabled?: boolean
+          created_at?: string
+          font_size?: string
+          glassmorphism_enabled?: boolean
+          high_contrast?: boolean
+          id?: string
+          theme?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          animations_enabled?: boolean
+          created_at?: string
+          font_size?: string
+          glassmorphism_enabled?: boolean
+          high_contrast?: boolean
+          id?: string
+          theme?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_appearance_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_notification_settings: {
+        Row: {
+          challenge_updates: boolean
+          created_at: string
+          email_enabled: boolean
+          event_reminders: boolean
+          id: string
+          marketing_emails: boolean
+          push_enabled: boolean
+          sms_enabled: boolean
+          social_interactions: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenge_updates?: boolean
+          created_at?: string
+          email_enabled?: boolean
+          event_reminders?: boolean
+          id?: string
+          marketing_emails?: boolean
+          push_enabled?: boolean
+          sms_enabled?: boolean
+          social_interactions?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenge_updates?: boolean
+          created_at?: string
+          email_enabled?: boolean
+          event_reminders?: boolean
+          id?: string
+          marketing_emails?: boolean
+          push_enabled?: boolean
+          sms_enabled?: boolean
+          social_interactions?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_notification_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           assigned_at: string | null
@@ -849,6 +943,100 @@ export type Database = {
             foreignKeyName: "fk_user_roles_user_id"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_social_settings: {
+        Row: {
+          activity_visibility: string
+          auto_follow_friends: boolean
+          content_suggestions: boolean
+          created_at: string
+          group_invitations: boolean
+          id: string
+          message_requests: boolean
+          story_sharing: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_visibility?: string
+          auto_follow_friends?: boolean
+          content_suggestions?: boolean
+          created_at?: string
+          group_invitations?: boolean
+          id?: string
+          message_requests?: boolean
+          story_sharing?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_visibility?: string
+          auto_follow_friends?: boolean
+          content_suggestions?: boolean
+          created_at?: string
+          group_invitations?: boolean
+          id?: string
+          message_requests?: boolean
+          story_sharing?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_social_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_wellness_settings: {
+        Row: {
+          activity_reminders: boolean
+          created_at: string
+          daily_goal_steps: number
+          health_data_sharing: boolean
+          id: string
+          mindfulness_reminders: boolean
+          sleep_tracking: boolean
+          updated_at: string
+          user_id: string
+          water_reminders: boolean
+        }
+        Insert: {
+          activity_reminders?: boolean
+          created_at?: string
+          daily_goal_steps?: number
+          health_data_sharing?: boolean
+          id?: string
+          mindfulness_reminders?: boolean
+          sleep_tracking?: boolean
+          updated_at?: string
+          user_id: string
+          water_reminders?: boolean
+        }
+        Update: {
+          activity_reminders?: boolean
+          created_at?: string
+          daily_goal_steps?: number
+          health_data_sharing?: boolean
+          id?: string
+          mindfulness_reminders?: boolean
+          sleep_tracking?: boolean
+          updated_at?: string
+          user_id?: string
+          water_reminders?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_wellness_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },

@@ -128,7 +128,7 @@
   }
 
   .glass-card-enhanced {
-    @apply glass-card hover:shadow-2xl transition-all duration-300 group;
+    @apply glass-card hover:shadow-2xl transition-all duration-300;
     background: linear-gradient(135deg, 
       hsl(var(--background) / 0.8) 0%, 
       hsl(var(--card) / 0.6) 100%);
@@ -169,7 +169,7 @@
   }
 
   .stats-card {
-    @apply glass-card-enhanced hover:scale-[1.02] cursor-pointer group;
+    @apply glass-card-enhanced hover:scale-[1.02] cursor-pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 

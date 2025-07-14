@@ -1,7 +1,7 @@
 import React, { Suspense, memo, useCallback, useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useAdvancedMobileOptimization } from '@/hooks/useAdvancedMobileOptimization';
-import { useEnhancedEventService } from '@/services/domain/EnhancedEventService';
+import { useEventService } from '@/services/domain/EventService';
 import { useProgressiveEnhancement } from '@/hooks/useProgressiveEnhancement';
 import { VirtualizedList } from '@/components/advanced/VirtualizedList';
 import { EventCardPresentation } from '@/components/presentation/EventCardPresentation';
@@ -9,14 +9,12 @@ import { MobileCard } from '@/components/advanced/CompoundMobileCard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { eventBus } from '@/core/EventBus';
-import { PerformanceMonitorService } from '@/services/core/PerformanceMonitorService';
 
 // Ultimate Events Page with enterprise architecture
 const UltimateEventsPage = memo(() => {
   const { user } = useAuth();
   const { performanceMetrics, isMobileOptimized } = useAdvancedMobileOptimization();
-  const { getEvents, createEvent, registerForEvent } = useEnhancedEventService();
+  const { getEvents, createEvent, registerForEvent } = useEventService();
   const { getLoadingStrategy, usePullToRefresh } = useProgressiveEnhancement();
   
   const [events, setEvents] = useState<any[]>([]);
@@ -24,8 +22,8 @@ const UltimateEventsPage = memo(() => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Performance monitoring
-  const performanceMonitor = PerformanceMonitorService.getInstance();
+  // Enhanced performance monitoring
+  console.log('UltimateEventsPage: Component rendered');
 
   // Load events with enhanced caching and monitoring
   const loadEvents = useCallback(async (status = 'upcoming') => {
@@ -94,20 +92,10 @@ const UltimateEventsPage = memo(() => {
     }
   }, [registerForEvent, user]);
 
-  // Real-time event updates
+  // Enhanced event loading
   useEffect(() => {
-    const unsubscribeCreated = eventBus.on('event:created', () => {
-      loadEvents(activeTab);
-    });
-
-    const unsubscribeRegistered = eventBus.on('event:registered', () => {
-      loadEvents(activeTab);
-    });
-
-    return () => {
-      unsubscribeCreated();
-      unsubscribeRegistered();
-    };
+    console.log('UltimateEventsPage: Loading events for tab:', activeTab);
+    loadEvents(activeTab);
   }, [loadEvents, activeTab]);
 
   // Pull to refresh with performance tracking
@@ -118,10 +106,6 @@ const UltimateEventsPage = memo(() => {
     performance.measure('pullToRefresh-duration', 'pullToRefresh-start', 'pullToRefresh-end');
   });
 
-  // Initial load and tab changes
-  useEffect(() => {
-    loadEvents(activeTab);
-  }, [loadEvents, activeTab]);
 
   // Enhanced render event card with error boundaries
   const renderEventCard = useCallback((event: any, index: number) => (

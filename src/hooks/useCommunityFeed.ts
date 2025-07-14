@@ -22,8 +22,6 @@ export const useCommunityFeed = (userId?: string) => {
   const { fetchWithCache } = useOptimizedData<FeedPost[]>('community-feed', 5 * 60 * 1000);
 
   const fetchPosts = useCallback(async () => {
-    if (!userId) return;
-
     const cacheKey = 'community-feed';
     try {
       const feedPosts = await fetchWithCache(cacheKey, async () => {
@@ -34,7 +32,7 @@ export const useCommunityFeed = (userId?: string) => {
           `)
           .eq('status', 'active')
           .order('created_at', { ascending: false })
-          .limit(10);
+          .limit(20);
 
         if (!data) return [];
 
@@ -54,7 +52,7 @@ export const useCommunityFeed = (userId?: string) => {
           image_urls: post.image_urls,
           likes_count: post.likes_count,
           comments_count: post.comments_count,
-          user_profile: profileMap.get(post.user_id) || { full_name: 'Unknown User' }
+          user_profile: profileMap.get(post.user_id) || { full_name: 'Community Member' }
         }));
       });
 
@@ -64,7 +62,30 @@ export const useCommunityFeed = (userId?: string) => {
     } finally {
       setLoading(false);
     }
-  }, [userId, fetchWithCache]);
+  }, [fetchWithCache]);
+
+  const createPost = async (postData: { content: string; user_id: string; image_urls?: string[] }) => {
+    const { data, error } = await supabase
+      .from('social_posts')
+      .insert([postData])
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    // Refresh posts after creating
+    await fetchPosts();
+    return data;
+  };
+
+  const toggleLike = async (postId: string) => {
+    // For demo purposes, just increment the like count
+    setPosts(prev => prev.map(post => 
+      post.id === postId 
+        ? { ...post, likes_count: post.likes_count + 1 }
+        : post
+    ));
+  };
 
   // Real-time subscription for new posts
   useRealtimeSubscription(userId, [
@@ -83,6 +104,8 @@ export const useCommunityFeed = (userId?: string) => {
   return {
     posts,
     loading,
+    createPost,
+    toggleLike,
     refetch: fetchPosts
   };
 };

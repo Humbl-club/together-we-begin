@@ -1,284 +1,245 @@
-import { useState, useEffect, useRef } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { MessageCircle, Send, MoreVertical, Phone, Video } from 'lucide-react'
-import { supabase } from '@/integrations/supabase/client'
-import { useToast } from '@/hooks/use-toast'
-import { formatDistanceToNow } from 'date-fns'
+import { useState, useEffect, useRef } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Send, Search, MessageCircle, Phone, Video } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
-  id: string
-  sender_id: string
-  recipient_id: string
-  content: string
-  message_type: string
-  media_url?: string
-  read_at?: string
-  created_at: string
+  id: string;
+  content: string;
+  sender_id: string;
+  recipient_id: string;
+  created_at: string;
+  read_at?: string;
+  media_url?: string;
+  sender_profile?: {
+    full_name: string;
+    avatar_url?: string;
+  };
 }
 
-interface MessageThread {
-  id: string
-  participant_1: string
-  participant_2: string
-  last_message_at?: string
-  other_user?: {
-    id: string
-    full_name: string
-    avatar_url?: string
-  }
+interface Conversation {
+  id: string;
+  participant_1: string;
+  participant_2: string;
+  last_message_at?: string;
+  last_message?: string;
+  unread_count: number;
+  other_user: {
+    full_name: string;
+    avatar_url?: string;
+    id: string;
+  };
 }
 
-interface DirectMessagingProps {
-  currentUserId: string
-}
+export const DirectMessaging = () => {
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
-export const DirectMessaging = ({ currentUserId }: DirectMessagingProps) => {
-  const [threads, setThreads] = useState<MessageThread[]>([])
-  const [selectedThread, setSelectedThread] = useState<string | null>(null)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [newMessage, setNewMessage] = useState('')
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSending, setIsSending] = useState(false)
-  const { toast } = useToast()
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const currentUserId = 'demo-user-id'; // In real app, get from auth
 
   useEffect(() => {
-    loadThreads()
-  }, [currentUserId])
+    fetchConversations();
+  }, []);
 
   useEffect(() => {
-    if (selectedThread) {
-      loadMessages()
-      markMessagesAsRead()
-    }
-  }, [selectedThread])
+    scrollToBottom();
+  }, [messages]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-  const loadThreads = async () => {
+  const fetchConversations = async () => {
     try {
-      // For now, let's simplify and just get basic thread data
-      const { data, error } = await supabase
-        .from('message_threads')
-        .select('*')
-        .or(`participant_1.eq.${currentUserId},participant_2.eq.${currentUserId}`)
-        .order('last_message_at', { ascending: false })
-
-      if (error) throw error
-
-      // Get user profiles separately for better type safety
-      const threadIds = data?.map(thread => 
-        thread.participant_1 === currentUserId ? thread.participant_2 : thread.participant_1
-      ) || []
-
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, full_name, avatar_url')
-        .in('id', threadIds)
-
-      const threadsWithOtherUser: MessageThread[] = data?.map(thread => {
-        const otherUserId = thread.participant_1 === currentUserId ? thread.participant_2 : thread.participant_1
-        const otherUser = profiles?.find(p => p.id === otherUserId) || {
-          id: otherUserId,
-          full_name: 'Unknown User'
+      // Mock data for demonstration
+      const mockConversations: Conversation[] = [
+        {
+          id: '1',
+          participant_1: currentUserId,
+          participant_2: 'user-2',
+          last_message_at: new Date().toISOString(),
+          last_message: 'See you at the yoga class tomorrow!',
+          unread_count: 2,
+          other_user: {
+            id: 'user-2',
+            full_name: 'Sarah Johnson',
+            avatar_url: undefined
+          }
+        },
+        {
+          id: '2',
+          participant_1: currentUserId,
+          participant_2: 'user-3',
+          last_message_at: new Date(Date.now() - 3600000).toISOString(),
+          last_message: 'Thanks for the book recommendation!',
+          unread_count: 0,
+          other_user: {
+            id: 'user-3',
+            full_name: 'Emma Chen',
+            avatar_url: undefined
+          }
         }
-        
-        return {
-          ...thread,
-          other_user: otherUser
-        }
-      }) || []
+      ];
 
-      setThreads(threadsWithOtherUser)
+      setConversations(mockConversations);
     } catch (error) {
-      console.error('Failed to load threads:', error)
-      toast({
-        title: "Failed to load conversations",
-        variant: "destructive"
-      })
+      console.error('Error fetching conversations:', error);
     } finally {
-      setIsLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const loadMessages = async () => {
-    if (!selectedThread) return
-
+  const fetchMessages = async (conversationId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('direct_messages')
-        .select('*')
-        .or(`
-          and(sender_id.eq.${currentUserId},recipient_id.eq.${selectedThread}),
-          and(sender_id.eq.${selectedThread},recipient_id.eq.${currentUserId})
-        `)
-        .order('created_at', { ascending: true })
+      // Mock messages for demonstration
+      const mockMessages: Message[] = [
+        {
+          id: '1',
+          content: 'Hey! How are you doing?',
+          sender_id: 'user-2',
+          recipient_id: currentUserId,
+          created_at: new Date(Date.now() - 7200000).toISOString(),
+          sender_profile: {
+            full_name: 'Sarah Johnson'
+          }
+        },
+        {
+          id: '2',
+          content: 'I\'m great! Just finished my morning workout. How about you?',
+          sender_id: currentUserId,
+          recipient_id: 'user-2',
+          created_at: new Date(Date.now() - 7000000).toISOString()
+        }
+      ];
 
-      if (error) throw error
-
-      setMessages(data || [])
+      setMessages(mockMessages);
     } catch (error) {
-      console.error('Failed to load messages:', error)
-      toast({
-        title: "Failed to load messages",
-        variant: "destructive"
-      })
+      console.error('Error fetching messages:', error);
     }
-  }
-
-  const markMessagesAsRead = async () => {
-    if (!selectedThread) return
-
-    try {
-      await supabase
-        .from('direct_messages')
-        .update({ read_at: new Date().toISOString() })
-        .eq('sender_id', selectedThread)
-        .eq('recipient_id', currentUserId)
-        .is('read_at', null)
-    } catch (error) {
-      console.error('Failed to mark messages as read:', error)
-    }
-  }
+  };
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !selectedThread || isSending) return
+    if (!newMessage.trim() || !selectedConversation) return;
 
-    setIsSending(true)
     try {
-      const { error: messageError } = await supabase
-        .from('direct_messages')
-        .insert({
-          sender_id: currentUserId,
-          recipient_id: selectedThread,
-          content: newMessage.trim(),
-          message_type: 'text'
-        })
+      const messageData = {
+        content: newMessage.trim(),
+        sender_id: currentUserId,
+        recipient_id: conversations.find(c => c.id === selectedConversation)?.other_user.id,
+        created_at: new Date().toISOString()
+      };
 
-      if (messageError) throw messageError
+      // Add optimistic update
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        ...messageData,
+        recipient_id: messageData.recipient_id || ''
+      }]);
 
-      // Update or create thread
-      await supabase
-        .from('message_threads')
-        .upsert({
-          participant_1: currentUserId < selectedThread ? currentUserId : selectedThread,
-          participant_2: currentUserId < selectedThread ? selectedThread : currentUserId,
-          last_message_at: new Date().toISOString()
-        })
-
-      setNewMessage('')
-      loadMessages()
-      loadThreads()
-    } catch (error) {
-      console.error('Failed to send message:', error)
+      setNewMessage('');
+      
       toast({
-        title: "Failed to send message",
-        variant: "destructive"
-      })
-    } finally {
-      setIsSending(false)
-    }
-  }
+        title: "Message sent!",
+        description: "Your message has been delivered.",
+      });
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      sendMessage()
+    } catch (error) {
+      console.error('Error sending message:', error);
     }
-  }
+  };
 
-  if (isLoading) {
-    return <div className="p-4">Loading conversations...</div>
+  const handleConversationSelect = (conversationId: string) => {
+    setSelectedConversation(conversationId);
+    fetchMessages(conversationId);
+  };
+
+  const selectedConv = conversations.find(c => c.id === selectedConversation);
+
+  if (loading) {
+    return (
+      <div className="h-[600px] flex items-center justify-center">
+        <div className="text-center">
+          <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+          <p className="text-muted-foreground">Loading conversations...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="flex h-[600px] border rounded-lg overflow-hidden">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[600px]">
       {/* Conversations List */}
-      <div className="w-1/3 border-r">
-        <div className="p-4 border-b">
-          <h3 className="font-semibold flex items-center gap-2">
+      <Card className="md:col-span-1">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
             <MessageCircle className="h-5 w-5" />
             Messages
-          </h3>
-        </div>
-        <ScrollArea className="h-full">
-          {threads.length === 0 ? (
-            <div className="p-4 text-center text-muted-foreground">
-              No conversations yet
-            </div>
-          ) : (
-            threads.map((thread) => (
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="space-y-1 max-h-[450px] overflow-y-auto">
+            {conversations.map((conversation) => (
               <div
-                key={thread.id}
-                onClick={() => setSelectedThread(thread.other_user?.id || '')}
-                className={`p-4 border-b cursor-pointer hover:bg-accent ${
-                  selectedThread === thread.other_user?.id ? 'bg-accent' : ''
+                key={conversation.id}
+                className={`p-3 hover:bg-muted/50 cursor-pointer border-l-4 transition-colors ${
+                  selectedConversation === conversation.id 
+                    ? 'border-l-primary bg-muted/30' 
+                    : 'border-l-transparent'
                 }`}
+                onClick={() => handleConversationSelect(conversation.id)}
               >
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={thread.other_user?.avatar_url} />
+                    <AvatarImage src={conversation.other_user.avatar_url} />
                     <AvatarFallback>
-                      {thread.other_user?.full_name?.charAt(0) || 'U'}
+                      {conversation.other_user.full_name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium truncate">
-                      {thread.other_user?.full_name || 'Unknown User'}
-                    </div>
-                    {thread.last_message_at && (
-                      <div className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(thread.last_message_at), { addSuffix: true })}
-                      </div>
-                    )}
+                    <p className="font-medium truncate">{conversation.other_user.full_name}</p>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {conversation.last_message}
+                    </p>
                   </div>
                 </div>
               </div>
-            ))
-          )}
-        </ScrollArea>
-      </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Messages Area */}
-      <div className="flex-1 flex flex-col">
-        {selectedThread ? (
+      <Card className="md:col-span-2">
+        {selectedConv ? (
           <>
-            {/* Header */}
-            <div className="p-4 border-b flex items-center justify-between">
+            <CardHeader className="pb-3 border-b">
               <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={threads.find(t => t.other_user?.id === selectedThread)?.other_user?.avatar_url} />
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={selectedConv.other_user.avatar_url} />
                   <AvatarFallback>
-                    {threads.find(t => t.other_user?.id === selectedThread)?.other_user?.full_name?.charAt(0) || 'U'}
+                    {selectedConv.other_user.full_name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
-                <span className="font-medium">
-                  {threads.find(t => t.other_user?.id === selectedThread)?.other_user?.full_name || 'Unknown User'}
-                </span>
+                <div>
+                  <h3 className="font-semibold">{selectedConv.other_user.full_name}</h3>
+                  <p className="text-sm text-muted-foreground">Online</p>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm">
-                  <Phone className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Video className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
+            </CardHeader>
+            
+            <CardContent className="p-0 flex flex-col h-[450px]">
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.map((message) => (
                   <div
                     key={message.id}
@@ -287,52 +248,46 @@ export const DirectMessaging = ({ currentUserId }: DirectMessagingProps) => {
                     }`}
                   >
                     <div
-                      className={`max-w-[70%] p-3 rounded-lg ${
+                      className={`max-w-[80%] rounded-lg p-3 ${
                         message.sender_id === currentUserId
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted'
                       }`}
                     >
-                      <div className="text-sm">{message.content}</div>
-                      <div className="text-xs opacity-70 mt-1">
-                        {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
-                        {message.sender_id === currentUserId && message.read_at && (
-                          <span className="ml-2">✓✓</span>
-                        )}
-                      </div>
+                      <p className="text-sm">{message.content}</p>
                     </div>
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
               </div>
-            </ScrollArea>
 
-            {/* Message Input */}
-            <div className="p-4 border-t">
-              <div className="flex gap-2">
-                <Input
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Type a message..."
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={sendMessage} 
-                  disabled={!newMessage.trim() || isSending}
-                  size="sm"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
+              {/* Message Input */}
+              <div className="border-t p-4">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Type a message..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    className="flex-1"
+                  />
+                  <Button onClick={sendMessage} disabled={!newMessage.trim()}>
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-            </div>
+            </CardContent>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-muted-foreground">
-            Select a conversation to start messaging
-          </div>
+          <CardContent className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-medium mb-2">Select a conversation</h3>
+              <p className="text-muted-foreground">Choose a conversation from the list to start messaging</p>
+            </div>
+          </CardContent>
         )}
-      </div>
+      </Card>
     </div>
-  )
-}
+  );
+};

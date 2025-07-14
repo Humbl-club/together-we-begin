@@ -1,11 +1,14 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sparkles, TrendingUp } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Sparkles, TrendingUp, Plus, Send, MessageCircle } from 'lucide-react';
 import FeedPost from './FeedPost';
 import { useCommunityFeed } from '@/hooks/useCommunityFeed';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { OptimizedSkeleton } from '@/components/ui/optimized-skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 const CommunityFeed: React.FC = memo(() => {
   const { user } = useAuth();

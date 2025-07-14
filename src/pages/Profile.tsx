@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { useViewport } from '@/hooks/use-mobile';
-import { useProfileData } from '@/hooks/useProfileData';
+import { useOptimizedProfileData } from '@/hooks/useOptimizedProfileData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,7 +37,7 @@ const Profile: React.FC = () => {
     completedChallenges, 
     loading, 
     updateProfile 
-  } = useProfileData(user?.id);
+  } = useOptimizedProfileData(user?.id);
 
   // Initialize editedProfile when profile loads
   React.useEffect(() => {
@@ -151,14 +151,14 @@ const Profile: React.FC = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-fluid-4 flow-content">
+    <div className="max-w-6xl mx-auto p-4 lg:p-6 space-y-6">
       {/* Hero Section */}
-      <Card className="profile-hero mb-6">
-        <CardContent className="p-8">
-          <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
+      <Card className="glass-card border-0 shadow-xl">
+        <CardContent className="p-6 lg:p-8">
+          <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6 lg:gap-8">
             {/* Avatar Section */}
-            <div className="relative">
-              <Avatar className={`avatar-glow ${isMobile ? 'w-24 h-24' : 'w-32 h-32'}`}>
+            <div className="relative flex-shrink-0">
+              <Avatar className={`ring-4 ring-primary/20 transition-all duration-300 hover:ring-primary/40 ${isMobile ? 'w-24 h-24' : 'w-32 h-32'}`}>
                 <AvatarImage 
                   src={selectedAvatar ? URL.createObjectURL(selectedAvatar) : profile.avatar_url || undefined} 
                 />
@@ -171,7 +171,7 @@ const Profile: React.FC = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="absolute -bottom-2 -right-2 rounded-full w-10 h-10 p-0 min-h-[44px] hover:scale-110 transition-transform"
+                  className="glass-card absolute -bottom-2 -right-2 rounded-full w-10 h-10 p-0 min-h-[44px] hover:scale-110 transition-all duration-300 border-primary/20"
                   onClick={() => document.getElementById('avatar-upload')?.click()}
                 >
                   <Camera className="w-4 h-4" />
@@ -188,34 +188,34 @@ const Profile: React.FC = () => {
             </div>
             
             {/* Profile Info */}
-            <div className="flex-1 text-center lg:text-left space-y-4">
+            <div className="flex-1 text-center lg:text-left space-y-4 min-w-0">
               {!editing ? (
                 <>
                   <div>
-                    <h1 className="text-4xl font-bold tracking-tight mb-2">
+                    <h1 className="text-2xl lg:text-4xl font-bold tracking-tight mb-2 break-words">
                       {profile.full_name || profile.username || 'Unnamed User'}
                     </h1>
                     {profile.username && profile.full_name && (
-                      <p className="text-xl text-muted-foreground">@{profile.username}</p>
+                      <p className="text-lg lg:text-xl text-muted-foreground">@{profile.username}</p>
                     )}
                   </div>
                   
                   {profile.bio && (
-                    <p className="text-lg text-muted-foreground max-w-2xl">{profile.bio}</p>
+                    <p className="text-base lg:text-lg text-muted-foreground max-w-2xl break-words">{profile.bio}</p>
                   )}
                   
-                  <div className="flex flex-wrap justify-center lg:justify-start gap-6 text-muted-foreground">
+                  <div className="flex flex-wrap justify-center lg:justify-start gap-4 lg:gap-6 text-muted-foreground">
                     {profile.location && (
                       <div className="flex items-center gap-2">
-                        <MapPin className="w-5 h-5" />
-                        <span className="text-lg">{profile.location}</span>
+                        <MapPin className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
+                        <span className="text-sm lg:text-lg break-words">{profile.location}</span>
                       </div>
                     )}
                     
                     {profile.instagram_handle && (
                       <div className="flex items-center gap-2">
-                        <Instagram className="w-5 h-5" />
-                        <span className="text-lg">@{profile.instagram_handle}</span>
+                        <Instagram className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
+                        <span className="text-sm lg:text-lg break-words">@{profile.instagram_handle}</span>
                       </div>
                     )}
                   </div>
@@ -286,25 +286,25 @@ const Profile: React.FC = () => {
             </div>
             
             {/* Edit Button */}
-            <div className="lg:ml-auto">
+            <div className="lg:ml-auto flex-shrink-0">
               {!editing ? (
                 <Button
                   variant="outline"
                   onClick={() => setEditing(true)}
-                  className="flex items-center gap-2 hover:scale-105 transition-transform"
+                  className="glass-card flex items-center gap-2 hover:scale-105 transition-all duration-300 border-primary/20"
                 >
                   <Edit3 className="w-4 h-4" />
-                  Edit Profile
+                  {!isMobile && "Edit Profile"}
                 </Button>
               ) : (
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
                     onClick={cancelEdit}
-                    className="flex items-center gap-2"
+                    className="glass-card flex items-center gap-2 border-red-200"
                   >
                     <X className="w-4 h-4" />
-                    Cancel
+                    {!isMobile && "Cancel"}
                   </Button>
                   <Button
                     onClick={saveProfile}
@@ -312,7 +312,7 @@ const Profile: React.FC = () => {
                     className="flex items-center gap-2 hover:scale-105 transition-transform"
                   >
                     <Save className="w-4 h-4" />
-                    Save Changes
+                    {!isMobile && "Save"}
                   </Button>
                 </div>
               )}
@@ -334,15 +334,15 @@ const Profile: React.FC = () => {
 
       {/* Profile Completion Section */}
       {!editing && (
-        <Card className="profile-completion mb-8">
+        <Card className="glass-card border-0 shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center gap-3">
-              <CheckCircle className="w-6 h-6 text-primary" />
+            <CardTitle className="flex items-center gap-3 text-lg lg:text-xl">
+              <CheckCircle className="w-5 h-5 lg:w-6 lg:h-6 text-primary" />
               Profile Completion
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-8">
+            <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-8">
               <ProgressRing 
                 percentage={(() => {
                   let completed = 0;
@@ -356,9 +356,9 @@ const Profile: React.FC = () => {
                   return (completed / total) * 100;
                 })()}
               />
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold mb-4">Complete your profile to unlock more features</h3>
-                <div className="space-y-3">
+              <div className="flex-1 w-full">
+                <h3 className="text-base lg:text-lg font-semibold mb-4 text-center lg:text-left">Complete your profile to unlock more features</h3>
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                   {[
                     { field: 'full_name', label: 'Full Name', completed: !!profile.full_name },
                     { field: 'username', label: 'Username', completed: !!profile.username },
@@ -386,18 +386,18 @@ const Profile: React.FC = () => {
       )}
 
       {/* Tabbed Content */}
-      <Card className="profile-section">
+      <Card className="glass-card border-0 shadow-lg">
         <CardHeader>
-          <CardTitle className="text-2xl">Activity</CardTitle>
+          <CardTitle className="text-xl lg:text-2xl">Activity</CardTitle>
         </CardHeader>
 
         <CardContent>
           <Tabs defaultValue="activity" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-6">
-              <TabsTrigger value="activity" className="text-base">Activity</TabsTrigger>
-              <TabsTrigger value="privacy" className="text-base">Privacy</TabsTrigger>
-              <TabsTrigger value="verification" className="text-base">Verification</TabsTrigger>
-              <TabsTrigger value="messages" className="text-base">Messages</TabsTrigger>
+            <TabsList className="glass-card grid w-full grid-cols-2 lg:grid-cols-4 mb-6 p-1">
+              <TabsTrigger value="activity" className="text-xs lg:text-base">Activity</TabsTrigger>
+              <TabsTrigger value="privacy" className="text-xs lg:text-base">Privacy</TabsTrigger>
+              <TabsTrigger value="verification" className="text-xs lg:text-base">Verify</TabsTrigger>
+              <TabsTrigger value="messages" className="text-xs lg:text-base">Messages</TabsTrigger>
             </TabsList>
 
             <TabsContent value="activity" className="space-y-6">
@@ -408,9 +408,9 @@ const Profile: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="privacy">
-              <Card className="profile-section">
+              <Card className="glass-card border-0">
                 <CardHeader>
-                  <CardTitle className="text-xl">Privacy Settings</CardTitle>
+                  <CardTitle className="text-lg lg:text-xl">Privacy Settings</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <PrivacyControls userId={user!.id} />
@@ -419,9 +419,9 @@ const Profile: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="verification">
-              <Card className="profile-section">
+              <Card className="glass-card border-0">
                 <CardHeader>
-                  <CardTitle className="text-xl">Profile Verification</CardTitle>
+                  <CardTitle className="text-lg lg:text-xl">Profile Verification</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ProfileVerification 
@@ -434,7 +434,7 @@ const Profile: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="messages">
-              <Card className="profile-section">
+              <Card className="glass-card border-0">
                 <CardHeader>
                   <CardTitle className="text-xl">Direct Messages</CardTitle>
                 </CardHeader>

@@ -807,6 +807,43 @@
     -webkit-tap-highlight-color: transparent;
   }
   
+  /* Profile components */
+  .profile-hero {
+    background: linear-gradient(135deg, 
+      hsl(var(--card) / 0.8) 0%, 
+      hsl(var(--accent) / 0.1) 100%
+    );
+    backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--border) / 0.2);
+  }
+
+  .profile-completion,
+  .profile-section {
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--border) / 0.1);
+  }
+
+  .stats-card {
+    background: hsl(var(--card) / 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border) / 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .stats-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 40px hsl(var(--primary) / 0.2);
+    border-color: hsl(var(--primary) / 0.3);
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .stats-card:hover {
+      transform: translateY(-2px);
+    }
+  }
+
   /* Safe area handling for mobile navigation */
   .mobile-nav-safe {
     padding-bottom: env(safe-area-inset-bottom);

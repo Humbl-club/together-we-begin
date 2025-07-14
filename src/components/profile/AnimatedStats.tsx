@@ -64,16 +64,16 @@ export const AnimatedStats: React.FC<AnimatedStatsProps> = React.memo(({
         icon={Star}
         title="Total Points"
         value={totalPoints}
-        iconColor="text-amber-600"
-        iconBgColor="bg-amber-100"
+        iconColor="text-primary"
+        iconBgColor="bg-primary/10"
         delay={0}
       />
       <AnimatedStatCard
         icon={Star}
         title="Available Points"
         value={availablePoints}
-        iconColor="text-green-600"
-        iconBgColor="bg-green-100"
+        iconColor="text-emerald-600"
+        iconBgColor="bg-emerald-500/10"
         delay={200}
       />
       <AnimatedStatCard
@@ -81,7 +81,7 @@ export const AnimatedStats: React.FC<AnimatedStatsProps> = React.memo(({
         title="Challenges Won"
         value={completedChallenges}
         iconColor="text-purple-600"
-        iconBgColor="bg-purple-100"
+        iconBgColor="bg-purple-500/10"
         delay={400}
       />
     </div>

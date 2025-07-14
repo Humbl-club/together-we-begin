@@ -53,8 +53,8 @@ export const AchievementsDisplay: React.FC<AchievementsDisplayProps> = ({ challe
                 }}
               >
                 <div className="achievement-badge flex-shrink-0">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
-                    <Trophy className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
+                    <Trophy className="w-6 h-6 text-primary-foreground" />
                   </div>
                 </div>
                 
@@ -73,7 +73,7 @@ export const AchievementsDisplay: React.FC<AchievementsDisplayProps> = ({ challe
                     </Badge>
                   )}
                   {challenge.challenges.points_reward && (
-                    <span className="text-sm font-medium text-amber-600">
+                    <span className="text-sm font-medium text-primary">
                       +{challenge.challenges.points_reward} pts
                     </span>
                   )}

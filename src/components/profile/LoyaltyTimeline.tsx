@@ -27,15 +27,15 @@ export const LoyaltyTimeline: React.FC<LoyaltyTimelineProps> = ({ transactions }
 
   const getTransactionColor = (type: string) => {
     return type === 'earned' 
-      ? 'text-green-600 bg-green-100' 
-      : 'text-red-600 bg-red-100';
+      ? 'text-emerald-600 bg-emerald-500/10' 
+      : 'text-red-600 bg-red-500/10';
   };
 
   return (
     <Card className="profile-section">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Coins className="w-5 h-5 text-yellow-500" />
+          <Coins className="w-5 h-5 text-primary" />
           Points Activity
         </CardTitle>
       </CardHeader>
@@ -80,7 +80,7 @@ export const LoyaltyTimeline: React.FC<LoyaltyTimelineProps> = ({ transactions }
                   
                   <div className="text-right">
                     <span className={`font-bold ${
-                      transaction.type === 'earned' ? 'text-green-600' : 'text-red-600'
+                      transaction.type === 'earned' ? 'text-emerald-600' : 'text-red-600'
                     }`}>
                       {transaction.type === 'earned' ? '+' : '-'}{transaction.points}
                     </span>

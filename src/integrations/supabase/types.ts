@@ -642,6 +642,7 @@ export type Database = {
           id: string
           instagram_handle: string | null
           location: string | null
+          public_key: string | null
           total_loyalty_points: number | null
           updated_at: string | null
           username: string | null
@@ -655,6 +656,7 @@ export type Database = {
           id: string
           instagram_handle?: string | null
           location?: string | null
+          public_key?: string | null
           total_loyalty_points?: number | null
           updated_at?: string | null
           username?: string | null
@@ -668,6 +670,7 @@ export type Database = {
           id?: string
           instagram_handle?: string | null
           location?: string | null
+          public_key?: string | null
           total_loyalty_points?: number | null
           updated_at?: string | null
           username?: string | null

@@ -16,7 +16,7 @@ import { Camera, MapPin, Instagram, Edit3, Save, X, CheckCircle, Star, Trophy } 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PrivacyControls } from '@/components/profile/PrivacyControls';
 
-import { DirectMessaging } from '@/components/messaging/DirectMessaging';
+
 import { AnimatedStats } from '@/components/profile/AnimatedStats';
 import { ProgressRing } from '@/components/profile/ProgressRing';
 import { AchievementsDisplay } from '@/components/profile/AchievementsDisplay';
@@ -393,11 +393,9 @@ const Profile: React.FC = () => {
 
         <CardContent>
           <Tabs defaultValue="activity" className="w-full">
-            <TabsList className="glass-card grid w-full grid-cols-2 lg:grid-cols-4 mb-6 p-1">
+            <TabsList className="glass-card grid w-full grid-cols-2 mb-6 p-1">
               <TabsTrigger value="activity" className="text-xs lg:text-base">Activity</TabsTrigger>
               <TabsTrigger value="privacy" className="text-xs lg:text-base">Privacy</TabsTrigger>
-              
-              <TabsTrigger value="messages" className="text-xs lg:text-base">Messages</TabsTrigger>
             </TabsList>
 
             <TabsContent value="activity" className="space-y-6">
@@ -418,17 +416,6 @@ const Profile: React.FC = () => {
               </Card>
             </TabsContent>
 
-
-            <TabsContent value="messages">
-              <Card className="glass-card border-0">
-                <CardHeader>
-                  <CardTitle className="text-xl">Direct Messages</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <DirectMessaging />
-                </CardContent>
-              </Card>
-            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>

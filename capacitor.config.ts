@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.humblclub.togetherwebegin',
-  appName: 'together-we-begin',
+  appName: 'final girls app',
   webDir: 'dist',
   server: {
     url: 'https://945e8026-291f-4434-93b5-949dcf1fab6b.lovableproject.com?forceHideBadge=true',

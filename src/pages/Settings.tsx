@@ -82,60 +82,88 @@ const Settings: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="pushNotifications">Push Notifications</Label>
+              <div className="space-y-6">
+                <div className="flex items-start justify-between gap-4 py-3">
+                  <div className="flex-1">
+                    <Label htmlFor="pushNotifications" className="text-base font-medium">Push Notifications</Label>
+                    <p className="text-sm text-muted-foreground mt-1">Get instant updates on your device</p>
+                  </div>
                   <MobileToggle
                     checked={settings.notifications.push_enabled}
                     onCheckedChange={(checked) => updateSetting('notifications', 'push_enabled', checked)}
+                    className="flex-shrink-0"
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="emailNotifications">Email Notifications</Label>
+                <div className="flex items-start justify-between gap-4 py-3">
+                  <div className="flex-1">
+                    <Label htmlFor="emailNotifications" className="text-base font-medium">Email Notifications</Label>
+                    <p className="text-sm text-muted-foreground mt-1">Receive updates via email</p>
+                  </div>
                   <MobileToggle
                     checked={settings.notifications.email_enabled}
                     onCheckedChange={(checked) => updateSetting('notifications', 'email_enabled', checked)}
+                    className="flex-shrink-0"
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="smsNotifications">SMS Notifications</Label>
+                <div className="flex items-start justify-between gap-4 py-3">
+                  <div className="flex-1">
+                    <Label htmlFor="smsNotifications" className="text-base font-medium">SMS Notifications</Label>
+                    <p className="text-sm text-muted-foreground mt-1">Get text messages for important updates</p>
+                  </div>
                   <MobileToggle
                     checked={settings.notifications.sms_enabled}
                     onCheckedChange={(checked) => updateSetting('notifications', 'sms_enabled', checked)}
+                    className="flex-shrink-0"
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="eventReminders">Event Reminders</Label>
+                <div className="flex items-start justify-between gap-4 py-3">
+                  <div className="flex-1">
+                    <Label htmlFor="eventReminders" className="text-base font-medium">Event Reminders</Label>
+                    <p className="text-sm text-muted-foreground mt-1">Never miss upcoming events</p>
+                  </div>
                   <MobileToggle
                     checked={settings.notifications.event_reminders}
                     onCheckedChange={(checked) => updateSetting('notifications', 'event_reminders', checked)}
+                    className="flex-shrink-0"
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="challengeUpdates">Challenge Updates</Label>
+                <div className="flex items-start justify-between gap-4 py-3">
+                  <div className="flex-1">
+                    <Label htmlFor="challengeUpdates" className="text-base font-medium">Challenge Updates</Label>
+                    <p className="text-sm text-muted-foreground mt-1">Stay updated on wellness challenges</p>
+                  </div>
                   <MobileToggle
                     checked={settings.notifications.challenge_updates}
                     onCheckedChange={(checked) => updateSetting('notifications', 'challenge_updates', checked)}
+                    className="flex-shrink-0"
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="socialInteractions">Social Interactions</Label>
+                <div className="flex items-start justify-between gap-4 py-3">
+                  <div className="flex-1">
+                    <Label htmlFor="socialInteractions" className="text-base font-medium">Social Interactions</Label>
+                    <p className="text-sm text-muted-foreground mt-1">Likes, comments, and new followers</p>
+                  </div>
                   <MobileToggle
                     checked={settings.notifications.social_interactions}
                     onCheckedChange={(checked) => updateSetting('notifications', 'social_interactions', checked)}
+                    className="flex-shrink-0"
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="marketingEmails">Marketing Emails</Label>
+                <div className="flex items-start justify-between gap-4 py-3">
+                  <div className="flex-1">
+                    <Label htmlFor="marketingEmails" className="text-base font-medium">Marketing Emails</Label>
+                    <p className="text-sm text-muted-foreground mt-1">Community updates and promotions</p>
+                  </div>
                   <MobileToggle
                     checked={settings.notifications.marketing_emails}
                     onCheckedChange={(checked) => updateSetting('notifications', 'marketing_emails', checked)}
+                    className="flex-shrink-0"
                   />
                 </div>
               </div>

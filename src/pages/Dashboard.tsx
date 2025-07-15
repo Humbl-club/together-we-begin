@@ -21,6 +21,8 @@ const Dashboard: React.FC = memo(() => {
   const { isMobile } = useViewport();
   const { handleError } = useErrorHandler();
 
+  console.log('Dashboard render:', { user, stats, profile, loading });
+
   if (loading) {
     return <DashboardSkeleton />;
   }

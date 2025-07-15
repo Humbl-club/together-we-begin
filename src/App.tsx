@@ -20,6 +20,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Messages from "./pages/Messages";
 import Admin from "./pages/Admin";
+import QRScanner from "./pages/QRScanner";
 
 const queryClient = new QueryClient();
 
@@ -80,6 +81,7 @@ const App = () => {
                 <Route path="/messages" element={<Layout><Messages /></Layout>} />
                 <Route path="/admin" element={<Layout><Admin /></Layout>} />
                 <Route path="/settings" element={<Layout><Settings /></Layout>} />
+                <Route path="/qr-scanner" element={<Layout><QRScanner /></Layout>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </ErrorBoundary>

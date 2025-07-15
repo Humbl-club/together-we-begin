@@ -209,6 +209,44 @@ export type Database = {
         }
         Relationships: []
       }
+      event_attendance: {
+        Row: {
+          attended_at: string
+          created_at: string
+          event_id: string
+          id: string
+          points_awarded: number | null
+          user_id: string
+          verified_by: string | null
+        }
+        Insert: {
+          attended_at?: string
+          created_at?: string
+          event_id: string
+          id?: string
+          points_awarded?: number | null
+          user_id: string
+          verified_by?: string | null
+        }
+        Update: {
+          attended_at?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          points_awarded?: number | null
+          user_id?: string
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_attendance_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_registrations: {
         Row: {
           event_id: string | null
@@ -259,6 +297,7 @@ export type Database = {
       }
       events: {
         Row: {
+          attendance_points: number | null
           created_at: string | null
           created_by: string | null
           current_capacity: number | null
@@ -270,12 +309,16 @@ export type Database = {
           loyalty_points_price: number | null
           max_capacity: number | null
           price_cents: number | null
+          qr_code_generated_at: string | null
+          qr_code_generated_by: string | null
+          qr_code_token: string | null
           start_time: string
           status: Database["public"]["Enums"]["event_status"] | null
           title: string
           updated_at: string | null
         }
         Insert: {
+          attendance_points?: number | null
           created_at?: string | null
           created_by?: string | null
           current_capacity?: number | null
@@ -287,12 +330,16 @@ export type Database = {
           loyalty_points_price?: number | null
           max_capacity?: number | null
           price_cents?: number | null
+          qr_code_generated_at?: string | null
+          qr_code_generated_by?: string | null
+          qr_code_token?: string | null
           start_time: string
           status?: Database["public"]["Enums"]["event_status"] | null
           title: string
           updated_at?: string | null
         }
         Update: {
+          attendance_points?: number | null
           created_at?: string | null
           created_by?: string | null
           current_capacity?: number | null
@@ -304,6 +351,9 @@ export type Database = {
           loyalty_points_price?: number | null
           max_capacity?: number | null
           price_cents?: number | null
+          qr_code_generated_at?: string | null
+          qr_code_generated_by?: string | null
+          qr_code_token?: string | null
           start_time?: string
           status?: Database["public"]["Enums"]["event_status"] | null
           title?: string
@@ -1050,6 +1100,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_event_qr_code: {
+        Args: { event_id_param: string }
+        Returns: Json
+      }
       get_dashboard_data_v2: {
         Args: { user_id_param: string }
         Returns: {
@@ -1111,6 +1165,10 @@ export type Database = {
       is_admin: {
         Args: { _user_id: string }
         Returns: boolean
+      }
+      mark_event_attendance: {
+        Args: { event_qr_token: string; scanning_user_id: string }
+        Returns: Json
       }
       mark_thread_messages_read: {
         Args: { thread_id_param: string; user_id_param: string }

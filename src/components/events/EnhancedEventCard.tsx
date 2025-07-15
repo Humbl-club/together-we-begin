@@ -10,12 +10,15 @@ import {
   Clock,
   Star,
   MessageSquare,
-  ExternalLink
+  ExternalLink,
+  QrCode,
+  Trophy
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface EnhancedEventCardProps {
   event: {
@@ -69,6 +72,7 @@ export const EnhancedEventCard = memo(({
 }: EnhancedEventCardProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const navigate = useNavigate();
 
   const cardClasses = useMemo(() => cn(
     'glass-card-enhanced overflow-hidden transition-all duration-300 group',
@@ -390,11 +394,34 @@ export const EnhancedEventCard = memo(({
             </Button>
           )}
           
-          {event.is_registered && (
+          {event.is_registered && event.isUpcoming && (
+            <>
+              <Button
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/qr-scanner');
+                }}
+                className={cn(
+                  'flex-1 text-xs h-8'
+                )}
+              >
+                <QrCode className="w-3 h-3 mr-1" />
+                Scan QR
+              </Button>
+              <div className={cn(
+                'flex-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-md flex items-center justify-center font-medium text-xs h-8'
+              )}>
+                ✓ Registered
+              </div>
+            </>
+          )}
+          
+          {event.is_registered && !event.isUpcoming && (
             <div className={cn(
-              'flex-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-md flex items-center justify-center font-medium text-xs h-8'
+              'w-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-md flex items-center justify-center font-medium text-xs h-8'
             )}>
-              ✓ Registered
+              ✓ Attended
             </div>
           )}
         </div>

@@ -41,6 +41,7 @@ const UltimateEventsPage = memo(() => {
   // Load events with enhanced caching and monitoring
   const loadEvents = useCallback(async (status = 'upcoming') => {
     performance.mark('loadEvents-start');
+    console.log(`🔄 Loading events with status: ${status}, user: ${user?.id}`);
     
     try {
       setLoading(true);
@@ -52,13 +53,14 @@ const UltimateEventsPage = memo(() => {
         limit: 20
       });
       
+      console.log(`✅ Loaded ${Array.isArray(eventsData) ? eventsData.length : 0} events:`, eventsData);
       setEvents(Array.isArray(eventsData) ? eventsData : []);
       
       performance.mark('loadEvents-end');
       performance.measure('loadEvents-duration', 'loadEvents-start', 'loadEvents-end');
       
     } catch (err) {
-      console.error('Error loading events:', err);
+      console.error('❌ Error loading events:', err);
       setError('Failed to load events');
       toast({
         title: 'Error',
@@ -261,100 +263,99 @@ const UltimateEventsPage = memo(() => {
   }
 
   return (
-    <div className="responsive-container max-w-7xl mx-auto mobile:p-4 sm:p-6 lg:p-8 safe-area-top mobile-content spacing-responsive-lg animate-fade-in" data-pull-refresh>
-      {/* Header */}
-      <div className="glass-card-enhanced mobile:p-4 sm:p-6 spacing-responsive-sm settings-header">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-display mobile:text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-balance bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
-              Events
-            </h1>
-            <p className="text-muted-foreground mobile:text-sm sm:text-base break-words text-balance mt-2">
-              Discover and join community events
-            </p>
-          </div>
-          
-          {/* Create Event Button - Admin/Organizer only */}
-          <Button className="glass-button mobile:h-10 sm:h-12 mobile:px-3 sm:px-4">
-            <Plus className="mobile:w-4 mobile:h-4 sm:w-5 sm:h-5 mobile:mr-1 sm:mr-2" />
-            <span className="mobile:text-xs sm:text-sm">Create</span>
-          </Button>
-        </div>
-      </div>
-
-      {/* Search & Filters */}
-      <div className="glass-card-enhanced mobile:p-4 sm:p-6">
-        <EventSearch
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          activeFilters={activeFilters}
-          onFilterChange={setActiveFilters}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-        />
-      </div>
-
-      {/* Enhanced Tabs with Better Mobile Support */}
-      <div className="glass-card-enhanced mobile:p-2 sm:p-3 rounded-xl">
-        <div className="flex items-center justify-between mb-4">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-            <TabsList className="premium-tabs grid w-full mobile:grid-cols-3 sm:grid-cols-3 mobile:h-auto sm:h-12 mobile:gap-1 sm:gap-2">
-              <TabsTrigger 
-                value="upcoming" 
-                className="premium-tab mobile:min-h-[48px] sm:min-h-[44px] mobile:text-xs sm:text-sm font-medium touch-manipulation focus-ring"
-              >
-                Upcoming
-              </TabsTrigger>
-              <TabsTrigger 
-                value="ongoing" 
-                className="premium-tab mobile:min-h-[48px] sm:min-h-[44px] mobile:text-xs sm:text-sm font-medium touch-manipulation focus-ring"
-              >
-                Ongoing
-              </TabsTrigger>
-              <TabsTrigger 
-                value="completed" 
-                className="premium-tab mobile:min-h-[48px] sm:min-h-[44px] mobile:text-xs sm:text-sm font-medium touch-manipulation focus-ring"
-              >
-                Past
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-          {/* View Mode Toggle */}
-          {!isMobileOptimized && (
-            <div className="flex gap-1 ml-4">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-                className="h-8 w-8 p-0"
-              >
-                <LayoutGrid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-                className="h-8 w-8 p-0"
-              >
-                <List className="h-4 w-4" />
-              </Button>
+    <div className="min-h-screen bg-background mobile:p-2 sm:p-4 lg:p-6 safe-area-top" data-pull-refresh>
+      <div className="max-w-4xl mx-auto space-y-4">
+        {/* Header */}
+        <div className="glass-card-enhanced mobile:p-3 sm:p-4 lg:p-6">
+          <div className="flex flex-col mobile:gap-2 sm:gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 className="font-display mobile:text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">
+                Events
+              </h1>
+              <p className="text-muted-foreground mobile:text-sm sm:text-base lg:text-lg">
+                Discover and join community events
+              </p>
             </div>
-          )}
+            
+            {/* Create Event Button - Admin/Organizer only */}
+            <Button className="glass-button mobile:w-full lg:w-auto mobile:h-10 sm:h-11 lg:h-12 mobile:px-4 sm:px-6">
+              <Plus className="mobile:w-4 mobile:h-4 sm:w-5 sm:h-5 mr-2" />
+              <span className="mobile:text-sm sm:text-base">Create Event</span>
+            </Button>
+          </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        {/* Search & Filters */}
+        <div className="glass-card-enhanced mobile:p-3 sm:p-4 lg:p-6">
+          <EventSearch
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            activeFilters={activeFilters}
+            onFilterChange={setActiveFilters}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+          />
+        </div>
 
-          <TabsContent value={activeTab} className="mobile:mt-4 sm:mt-6 spacing-responsive-md">
+        {/* Enhanced Tabs with Better Mobile Support */}
+        <div className="glass-card-enhanced mobile:p-3 sm:p-4 lg:p-6">
+          <div className="flex mobile:flex-col sm:flex-row mobile:gap-3 sm:items-center sm:justify-between mb-4">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
+              <TabsList className="grid w-full grid-cols-3 mobile:h-12 sm:h-10 gap-1">
+                <TabsTrigger 
+                  value="upcoming" 
+                  className="mobile:text-sm sm:text-base font-medium touch-manipulation"
+                >
+                  Upcoming
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="ongoing" 
+                  className="mobile:text-sm sm:text-base font-medium touch-manipulation"
+                >
+                  Ongoing
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="completed" 
+                  className="mobile:text-sm sm:text-base font-medium touch-manipulation"
+                >
+                  Past
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+
+            {/* View Mode Toggle - Hidden on mobile */}
+            {!isMobileOptimized && (
+              <div className="flex gap-1">
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className="h-8 w-8 p-0"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className="h-8 w-8 p-0"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <TabsContent value={activeTab} className="mobile:mt-4 sm:mt-6">
             {loading ? (
-              <div className="spacing-responsive-md stagger-children">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="glass-section mobile:h-32 sm:h-40 rounded-xl animate-pulse" />
+              <div className="space-y-4">
+                {Array.from({ length: isMobileOptimized ? 2 : 3 }).map((_, i) => (
+                  <div key={i} className="glass-card mobile:h-32 sm:h-40 rounded-xl animate-pulse" />
                 ))}
               </div>
             ) : filteredEvents.length === 0 ? (
               <div className="glass-card-enhanced mobile:p-6 sm:p-8 text-center">
-                <div className="spacing-responsive-sm">
+                <div className="space-y-4">
                   <div className="mobile:w-12 mobile:h-12 sm:w-16 sm:h-16 bg-muted rounded-full mx-auto opacity-50 flex items-center justify-center">
                     <Calendar className="mobile:w-6 mobile:h-6 sm:w-8 sm:h-8" />
                   </div>
@@ -370,65 +371,56 @@ const UltimateEventsPage = memo(() => {
                         : 'Check back later for new events'}
                     </p>
                   </div>
-                  <Button variant="outline" className="btn-responsive mobile:text-sm sm:text-base">
+                  <Button variant="outline" className="mobile:text-sm sm:text-base">
                     Browse All Events
                   </Button>
                 </div>
               </div>
             ) : (
-              <div className="spacing-responsive-md">
-                <Suspense fallback={
-                  <div className="spacing-responsive-md">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="glass-section mobile:h-32 sm:h-40 rounded-xl animate-pulse" />
-                    ))}
+              <div className="mobile:space-y-3 sm:space-y-4">
+                {/* Mobile-first event list */}
+                {isMobileOptimized ? (
+                  <div className="space-y-3">
+                    {filteredEvents.slice(0, 10).map((event, index) => renderEventCard(event, index))}
+                    
+                    {filteredEvents.length > 10 && (
+                      <div className="text-center pt-4">
+                        <Button variant="outline" className="w-full">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Load More Events ({filteredEvents.length - 10} remaining)
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                }>
-                  {/* Enhanced event list with view modes */}
-                  {isMobileOptimized || viewMode === 'list' ? (
-                    <div className="space-y-4">
-                      {filteredEvents.slice(0, 10).map((event, index) => renderEventCard(event, index))}
-                      
-                      {filteredEvents.length > 10 && (
-                        <div className="text-center pt-4">
-                          <Button variant="outline" className="glass-button">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Load More Events ({filteredEvents.length - 10} remaining)
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className={cn(
-                      'grid gap-6',
-                      viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
-                    )}>
-                      {filteredEvents.slice(0, 12).map((event, index) => renderEventCard(event, index))}
-                      
-                      {filteredEvents.length > 12 && (
-                        <div className="col-span-full text-center pt-4">
-                          <Button variant="outline" className="glass-button">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Load More Events ({filteredEvents.length - 12} remaining)
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </Suspense>
+                ) : (
+                  <div className={cn(
+                    'grid gap-4',
+                    viewMode === 'grid' ? 'sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
+                  )}>
+                    {filteredEvents.slice(0, 12).map((event, index) => renderEventCard(event, index))}
+                    
+                    {filteredEvents.length > 12 && (
+                      <div className="col-span-full text-center pt-4">
+                        <Button variant="outline">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Load More Events ({filteredEvents.length - 12} remaining)
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </TabsContent>
-        </Tabs>
+        </div>
       </div>
 
       {/* Enhanced Performance Debug Info */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="fixed mobile:bottom-20 sm:bottom-4 right-4 glass-modal p-3 rounded-lg mobile:text-xs sm:text-sm space-y-1 z-40">
-          <div>Mobile: {isMobileOptimized ? 'Yes' : 'No'}</div>
+        <div className="fixed mobile:bottom-4 sm:bottom-6 right-4 glass-modal p-2 rounded-lg mobile:text-xs sm:text-sm space-y-1 z-40 max-w-32">
+          <div>Mobile: {isMobileOptimized ? '✓' : '✗'}</div>
           <div>View: {viewMode}</div>
-          <div>Filtered: {filteredEvents.length}/{events.length}</div>
-          <div>Cache: Active</div>
+          <div>Events: {filteredEvents.length}/{events.length}</div>
         </div>
       )}
     </div>

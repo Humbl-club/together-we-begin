@@ -76,8 +76,8 @@ export const EnhancedEventCard = memo(({
     'mobile:rounded-lg sm:rounded-xl',
     {
       'h-full': variant === 'default',
-      'mobile:h-auto sm:h-40 mobile:min-h-[320px] flex mobile:flex-col sm:flex-row': variant === 'compact',
-      'min-h-[450px] featured-gradient border-2 border-primary/20': variant === 'featured'
+      'mobile:h-auto mobile:min-h-[300px] sm:h-36 mobile:flex-col sm:flex-row flex': variant === 'compact',
+      'min-h-[400px] featured-gradient border-2 border-primary/20': variant === 'featured'
     },
     className
   ), [variant, className]);
@@ -177,8 +177,8 @@ export const EnhancedEventCard = memo(({
       <div className={cn(
         'relative overflow-hidden',
         variant === 'compact' 
-          ? 'mobile:h-48 sm:w-48 sm:h-full' 
-          : 'mobile:h-48 sm:h-56'
+          ? 'mobile:h-40 sm:w-40 sm:h-full sm:flex-shrink-0' 
+          : 'mobile:h-44 sm:h-52'
       )}>
         {event.image_url ? (
           <img
@@ -247,94 +247,93 @@ export const EnhancedEventCard = memo(({
 
       {/* Content Section */}
       <div className={cn(
-        'mobile:p-4 sm:p-5 flex-1',
-        variant === 'compact' ? 'mobile:space-y-2 sm:space-y-3' : 'mobile:space-y-3 sm:space-y-4'
+        'flex-1 flex flex-col',
+        variant === 'compact' ? 'mobile:p-3 sm:p-4' : 'mobile:p-4 sm:p-5'
       )}>
-        {/* Header */}
-        <div>
-          <div className="flex items-start justify-between gap-2 mb-2">
-            <h3 className={cn(
-              'font-semibold line-clamp-2 group-hover:text-primary transition-colors',
-              variant === 'compact' ? 'mobile:text-base sm:text-lg' : 'mobile:text-lg sm:text-xl'
-            )}>
-              {event.title}
-            </h3>
-            {event.average_rating && (
-              <div className="flex items-center gap-1 shrink-0">
-                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span className="text-sm font-medium">{event.average_rating.toFixed(1)}</span>
-              </div>
+        <div className="flex-1 space-y-3">
+          {/* Header */}
+          <div>
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <h3 className={cn(
+                'font-semibold line-clamp-2 group-hover:text-primary transition-colors',
+                variant === 'compact' ? 'mobile:text-sm sm:text-base' : 'mobile:text-base sm:text-lg'
+              )}>
+                {event.title}
+              </h3>
+              {event.average_rating && (
+                <div className="flex items-center gap-1 shrink-0">
+                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                  <span className="text-xs font-medium">{event.average_rating.toFixed(1)}</span>
+                </div>
+              )}
+            </div>
+
+            {event.description && variant !== 'compact' && (
+              <p className="text-muted-foreground mobile:text-xs sm:text-sm line-clamp-2">
+                {event.description}
+              </p>
             )}
           </div>
 
-          {event.description && variant !== 'compact' && (
-            <p className="text-muted-foreground mobile:text-sm sm:text-base line-clamp-2">
-              {event.description}
-            </p>
-          )}
-        </div>
-
-        {/* Organizer Info */}
-        {event.organizer && (
-          <div className="flex items-center gap-2">
-            <Avatar className="w-6 h-6">
-              <AvatarImage src={event.organizer.avatar} alt={event.organizer.name} />
-              <AvatarFallback className="text-xs">
-                {event.organizer.name.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-sm text-muted-foreground">by {event.organizer.name}</span>
-            {event.organizer.rating && (
-              <div className="flex items-center gap-1">
-                <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                <span className="text-xs text-muted-foreground">{event.organizer.rating}</span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Event Details */}
-        <div className={cn(
-          'space-y-2',
-          variant === 'compact' ? 'mobile:text-xs sm:text-sm' : 'mobile:text-sm sm:text-base'
-        )}>
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
-            <span>{new Date(event.start_time).toLocaleDateString()}</span>
-            {event.timeUntilStart && (
-              <Badge variant="outline" className="text-xs">
-                <Clock className="w-3 h-3 mr-1" />
-                {event.timeUntilStart}
-              </Badge>
-            )}
-          </div>
-
-          {event.location && (
+          {/* Organizer Info */}
+          {event.organizer && (
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
-              <span className="line-clamp-1">{event.location}</span>
+              <Avatar className="w-5 h-5">
+                <AvatarImage src={event.organizer.avatar} alt={event.organizer.name} />
+                <AvatarFallback className="text-xs">
+                  {event.organizer.name.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-xs text-muted-foreground">by {event.organizer.name}</span>
+              {event.organizer.rating && (
+                <div className="flex items-center gap-1">
+                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                  <span className="text-xs text-muted-foreground">{event.organizer.rating}</span>
+                </div>
+              )}
             </div>
           )}
 
-          <div className="flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-muted-foreground shrink-0" />
-            <span className="font-medium text-primary">{priceDisplay}</span>
+          {/* Event Details */}
+          <div className="space-y-2 text-xs">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-3 h-3 text-muted-foreground shrink-0" />
+              <span className="text-xs">{new Date(event.start_time).toLocaleDateString()}</span>
+              {event.timeUntilStart && (
+                <Badge variant="outline" className="text-xs px-1 py-0">
+                  <Clock className="w-2 h-2 mr-1" />
+                  {event.timeUntilStart}
+                </Badge>
+              )}
+            </div>
+
+            {event.location && (
+              <div className="flex items-center gap-2">
+                <MapPin className="w-3 h-3 text-muted-foreground shrink-0" />
+                <span className="line-clamp-1 text-xs">{event.location}</span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-3 h-3 text-muted-foreground shrink-0" />
+              <span className="text-xs font-medium text-primary">{priceDisplay}</span>
+            </div>
           </div>
         </div>
 
         {/* Capacity & Social Proof */}
         {(event.max_capacity || attendeePreview) && variant !== 'compact' && (
-          <div className="space-y-2">
+          <div className="space-y-2 mt-3">
             {event.max_capacity && (
               <div className="space-y-1">
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Capacity</span>
                   <span>{event.current_capacity}/{event.max_capacity}</span>
                 </div>
-                <div className="w-full bg-muted rounded-full h-2">
+                <div className="w-full bg-muted rounded-full h-1.5">
                   <div
                     className={cn(
-                      'h-2 rounded-full transition-all duration-300',
+                      'h-1.5 rounded-full transition-all duration-300',
                       event.capacityPercentage && event.capacityPercentage > 80 
                         ? 'bg-red-500' 
                         : event.capacityPercentage && event.capacityPercentage > 60 
@@ -360,9 +359,8 @@ export const EnhancedEventCard = memo(({
             )}
           </div>
         )}
-
         {/* Actions */}
-        <div className="flex gap-2 pt-2">
+        <div className="flex gap-2 mt-auto pt-3">
           <Button
             variant="outline"
             onClick={(e) => {
@@ -370,11 +368,10 @@ export const EnhancedEventCard = memo(({
               onViewDetails?.(event.id);
             }}
             className={cn(
-              'flex-1 glass-button',
-              variant === 'compact' ? 'mobile:text-xs sm:text-sm h-8' : 'mobile:text-sm sm:text-base h-10'
+              'flex-1 glass-button text-xs h-8'
             )}
           >
-            <ExternalLink className="w-4 h-4 mr-2" />
+            <ExternalLink className="w-3 h-3 mr-1" />
             Details
           </Button>
           
@@ -385,19 +382,17 @@ export const EnhancedEventCard = memo(({
                 onRegister?.(event.id);
               }}
               className={cn(
-                'flex-1',
-                variant === 'compact' ? 'mobile:text-xs sm:text-sm h-8' : 'mobile:text-sm sm:text-base h-10'
+                'flex-1 text-xs h-8'
               )}
             >
-              <Users className="w-4 h-4 mr-2" />
+              <Users className="w-3 h-3 mr-1" />
               Register
             </Button>
           )}
           
           {event.is_registered && (
             <div className={cn(
-              'flex-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-md flex items-center justify-center font-medium',
-              variant === 'compact' ? 'mobile:text-xs sm:text-sm h-8' : 'mobile:text-sm sm:text-base h-10'
+              'flex-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-md flex items-center justify-center font-medium text-xs h-8'
             )}>
               ✓ Registered
             </div>

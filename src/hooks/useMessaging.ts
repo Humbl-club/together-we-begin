@@ -3,6 +3,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { MessagingService, MessageThread, DirectMessage } from '@/services/messaging/MessagingService';
 import { useToast } from '@/hooks/use-toast';
 import { useMessageCache } from './useMessageCache';
+import { useMessagePerformance } from './useMessagePerformance';
 
 export const useMessaging = () => {
   const [threads, setThreads] = useState<MessageThread[]>([]);
@@ -15,6 +16,7 @@ export const useMessaging = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const messagingService = MessagingService.getInstance();
+  const { measureDatabase, measureEncryption } = useMessagePerformance();
   
   const {
     cacheMessages,
@@ -51,7 +53,11 @@ export const useMessaging = () => {
         return;
       }
       
-      const userThreads = await messagingService.getThreads();
+      const userThreads = await measureDatabase(
+        'load_threads',
+        () => messagingService.getThreads(),
+        0 // Will be updated with actual count
+      );
       setThreads(userThreads);
       cacheThreads(userThreads);
       

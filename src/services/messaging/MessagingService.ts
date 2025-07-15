@@ -86,87 +86,82 @@ export class MessagingService {
   async getThreads(page = 0, limit = 20): Promise<MessageThread[]> {
     if (!this.currentUserId) throw new Error('Not authenticated');
 
-    const { data: threads, error } = await supabase
-      .from('message_threads')
-      .select('*')
-      .or(`participant_1.eq.${this.currentUserId},participant_2.eq.${this.currentUserId}`)
-      .order('last_message_at', { ascending: false, nullsFirst: false })
-      .range(page * limit, (page + 1) * limit - 1);
+    try {
+      const { data: threads, error } = await supabase
+        .from('message_threads')
+        .select('*')
+        .or(`participant_1.eq.${this.currentUserId},participant_2.eq.${this.currentUserId}`)
+        .order('last_message_at', { ascending: false, nullsFirst: false })
+        .range(page * limit, (page + 1) * limit - 1);
 
-    if (error) throw error;
+      if (error) throw error;
 
-    // Get other user IDs for batch profile loading
-    const otherUserIds = threads.map(thread => 
-      thread.participant_1 === this.currentUserId 
-        ? thread.participant_2 
-        : thread.participant_1
-    );
+      // Get other user IDs for batch profile loading
+      const otherUserIds = threads.map(thread => 
+        thread.participant_1 === this.currentUserId 
+          ? thread.participant_2 
+          : thread.participant_1
+      );
 
-    // Batch load profiles to avoid N+1 queries
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('id, full_name, avatar_url')
-      .in('id', otherUserIds);
+      // Batch load profiles to avoid N+1 queries
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', otherUserIds);
 
-    const profilesMap = new Map(profiles?.map(p => [p.id, p]) || []);
+      const profilesMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
-    // Get unread counts for all threads
-    const unreadCounts = await this.getUnreadCounts(threads.map(t => t.id));
+      // Get all unread counts in a single optimized query
+      const { data: unreadCounts, error: countsError } = await supabase
+        .rpc('get_unread_counts_for_user', { user_id_param: this.currentUserId });
 
-    const threadsWithProfiles = threads.map((thread) => {
-      const otherUserId = thread.participant_1 === this.currentUserId 
-        ? thread.participant_2 
-        : thread.participant_1;
-      
-      const profile = profilesMap.get(otherUserId);
+      if (countsError) {
+        console.warn('Error fetching unread counts:', countsError);
+      }
 
-      return {
-        ...thread,
-        other_user: profile || { id: otherUserId, full_name: 'Unknown User' },
-        unread_count: unreadCounts.get(thread.id) || 0
-      };
-    });
+      // Create a map for fast lookup
+      const unreadMap = new Map(
+        (unreadCounts || []).map(count => [count.thread_id, Number(count.unread_count)])
+      );
 
-    return threadsWithProfiles;
+      const threadsWithProfiles = threads.map((thread) => {
+        const otherUserId = thread.participant_1 === this.currentUserId 
+          ? thread.participant_2 
+          : thread.participant_1;
+        
+        const profile = profilesMap.get(otherUserId);
+
+        return {
+          ...thread,
+          other_user: profile || { id: otherUserId, full_name: 'Unknown User' },
+          unread_count: unreadMap.get(thread.id) || 0
+        };
+      });
+
+      return threadsWithProfiles;
+    } catch (error) {
+      console.error('Error fetching threads:', error);
+      throw error;
+    }
   }
 
-  private async getUnreadCounts(threadIds: string[]): Promise<Map<string, number>> {
-    if (!this.currentUserId || threadIds.length === 0) return new Map();
+  // Mark thread as read efficiently using database function
+  async markThreadAsRead(threadId: string): Promise<void> {
+    if (!this.currentUserId) throw new Error('Not authenticated');
 
-    const { data: unreadMessages } = await supabase
-      .from('direct_messages')
-      .select('id')
-      .neq('sender_id', this.currentUserId)
-      .is('read_at', null)
-      .in('recipient_id', [this.currentUserId]);
+    try {
+      const { error } = await supabase
+        .rpc('mark_thread_messages_read', { 
+          thread_id_param: threadId, 
+          user_id_param: this.currentUserId 
+        });
 
-    // Count unread messages per thread
-    const counts = new Map<string, number>();
-    
-    // For each message, find which thread it belongs to
-    if (unreadMessages) {
-      for (const message of unreadMessages) {
-        // Find the thread this message belongs to
-        const { data: messageWithThread } = await supabase
-          .from('direct_messages')
-          .select('sender_id, recipient_id')
-          .eq('id', message.id)
-          .single();
-
-        if (messageWithThread) {
-          const threadId = threadIds.find(id => {
-            // Check if this thread contains these participants
-            return true; // Simplified for now
-          });
-          
-          if (threadId) {
-            counts.set(threadId, (counts.get(threadId) || 0) + 1);
-          }
-        }
+      if (error) {
+        console.warn('Error marking thread as read:', error);
       }
+    } catch (error) {
+      console.error('Failed to mark thread as read:', error);
     }
-
-    return counts;
   }
 
   async getMessages(threadId: string, page = 0, limit = 50): Promise<DirectMessage[]> {
@@ -215,17 +210,14 @@ export class MessagingService {
       this.currentUserId
     );
 
-    // Mark messages as read
+    // Mark messages as read using optimized function
     if (encryptedMessages && encryptedMessages.length > 0) {
-      const unreadMessages = encryptedMessages.filter(
+      const hasUnreadMessages = encryptedMessages.some(
         msg => msg.recipient_id === this.currentUserId && !msg.read_at
       );
       
-      if (unreadMessages.length > 0) {
-        await supabase
-          .from('direct_messages')
-          .update({ read_at: new Date().toISOString() })
-          .in('id', unreadMessages.map(msg => msg.id));
+      if (hasUnreadMessages) {
+        await this.markThreadAsRead(threadId);
       }
     }
 

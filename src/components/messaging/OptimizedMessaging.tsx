@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMessaging } from '@/hooks/useMessaging';
 import { ThreadList } from './ThreadList';
 import { MessageView } from './MessageView';
+import { MessageErrorBoundary } from './MessageErrorBoundary';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useViewport } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';
@@ -76,32 +77,44 @@ export const OptimizedMessaging = () => {
   const selectedThreadData = threads.find(t => t.id === selectedThread);
 
   return (
-    <div className="flex flex-col h-full min-h-[600px]">
-      <div className={`grid gap-4 flex-1 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
-        {/* Thread List */}
-        <div className={`${isMobile ? (selectedThread ? 'hidden' : 'block') : 'col-span-1'}`}>
-            <ThreadList
-              threads={threads}
-              selectedThreadId={selectedThread}
-              onThreadSelect={selectThread}
-              onStartConversation={handleStartConversation}
-              loading={loading}
-              totalUnreadCount={totalUnreadCount}
-            />
-        </div>
+    <MessageErrorBoundary
+      onError={(error, errorInfo) => {
+        // Log error for monitoring
+        console.error('Messaging system error:', error, errorInfo);
+        toast({
+          title: "Messaging Error",
+          description: "There was an issue with the messaging system. Please try again.",
+          variant: "destructive"
+        });
+      }}
+    >
+      <div className="flex flex-col h-full min-h-[600px]">
+        <div className={`grid gap-4 flex-1 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
+          {/* Thread List */}
+          <div className={`${isMobile ? (selectedThread ? 'hidden' : 'block') : 'col-span-1'}`}>
+              <ThreadList
+                threads={threads}
+                selectedThreadId={selectedThread}
+                onThreadSelect={selectThread}
+                onStartConversation={handleStartConversation}
+                loading={loading}
+                totalUnreadCount={totalUnreadCount}
+              />
+          </div>
 
-        {/* Message View */}
-        <div className={`${isMobile ? (selectedThread ? 'block' : 'hidden') : 'col-span-2'}`}>
-          <MessageView
-            thread={selectedThreadData || null}
-            messages={messages}
-            onSendMessage={handleSendMessage}
-            onBack={isMobile ? handleBackToList : undefined}
-            loading={loadingMessages}
-            sending={sending}
-          />
+          {/* Message View */}
+          <div className={`${isMobile ? (selectedThread ? 'block' : 'hidden') : 'col-span-2'}`}>
+            <MessageView
+              thread={selectedThreadData || null}
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              onBack={isMobile ? handleBackToList : undefined}
+              loading={loadingMessages}
+              sending={sending}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </MessageErrorBoundary>
   );
 };

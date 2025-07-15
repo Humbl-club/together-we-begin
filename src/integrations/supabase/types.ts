@@ -1086,6 +1086,13 @@ export type Database = {
           registration_status: Database["public"]["Enums"]["payment_status"]
         }[]
       }
+      get_unread_counts_for_user: {
+        Args: { user_id_param: string }
+        Returns: {
+          thread_id: string
+          unread_count: number
+        }[]
+      }
       get_user_dashboard_optimized: {
         Args: { user_id_param: string }
         Returns: {
@@ -1104,6 +1111,10 @@ export type Database = {
       is_admin: {
         Args: { _user_id: string }
         Returns: boolean
+      }
+      mark_thread_messages_read: {
+        Args: { thread_id_param: string; user_id_param: string }
+        Returns: undefined
       }
     }
     Enums: {

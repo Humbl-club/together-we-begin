@@ -35,6 +35,53 @@ export type Database = {
         }
         Relationships: []
       }
+      challenge_cycles: {
+        Row: {
+          created_at: string
+          cycle_end: string
+          cycle_start: string
+          id: string
+          parent_challenge_id: string
+          participants_count: number | null
+          runner_up_user_id: string | null
+          status: string | null
+          updated_at: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          cycle_end: string
+          cycle_start: string
+          id?: string
+          parent_challenge_id: string
+          participants_count?: number | null
+          runner_up_user_id?: string | null
+          status?: string | null
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          cycle_end?: string
+          cycle_start?: string
+          id?: string
+          parent_challenge_id?: string
+          participants_count?: number | null
+          runner_up_user_id?: string | null
+          status?: string | null
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_cycles_parent_challenge_id_fkey"
+            columns: ["parent_challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       challenge_participations: {
         Row: {
           challenge_id: string | null
@@ -82,49 +129,67 @@ export type Database = {
       }
       challenges: {
         Row: {
+          auto_award_enabled: boolean | null
           badge_image_url: string | null
           badge_name: string | null
+          challenge_type: string | null
           created_at: string | null
           created_by: string | null
           description: string | null
           end_date: string | null
           id: string
           instructions: string | null
+          participation_reward_points: number | null
           points_reward: number | null
+          runner_up_reward_points: number | null
           start_date: string | null
           status: Database["public"]["Enums"]["challenge_status"] | null
+          step_goal: number | null
           title: string
           updated_at: string | null
+          winner_reward_points: number | null
         }
         Insert: {
+          auto_award_enabled?: boolean | null
           badge_image_url?: string | null
           badge_name?: string | null
+          challenge_type?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           end_date?: string | null
           id?: string
           instructions?: string | null
+          participation_reward_points?: number | null
           points_reward?: number | null
+          runner_up_reward_points?: number | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["challenge_status"] | null
+          step_goal?: number | null
           title: string
           updated_at?: string | null
+          winner_reward_points?: number | null
         }
         Update: {
+          auto_award_enabled?: boolean | null
           badge_image_url?: string | null
           badge_name?: string | null
+          challenge_type?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           end_date?: string | null
           id?: string
           instructions?: string | null
+          participation_reward_points?: number | null
           points_reward?: number | null
+          runner_up_reward_points?: number | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["challenge_status"] | null
+          step_goal?: number | null
           title?: string
           updated_at?: string | null
+          winner_reward_points?: number | null
         }
         Relationships: []
       }
@@ -796,6 +861,50 @@ export type Database = {
         }
         Relationships: []
       }
+      step_validation_logs: {
+        Row: {
+          anomaly_flags: Json | null
+          challenge_id: string
+          created_at: string
+          device_info: Json | null
+          id: string
+          reported_steps: number
+          timestamp: string
+          user_id: string
+          validation_score: number | null
+        }
+        Insert: {
+          anomaly_flags?: Json | null
+          challenge_id: string
+          created_at?: string
+          device_info?: Json | null
+          id?: string
+          reported_steps: number
+          timestamp?: string
+          user_id: string
+          validation_score?: number | null
+        }
+        Update: {
+          anomaly_flags?: Json | null
+          challenge_id?: string
+          created_at?: string
+          device_info?: Json | null
+          id?: string
+          reported_steps?: number
+          timestamp?: string
+          user_id?: string
+          validation_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "step_validation_logs_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       story_reactions: {
         Row: {
           created_at: string
@@ -1091,6 +1200,53 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      walking_leaderboards: {
+        Row: {
+          challenge_id: string
+          created_at: string
+          daily_steps: Json | null
+          flagged_for_review: boolean | null
+          id: string
+          is_validated: boolean | null
+          last_updated: string
+          total_steps: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string
+          daily_steps?: Json | null
+          flagged_for_review?: boolean | null
+          id?: string
+          is_validated?: boolean | null
+          last_updated?: string
+          total_steps?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string
+          daily_steps?: Json | null
+          flagged_for_review?: boolean | null
+          id?: string
+          is_validated?: boolean | null
+          last_updated?: string
+          total_steps?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "walking_leaderboards_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
             referencedColumns: ["id"]
           },
         ]

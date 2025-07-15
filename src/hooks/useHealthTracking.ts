@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { pedometerService, StepData, DailyStepData } from '@/services/PedometerService';
 
 interface HealthData {
   steps: number;
@@ -13,6 +14,8 @@ interface HealthData {
   waterGlasses: number;
   sleepHours: number;
   lastUpdated: Date;
+  dailySteps: { [date: string]: number };
+  weeklySteps: DailyStepData[];
 }
 
 interface HealthGoals {
@@ -33,7 +36,9 @@ export const useHealthTracking = () => {
     workouts: 0,
     waterGlasses: 0,
     sleepHours: 0,
-    lastUpdated: new Date()
+    lastUpdated: new Date(),
+    dailySteps: {},
+    weeklySteps: []
   });
   
   const [healthGoals, setHealthGoals] = useState<HealthGoals>({
@@ -51,43 +56,160 @@ export const useHealthTracking = () => {
 
   useEffect(() => {
     if (user) {
-      checkHealthKitConnection();
+      initializePedometer();
     }
   }, [user]);
 
-  const checkHealthKitConnection = useCallback(async () => {
+  const initializePedometer = useCallback(async () => {
     try {
       setLoading(true);
-      // Check if device supports health data
-      if ('permissions' in navigator && 'query' in navigator.permissions) {
-        try {
-          const permission = await navigator.permissions.query({ name: 'accelerometer' as any });
-          setIsConnected(permission.state === 'granted');
-        } catch {
-          setIsConnected(false);
-        }
-      }
       
-      // Try to access step counter API if available
-      if ('sensors' in navigator) {
-        try {
-          const sensor = new (window as any).Accelerometer({ frequency: 60 });
-          sensor.addEventListener('reading', () => {
-            updateStepsFromSensor();
-          });
-          sensor.start();
-          setIsConnected(true);
-        } catch (error) {
-          setIsConnected(false);
-        }
+      // Start native pedometer tracking
+      const trackingStarted = await pedometerService.startTracking();
+      setIsConnected(trackingStarted);
+      
+      if (trackingStarted) {
+        // Set up step callback
+        pedometerService.addStepCallback(handleStepUpdate);
+        
+        // Load initial data
+        updateHealthDataFromPedometer();
+        
+        toast({
+          title: "Pedometer Connected",
+          description: "Step tracking is now active!"
+        });
+      } else {
+        // Fallback for web/testing
+        setIsConnected(true);
+        startMockTracking();
       }
     } catch (error) {
-      console.log('Health tracking not available on this device');
+      console.error('Error initializing pedometer:', error);
       setIsConnected(false);
     } finally {
       setLoading(false);
     }
   }, []);
+
+  const handleStepUpdate = useCallback((stepData: StepData) => {
+    updateHealthDataFromPedometer();
+    
+    // Validate steps for anti-cheating
+    const validation = pedometerService.validateSteps(stepData.steps);
+    if (!validation.isValid) {
+      console.warn('Suspicious step data detected:', validation.flags);
+      logStepValidation(stepData, validation);
+    }
+  }, []);
+
+  const updateHealthDataFromPedometer = useCallback(() => {
+    const currentSteps = pedometerService.getCurrentSteps();
+    const todaySteps = pedometerService.getTodaySteps();
+    const dailySteps = pedometerService.getDailySteps();
+    const weeklySteps = pedometerService.getWeeklySteps();
+    
+    setHealthData(prev => ({
+      ...prev,
+      steps: todaySteps,
+      calories: Math.floor(todaySteps * 0.04),
+      distance: todaySteps * 0.0008, // km
+      activeMinutes: Math.floor(todaySteps / 100),
+      lastUpdated: new Date(),
+      dailySteps,
+      weeklySteps
+    }));
+  }, []);
+
+  const startMockTracking = useCallback(() => {
+    // Fallback mock tracking for development/web
+    const interval = setInterval(() => {
+      const mockSteps = Math.floor(Math.random() * 100) + pedometerService.getTodaySteps();
+      setHealthData(prev => ({
+        ...prev,
+        steps: mockSteps,
+        calories: Math.floor(mockSteps * 0.04),
+        distance: mockSteps * 0.0008,
+        activeMinutes: Math.floor(mockSteps / 100),
+        lastUpdated: new Date()
+      }));
+    }, 5000); // Update every 5 seconds for demo
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const logStepValidation = async (stepData: StepData, validation: any) => {
+    if (!user) return;
+    
+    try {
+      await supabase.from('step_validation_logs').insert({
+        user_id: user.id,
+        challenge_id: null, // Will be set when syncing with specific challenges
+        reported_steps: stepData.steps,
+        validation_score: validation.score,
+        anomaly_flags: validation.flags,
+        device_info: {
+          deviceId: stepData.deviceId,
+          timestamp: stepData.timestamp,
+          accelerationData: stepData.accelerationData
+        }
+      });
+    } catch (error) {
+      console.error('Error logging step validation:', error);
+    }
+  };
+
+  const syncChallengeProgress = async (challengeId: string, progressData?: any) => {
+    if (!user) return;
+    
+    try {
+      const todaySteps = pedometerService.getTodaySteps();
+      const weeklySteps = pedometerService.getWeeklySteps();
+      
+      // Update or insert walking leaderboard entry
+      const { error: leaderboardError } = await supabase
+        .from('walking_leaderboards')
+        .upsert({
+          challenge_id: challengeId,
+          user_id: user.id,
+          total_steps: todaySteps,
+          daily_steps: Object.fromEntries(
+            weeklySteps.map(day => [day.date, day.steps])
+          ),
+          last_updated: new Date().toISOString()
+        });
+
+      if (leaderboardError) throw leaderboardError;
+
+      // Update challenge participation
+      const { error: participationError } = await supabase
+        .from('challenge_participations')
+        .update({
+          progress_data: {
+            ...progressData,
+            steps: todaySteps,
+            weeklySteps,
+            lastSync: new Date().toISOString()
+          }
+        })
+        .eq('challenge_id', challengeId)
+        .eq('user_id', user.id);
+
+      if (participationError) throw participationError;
+
+      toast({
+        title: "Steps Synced",
+        description: `${todaySteps} steps synced to challenge!`
+      });
+    } catch (error) {
+      console.error('Error syncing challenge progress:', error);
+      toast({
+        title: "Sync Failed",
+        description: "Could not sync steps to challenge.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const updateHealthData = useCallback((newData: Partial<HealthData>) => {
     setHealthData(prev => ({
@@ -96,42 +218,6 @@ export const useHealthTracking = () => {
       lastUpdated: new Date()
     }));
   }, []);
-
-  const updateStepsFromSensor = useCallback(() => {
-    // Simulate step counting - in a real app this would come from device sensors
-    const mockSteps = Math.floor(Math.random() * 1000) + 5000;
-    updateHealthData({
-      steps: mockSteps,
-      calories: Math.floor(mockSteps * 0.04),
-      distance: mockSteps * 0.0008, // km
-      activeMinutes: Math.floor(mockSteps / 100),
-    });
-  }, [updateHealthData]);
-
-  const syncChallengeProgress = async (challengeId: string, progressData: any) => {
-    try {
-      const { error } = await supabase
-        .from('challenge_participations')
-        .update({
-          progress_data: {
-            ...progressData,
-            steps: healthData.steps,
-            lastSync: new Date().toISOString()
-          }
-        })
-        .eq('challenge_id', challengeId)
-        .eq('user_id', user!.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Progress Synced",
-        description: "Your health data has been synced with challenges!"
-      });
-    } catch (error) {
-      console.error('Error syncing challenge progress:', error);
-    }
-  };
 
   const updateGoals = (newGoals: Partial<HealthGoals>) => {
     setHealthGoals(prev => ({ ...prev, ...newGoals }));
@@ -154,16 +240,21 @@ export const useHealthTracking = () => {
     }
   };
 
-  // Simulate daily data updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (isConnected) {
-        updateStepsFromSensor();
-      }
-    }, 30000); // Update every 30 seconds
+  const resetDailySteps = async () => {
+    await pedometerService.resetDailySteps();
+    updateHealthDataFromPedometer();
+  };
 
-    return () => clearInterval(interval);
-  }, [isConnected, updateStepsFromSensor]);
+  const checkHealthKitConnection = useCallback(async () => {
+    await initializePedometer();
+  }, [initializePedometer]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      pedometerService.removeStepCallback(handleStepUpdate);
+    };
+  }, [handleStepUpdate]);
 
   return {
     healthData,
@@ -175,6 +266,7 @@ export const useHealthTracking = () => {
     syncChallengeProgress,
     getProgressPercentage,
     checkHealthKitConnection,
-    updateStepsFromSensor
+    resetDailySteps,
+    updateStepsFromSensor: updateHealthDataFromPedometer
   };
 };

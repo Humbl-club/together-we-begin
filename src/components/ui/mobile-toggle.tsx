@@ -23,11 +23,7 @@ export const MobileToggle: React.FC<MobileToggleProps> = ({
       checked={checked}
       onCheckedChange={onCheckedChange}
       disabled={disabled}
-      className={cn(
-        // Responsive sizing - slightly larger on mobile for touch
-        "sm:h-5 sm:w-10",
-        className
-      )}
+      className={cn(className)}
     />
   );
 };

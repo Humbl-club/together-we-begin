@@ -14,7 +14,8 @@ import {
   Shield,
   MoreHorizontal,
   X,
-  MessageCircle
+  MessageCircle,
+  QrCode
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
@@ -118,6 +119,20 @@ export const Navigation: React.FC = () => {
                             </div>
                           </Link>
                         ))}
+                        
+                        <Link 
+                          to="/qr-scanner" 
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors touch-manipulation ${
+                            isActive('/qr-scanner') ? 'bg-primary/20 text-primary' : ''
+                          }`}
+                        >
+                          <QrCode className="w-6 h-6" />
+                          <div className="flex-1">
+                            <div className="font-medium">Scan QR Code</div>
+                            <div className="text-sm text-muted-foreground">Mark event attendance and earn points</div>
+                          </div>
+                        </Link>
                         
                         <Link 
                           to="/settings" 

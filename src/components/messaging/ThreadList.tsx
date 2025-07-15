@@ -15,6 +15,7 @@ interface ThreadListProps {
   onThreadSelect: (threadId: string) => void;
   onStartConversation: (userId: string, userName: string) => void;
   loading?: boolean;
+  totalUnreadCount?: number;
 }
 
 export const ThreadList: React.FC<ThreadListProps> = ({
@@ -22,7 +23,8 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   selectedThreadId,
   onThreadSelect,
   onStartConversation,
-  loading = false
+  loading = false,
+  totalUnreadCount = 0
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const { isMobile } = useViewport();
@@ -30,8 +32,6 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   const filteredThreads = threads.filter(thread =>
     thread.other_user?.full_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const totalUnreadCount = threads.reduce((sum, thread) => sum + thread.unread_count, 0);
 
   const formatLastMessageTime = (dateString?: string) => {
     if (!dateString) return '';

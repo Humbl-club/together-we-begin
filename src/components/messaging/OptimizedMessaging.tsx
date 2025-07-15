@@ -22,7 +22,8 @@ export const OptimizedMessaging = () => {
     sendMessage,
     createNewThread,
     selectThread,
-    setSelectedThread
+    setSelectedThread,
+    totalUnreadCount
   } = useMessaging();
 
   const handleSendMessage = async (content: string) => {
@@ -79,13 +80,14 @@ export const OptimizedMessaging = () => {
       <div className={`grid gap-4 flex-1 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
         {/* Thread List */}
         <div className={`${isMobile ? (selectedThread ? 'hidden' : 'block') : 'col-span-1'}`}>
-          <ThreadList
-            threads={threads}
-            selectedThreadId={selectedThread}
-            onThreadSelect={selectThread}
-            onStartConversation={handleStartConversation}
-            loading={loading}
-          />
+            <ThreadList
+              threads={threads}
+              selectedThreadId={selectedThread}
+              onThreadSelect={selectThread}
+              onStartConversation={handleStartConversation}
+              loading={loading}
+              totalUnreadCount={totalUnreadCount}
+            />
         </div>
 
         {/* Message View */}

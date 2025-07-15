@@ -60,11 +60,10 @@ const Challenges: React.FC = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Temporarily load data even without user for testing
-    fetchChallenges();
     if (user) {
+      fetchChallenges();
       fetchUserProfile();
-      subscribeToRealtime();
+      return subscribeToRealtime();
     }
   }, [user]);
 
@@ -82,7 +81,9 @@ const Challenges: React.FC = () => {
       })
       .subscribe();
 
-    return () => supabase.removeChannel(channel);
+    return () => {
+      supabase.removeChannel(channel);
+    };
   };
 
   const fetchUserProfile = async () => {
@@ -101,28 +102,33 @@ const Challenges: React.FC = () => {
   };
 
   const fetchChallenges = async () => {
+    if (!user) return;
+    
     try {
-      // Fetch active challenges
+      // Fetch active challenges with user participations in single query
       const { data: challengesData, error: challengesError } = await supabase
         .from('challenges')
-        .select('*')
+        .select(`
+          *,
+          challenge_participations!left (
+            id,
+            completed,
+            completion_date,
+            progress_data,
+            joined_at,
+            user_id
+          )
+        `)
         .eq('status', 'active')
+        .eq('challenge_participations.user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (challengesError) throw challengesError;
 
-      // Fetch user participations
-      const { data: participations, error: participationsError } = await supabase
-        .from('challenge_participations')
-        .select('*')
-        .eq('user_id', user!.id);
-
-      if (participationsError) throw participationsError;
-
-      // Combine challenges with user participation data
+      // Format challenges with participation data
       const challengesWithParticipation = challengesData?.map(challenge => ({
         ...challenge,
-        user_participation: participations?.find(p => p.challenge_id === challenge.id)
+        user_participation: (challenge.challenge_participations as any)?.[0] || null
       })) || [];
 
       setChallenges(challengesWithParticipation);

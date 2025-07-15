@@ -46,6 +46,35 @@ export const useWalkingChallenges = () => {
     if (user) {
       fetchWalkingChallenges();
       fetchUserProgress();
+      
+      // Set up real-time subscriptions
+      const challengeChannel = supabase
+        .channel('walking-challenges-updates')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'challenges',
+          filter: 'step_goal=not.is.null'
+        }, () => {
+          fetchWalkingChallenges();
+        })
+        .subscribe();
+
+      const leaderboardChannel = supabase
+        .channel('leaderboard-updates')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'walking_leaderboards'
+        }, () => {
+          fetchUserProgress();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(challengeChannel);
+        supabase.removeChannel(leaderboardChannel);
+      };
     }
   }, [user]);
 

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Activity, Heart, Footprints, Clock, Smartphone, SmartphoneNfc, Target, Droplets, Moon, TrendingUp } from "lucide-react";
 import { HealthDataInput } from "./HealthDataInput";
+import { WalkingChallengeWidget } from "./WalkingChallengeWidget";
 
 interface WellnessWidgetProps {
   onChallengeSync?: (challengeId: string) => void;
@@ -62,68 +63,73 @@ const WellnessWidget: React.FC<WellnessWidgetProps> = ({ onChallengeSync }) => {
   ];
 
   return (
-    <Card className="glass-card">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-primary" />
-          Wellness Tracking
-          {isConnected ? (
-            <Badge className="bg-green-500">Connected</Badge>
-          ) : (
-            <Badge variant="outline">Manual</Badge>
+    <div className="space-y-4">
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-primary" />
+            Wellness Tracking
+            {isConnected ? (
+              <Badge className="bg-green-500">Connected</Badge>
+            ) : (
+              <Badge variant="outline">Manual</Badge>
+            )}
+          </CardTitle>
+        </CardHeader>
+        
+        <CardContent className="space-y-4">
+          {!isConnected && (
+            <div className="p-3 bg-muted/30 rounded-lg">
+              <p className="text-sm text-muted-foreground mb-2">
+                Connect your health app for automatic tracking
+              </p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={checkHealthKitConnection}
+              >
+                Connect Health App
+              </Button>
+            </div>
           )}
-        </CardTitle>
-      </CardHeader>
-      
-      <CardContent className="space-y-4">
-        {!isConnected && (
-          <div className="p-3 bg-muted/30 rounded-lg">
-            <p className="text-sm text-muted-foreground mb-2">
-              Connect your health app for automatic tracking
-            </p>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={checkHealthKitConnection}
-            >
-              Connect Health App
-            </Button>
-          </div>
-        )}
 
-        <div className="space-y-4">
-          {wellnessMetrics.map((metric) => {
-            const Icon = metric.icon;
-            return (
-              <div key={metric.label} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Icon className={`w-4 h-4 ${metric.color}`} />
-                    <span className="text-sm font-medium">{metric.label}</span>
+          <div className="space-y-4">
+            {wellnessMetrics.map((metric) => {
+              const Icon = metric.icon;
+              return (
+                <div key={metric.label} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Icon className={`w-4 h-4 ${metric.color}`} />
+                      <span className="text-sm font-medium">{metric.label}</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      {metric.value} / {metric.goal}
+                    </span>
                   </div>
-                  <span className="text-sm text-muted-foreground">
-                    {metric.value} / {metric.goal}
-                  </span>
+                  <Progress 
+                    value={metric.progress} 
+                    className="h-2"
+                  />
+                  <div className="text-xs text-muted-foreground text-right">
+                    {metric.progress.toFixed(1)}% complete
+                  </div>
                 </div>
-                <Progress 
-                  value={metric.progress} 
-                  className="h-2"
-                />
-                <div className="text-xs text-muted-foreground text-right">
-                  {metric.progress.toFixed(1)}% complete
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
 
-        <div className="pt-2 border-t border-muted/20">
-          <p className="text-xs text-muted-foreground">
-            Last updated: {healthData.lastUpdated.toLocaleTimeString()}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+          <div className="pt-2 border-t border-muted/20">
+            <p className="text-xs text-muted-foreground">
+              Last updated: {healthData.lastUpdated.toLocaleTimeString()}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Walking Challenges Integration */}
+      <WalkingChallengeWidget />
+    </div>
   );
 };
 

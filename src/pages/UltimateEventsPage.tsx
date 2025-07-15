@@ -299,8 +299,8 @@ const UltimateEventsPage = memo(() => {
 
         {/* Enhanced Tabs with Better Mobile Support */}
         <div className="glass-card-enhanced mobile:p-3 sm:p-4 lg:p-6">
-          <div className="flex mobile:flex-col sm:flex-row mobile:gap-3 sm:items-center sm:justify-between mb-4">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="flex mobile:flex-col sm:flex-row mobile:gap-3 sm:items-center sm:justify-between mb-4">
               <TabsList className="grid w-full grid-cols-3 mobile:h-12 sm:h-10 gap-1">
                 <TabsTrigger 
                   value="upcoming" 
@@ -321,97 +321,177 @@ const UltimateEventsPage = memo(() => {
                   Past
                 </TabsTrigger>
               </TabsList>
-            </Tabs>
 
-            {/* View Mode Toggle - Hidden on mobile */}
-            {!isMobileOptimized && (
-              <div className="flex gap-1">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className="h-8 w-8 p-0"
-                >
-                  <LayoutGrid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className="h-8 w-8 p-0"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-          </div>
-
-          <TabsContent value={activeTab} className="mobile:mt-4 sm:mt-6">
-            {loading ? (
-              <div className="space-y-4">
-                {Array.from({ length: isMobileOptimized ? 2 : 3 }).map((_, i) => (
-                  <div key={i} className="glass-card mobile:h-32 sm:h-40 rounded-xl animate-pulse" />
-                ))}
-              </div>
-            ) : filteredEvents.length === 0 ? (
-              <div className="glass-card-enhanced mobile:p-6 sm:p-8 text-center">
-                <div className="space-y-4">
-                  <div className="mobile:w-12 mobile:h-12 sm:w-16 sm:h-16 bg-muted rounded-full mx-auto opacity-50 flex items-center justify-center">
-                    <Calendar className="mobile:w-6 mobile:h-6 sm:w-8 sm:h-8" />
-                  </div>
-                  <div>
-                    <h3 className="mobile:text-base sm:text-lg font-semibold">
-                      {searchQuery || activeFilters.length > 0 
-                        ? 'No events match your search' 
-                        : `No ${activeTab} events found`}
-                    </h3>
-                    <p className="text-muted-foreground mobile:text-sm sm:text-base">
-                      {searchQuery || activeFilters.length > 0
-                        ? 'Try adjusting your search or filters'
-                        : 'Check back later for new events'}
-                    </p>
-                  </div>
-                  <Button variant="outline" className="mobile:text-sm sm:text-base">
-                    Browse All Events
+              {/* View Mode Toggle - Hidden on mobile */}
+              {!isMobileOptimized && (
+                <div className="flex gap-1">
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                    className="h-8 w-8 p-0"
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    className="h-8 w-8 p-0"
+                  >
+                    <List className="h-4 w-4" />
                   </Button>
                 </div>
-              </div>
-            ) : (
-              <div className="mobile:space-y-3 sm:space-y-4">
-                {/* Mobile-first event list */}
-                {isMobileOptimized ? (
-                  <div className="space-y-3">
-                    {filteredEvents.slice(0, 10).map((event, index) => renderEventCard(event, index))}
-                    
-                    {filteredEvents.length > 10 && (
-                      <div className="text-center pt-4">
-                        <Button variant="outline" className="w-full">
-                          <Plus className="w-4 h-4 mr-2" />
-                          Load More Events ({filteredEvents.length - 10} remaining)
-                        </Button>
-                      </div>
-                    )}
+              )}
+            </div>
+
+            <TabsContent value="upcoming" className="mobile:mt-4 sm:mt-6">
+              {loading ? (
+                <div className="space-y-4">
+                  {Array.from({ length: isMobileOptimized ? 2 : 3 }).map((_, i) => (
+                    <div key={i} className="glass-card mobile:h-32 sm:h-40 rounded-xl animate-pulse" />
+                  ))}
+                </div>
+              ) : filteredEvents.length === 0 ? (
+                <div className="glass-card-enhanced mobile:p-6 sm:p-8 text-center">
+                  <div className="space-y-4">
+                    <div className="mobile:w-12 mobile:h-12 sm:w-16 sm:h-16 bg-muted rounded-full mx-auto opacity-50 flex items-center justify-center">
+                      <Calendar className="mobile:w-6 mobile:h-6 sm:w-8 sm:h-8" />
+                    </div>
+                    <div>
+                      <h3 className="mobile:text-base sm:text-lg font-semibold">
+                        {searchQuery || activeFilters.length > 0 
+                          ? 'No events match your search' 
+                          : `No ${activeTab} events found`}
+                      </h3>
+                      <p className="text-muted-foreground mobile:text-sm sm:text-base">
+                        {searchQuery || activeFilters.length > 0
+                          ? 'Try adjusting your search or filters'
+                          : 'Check back later for new events'}
+                      </p>
+                    </div>
+                    <Button variant="outline" className="mobile:text-sm sm:text-base">
+                      Browse All Events
+                    </Button>
                   </div>
-                ) : (
-                  <div className={cn(
-                    'grid gap-4',
-                    viewMode === 'grid' ? 'sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
-                  )}>
-                    {filteredEvents.slice(0, 12).map((event, index) => renderEventCard(event, index))}
-                    
-                    {filteredEvents.length > 12 && (
-                      <div className="col-span-full text-center pt-4">
-                        <Button variant="outline">
-                          <Plus className="w-4 h-4 mr-2" />
-                          Load More Events ({filteredEvents.length - 12} remaining)
-                        </Button>
-                      </div>
-                    )}
+                </div>
+              ) : (
+                <div className="mobile:space-y-3 sm:space-y-4">
+                  {/* Mobile-first event list */}
+                  {isMobileOptimized ? (
+                    <div className="space-y-3">
+                      {filteredEvents.slice(0, 10).map((event, index) => renderEventCard(event, index))}
+                      
+                      {filteredEvents.length > 10 && (
+                        <div className="text-center pt-4">
+                          <Button variant="outline" className="w-full">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Load More Events ({filteredEvents.length - 10} remaining)
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className={cn(
+                      'grid gap-4',
+                      viewMode === 'grid' ? 'sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
+                    )}>
+                      {filteredEvents.slice(0, 12).map((event, index) => renderEventCard(event, index))}
+                      
+                      {filteredEvents.length > 12 && (
+                        <div className="col-span-full text-center pt-4">
+                          <Button variant="outline">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Load More Events ({filteredEvents.length - 12} remaining)
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="ongoing" className="mobile:mt-4 sm:mt-6">
+              {loading ? (
+                <div className="space-y-4">
+                  {Array.from({ length: isMobileOptimized ? 2 : 3 }).map((_, i) => (
+                    <div key={i} className="glass-card mobile:h-32 sm:h-40 rounded-xl animate-pulse" />
+                  ))}
+                </div>
+              ) : filteredEvents.length === 0 ? (
+                <div className="glass-card-enhanced mobile:p-6 sm:p-8 text-center">
+                  <div className="space-y-4">
+                    <div className="mobile:w-12 mobile:h-12 sm:w-16 sm:h-16 bg-muted rounded-full mx-auto opacity-50 flex items-center justify-center">
+                      <Calendar className="mobile:w-6 mobile:h-6 sm:w-8 sm:h-8" />
+                    </div>
+                    <div>
+                      <h3 className="mobile:text-base sm:text-lg font-semibold">No ongoing events</h3>
+                      <p className="text-muted-foreground mobile:text-sm sm:text-base">
+                        Check back later for ongoing events
+                      </p>
+                    </div>
                   </div>
-                )}
-              </div>
-            )}
-          </TabsContent>
+                </div>
+              ) : (
+                <div className="mobile:space-y-3 sm:space-y-4">
+                  {/* Mobile-first event list */}
+                  {isMobileOptimized ? (
+                    <div className="space-y-3">
+                      {filteredEvents.slice(0, 10).map((event, index) => renderEventCard(event, index))}
+                    </div>
+                  ) : (
+                    <div className={cn(
+                      'grid gap-4',
+                      viewMode === 'grid' ? 'sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
+                    )}>
+                      {filteredEvents.slice(0, 12).map((event, index) => renderEventCard(event, index))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="completed" className="mobile:mt-4 sm:mt-6">
+              {loading ? (
+                <div className="space-y-4">
+                  {Array.from({ length: isMobileOptimized ? 2 : 3 }).map((_, i) => (
+                    <div key={i} className="glass-card mobile:h-32 sm:h-40 rounded-xl animate-pulse" />
+                  ))}
+                </div>
+              ) : filteredEvents.length === 0 ? (
+                <div className="glass-card-enhanced mobile:p-6 sm:p-8 text-center">
+                  <div className="space-y-4">
+                    <div className="mobile:w-12 mobile:h-12 sm:w-16 sm:h-16 bg-muted rounded-full mx-auto opacity-50 flex items-center justify-center">
+                      <Calendar className="mobile:w-6 mobile:h-6 sm:w-8 sm:h-8" />
+                    </div>
+                    <div>
+                      <h3 className="mobile:text-base sm:text-lg font-semibold">No past events</h3>
+                      <p className="text-muted-foreground mobile:text-sm sm:text-base">
+                        Past events will appear here once they're completed
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="mobile:space-y-3 sm:space-y-4">
+                  {/* Mobile-first event list */}
+                  {isMobileOptimized ? (
+                    <div className="space-y-3">
+                      {filteredEvents.slice(0, 10).map((event, index) => renderEventCard(event, index))}
+                    </div>
+                  ) : (
+                    <div className={cn(
+                      'grid gap-4',
+                      viewMode === 'grid' ? 'sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
+                    )}>
+                      {filteredEvents.slice(0, 12).map((event, index) => renderEventCard(event, index))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
 

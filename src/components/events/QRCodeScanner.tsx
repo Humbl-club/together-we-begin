@@ -80,7 +80,14 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
   };
 
   const handleScanResult = async (qrToken: string) => {
-    if (!user?.id || scanning) return;
+    if (!user?.id || scanning) {
+      toast({
+        title: 'Authentication Required',
+        description: 'Please log in to mark attendance',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     setScanning(true);
     

@@ -118,28 +118,27 @@ export class MessagingService {
   async getMessages(threadId: string, page = 0, limit = 50): Promise<DirectMessage[]> {
     if (!this.currentUserId) throw new Error('Not authenticated');
 
+    // First get the thread to find participants
+    const { data: thread, error: threadError } = await supabase
+      .from('message_threads')
+      .select('participant_1, participant_2')
+      .eq('id', threadId)
+      .single();
+
+    if (threadError || !thread) throw new Error('Thread not found');
+
+    // Get messages for this thread (between the two participants)
     const { data: messages, error } = await supabase
       .from('direct_messages')
       .select('*')
-      .or(`sender_id.eq.${this.currentUserId},recipient_id.eq.${this.currentUserId}`)
-      .order('created_at', { ascending: false })
+      .or(`and(sender_id.eq.${thread.participant_1},recipient_id.eq.${thread.participant_2}),and(sender_id.eq.${thread.participant_2},recipient_id.eq.${thread.participant_1})`)
+      .order('created_at', { ascending: true })
       .range(page * limit, (page + 1) * limit - 1);
 
     if (error) throw error;
 
-    // Decrypt messages
-    return messages.map(message => {
-      try {
-        if (this.userKeyPair && message.media_url) {
-          // For decryption, we need the sender's public key and our private key
-          // Since we can't determine sender's public key here, we'll simplify for now
-          return { ...message, content: message.content }; // Return as-is for now
-        }
-        return message;
-      } catch {
-        return { ...message, content: '[Failed to decrypt]' };
-      }
-    }).reverse();
+    // For now, return messages as-is (decryption can be added later)
+    return messages || [];
   }
 
   async sendMessage(recipientId: string, content: string): Promise<DirectMessage> {

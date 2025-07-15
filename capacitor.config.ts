@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.945e8026291f443493b5949dcf1fab6b',
+  appId: 'com.humblclub.togetherwebegin',
   appName: 'together-we-begin',
   webDir: 'dist',
   server: {

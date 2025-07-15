@@ -41,32 +41,34 @@ const Settings: React.FC = () => {
       </div>
 
       <Tabs defaultValue="notifications" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6">
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
-            <Bell className="w-4 h-4" />
-            <span className="hidden sm:inline">Notifications</span>
-          </TabsTrigger>
-          <TabsTrigger value="privacy" className="flex items-center gap-2">
-            <Shield className="w-4 h-4" />
-            <span className="hidden sm:inline">Privacy</span>
-          </TabsTrigger>
-          <TabsTrigger value="messaging" className="flex items-center gap-2">
-            <MessageCircle className="w-4 h-4" />
-            <span className="hidden sm:inline">Messaging</span>
-          </TabsTrigger>
-          <TabsTrigger value="wellness" className="flex items-center gap-2">
-            <Heart className="w-4 h-4" />
-            <span className="hidden sm:inline">Wellness</span>
-          </TabsTrigger>
-          <TabsTrigger value="social" className="flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            <span className="hidden sm:inline">Social</span>
-          </TabsTrigger>
-          <TabsTrigger value="appearance" className="flex items-center gap-2">
-            <Palette className="w-4 h-4" />
-            <span className="hidden sm:inline">Appearance</span>
-          </TabsTrigger>
-        </TabsList>
+        <div className="w-full overflow-x-auto">
+          <TabsList className="inline-flex w-max min-w-full sm:grid sm:grid-cols-6 gap-1 p-1">
+            <TabsTrigger value="notifications" className="flex items-center gap-2 flex-shrink-0">
+              <Bell className="w-4 h-4" />
+              <span className="text-xs sm:text-sm">Notifications</span>
+            </TabsTrigger>
+            <TabsTrigger value="privacy" className="flex items-center gap-2 flex-shrink-0">
+              <Shield className="w-4 h-4" />
+              <span className="text-xs sm:text-sm">Privacy</span>
+            </TabsTrigger>
+            <TabsTrigger value="messaging" className="flex items-center gap-2 flex-shrink-0">
+              <MessageCircle className="w-4 h-4" />
+              <span className="text-xs sm:text-sm">Messaging</span>
+            </TabsTrigger>
+            <TabsTrigger value="wellness" className="flex items-center gap-2 flex-shrink-0">
+              <Heart className="w-4 h-4" />
+              <span className="text-xs sm:text-sm">Wellness</span>
+            </TabsTrigger>
+            <TabsTrigger value="social" className="flex items-center gap-2 flex-shrink-0">
+              <Users className="w-4 h-4" />
+              <span className="text-xs sm:text-sm">Social</span>
+            </TabsTrigger>
+            <TabsTrigger value="appearance" className="flex items-center gap-2 flex-shrink-0">
+              <Palette className="w-4 h-4" />
+              <span className="text-xs sm:text-sm">Appearance</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="notifications">
           <Card className="glass-card-enhanced">

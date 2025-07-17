@@ -111,109 +111,116 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
   };
 
   return (
-    <div className="floating-card max-w-md mx-auto">
-      <div className="text-center mb-6">
-        <h1 className="text-3xl font-bold gradient-text mb-2">
-          Create Your Account
-        </h1>
-        <p className="text-muted-foreground">
-          Join the HUMBL community
-        </p>
+    <div className="w-full max-w-md mx-auto">
+      <div className="editorial-card p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl editorial-heading mb-4 text-foreground">
+            Create Your Account
+          </h1>
+          <p className="text-muted-foreground font-light text-lg">
+            Join the HUMBL community
+          </p>
+        </div>
+
+        <form onSubmit={handleSignUp} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="fullName" className="text-sm font-medium">Full Name</Label>
+            <Input
+              id="fullName"
+              type="text"
+              value={formData.fullName}
+              onChange={(e) => handleInputChange('fullName', e.target.value)}
+              required
+              disabled={loading}
+              className="h-12 text-base"
+              placeholder="Enter your full name"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="username" className="text-sm font-medium">Username</Label>
+            <Input
+              id="username"
+              type="text"
+              value={formData.username}
+              onChange={(e) => handleInputChange('username', e.target.value)}
+              required
+              disabled={loading}
+              className="h-12 text-base"
+              placeholder="Choose a username"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange('email', e.target.value)}
+              required
+              disabled={loading}
+              className="h-12 text-base"
+              placeholder="Enter your email"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={formData.password}
+              onChange={(e) => handleInputChange('password', e.target.value)}
+              required
+              disabled={loading}
+              className="h-12 text-base"
+              placeholder="Create a password"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+              required
+              disabled={loading}
+              className="h-12 text-base"
+              placeholder="Confirm your password"
+            />
+          </div>
+
+          <div className="flex gap-4 pt-4">
+            <Button 
+              type="button"
+              variant="outline"
+              onClick={onBackToInvite}
+              disabled={loading}
+              className="flex-1 h-12 text-base"
+            >
+              Back
+            </Button>
+            
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="flex-1 h-12 bg-primary hover:bg-primary/90 text-base font-medium"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                'Create Account'
+              )}
+            </Button>
+          </div>
+        </form>
       </div>
-
-      <form onSubmit={handleSignUp} className="space-y-4">
-        <div>
-          <Label htmlFor="fullName">Full Name</Label>
-          <Input
-            id="fullName"
-            type="text"
-            value={formData.fullName}
-            onChange={(e) => handleInputChange('fullName', e.target.value)}
-            required
-            disabled={loading}
-            className="mt-1"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="username">Username</Label>
-          <Input
-            id="username"
-            type="text"
-            value={formData.username}
-            onChange={(e) => handleInputChange('username', e.target.value)}
-            required
-            disabled={loading}
-            className="mt-1"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => handleInputChange('email', e.target.value)}
-            required
-            disabled={loading}
-            className="mt-1"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            value={formData.password}
-            onChange={(e) => handleInputChange('password', e.target.value)}
-            required
-            disabled={loading}
-            className="mt-1"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <Input
-            id="confirmPassword"
-            type="password"
-            value={formData.confirmPassword}
-            onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-            required
-            disabled={loading}
-            className="mt-1"
-          />
-        </div>
-
-        <div className="flex gap-3">
-          <Button 
-            type="button"
-            variant="outline"
-            onClick={onBackToInvite}
-            disabled={loading}
-            className="flex-1"
-          >
-            Back
-          </Button>
-          
-          <Button 
-            type="submit" 
-            disabled={loading}
-            className="flex-1 bg-primary hover:bg-primary/90"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Creating...
-              </>
-            ) : (
-              'Create Account'
-            )}
-          </Button>
-        </div>
-      </form>
     </div>
   );
 };

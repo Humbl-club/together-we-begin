@@ -95,60 +95,62 @@ export const PasswordResetForm: React.FC = () => {
   };
 
   return (
-    <div className="editorial-card max-w-md mx-auto p-8">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl editorial-heading mb-3 text-foreground">
-          Reset Your Password
-        </h1>
-        <p className="text-muted-foreground font-light">
-          Enter your new password below
-        </p>
+    <div className="w-full max-w-md mx-auto">
+      <div className="editorial-card p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl editorial-heading mb-4 text-foreground">
+            Reset Your Password
+          </h1>
+          <p className="text-muted-foreground font-light text-lg">
+            Enter your new password below
+          </p>
+        </div>
+
+        <form onSubmit={handlePasswordReset} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-sm font-medium">New Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+              className="h-12 text-base"
+              placeholder="Enter your new password"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm New Password</Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              disabled={loading}
+              className="h-12 text-base"
+              placeholder="Confirm your new password"
+            />
+          </div>
+
+          <Button 
+            type="submit" 
+            disabled={loading}
+            className="w-full h-12 bg-primary hover:bg-primary/90 transition-all text-base font-medium"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              'Update Password'
+            )}
+          </Button>
+        </form>
       </div>
-
-      <form onSubmit={handlePasswordReset} className="space-y-4">
-        <div>
-          <Label htmlFor="password">New Password</Label>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={loading}
-            className="mt-1"
-            placeholder="Enter your new password"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="confirmPassword">Confirm New Password</Label>
-          <Input
-            id="confirmPassword"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            disabled={loading}
-            className="mt-1"
-            placeholder="Confirm your new password"
-          />
-        </div>
-
-        <Button 
-          type="submit" 
-          disabled={loading}
-          className="w-full bg-primary hover:bg-primary/90 transition-all"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Updating...
-            </>
-          ) : (
-            'Update Password'
-          )}
-        </Button>
-      </form>
     </div>
   );
 };

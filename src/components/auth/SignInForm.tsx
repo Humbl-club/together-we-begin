@@ -93,107 +93,109 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onSwitchToSignUp }) => {
   };
 
   return (
-    <div className={`editorial-card max-w-md mx-auto ${isMobile ? 'p-6' : 'p-8'}`}>
-      <div className={`text-center ${isMobile ? 'mb-6' : 'mb-8'}`}>
-        <h1 className={`${isMobile ? 'text-xl' : 'text-2xl'} editorial-heading mb-3 text-foreground`}>
-          Welcome Back
-        </h1>
-        <p className={`text-muted-foreground font-light ${isMobile ? 'text-sm' : ''}`}>
-          Sign in to your account
-        </p>
-      </div>
-
-      <form onSubmit={handleSignIn} className="space-y-4">
-        <div>
-          <Label htmlFor="email" className={isMobile ? 'text-sm font-medium' : ''}>Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            disabled={loading}
-            className={`mt-1 ${isMobile ? 'min-h-[48px] text-base' : ''}`}
-            placeholder="Enter your email"
-          />
+    <div className="w-full max-w-md mx-auto">
+      <div className="editorial-card p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl editorial-heading mb-4 text-foreground">
+            Welcome Back
+          </h1>
+          <p className="text-muted-foreground font-light text-lg">
+            Sign in to your account
+          </p>
         </div>
 
-        <div>
-          <div className="flex justify-between items-center">
-            <Label htmlFor="password" className={isMobile ? 'text-sm font-medium' : ''}>Password</Label>
-            <button
-              type="button"
-              onClick={() => setShowForgotPassword(!showForgotPassword)}
-              className="text-xs text-primary hover:text-primary/80"
-            >
-              Forgot password?
-            </button>
+        <form onSubmit={handleSignIn} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={loading}
+              className="h-12 text-base"
+              placeholder="Enter your email"
+            />
           </div>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required={!showForgotPassword}
-            disabled={loading || resetLoading}
-            className={`mt-1 ${isMobile ? 'min-h-[48px] text-base' : ''}`}
-            placeholder="Enter your password"
-          />
-        </div>
 
-        {showForgotPassword && (
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground mb-3">
-              Enter your email address and we'll send you a link to reset your password.
-            </p>
-            <Button
-              type="button"
-              onClick={handleForgotPassword}
-              disabled={resetLoading || !email}
-              variant="outline"
-              className="w-full"
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(!showForgotPassword)}
+                className="text-sm text-primary hover:text-primary/80 transition-colors"
+              >
+                Forgot password?
+              </button>
+            </div>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required={!showForgotPassword}
+              disabled={loading || resetLoading}
+              className="h-12 text-base"
+              placeholder="Enter your password"
+            />
+          </div>
+
+          {showForgotPassword && (
+            <div className="bg-muted/50 p-6 rounded-lg">
+              <p className="text-sm text-muted-foreground mb-4">
+                Enter your email address and we'll send you a link to reset your password.
+              </p>
+              <Button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={resetLoading || !email}
+                variant="outline"
+                className="w-full h-12"
+              >
+                {resetLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  'Send Reset Email'
+                )}
+              </Button>
+            </div>
+          )}
+
+          {!showForgotPassword && (
+            <Button 
+              type="submit" 
+              disabled={loading || resetLoading}
+              className="w-full h-12 bg-primary hover:bg-primary/90 transition-all text-base font-medium"
             >
-              {resetLoading ? (
+              {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Sending...
+                  Signing in...
                 </>
               ) : (
-                'Send Reset Email'
+                'Sign In'
               )}
             </Button>
-          </div>
-        )}
+          )}
+        </form>
 
-        {!showForgotPassword && (
-          <Button 
-            type="submit" 
-            disabled={loading || resetLoading}
-            className={`w-full bg-primary hover:bg-primary/90 transition-all ${isMobile ? 'min-h-[48px] text-base' : ''}`}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Signing in...
-              </>
-            ) : (
-              'Sign In'
-            )}
-          </Button>
-        )}
-      </form>
-
-      <div className={`${isMobile ? 'mt-4' : 'mt-6'} text-center`}>
-        <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-          Don't have an account?{' '}
-          <button
-            type="button"
-            onClick={onSwitchToSignUp}
-            className={`text-primary hover:text-primary/80 font-medium min-h-[44px] ${isMobile ? 'text-xs' : ''}`}
-          >
-            Sign up with invite code
-          </button>
-        </p>
+        <div className="mt-8 text-center">
+          <p className="text-sm text-muted-foreground">
+            Don't have an account?{' '}
+            <button
+              type="button"
+              onClick={onSwitchToSignUp}
+              className="text-primary hover:text-primary/80 font-medium transition-colors"
+            >
+              Sign up with invite code
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );

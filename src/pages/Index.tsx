@@ -35,49 +35,49 @@ const Index = () => {
       <div className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-16">
         <div className="absolute inset-0 bg-gradient-to-br from-editorial-cream/20 via-editorial-sage/15 to-editorial-blush/20"></div>
         
-        <div className="relative z-10 w-full max-w-7xl mx-auto">
+        <div className="relative z-10 w-full max-w-6xl mx-auto">
           {/* Hero Content Container */}
-          <div className="text-center mb-20">
+          <div className="text-center mb-16">
             {/* Elegant Logo */}
-            <div className="relative inline-block mb-12">
-              <div className="w-24 h-24 mx-auto glass-card rounded-full flex items-center justify-center shadow-2xl hover:scale-105 transition-all duration-500">
-                <span className="text-primary font-light text-4xl tracking-wider">H</span>
+            <div className="relative inline-block mb-8">
+              <div className="w-20 h-20 mx-auto glass-card rounded-full flex items-center justify-center shadow-2xl hover:scale-105 transition-all duration-500">
+                <span className="text-primary font-light text-3xl tracking-wider">H</span>
               </div>
               <div className="absolute -inset-4 glass-card rounded-full opacity-20 blur-xl"></div>
             </div>
             
             {/* Main Brand */}
-            <div className="mb-12 space-y-4 px-4">
-              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl editorial-heading text-foreground font-extralight tracking-tight leading-none break-words">
+            <div className="mb-8 space-y-2 px-4">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl editorial-heading text-foreground font-extralight tracking-tight leading-tight">
                 HUMBL
               </h1>
               <div className="relative">
-                <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-muted-foreground font-light tracking-wider break-words">
+                <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-muted-foreground font-light tracking-wider">
                   Girls Club
                 </p>
-                <div className="w-32 h-1 bg-gradient-to-r from-primary/50 to-transparent mx-auto mt-4 rounded-full"></div>
+                <div className="w-24 h-1 bg-gradient-to-r from-primary/50 to-transparent mx-auto mt-3 rounded-full"></div>
               </div>
             </div>
             
             {/* Refined Tagline */}
-            <div className="max-w-4xl mx-auto mb-16 px-4">
-              <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground font-light leading-relaxed text-center break-words">
-                An exclusive wellness sanctuary for women seeking 
-                <span className="text-primary"> connection</span>, 
-                <span className="text-primary"> growth</span>, and 
-                <span className="text-primary"> inspiration</span>
+            <div className="max-w-3xl mx-auto mb-12 px-6">
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground font-light leading-relaxed text-center">
+                An exclusive wellness sanctuary for women seeking{" "}
+                <span className="text-primary">connection</span>,{" "}
+                <span className="text-primary">growth</span>, and{" "}
+                <span className="text-primary">inspiration</span>
               </p>
             </div>
 
             {/* Enhanced CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Button asChild size="lg" className="glass-card bg-gradient-to-r from-primary/90 to-primary hover:from-primary hover:to-primary/90 text-primary-foreground px-12 py-7 text-xl rounded-full font-medium transition-all duration-500 hover:scale-105 hover:shadow-2xl backdrop-blur-lg border border-primary/20">
-                <Link to="/auth" className="flex items-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center px-4">
+              <Button asChild size="lg" className="glass-card bg-gradient-to-r from-primary/90 to-primary hover:from-primary hover:to-primary/90 text-primary-foreground px-8 py-6 text-lg rounded-full font-medium transition-all duration-500 hover:scale-105 hover:shadow-2xl backdrop-blur-lg border border-primary/20 w-full sm:w-auto">
+                <Link to="/auth" className="flex items-center justify-center">
                   Join Our Community
-                  <ArrowRight className="w-6 h-6 ml-3" />
+                  <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="glass-card border-2 border-primary/40 text-primary hover:bg-primary/10 hover:border-primary/60 px-12 py-7 text-xl rounded-full font-medium transition-all duration-500 hover:scale-105 backdrop-blur-lg">
+              <Button asChild variant="outline" size="lg" className="glass-card border-2 border-primary/40 text-primary hover:bg-primary/10 hover:border-primary/60 px-8 py-6 text-lg rounded-full font-medium transition-all duration-500 hover:scale-105 backdrop-blur-lg w-full sm:w-auto">
                 <Link to="/auth">Member Sign In</Link>
               </Button>
             </div>

@@ -47,12 +47,12 @@ const Index = () => {
             </div>
             
             {/* Main Brand */}
-            <div className="mb-12 space-y-4">
-              <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl editorial-heading text-foreground font-extralight tracking-tight leading-none">
+            <div className="mb-12 space-y-4 px-4">
+              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl editorial-heading text-foreground font-extralight tracking-tight leading-none break-words">
                 HUMBL
               </h1>
               <div className="relative">
-                <p className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-muted-foreground font-light tracking-wider">
+                <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-muted-foreground font-light tracking-wider break-words">
                   Girls Club
                 </p>
                 <div className="w-32 h-1 bg-gradient-to-r from-primary/50 to-transparent mx-auto mt-4 rounded-full"></div>
@@ -60,8 +60,8 @@ const Index = () => {
             </div>
             
             {/* Refined Tagline */}
-            <div className="max-w-4xl mx-auto mb-16">
-              <p className="text-xl sm:text-2xl md:text-3xl text-muted-foreground font-light leading-relaxed">
+            <div className="max-w-4xl mx-auto mb-16 px-4">
+              <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground font-light leading-relaxed text-center break-words">
                 An exclusive wellness sanctuary for women seeking 
                 <span className="text-primary"> connection</span>, 
                 <span className="text-primary"> growth</span>, and 

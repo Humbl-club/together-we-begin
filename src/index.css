@@ -205,6 +205,16 @@
     @apply bg-card/80 dark:bg-card/40 backdrop-blur-md border border-border/50 shadow-sm hover:shadow-lg transition-all duration-300;
     container-type: inline-size;
   }
+
+  /* Editorial Hero Background - Sophisticated gradient */
+  .bg-editorial-hero {
+    background: linear-gradient(135deg, 
+      hsl(var(--editorial-cream) / 0.6) 0%, 
+      hsl(var(--editorial-warm-grey) / 0.4) 35%,
+      hsl(var(--editorial-sage) / 0.3) 70%,
+      hsl(var(--editorial-blush) / 0.4) 100%
+    );
+  }
   
   /* Enhanced Glass Effects */
   .glass-card {

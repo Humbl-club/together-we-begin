@@ -16,7 +16,9 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onSwitchToSignUp }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const { signIn, resetPassword } = useAuth();
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -52,6 +54,44 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onSwitchToSignUp }) => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      toast({
+        title: "Email required",
+        description: "Please enter your email address to reset your password.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      const { error } = await resetPassword(email);
+      if (error) {
+        toast({
+          title: "Reset failed",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Reset email sent",
+          description: "Check your email for password reset instructions.",
+        });
+        setShowForgotPassword(false);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   return (
     <div className={`editorial-card max-w-md mx-auto ${isMobile ? 'p-6' : 'p-8'}`}>
       <div className={`text-center ${isMobile ? 'mb-6' : 'mb-8'}`}>
@@ -79,33 +119,68 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onSwitchToSignUp }) => {
         </div>
 
         <div>
-          <Label htmlFor="password" className={isMobile ? 'text-sm font-medium' : ''}>Password</Label>
+          <div className="flex justify-between items-center">
+            <Label htmlFor="password" className={isMobile ? 'text-sm font-medium' : ''}>Password</Label>
+            <button
+              type="button"
+              onClick={() => setShowForgotPassword(!showForgotPassword)}
+              className="text-xs text-primary hover:text-primary/80"
+            >
+              Forgot password?
+            </button>
+          </div>
           <Input
             id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={loading}
+            required={!showForgotPassword}
+            disabled={loading || resetLoading}
             className={`mt-1 ${isMobile ? 'min-h-[48px] text-base' : ''}`}
             placeholder="Enter your password"
           />
         </div>
 
-        <Button 
-          type="submit" 
-          disabled={loading}
-          className={`w-full bg-primary hover:bg-primary/90 transition-all ${isMobile ? 'min-h-[48px] text-base' : ''}`}
-        >
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Signing in...
-            </>
-          ) : (
-            'Sign In'
-          )}
-        </Button>
+        {showForgotPassword && (
+          <div className="bg-muted/50 p-4 rounded-lg">
+            <p className="text-sm text-muted-foreground mb-3">
+              Enter your email address and we'll send you a link to reset your password.
+            </p>
+            <Button
+              type="button"
+              onClick={handleForgotPassword}
+              disabled={resetLoading || !email}
+              variant="outline"
+              className="w-full"
+            >
+              {resetLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                'Send Reset Email'
+              )}
+            </Button>
+          </div>
+        )}
+
+        {!showForgotPassword && (
+          <Button 
+            type="submit" 
+            disabled={loading || resetLoading}
+            className={`w-full bg-primary hover:bg-primary/90 transition-all ${isMobile ? 'min-h-[48px] text-base' : ''}`}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              'Sign In'
+            )}
+          </Button>
+        )}
       </form>
 
       <div className={`${isMobile ? 'mt-4' : 'mt-6'} text-center`}>

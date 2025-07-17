@@ -77,14 +77,20 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
         return;
       }
 
-      // Mark invite as used
-      await supabase
+      // Mark invite as used - only if sign up was successful
+      const { error: inviteError } = await supabase
         .from('invites')
         .update({ 
           status: 'used',
-          used_at: new Date().toISOString()
+          used_at: new Date().toISOString(),
+          used_by: null // Will be set by trigger after user profile is created
         })
         .eq('code', inviteCode);
+
+      if (inviteError) {
+        console.error('Error updating invite:', inviteError);
+        // Don't fail the signup for this, just log it
+      }
 
       toast({
         title: "Welcome to HUMBL!",

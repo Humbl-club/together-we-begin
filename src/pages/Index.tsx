@@ -9,8 +9,8 @@ const Index = () => {
   const { user, loading } = useAuth();
   const isMobile = useIsMobile();
 
-  // Security disabled - always redirect to dashboard for testing
-  if (!loading) {
+  // Redirect authenticated users to dashboard
+  if (user && !loading) {
     return <Navigate to="/dashboard" replace />;
   }
 

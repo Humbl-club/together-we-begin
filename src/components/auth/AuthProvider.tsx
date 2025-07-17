@@ -10,44 +10,88 @@ interface AuthContextType {
   signUp: (email: string, password: string, userData: any) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error: any }>;
   isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Mock user with valid UUID for testing
-  const mockUser = {
-    id: '550e8400-e29b-41d4-a716-446655440000', // Valid UUID
-    email: 'test@example.com',
-    aud: 'authenticated',
-    app_metadata: {},
-    user_metadata: { full_name: 'Sophia Williams', username: 'sophiaw' },
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    email_confirmed_at: new Date().toISOString(),
-    phone: null,
-    confirmed_at: new Date().toISOString(),
-    last_sign_in_at: new Date().toISOString(),
-    role: 'authenticated',
-    identities: []
-  } as User;
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const mockSession = {
-    access_token: 'mock-access-token',
-    refresh_token: 'mock-refresh-token',
-    expires_in: 3600,
-    expires_at: Date.now() + 3600000,
-    token_type: 'bearer',
-    user: mockUser
-  } as Session;
+  useEffect(() => {
+    let mounted = true;
 
-  const [user] = useState<User | null>(mockUser);
-  const [session] = useState<Session | null>(mockSession);
-  const [loading] = useState(false);
-  const [isAdmin] = useState(true); // Make mock user admin for full access
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!mounted) return;
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        // Check admin status when user changes
+        if (session?.user) {
+          setTimeout(async () => {
+            try {
+              const { data: adminCheck } = await supabase
+                .rpc('is_admin', { _user_id: session.user.id });
+              if (mounted) {
+                setIsAdmin(adminCheck || false);
+              }
+            } catch (error) {
+              console.error('Error checking admin status:', error);
+              if (mounted) {
+                setIsAdmin(false);
+              }
+            }
+          }, 0);
+        } else {
+          setIsAdmin(false);
+        }
+        
+        setLoading(false);
+      }
+    );
 
-  // Remove all auth listeners and session checks for testing
+    // Get initial session
+    const getInitialSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          if (session?.user) {
+            try {
+              const { data: adminCheck } = await supabase
+                .rpc('is_admin', { _user_id: session.user.id });
+              setIsAdmin(adminCheck || false);
+            } catch (error) {
+              console.error('Error checking admin status:', error);
+              setIsAdmin(false);
+            }
+          }
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error getting initial session:', error);
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    getInitialSession();
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const signUp = async (email: string, password: string, userData: any) => {
     const redirectUrl = `${window.location.origin}/`;
@@ -74,7 +118,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    const redirectUrl = `${window.location.origin}/auth?mode=reset`;
+    
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl
+    });
+    
+    return { error };
   };
 
   const value = {
@@ -84,6 +143,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signUp,
     signIn,
     signOut,
+    resetPassword,
     isAdmin
   };
 

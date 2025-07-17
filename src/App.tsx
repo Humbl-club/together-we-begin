@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Layout } from "@/components/layout/Layout";
 import NotificationService from "@/services/notificationService";
@@ -73,15 +74,51 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
-                <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-                <Route path="/social" element={<Layout><Social /></Layout>} />
-                <Route path="/events" element={<Layout><Events /></Layout>} />
-                <Route path="/challenges" element={<Layout><Challenges /></Layout>} />
-                <Route path="/profile" element={<Layout><Profile /></Layout>} />
-                <Route path="/messages" element={<Layout><Messages /></Layout>} />
-                <Route path="/admin" element={<Layout><Admin /></Layout>} />
-                <Route path="/settings" element={<Layout><Settings /></Layout>} />
-                <Route path="/qr-scanner" element={<Layout><QRScanner /></Layout>} />
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Layout><Dashboard /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/social" element={
+                  <ProtectedRoute>
+                    <Layout><Social /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/events" element={
+                  <ProtectedRoute>
+                    <Layout><Events /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/challenges" element={
+                  <ProtectedRoute>
+                    <Layout><Challenges /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Layout><Profile /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/messages" element={
+                  <ProtectedRoute>
+                    <Layout><Messages /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin" element={
+                  <ProtectedRoute requireAdmin>
+                    <Layout><Admin /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/settings" element={
+                  <ProtectedRoute>
+                    <Layout><Settings /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/qr-scanner" element={
+                  <ProtectedRoute>
+                    <Layout><QRScanner /></Layout>
+                  </ProtectedRoute>
+                } />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </ErrorBoundary>

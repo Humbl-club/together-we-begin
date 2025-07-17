@@ -1,16 +1,28 @@
-import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { InviteCodeForm } from '@/components/auth/InviteCodeForm';
 import { SignUpForm } from '@/components/auth/SignUpForm';
 import { SignInForm } from '@/components/auth/SignInForm';
+import { PasswordResetForm } from '@/components/auth/PasswordResetForm';
 
-type AuthStep = 'signin' | 'invite' | 'signup';
+type AuthStep = 'signin' | 'invite' | 'signup' | 'reset';
 
 const Auth: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<AuthStep>('signin');
   const [inviteCode, setInviteCode] = useState('');
+  const [searchParams] = useSearchParams();
   const { user, loading } = useAuth();
+
+  useEffect(() => {
+    // Check if we're in password reset mode
+    const mode = searchParams.get('mode');
+    const accessToken = searchParams.get('access_token');
+    
+    if (mode === 'reset' && accessToken) {
+      setCurrentStep('reset');
+    }
+  }, [searchParams]);
 
   // Redirect authenticated users to dashboard
   if (user && !loading) {
@@ -50,6 +62,9 @@ const Auth: React.FC = () => {
             onBackToInvite={() => setCurrentStep('invite')}
           />
         );
+      
+      case 'reset':
+        return <PasswordResetForm />;
       
       default:
         return (

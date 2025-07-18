@@ -63,144 +63,33 @@ const Index = () => {
       {/* Hero Section */}
       <main className="relative">
         {/* Hero Content */}
-        <section className="relative z-10 px-fluid-4 pt-fluid-8 pb-fluid-12">
-          <div className="max-w-7xl mx-auto text-center">
-            {/* Hero Badge */}
-            <div className="inline-flex items-center bg-gradient-to-r from-primary/10 to-accent/10 backdrop-blur-xl px-8 py-4 rounded-full mb-12 border border-primary/30 shadow-2xl">
-              <Sparkles className="w-5 h-5 text-primary mr-3 animate-pulse" />
-              <span className="text-base font-semibold text-foreground tracking-wide">Exclusive Women's Community</span>
-            </div>
-            
+        <section className="relative z-10 px-fluid-4 pt-fluid-16 pb-fluid-20">
+          <div className="max-w-4xl mx-auto text-center">
             {/* Main Headline */}
-            <div className="mb-16 max-w-5xl mx-auto">
-              <h1 className="font-display text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extralight text-foreground leading-[0.85] tracking-tighter mb-8">
-                Your Sanctuary for
-                <span className="block bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent font-medium italic">Growth & Connection</span>
+            <div className="mb-16">
+              <h1 className="font-display text-6xl md:text-7xl lg:text-8xl font-extralight text-foreground leading-[0.85] tracking-tighter mb-8">
+                HUMBL
+                <span className="block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent font-light italic">Girls Club</span>
               </h1>
               
-              <p className="text-xl md:text-2xl text-muted-foreground/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide">
-                Join thousands of inspiring women in an exclusive wellness community designed for 
-                <span className="text-primary font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> authentic connections</span>, 
-                <span className="text-primary font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> mindful growth</span>, and 
-                <span className="text-primary font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> lasting transformation</span>.
+              <p className="text-xl md:text-2xl text-muted-foreground/80 font-light leading-relaxed max-w-2xl mx-auto">
+                An exclusive sanctuary for women who embrace growth, wellness, and authentic connection.
               </p>
             </div>
 
             {/* CTA Section */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20">
-              <Button asChild size="lg" className="w-full sm:w-auto bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground hover:from-primary/90 hover:via-primary/90 hover:to-accent/90 px-12 py-4 text-lg font-bold rounded-2xl transition-all duration-300 hover:scale-105 shadow-2xl hover:shadow-3xl border border-primary/30 backdrop-blur-sm">
-                <Link to="/auth" className="flex items-center justify-center group">
-                  Begin Your Journey
-                  <ArrowRight className="w-5 h-5 ml-3 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-110" />
+            <div className="flex flex-col gap-4 justify-center items-center max-w-md mx-auto">
+              <Button asChild size="lg" className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:from-primary/90 hover:to-accent/90 px-8 py-4 text-lg font-medium rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-lg border border-primary/20">
+                <Link to="/auth">
+                  I have an invite code
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto bg-background/80 backdrop-blur-xl border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/5 px-12 py-4 text-lg font-semibold rounded-2xl transition-all duration-300 hover:scale-105 shadow-xl">
-                <Link to="/auth">Member Access</Link>
-              </Button>
-            </div>
-
-            {/* Social Proof */}
-            <div className="flex items-center justify-center space-x-8 text-sm text-muted-foreground">
-              <div className="flex items-center">
-                <div className="flex -space-x-2 mr-3">
-                  {[1,2,3,4].map((i) => (
-                    <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-editorial-sage to-editorial-blush border-2 border-background shadow-sm"></div>
-                  ))}
-                </div>
-                <span className="font-medium">1,000+ members</span>
-              </div>
-              <div className="hidden sm:flex items-center">
-                <div className="flex mr-1">
-                  {[1,2,3,4,5].map((i) => (
-                    <Star key={i} className="w-3.5 h-3.5 text-yellow-500 fill-current" />
-                  ))}
-                </div>
-                <span className="font-medium">4.9/5 rating</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section className="relative z-10 px-fluid-4 py-fluid-12">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="font-display text-fluid-3xl font-light text-foreground mb-6 tracking-tight">
-                What Makes Us Different
-              </h2>
-              <p className="text-fluid-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                Every feature is thoughtfully designed to create meaningful connections and support your wellness journey.
-              </p>
-            </div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[
-                {
-                  icon: Shield,
-                  title: 'Safe Space',
-                  description: 'Women-only sanctuary with verified membership and thoughtful moderation.',
-                  gradient: 'from-emerald-500/20 to-teal-500/20'
-                },
-                {
-                  icon: Heart,
-                  title: 'Authentic Bonds',
-                  description: 'Connect with inspiring women through shared values and genuine conversations.',
-                  gradient: 'from-pink-500/20 to-rose-500/20'
-                },
-                {
-                  icon: Target,
-                  title: 'Wellness Focus',
-                  description: 'Personalized challenges and goals that fit your lifestyle and aspirations.',
-                  gradient: 'from-violet-500/20 to-purple-500/20'
-                },
-                {
-                  icon: Sparkles,
-                  title: 'Growth Journey',
-                  description: 'Exclusive events, masterclasses, and experiences for continuous evolution.',
-                  gradient: 'from-amber-500/20 to-orange-500/20'
-                }
-              ].map(({ icon: Icon, title, description, gradient }, index) => (
-                <div 
-                  key={index} 
-                  className="group glass-card p-8 rounded-2xl hover:scale-105 transition-all duration-500 cursor-pointer border border-primary/10 hover:border-primary/20"
-                  style={{animationDelay: `${index * 0.1}s`}}
-                >
-                  <div className={`w-16 h-16 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className="w-8 h-8 text-foreground" />
-                  </div>
-                  <h3 className="text-xl font-display font-medium mb-3 text-foreground">{title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Final CTA Section */}
-        <section className="relative z-10 px-fluid-4 py-fluid-12">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="glass-card p-12 lg:p-16 rounded-3xl border border-primary/10 shadow-xl backdrop-blur-sm">
-              <div className="mb-10">
-                <h2 className="font-display text-fluid-3xl font-light text-foreground mb-6 tracking-tight">
-                  Ready to Transform Your Wellness Journey?
-                </h2>
-                <p className="text-fluid-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                  Join our vibrant community of women who support, inspire, and grow together every day.
-                </p>
-              </div>
               
-              <div className="space-y-6">
-                <Button asChild size="lg" className="glass-card bg-primary text-primary-foreground hover:bg-primary/90 px-12 py-6 text-xl rounded-xl font-medium transition-all duration-300 hover:scale-[1.02] shadow-xl border border-primary/20">
-                  <Link to="/auth" className="flex items-center justify-center group">
-                    Start Your Journey Today
-                    <ArrowRight className="w-6 h-6 ml-3 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
-                
-                <p className="text-sm text-muted-foreground tracking-wide">
-                  Join 1,000+ women • Exclusive membership • Transform together
-                </p>
-              </div>
+              <Button asChild variant="ghost" size="lg" className="w-full text-muted-foreground hover:text-foreground hover:bg-primary/5 px-8 py-4 text-lg font-medium rounded-xl transition-all duration-300">
+                <Link to="/auth">
+                  Sign in
+                </Link>
+              </Button>
             </div>
           </div>
         </section>

@@ -33,15 +33,18 @@ const Index = () => {
       </div>
 
       {/* Navigation Header */}
-      <header className="relative z-50 w-full py-8 px-6 lg:py-12 lg:px-8">
+      <header className="relative z-50 w-full py-8 px-6 lg:py-12 lg:px-8 animate-fade-in">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <AnimatedLogo size="sm" />
-            <div className="font-display text-lg md:text-xl font-extralight text-foreground tracking-[0.3em] uppercase">
-              HUMBL
+          <div className="flex items-center space-x-4 hover-scale">
+            <AnimatedLogo size="sm" className="animate-[float_3s_ease-in-out_infinite]" />
+            <div className="font-display text-lg md:text-xl font-extralight text-foreground tracking-[0.3em] uppercase relative">
+              <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-[shimmer_2s_ease-in-out_infinite] bg-[length:200%_100%]">
+                HUMBL
+              </span>
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-lg blur-lg opacity-75 animate-pulse"></div>
             </div>
           </div>
-          <div className="text-xs text-muted-foreground/40 tracking-[0.2em] uppercase font-light">
+          <div className="text-xs text-muted-foreground/40 tracking-[0.2em] uppercase font-light animate-fade-in animate-delay-1000">
             Est. 2024
           </div>
         </div>
@@ -56,86 +59,96 @@ const Index = () => {
               {/* Left Content */}
               <div className="lg:col-span-7 lg:col-start-2">
                 <div className="space-y-16">
-                  {/* Magazine Style Label */}
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-px bg-foreground"></div>
-                    <span className="text-xs tracking-[0.3em] uppercase text-muted-foreground font-light">
-                      Exclusive Access
-                    </span>
-                  </div>
+                   {/* Magazine Style Label */}
+                   <div className="flex items-center space-x-4 animate-fade-in animate-delay-500">
+                     <div className="w-12 h-px bg-foreground animate-[scale-in_0.8s_ease-out_0.7s_both]"></div>
+                     <span className="text-xs tracking-[0.3em] uppercase text-muted-foreground font-light hover:text-foreground transition-colors duration-500">
+                       Exclusive Access
+                     </span>
+                   </div>
                   
-                  {/* Main Headline */}
-                  <div className="space-y-8">
-                    <h1 className="font-display font-extralight leading-[0.75] tracking-[-0.02em]">
-                      <span className="block text-7xl md:text-8xl lg:text-9xl text-foreground">GIRLS</span>
-                      <span className="block text-5xl md:text-6xl lg:text-7xl text-foreground/60 italic ml-8 md:ml-16">Club</span>
-                    </h1>
+                   {/* Main Headline */}
+                   <div className="space-y-8">
+                     <h1 className="font-display font-extralight leading-[0.75] tracking-[-0.02em] relative">
+                       <span className="block text-7xl md:text-8xl lg:text-9xl text-foreground animate-fade-in animate-delay-1000 hover:animate-[gentle-bounce_0.6s_ease-in-out] cursor-default">
+                         GIRLS
+                       </span>
+                       <span className="block text-5xl md:text-6xl lg:text-7xl text-foreground/60 italic ml-8 md:ml-16 animate-fade-in animate-delay-1500 hover:text-foreground/80 transition-colors duration-700">
+                         Club
+                       </span>
+                       <div className="absolute -inset-4 bg-gradient-to-r from-transparent via-primary/5 to-transparent blur-xl opacity-0 hover:opacity-100 transition-opacity duration-1000"></div>
+                     </h1>
                     
-                    <div className="max-w-md space-y-6">
-                      <p className="text-base md:text-lg text-muted-foreground font-light leading-relaxed">
-                        An exclusive sanctuary for women who have arrived. 
-                        Where growth meets grace, and connections become legacy.
-                      </p>
-                    </div>
+                     <div className="max-w-md space-y-6 animate-fade-in animate-delay-2000">
+                       <p className="text-base md:text-lg text-muted-foreground font-light leading-relaxed hover:text-foreground transition-colors duration-700">
+                         An exclusive sanctuary for women who have arrived. 
+                         Where growth meets grace, and connections become legacy.
+                       </p>
+                     </div>
                   </div>
                   
-                  {/* CTA Section */}
-                  <div className="space-y-8">
-                    <div className="space-y-4 max-w-xs">
-                      <Button asChild className="w-full h-14 bg-foreground text-background hover:bg-foreground/90 rounded-none font-light text-sm tracking-[0.1em] uppercase transition-all duration-500 hover:tracking-[0.15em]">
-                        <Link to="/auth?step=invite">
-                          I have an invite code
-                        </Link>
-                      </Button>
-                      
-                      <div className="relative">
-                        <Button asChild variant="ghost" className="w-full h-12 text-muted-foreground hover:text-foreground hover:bg-transparent rounded-none font-light text-sm transition-all duration-500 group">
-                          <Link to="/auth">
-                            <span className="relative">
-                              Sign in
-                              <span className="absolute -bottom-1 left-0 w-0 h-px bg-foreground transition-all duration-500 group-hover:w-full"></span>
-                            </span>
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
+                   {/* CTA Section */}
+                   <div className="space-y-8 animate-fade-in animate-delay-2500">
+                     <div className="space-y-4 max-w-xs">
+                       <Button asChild className="w-full h-14 bg-foreground text-background hover:bg-foreground/90 rounded-none font-light text-sm tracking-[0.1em] uppercase transition-all duration-500 hover:tracking-[0.15em] hover:scale-105 hover:shadow-lg hover:shadow-primary/25 group">
+                         <Link to="/auth?step=invite">
+                           <span className="relative">
+                             I have an invite code
+                             <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                           </span>
+                         </Link>
+                       </Button>
+                       
+                       <div className="relative hover-scale">
+                         <Button asChild variant="ghost" className="w-full h-12 text-muted-foreground hover:text-foreground hover:bg-transparent rounded-none font-light text-sm transition-all duration-500 group">
+                           <Link to="/auth">
+                             <span className="relative">
+                               Sign in
+                               <span className="absolute -bottom-1 left-0 w-0 h-px bg-foreground transition-all duration-500 group-hover:w-full"></span>
+                             </span>
+                           </Link>
+                         </Button>
+                       </div>
+                     </div>
+                   </div>
                 </div>
               </div>
               
-              {/* Right Content - Creative Typography */}
-              <div className="lg:col-span-4 lg:col-start-10 hidden lg:block">
-                <div className="space-y-12 text-right">
-                  <div className="space-y-6 flex flex-col items-end">
-                    <AnimatedLogo size="xl" />
-                    <div className="text-xs tracking-[0.2em] uppercase text-muted-foreground/40 font-light">
-                      Artfully Crafted
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div className="w-px h-24 bg-foreground/10 ml-auto"></div>
-                    <div className="text-xs tracking-[0.3em] uppercase text-muted-foreground/40 font-light">
-                      Membership<br/>
-                      By invitation<br/>
-                      Only
-                    </div>
-                  </div>
-                </div>
-              </div>
+               {/* Right Content - Creative Typography */}
+               <div className="lg:col-span-4 lg:col-start-10 hidden lg:block animate-fade-in animate-delay-3000">
+                 <div className="space-y-12 text-right">
+                   <div className="space-y-6 flex flex-col items-end hover-scale">
+                     <AnimatedLogo size="xl" className="animate-[float_4s_ease-in-out_infinite_1s]" />
+                     <div className="text-xs tracking-[0.2em] uppercase text-muted-foreground/40 font-light hover:text-muted-foreground transition-colors duration-500">
+                       Artfully Crafted
+                     </div>
+                   </div>
+                   
+                   <div className="space-y-4 group">
+                     <div className="w-px h-24 bg-foreground/10 ml-auto group-hover:bg-foreground/30 transition-colors duration-700 animate-[scale-in_1s_ease-out_3.5s_both] origin-bottom"></div>
+                     <div className="text-xs tracking-[0.3em] uppercase text-muted-foreground/40 font-light hover:text-muted-foreground transition-colors duration-500">
+                       Membership<br/>
+                       By invitation<br/>
+                       Only
+                     </div>
+                   </div>
+                 </div>
+               </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 px-fluid-4 py-16">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-xs text-muted-foreground/60 tracking-widest uppercase font-light">
-            HUMBL Girls Club — Est. 2024
-          </p>
-        </div>
-      </footer>
+       {/* Footer */}
+       <footer className="relative z-10 px-fluid-4 py-16 animate-fade-in animate-delay-4000">
+         <div className="max-w-4xl mx-auto text-center">
+           <p className="text-xs text-muted-foreground/60 tracking-widest uppercase font-light hover:text-muted-foreground transition-colors duration-700">
+             <span className="bg-gradient-to-r from-muted-foreground/60 via-primary/80 to-muted-foreground/60 bg-clip-text hover:text-transparent transition-all duration-1000 bg-[length:200%_100%] animate-[shimmer_3s_ease-in-out_infinite]">
+               HUMBL Girls Club — Est. 2024
+             </span>
+           </p>
+         </div>
+       </footer>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { memo, Suspense } from 'react';
+import React, { memo, Suspense, useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useViewport } from '@/hooks/use-mobile';
@@ -8,6 +8,7 @@ import StatsGrid from '@/components/dashboard/StatsGrid';
 import WellnessCard from '@/components/dashboard/WellnessCard';
 import UpcomingEvents from '@/components/dashboard/UpcomingEvents';
 import CommunityFeed from '@/components/dashboard/CommunityFeed';
+import WelcomeFlow from '@/components/onboarding/WelcomeFlow';
 import { DashboardSkeleton } from '@/components/ui/optimized-skeleton';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 
@@ -20,8 +21,22 @@ const Dashboard: React.FC = memo(() => {
   const { stats, profile, loading } = useDashboardData(user?.id);
   const { isMobile } = useViewport();
   const { handleError } = useErrorHandler();
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   console.log('Dashboard render:', { user, stats, profile, loading });
+
+  useEffect(() => {
+    // Show onboarding if user hasn't completed profile
+    if (!loading && profile && !profile.full_name) {
+      setShowOnboarding(true);
+    }
+  }, [loading, profile]);
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    // Refresh the dashboard data
+    window.location.reload();
+  };
 
   if (loading) {
     return <DashboardSkeleton />;
@@ -29,6 +44,8 @@ const Dashboard: React.FC = memo(() => {
 
   return (
     <ErrorBoundary>
+      {showOnboarding && <WelcomeFlow onComplete={handleOnboardingComplete} />}
+      
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
         <div className="max-w-7xl mx-auto p-fluid-4 flow-content">
           {/* Header Section */}

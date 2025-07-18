@@ -23,33 +23,38 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-editorial-hero overflow-hidden">
-      {/* Ambient Background Elements */}
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 overflow-hidden relative">
+      {/* Enhanced Background Elements */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[12%] left-[4%] w-28 h-28 glass-card rounded-full opacity-25 animate-float blur-[0.5px]"></div>
-        <div className="absolute top-[35%] right-[6%] w-20 h-20 glass-card rounded-full opacity-20 animate-float blur-[0.5px]" style={{animationDelay: '1.2s'}}></div>
-        <div className="absolute bottom-[25%] left-[12%] w-16 h-16 glass-card rounded-full opacity-30 animate-float blur-[0.5px]" style={{animationDelay: '2.4s'}}></div>
-        <div className="absolute top-[65%] right-[18%] w-12 h-12 glass-card rounded-full opacity-15 animate-float blur-[0.5px]" style={{animationDelay: '3.6s'}}></div>
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-gradient-to-br from-accent/10 to-transparent rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-primary/5 to-transparent rounded-full blur-3xl"></div>
+        
+        {/* Floating Elements */}
+        <div className="absolute top-[15%] left-[8%] w-3 h-3 bg-primary/30 rounded-full animate-float"></div>
+        <div className="absolute top-[25%] right-[12%] w-2 h-2 bg-accent/40 rounded-full animate-float" style={{animationDelay: '1s'}}></div>
+        <div className="absolute bottom-[30%] left-[15%] w-4 h-4 bg-primary/20 rounded-full animate-float" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-[60%] right-[25%] w-2 h-2 bg-accent/30 rounded-full animate-float" style={{animationDelay: '3s'}}></div>
       </div>
 
       {/* Navigation Header */}
-      <header className="relative z-50 w-full py-fluid-4 px-fluid-4">
+      <header className="relative z-50 w-full py-6 px-6 lg:py-8 lg:px-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 glass-card rounded-xl flex items-center justify-center">
-              <span className="text-primary font-display text-xl font-semibold">H</span>
+          <div className="flex items-center space-x-4">
+            <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg border border-primary/20 backdrop-blur-sm">
+              <span className="text-primary-foreground font-display text-2xl font-bold tracking-tight">H</span>
             </div>
             <div className="hidden sm:block">
-              <span className="text-foreground font-display text-lg font-medium">HUMBL</span>
-              <span className="text-muted-foreground text-sm font-light ml-1">Girls Club</span>
+              <div className="font-display text-xl font-bold text-foreground tracking-tight">HUMBL</div>
+              <div className="text-muted-foreground text-sm font-medium tracking-wide -mt-1">Girls Club</div>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+          <div className="flex items-center space-x-4">
+            <Button asChild variant="ghost" size="default" className="hidden sm:inline-flex text-foreground/80 hover:text-foreground hover:bg-primary/5 font-medium">
               <Link to="/auth">Sign In</Link>
             </Button>
-            <Button asChild size="sm" className="glass-button">
-              <Link to="/auth">Join</Link>
+            <Button asChild size="default" className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:from-primary/90 hover:to-primary/80 font-semibold px-6 py-2.5 rounded-xl shadow-lg hover:shadow-xl border border-primary/20 transition-all duration-300 hover:scale-105">
+              <Link to="/auth">Join Club</Link>
             </Button>
           </div>
         </div>
@@ -61,35 +66,35 @@ const Index = () => {
         <section className="relative z-10 px-fluid-4 pt-fluid-8 pb-fluid-12">
           <div className="max-w-7xl mx-auto text-center">
             {/* Hero Badge */}
-            <div className="inline-flex items-center glass-card px-5 py-2.5 rounded-full mb-8 border border-primary/20 shadow-sm backdrop-blur-sm">
-              <Sparkles className="w-4 h-4 text-primary mr-2 animate-pulse" />
-              <span className="text-sm font-medium text-foreground tracking-wide">Exclusive Women's Community</span>
+            <div className="inline-flex items-center bg-gradient-to-r from-primary/10 to-accent/10 backdrop-blur-xl px-8 py-4 rounded-full mb-12 border border-primary/30 shadow-2xl">
+              <Sparkles className="w-5 h-5 text-primary mr-3 animate-pulse" />
+              <span className="text-base font-semibold text-foreground tracking-wide">Exclusive Women's Community</span>
             </div>
             
             {/* Main Headline */}
-            <div className="mb-10 max-w-4xl mx-auto">
-              <h1 className="font-display text-fluid-4xl md:text-6xl lg:text-7xl font-light text-foreground leading-[0.9] tracking-tight mb-6 drop-shadow-sm">
+            <div className="mb-16 max-w-5xl mx-auto">
+              <h1 className="font-display text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extralight text-foreground leading-[0.85] tracking-tighter mb-8">
                 Your Sanctuary for
-                <span className="block text-primary italic bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Growth & Connection</span>
+                <span className="block bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent font-medium italic">Growth & Connection</span>
               </h1>
               
-              <p className="text-fluid-lg text-muted-foreground font-light leading-relaxed max-w-2xl mx-auto tracking-wide">
+              <p className="text-xl md:text-2xl text-muted-foreground/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide">
                 Join thousands of inspiring women in an exclusive wellness community designed for 
-                <span className="text-primary font-medium"> authentic connections</span>, 
-                <span className="text-primary font-medium"> mindful growth</span>, and 
-                <span className="text-primary font-medium"> lasting transformation</span>.
+                <span className="text-primary font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> authentic connections</span>, 
+                <span className="text-primary font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> mindful growth</span>, and 
+                <span className="text-primary font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> lasting transformation</span>.
               </p>
             </div>
 
             {/* CTA Section */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 max-w-lg mx-auto">
-              <Button asChild size="lg" className="w-full sm:w-auto glass-card bg-primary text-primary-foreground hover:bg-primary/90 px-10 py-6 text-lg rounded-xl font-medium transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-2xl border border-primary/20">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20">
+              <Button asChild size="lg" className="w-full sm:w-auto bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground hover:from-primary/90 hover:via-primary/90 hover:to-accent/90 px-12 py-4 text-lg font-bold rounded-2xl transition-all duration-300 hover:scale-105 shadow-2xl hover:shadow-3xl border border-primary/30 backdrop-blur-sm">
                 <Link to="/auth" className="flex items-center justify-center group">
                   Begin Your Journey
-                  <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="w-5 h-5 ml-3 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-110" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto glass-button px-10 py-6 text-lg rounded-xl font-medium border-primary/20 hover:border-primary/40">
+              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto bg-background/80 backdrop-blur-xl border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/5 px-12 py-4 text-lg font-semibold rounded-2xl transition-all duration-300 hover:scale-105 shadow-xl">
                 <Link to="/auth">Member Access</Link>
               </Button>
             </div>

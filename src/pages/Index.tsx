@@ -2,8 +2,8 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Activity, Users, Target, Shield, ArrowRight, Heart, Star, Sparkles } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { AnimatedLogo } from '@/components/ui/animated-logo';
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -35,7 +35,8 @@ const Index = () => {
       {/* Navigation Header */}
       <header className="relative z-50 w-full py-8 px-6 lg:py-12 lg:px-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
+            <AnimatedLogo size="sm" />
             <div className="font-display text-lg md:text-xl font-extralight text-foreground tracking-[0.3em] uppercase">
               HUMBL
             </div>
@@ -82,7 +83,7 @@ const Index = () => {
                   <div className="space-y-8">
                     <div className="space-y-4 max-w-xs">
                       <Button asChild className="w-full h-14 bg-foreground text-background hover:bg-foreground/90 rounded-none font-light text-sm tracking-[0.1em] uppercase transition-all duration-500 hover:tracking-[0.15em]">
-                        <Link to="/auth">
+                        <Link to="/auth?step=invite">
                           I have an invite code
                         </Link>
                       </Button>
@@ -105,10 +106,10 @@ const Index = () => {
               {/* Right Content - Creative Typography */}
               <div className="lg:col-span-4 lg:col-start-10 hidden lg:block">
                 <div className="space-y-12 text-right">
-                  <div className="space-y-2">
-                    <div className="text-9xl font-display font-extralight text-foreground/5 leading-none">H</div>
-                    <div className="text-xs tracking-[0.2em] uppercase text-muted-foreground/40 font-light -mt-4">
-                      Humble
+                  <div className="space-y-6 flex flex-col items-end">
+                    <AnimatedLogo size="xl" />
+                    <div className="text-xs tracking-[0.2em] uppercase text-muted-foreground/40 font-light">
+                      Artfully Crafted
                     </div>
                   </div>
                   

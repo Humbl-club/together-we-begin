@@ -15,11 +15,14 @@ const Auth: React.FC = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    // Check if we're in password reset mode
+    // Check URL parameters for initial step
+    const step = searchParams.get('step');
     const mode = searchParams.get('mode');
     const accessToken = searchParams.get('access_token');
     
-    if (mode === 'reset' && accessToken) {
+    if (step === 'invite') {
+      setCurrentStep('invite');
+    } else if (mode === 'reset' && accessToken) {
       setCurrentStep('reset');
     }
   }, [searchParams]);

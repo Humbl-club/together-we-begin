@@ -40,10 +40,10 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   };
 
   return (
-    <div className={`min-h-screen bg-editorial-subtle safe-area-layout ${getLayoutPadding()}`}>
+    <div className={`min-h-screen bg-editorial-subtle safe-area-layout ${getLayoutPadding()}`} style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       <Navigation />
       <main className={`responsive-container max-w-7xl mx-auto ${getMainPadding()}`}>
-        <div className="mobile-nav-safe">
+        <div className="mobile-nav-safe" style={{ paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : '0' }}>
           {children}
         </div>
       </main>

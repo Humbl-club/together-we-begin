@@ -466,6 +466,7 @@ export type Database = {
           created_by: string | null
           expires_at: string | null
           id: string
+          notes: string | null
           status: Database["public"]["Enums"]["invite_status"] | null
           used_at: string | null
           used_by: string | null
@@ -476,6 +477,7 @@ export type Database = {
           created_by?: string | null
           expires_at?: string | null
           id?: string
+          notes?: string | null
           status?: Database["public"]["Enums"]["invite_status"] | null
           used_at?: string | null
           used_by?: string | null
@@ -486,6 +488,7 @@ export type Database = {
           created_by?: string | null
           expires_at?: string | null
           id?: string
+          notes?: string | null
           status?: Database["public"]["Enums"]["invite_status"] | null
           used_at?: string | null
           used_by?: string | null

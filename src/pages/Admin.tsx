@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,9 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
 import { 
   Users, 
-  Calendar, 
+  Calendar as CalendarIcon, 
   Trophy, 
   MessageSquare, 
   Shield, 
@@ -19,12 +22,19 @@ import {
   BarChart,
   Settings,
   Copy,
-  Check
+  Check,
+  Search,
+  Filter,
+  TrendingUp,
+  Clock,
+  Target
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 
 interface UserProfile {
   id: string;
@@ -43,6 +53,16 @@ interface Invite {
   created_at: string;
   used_at: string | null;
   used_by: string | null;
+  notes: string | null;
+  created_by: string | null;
+  profiles?: {
+    full_name: string | null;
+    username: string | null;
+  };
+  used_by_profile?: {
+    full_name: string | null;
+    username: string | null;
+  };
 }
 
 interface FlaggedPost {
@@ -69,8 +89,73 @@ const Admin: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [newInviteCode, setNewInviteCode] = useState('');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  
+  // Enhanced invite state
+  const [inviteFilter, setInviteFilter] = useState('all');
+  const [inviteSearch, setInviteSearch] = useState('');
+  const [inviteStartDate, setInviteStartDate] = useState<Date | undefined>();
+  const [inviteEndDate, setInviteEndDate] = useState<Date | undefined>();
+  const [newInviteNotes, setNewInviteNotes] = useState('');
+  const [newInviteExpiry, setNewInviteExpiry] = useState<Date | undefined>(
+    new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  );
+  const [bulkCreateCount, setBulkCreateCount] = useState(1);
+  
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
+  
+  // Filtered invites computation
+  const filteredInvites = useMemo(() => {
+    return invites.filter(invite => {
+      // Status filter
+      if (inviteFilter !== 'all' && invite.status !== inviteFilter) return false;
+      
+      // Search filter
+      if (inviteSearch && !invite.code.toLowerCase().includes(inviteSearch.toLowerCase())) return false;
+      
+      // Date range filter
+      const createdDate = new Date(invite.created_at);
+      if (inviteStartDate && createdDate < inviteStartDate) return false;
+      if (inviteEndDate && createdDate > inviteEndDate) return false;
+      
+      return true;
+    });
+  }, [invites, inviteFilter, inviteSearch, inviteStartDate, inviteEndDate]);
+  
+  // Invite analytics computation
+  const inviteAnalytics = useMemo(() => {
+    const usedInvites = invites.filter(i => i.status === 'used');
+    const totalInvites = invites.length;
+    const successRate = totalInvites > 0 ? ((usedInvites.length / totalInvites) * 100).toFixed(1) : 0;
+    
+    // Calculate average time to use invite
+    const timesToUse = usedInvites
+      .filter(i => i.used_at && i.created_at)
+      .map(i => new Date(i.used_at!).getTime() - new Date(i.created_at).getTime());
+    
+    const avgTimeToUse = timesToUse.length > 0 
+      ? Math.round(timesToUse.reduce((a, b) => a + b, 0) / timesToUse.length / (1000 * 60 * 60 * 24))
+      : 0;
+    
+    // Find most active inviter
+    const inviterCounts = invites
+      .filter(i => i.created_by)
+      .reduce((acc, i) => {
+        const creator = i.profiles?.full_name || i.profiles?.username || 'Unknown';
+        acc[creator] = (acc[creator] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+    
+    const mostActiveInviter = Object.entries(inviterCounts)
+      .sort(([,a], [,b]) => b - a)[0];
+    
+    return {
+      successRate: parseFloat(successRate.toString()),
+      avgTimeToUse,
+      mostActiveInviter: mostActiveInviter ? mostActiveInviter[0] : 'None',
+      mostActiveInviterCount: mostActiveInviter ? mostActiveInviter[1] : 0
+    };
+  }, [invites]);
 
   useEffect(() => {
     if (user && isAdmin) {
@@ -115,7 +200,32 @@ const Admin: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setInvites(data || []);
+      
+      // Fetch profile information separately for created_by and used_by
+      const invitesWithProfiles = await Promise.all(
+        (data || []).map(async (invite) => {
+          const [creatorProfile, usedByProfile] = await Promise.all([
+            invite.created_by ? supabase
+              .from('profiles')
+              .select('full_name, username')
+              .eq('id', invite.created_by)
+              .single() : Promise.resolve({ data: null }),
+            invite.used_by ? supabase
+              .from('profiles')
+              .select('full_name, username')
+              .eq('id', invite.used_by)
+              .single() : Promise.resolve({ data: null })
+          ]);
+          
+          return {
+            ...invite,
+            profiles: creatorProfile.data,
+            used_by_profile: usedByProfile.data
+          };
+        })
+      );
+      
+      setInvites(invitesWithProfiles);
     } catch (error) {
       console.error('Error fetching invites:', error);
     }
@@ -182,30 +292,42 @@ const Admin: React.FC = () => {
 
   const createInvite = async () => {
     try {
-      const code = newInviteCode || generateInviteCode();
+      const invitePromises = [];
       
-      const { error } = await supabase
-        .from('invites')
-        .insert([{
-          code: code.toUpperCase(),
-          created_by: user!.id,
-          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
-        }]);
+      for (let i = 0; i < bulkCreateCount; i++) {
+        const code = newInviteCode || generateInviteCode();
+        invitePromises.push(
+          supabase
+            .from('invites')
+            .insert([{
+              code: (bulkCreateCount > 1 ? generateInviteCode() : code).toUpperCase(),
+              created_by: user!.id,
+              expires_at: newInviteExpiry?.toISOString() || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+              notes: newInviteNotes || null
+            }])
+        );
+      }
 
-      if (error) throw error;
+      const results = await Promise.all(invitePromises);
+      const hasError = results.some(result => result.error);
+      
+      if (hasError) throw new Error('Some invites failed to create');
 
       toast({
         title: "Success",
-        description: "Invite code created successfully!"
+        description: `${bulkCreateCount} invite code${bulkCreateCount > 1 ? 's' : ''} created successfully!`
       });
 
       setNewInviteCode('');
+      setNewInviteNotes('');
+      setBulkCreateCount(1);
+      setNewInviteExpiry(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
       fetchInvites();
     } catch (error) {
       console.error('Error creating invite:', error);
       toast({
         title: "Error",
-        description: "Failed to create invite code",
+        description: "Failed to create invite code(s)",
         variant: "destructive"
       });
     }
@@ -476,6 +598,46 @@ const Admin: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="invites" className="space-y-4">
+          {/* Invite Analytics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="glass-card">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2">
+                  <Target className="w-5 h-5 text-green-500" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Success Rate</p>
+                    <p className="text-2xl font-bold">{inviteAnalytics.successRate}%</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="glass-card">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-blue-500" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Avg. Time to Use</p>
+                    <p className="text-2xl font-bold">{inviteAnalytics.avgTimeToUse}d</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="glass-card">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-purple-500" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Top Inviter</p>
+                    <p className="text-lg font-bold truncate">{inviteAnalytics.mostActiveInviter}</p>
+                    <p className="text-xs text-muted-foreground">{inviteAnalytics.mostActiveInviterCount} invites</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card className="glass-card">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -487,7 +649,7 @@ const Admin: React.FC = () => {
                       Create Invite
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="max-w-lg">
                     <DialogHeader>
                       <DialogTitle>Create New Invite</DialogTitle>
                     </DialogHeader>
@@ -502,29 +664,161 @@ const Admin: React.FC = () => {
                           maxLength={8}
                         />
                       </div>
+                      
+                      <div>
+                        <Label htmlFor="invite-notes">Notes</Label>
+                        <Textarea
+                          id="invite-notes"
+                          value={newInviteNotes}
+                          onChange={(e) => setNewInviteNotes(e.target.value)}
+                          placeholder="Who is this invite for?"
+                          rows={2}
+                        />
+                      </div>
+
+                      <div>
+                        <Label>Expiration Date</Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-full justify-start text-left font-normal",
+                                !newInviteExpiry && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {newInviteExpiry ? format(newInviteExpiry, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={newInviteExpiry}
+                              onSelect={setNewInviteExpiry}
+                              initialFocus
+                              className="p-3 pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="bulk-count">Bulk Create</Label>
+                        <Select value={bulkCreateCount.toString()} onValueChange={(value) => setBulkCreateCount(parseInt(value))}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[1, 5, 10, 20, 50].map(count => (
+                              <SelectItem key={count} value={count.toString()}>
+                                {count} invite{count > 1 ? 's' : ''}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
                       <Button onClick={createInvite} className="w-full">
-                        Create Invite Code
+                        Create {bulkCreateCount > 1 ? `${bulkCreateCount} ` : ''}Invite Code{bulkCreateCount > 1 ? 's' : ''}
                       </Button>
                     </div>
                   </DialogContent>
                 </Dialog>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              {/* Search and Filter Bar */}
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search invite codes..."
+                    value={inviteSearch}
+                    onChange={(e) => setInviteSearch(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                
+                <Select value={inviteFilter} onValueChange={setInviteFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <Filter className="w-4 h-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="used">Used</SelectItem>
+                    <SelectItem value="expired">Expired</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <div className="flex gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-[140px]">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        From
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={inviteStartDate}
+                        onSelect={setInviteStartDate}
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-[140px]">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        To
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={inviteEndDate}
+                        onSelect={setInviteEndDate}
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+
+                  {(inviteStartDate || inviteEndDate) && (
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setInviteStartDate(undefined);
+                        setInviteEndDate(undefined);
+                      }}
+                      size="sm"
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
+              </div>
+
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Code</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Created By</TableHead>
+                      <TableHead>Used By</TableHead>
+                      <TableHead>Notes</TableHead>
                       <TableHead>Created</TableHead>
-                      <TableHead>Used</TableHead>
                       <TableHead>Expires</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {invites.map((invite) => (
+                    {filteredInvites.map((invite) => (
                       <TableRow key={invite.id}>
                         <TableCell className="font-mono font-bold">
                           {invite.code}
@@ -541,10 +835,21 @@ const Admin: React.FC = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {new Date(invite.created_at).toLocaleDateString()}
+                          {invite.profiles?.full_name || invite.profiles?.username || 'Admin'}
                         </TableCell>
                         <TableCell>
-                          {invite.used_at ? new Date(invite.used_at).toLocaleDateString() : '-'}
+                          {invite.used_by_profile ? 
+                            (invite.used_by_profile.full_name || invite.used_by_profile.username || 'Unknown') 
+                            : '-'
+                          }
+                        </TableCell>
+                        <TableCell className="max-w-[200px]">
+                          <div className="truncate" title={invite.notes || ''}>
+                            {invite.notes || '-'}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(invite.created_at).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
                           {invite.expires_at ? new Date(invite.expires_at).toLocaleDateString() : 'Never'}

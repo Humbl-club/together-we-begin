@@ -1307,4 +1307,213 @@
     box-shadow: 0 8px 30px hsl(var(--primary) / 0.25);
     transform: translateY(-2px);
   }
+
+  /* ============================================
+     ENHANCED MICRO-INTERACTIONS
+     ============================================ */
+
+  /* 1. Enhanced Hover State Transitions - Adding smooth timing */
+  .glass-card,
+  .glass-card-enhanced,
+  .btn-responsive,
+  .interactive-element,
+  .premium-tab,
+  .stats-card {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Enhanced hover states with better timing */
+  .glass-card:hover,
+  .glass-card-enhanced:hover {
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* 2. Ripple Effect for Button Clicks */
+  .btn-responsive,
+  .btn-mobile-optimized,
+  .glass-button {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-responsive::before,
+  .btn-mobile-optimized::before,
+  .glass-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: hsl(var(--primary-foreground) / 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease-out, height 0.3s ease-out;
+    z-index: 0;
+  }
+
+  .btn-responsive:active::before,
+  .btn-mobile-optimized:active::before,
+  .glass-button:active::before {
+    width: 300px;
+    height: 300px;
+    transition: width 0.15s ease-out, height 0.15s ease-out;
+  }
+
+  /* Ensure button content stays above ripple */
+  .btn-responsive > *,
+  .btn-mobile-optimized > *,
+  .glass-button > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* 3. Enhanced Card Hover with Gentle Scale */
+  .glass-card:hover,
+  .glass-card-enhanced:hover {
+    transform: translateY(-2px) scale(1.005);
+    box-shadow: 
+      0 12px 40px hsl(var(--primary) / 0.12),
+      0 4px 16px hsl(var(--primary) / 0.08);
+  }
+
+  /* Enhanced stats cards with subtle lift */
+  .stats-card:hover {
+    transform: translateY(-1px) scale(1.002);
+    box-shadow: 
+      0 8px 25px hsl(var(--primary) / 0.1),
+      0 2px 10px hsl(var(--primary) / 0.06);
+  }
+
+  /* 4. Enhanced Active States with Spring Physics */
+  .active\:scale-\[0\.98\]:active {
+    transform: scale(0.97);
+    transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Enhanced button active states with spring feel */
+  .btn-responsive:active,
+  .btn-mobile-optimized:active {
+    transform: scale(0.96);
+    transition: transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* Enhanced hover scale with spring physics */
+  .hover\:scale-\[1\.02\]:hover {
+    transform: scale(1.02);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.03);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* 5. Enhanced Interactive Elements */
+  .interactive-element:hover {
+    transform: translateY(-1px);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .interactive-element:active {
+    transform: translateY(0) scale(0.98);
+    transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* 6. Enhanced Tab Transitions */
+  .premium-tab {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .premium-tab:hover:not([data-state="active"]) {
+    transform: translateY(-1px);
+    transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .premium-tab[data-state="active"] {
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* 7. Enhanced Glass Button Interactions */
+  .glass-button:hover {
+    transform: translateY(-1px);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 
+      0 8px 25px hsl(var(--primary) / 0.15),
+      inset 0 1px 0 hsl(var(--primary-foreground) / 0.1);
+  }
+
+  .glass-button:active {
+    transform: translateY(0) scale(0.98);
+    transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* 8. Enhanced Touch Feedback */
+  .touch-feedback:active::after {
+    transform: scale(1);
+    opacity: 0.8;
+    transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* 9. Enhanced Loyalty and Achievement Items */
+  .loyalty-item:hover,
+  .achievement-item:hover {
+    transform: translateX(4px) translateY(-1px);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* 10. Enhanced Settings Item Interactions */
+  .settings-item:hover {
+    transform: translateX(2px);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* 11. Performance Optimizations for Smooth Animations */
+  .glass-card,
+  .glass-card-enhanced,
+  .btn-responsive,
+  .btn-mobile-optimized,
+  .interactive-element,
+  .premium-tab,
+  .stats-card,
+  .glass-button {
+    will-change: transform;
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  /* Reset will-change after animations complete */
+  .glass-card:not(:hover),
+  .glass-card-enhanced:not(:hover),
+  .btn-responsive:not(:active):not(:hover),
+  .interactive-element:not(:active):not(:hover) {
+    will-change: auto;
+  }
+
+  /* 12. Reduced Motion Respect for Enhanced Animations */
+  @media (prefers-reduced-motion: reduce) {
+    .btn-responsive::before,
+    .btn-mobile-optimized::before,
+    .glass-button::before {
+      display: none;
+    }
+    
+    .glass-card:hover,
+    .glass-card-enhanced:hover,
+    .stats-card:hover,
+    .interactive-element:hover,
+    .premium-tab:hover,
+    .glass-button:hover {
+      transform: none;
+      transition: box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+    
+    .active\:scale-\[0\.98\]:active,
+    .btn-responsive:active,
+    .btn-mobile-optimized:active {
+      transform: none;
+      opacity: 0.8;
+      transition: opacity 0.1s ease;
+    }
+  }
 }

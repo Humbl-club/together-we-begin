@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Shield, Users, Calendar, Trophy, MessageSquare } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Shield, Users, Calendar, Trophy, MessageSquare, Activity, BarChart3 } from 'lucide-react';
 
 const Admin: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -19,6 +20,7 @@ const Admin: React.FC = () => {
   
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user && isAdmin) {
@@ -136,6 +138,45 @@ const Admin: React.FC = () => {
         </Card>
       </div>
 
+      {/* Admin Navigation */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Card className="glass-card hover:scale-105 transition-transform cursor-pointer" onClick={() => navigate('/admin/performance')}>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <Activity className="w-8 h-8 text-blue-500" />
+              <div>
+                <h3 className="font-semibold">Performance Monitor</h3>
+                <p className="text-sm text-muted-foreground">Real-time app performance metrics</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-card hover:scale-105 transition-transform cursor-pointer opacity-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <Users className="w-8 h-8 text-green-500" />
+              <div>
+                <h3 className="font-semibold">User Management</h3>
+                <p className="text-sm text-muted-foreground">Coming soon</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-card hover:scale-105 transition-transform cursor-pointer opacity-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <BarChart3 className="w-8 h-8 text-purple-500" />
+              <div>
+                <h3 className="font-semibold">Analytics Dashboard</h3>
+                <p className="text-sm text-muted-foreground">Coming soon</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="glass-card">
         <CardHeader>
           <CardTitle>Admin Features Coming Soon</CardTitle>
@@ -143,7 +184,7 @@ const Admin: React.FC = () => {
         <CardContent>
           <p className="text-muted-foreground">
             Advanced admin features including user management, invite system, and analytics will be available soon.
-            For now, you can see the basic community statistics above.
+            For now, you can access the Performance Monitor above to track application performance in real-time.
           </p>
         </CardContent>
       </Card>

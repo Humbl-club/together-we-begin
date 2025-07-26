@@ -25,6 +25,7 @@ const Profile = React.lazy(() => import("./pages/Profile"));
 const Settings = React.lazy(() => import("./pages/Settings"));
 const Messages = React.lazy(() => import("./pages/Messages"));
 const Admin = React.lazy(() => import("./pages/Admin"));
+const PerformanceMonitor = React.lazy(() => import("./pages/admin/PerformanceMonitor"));
 const QRScanner = React.lazy(() => import("./pages/QRScanner"));
 
 // Loading component that matches Auth.tsx styling
@@ -122,6 +123,11 @@ const App = () => {
                   <Route path="/admin" element={
                     <ProtectedRoute requireAdmin>
                       <Layout><Admin /></Layout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/performance" element={
+                    <ProtectedRoute requireAdmin>
+                      <Layout><PerformanceMonitor /></Layout>
                     </ProtectedRoute>
                   } />
                   <Route path="/settings" element={

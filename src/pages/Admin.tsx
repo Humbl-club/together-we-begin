@@ -7,9 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Users, 
   Calendar as CalendarIcon, 
@@ -33,8 +31,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
 
 interface UserProfile {
   id: string;
@@ -462,7 +458,7 @@ const Admin: React.FC = () => {
         <Card className="glass-card">
           <CardContent className="pt-6">
             <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-green-500" />
+              <CalendarIcon className="w-5 h-5 text-green-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Active Events</p>
                 <p className="text-2xl font-bold">{stats.activeEvents}</p>
@@ -677,30 +673,14 @@ const Admin: React.FC = () => {
                       </div>
 
                       <div>
-                        <Label>Expiration Date</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !newInviteExpiry && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {newInviteExpiry ? format(newInviteExpiry, "PPP") : <span>Pick a date</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={newInviteExpiry}
-                              onSelect={setNewInviteExpiry}
-                              initialFocus
-                              className="p-3 pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <Label htmlFor="invite-expiry">Expiration Date</Label>
+                        <Input
+                          id="invite-expiry"
+                          type="date"
+                          value={newInviteExpiry ? newInviteExpiry.toISOString().split('T')[0] : ''}
+                          onChange={(e) => setNewInviteExpiry(e.target.value ? new Date(e.target.value) : undefined)}
+                          min={new Date().toISOString().split('T')[0]}
+                        />
                       </div>
 
                       <div>
@@ -754,39 +734,27 @@ const Admin: React.FC = () => {
                 </Select>
 
                 <div className="flex gap-2">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-[140px]">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        From
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={inviteStartDate}
-                        onSelect={setInviteStartDate}
-                        className="p-3 pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <div>
+                    <Label htmlFor="start-date" className="text-xs">From Date</Label>
+                    <Input
+                      id="start-date"
+                      type="date"
+                      value={inviteStartDate ? inviteStartDate.toISOString().split('T')[0] : ''}
+                      onChange={(e) => setInviteStartDate(e.target.value ? new Date(e.target.value) : undefined)}
+                      className="w-[140px]"
+                    />
+                  </div>
 
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-[140px]">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        To
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={inviteEndDate}
-                        onSelect={setInviteEndDate}
-                        className="p-3 pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <div>
+                    <Label htmlFor="end-date" className="text-xs">To Date</Label>
+                    <Input
+                      id="end-date"
+                      type="date"
+                      value={inviteEndDate ? inviteEndDate.toISOString().split('T')[0] : ''}
+                      onChange={(e) => setInviteEndDate(e.target.value ? new Date(e.target.value) : undefined)}
+                      className="w-[140px]"
+                    />
+                  </div>
 
                   {(inviteStartDate || inviteEndDate) && (
                     <Button
@@ -796,6 +764,7 @@ const Admin: React.FC = () => {
                         setInviteEndDate(undefined);
                       }}
                       size="sm"
+                      className="mt-6"
                     >
                       Clear
                     </Button>

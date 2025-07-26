@@ -10,10 +10,11 @@ import { EventSearch } from '@/components/events/EventSearch';
 import { MobileCard } from '@/components/advanced/CompoundMobileCard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EmptyState } from '@/components/ui/empty-state';
 import { toast } from '@/hooks/use-toast';
 import { eventBus } from '@/core/EventBus';
 import { PerformanceMonitorService } from '@/services/core/PerformanceMonitorService';
-import { Calendar, Plus, Grid3X3, List, LayoutGrid } from 'lucide-react';
+import { Calendar, Plus, Grid3X3, List, LayoutGrid, Search, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Ultimate Events Page with enterprise architecture
@@ -361,28 +362,24 @@ const UltimateEventsPage = memo(() => {
                   ))}
                 </div>
               ) : filteredEvents.length === 0 ? (
-                <div className="glass-card-enhanced mobile:p-6 sm:p-8 text-center">
-                  <div className="space-y-4">
-                    <div className="mobile:w-12 mobile:h-12 sm:w-16 sm:h-16 bg-muted rounded-full mx-auto opacity-50 flex items-center justify-center">
-                      <Calendar className="mobile:w-6 mobile:h-6 sm:w-8 sm:h-8" />
-                    </div>
-                    <div>
-                      <h3 className="mobile:text-base sm:text-lg font-semibold">
-                        {searchQuery || activeFilters.length > 0 
-                          ? 'No events match your search' 
-                          : `No ${activeTab} events found`}
-                      </h3>
-                      <p className="text-muted-foreground mobile:text-sm sm:text-base">
-                        {searchQuery || activeFilters.length > 0
-                          ? 'Try adjusting your search or filters'
-                          : 'Check back later for new events'}
-                      </p>
-                    </div>
-                    <Button variant="outline" className="mobile:text-sm sm:text-base">
-                      Browse All Events
-                    </Button>
-                  </div>
-                </div>
+                <EmptyState
+                  icon={searchQuery || activeFilters.length > 0 ? Search : Calendar}
+                  title={searchQuery || activeFilters.length > 0 
+                    ? "No events match your search" 
+                    : `No ${activeTab} events found`}
+                  description={searchQuery || activeFilters.length > 0
+                    ? "Try adjusting your search criteria or filters to find events that match your interests."
+                    : "New exciting events are added regularly. Check back soon to discover amazing experiences!"}
+                  actionLabel={searchQuery || activeFilters.length > 0 ? "Clear Filters" : "Explore All Events"}
+                  onAction={() => {
+                    if (searchQuery || activeFilters.length > 0) {
+                      setSearchQuery('');
+                      setActiveFilters([]);
+                    } else {
+                      setActiveTab('all');
+                    }
+                  }}
+                />
               ) : (
                 <div className="mobile:space-y-3 sm:space-y-4">
                   {/* Mobile-first event list */}
@@ -428,19 +425,12 @@ const UltimateEventsPage = memo(() => {
                   ))}
                 </div>
               ) : filteredEvents.length === 0 ? (
-                <div className="glass-card-enhanced mobile:p-6 sm:p-8 text-center">
-                  <div className="space-y-4">
-                    <div className="mobile:w-12 mobile:h-12 sm:w-16 sm:h-16 bg-muted rounded-full mx-auto opacity-50 flex items-center justify-center">
-                      <Calendar className="mobile:w-6 mobile:h-6 sm:w-8 sm:h-8" />
-                    </div>
-                    <div>
-                      <h3 className="mobile:text-base sm:text-lg font-semibold">No ongoing events</h3>
-                      <p className="text-muted-foreground mobile:text-sm sm:text-base">
-                        Check back later for ongoing events
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <EmptyState
+                  icon={Calendar}
+                  title="No ongoing events"
+                  description="There are currently no events in progress. Check back later for live events and activities!"
+                  variant="compact"
+                />
               ) : (
                 <div className="mobile:space-y-3 sm:space-y-4">
                   {/* Mobile-first event list */}
@@ -468,19 +458,14 @@ const UltimateEventsPage = memo(() => {
                   ))}
                 </div>
               ) : filteredEvents.length === 0 ? (
-                <div className="glass-card-enhanced mobile:p-6 sm:p-8 text-center">
-                  <div className="space-y-4">
-                    <div className="mobile:w-12 mobile:h-12 sm:w-16 sm:h-16 bg-muted rounded-full mx-auto opacity-50 flex items-center justify-center">
-                      <Calendar className="mobile:w-6 mobile:h-6 sm:w-8 sm:h-8" />
-                    </div>
-                    <div>
-                      <h3 className="mobile:text-base sm:text-lg font-semibold">No past events</h3>
-                      <p className="text-muted-foreground mobile:text-sm sm:text-base">
-                        Past events will appear here once they're completed
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <EmptyState
+                  icon={Calendar}
+                  title="No past events"
+                  description="Past events will appear here once they're completed. Check out upcoming events to join the community!"
+                  actionLabel="View Upcoming Events"
+                  onAction={() => setActiveTab('upcoming')}
+                  variant="compact"
+                />
               ) : (
                 <div className="mobile:space-y-3 sm:space-y-4">
                   {/* Mobile-first event list */}

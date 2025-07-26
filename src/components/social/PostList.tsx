@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { OptimizedImage } from '@/components/ui/optimized-image';
-import { Heart, MessageCircle, Share2, Flag, MoreHorizontal } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Heart, MessageCircle, Share2, Flag, MoreHorizontal, Users } from 'lucide-react';
 
 interface Post {
   id: string;
@@ -72,22 +73,13 @@ export const PostList: React.FC<PostListProps> = ({
 }) => {
   if (posts.length === 0 && !loading) {
     return (
-      <Card className="glass-card">
-        <CardContent className="text-center py-12 space-y-4">
-          <div className="w-16 h-16 bg-gradient-primary rounded-full mx-auto opacity-20 flex items-center justify-center">
-            <Heart className="w-8 h-8 text-white" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold">Welcome to the Community!</h3>
-            <p className="text-muted-foreground">
-              No posts yet. Be the first to share something inspiring with the community!
-            </p>
-          </div>
-          <Button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="bg-gradient-primary">
-            Create Your First Post
-          </Button>
-        </CardContent>
-      </Card>
+      <EmptyState
+        icon={Users}
+        title="Welcome to the Community!"
+        description="No posts yet. Be the first to share something inspiring with the community and start meaningful conversations!"
+        actionLabel="Create Your First Post"
+        onAction={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      />
     );
   }
 

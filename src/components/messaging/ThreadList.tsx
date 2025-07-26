@@ -3,9 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { EmptyState } from '@/components/ui/empty-state';
 import { MessageThread } from '@/services/messaging/MessagingService';
 import { UserSearch } from './UserSearch';
-import { Search, MessageCircle, Lock } from 'lucide-react';
+import { Search, MessageCircle, Lock, Users } from 'lucide-react';
 import { useViewport } from '@/hooks/use-mobile';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -86,11 +87,22 @@ export const ThreadList: React.FC<ThreadListProps> = ({
       
       <CardContent className="p-0">
         {threads.length === 0 ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">No conversations yet</h3>
-              <p className="text-muted-foreground mb-4">Start messaging with community members</p>
+          <div className="p-6">
+            <EmptyState
+              icon={Users}
+              title="Start Your First Conversation"
+              description="Connect with amazing women in our community! Share experiences, support each other, and build meaningful friendships."
+              actionLabel="Find Someone to Message"
+              onAction={() => {
+                // Focus on the user search component if it exists
+                const userSearchButton = document.querySelector('[data-user-search-trigger]');
+                if (userSearchButton) {
+                  (userSearchButton as HTMLElement).click();
+                }
+              }}
+              variant="compact"
+            />
+            <div className="mt-4">
               <UserSearch onStartConversation={onStartConversation} />
             </div>
           </div>

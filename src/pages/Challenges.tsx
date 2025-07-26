@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useToast } from '@/hooks/use-toast';
-import { Trophy, Target, Calendar, Star, TrendingUp, Users, Plus } from 'lucide-react';
+import { Trophy, Target, Calendar, Star, TrendingUp, Users, Plus, Zap } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -579,13 +580,13 @@ const Challenges: React.FC = () => {
           </div>
           
           {activeChallenges.length === 0 && (
-            <Card className="glass-card">
-              <CardContent className="text-center py-12">
-                <p className="text-muted-foreground">
-                  No new challenges available. Check back soon!
-                </p>
-              </CardContent>
-            </Card>
+            <EmptyState
+              icon={Target}
+              title="Ready for a Challenge?"
+              description="New challenges are on the way! These exciting opportunities will help you grow, achieve your goals, and earn rewards along the journey."
+              actionLabel="Create Challenge"
+              onAction={() => setShowCreateChallenge(true)}
+            />
           )}
         </TabsContent>
         
@@ -642,13 +643,21 @@ const Challenges: React.FC = () => {
           </div>
           
           {joinedChallenges.length === 0 && (
-            <Card className="glass-card">
-              <CardContent className="text-center py-12">
-                <p className="text-muted-foreground">
-                  No challenges in progress. Join a challenge to get started!
-                </p>
-              </CardContent>
-            </Card>
+            <EmptyState
+              icon={Zap}
+              title="Your Challenge Journey Awaits!"
+              description="Join your first challenge to start building healthy habits, earning rewards, and achieving your goals with our supportive community."
+              actionLabel="Browse Available Challenges"
+              onAction={() => {
+                const allTab = document.querySelector('[data-state="active"][value="all"]');
+                if (allTab) {
+                  (allTab as HTMLElement).click();
+                } else {
+                  // Fallback: scroll to top to see available challenges
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+            />
           )}
         </TabsContent>
         
@@ -696,13 +705,21 @@ const Challenges: React.FC = () => {
           </div>
           
           {completedChallenges.length === 0 && (
-            <Card className="glass-card">
-              <CardContent className="text-center py-12">
-                <p className="text-muted-foreground">
-                  No completed challenges yet. Start completing challenges to see them here!
-                </p>
-              </CardContent>
-            </Card>
+            <EmptyState
+              icon={Trophy}
+              title="Your Trophy Case Awaits!"
+              description="Complete challenges to see your achievements here. Each completed challenge brings you closer to your goals and unlocks amazing rewards!"
+              actionLabel="Start Your First Challenge"
+              onAction={() => {
+                const allTab = document.querySelector('[data-state="active"][value="all"]');
+                if (allTab) {
+                  (allTab as HTMLElement).click();
+                } else {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+              variant="compact"
+            />
           )}
         </TabsContent>
       </Tabs>

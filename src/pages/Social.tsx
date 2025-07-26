@@ -7,6 +7,7 @@ import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { AdvancedSearch, type SearchableItem } from '@/components/search/AdvancedSearch';
 import { useContentModeration, ReportModal, ContentWarning } from '@/components/moderation/ContentModeration';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useProgressiveEnhancement } from '@/hooks/useProgressiveEnhancement';
 import { dbPerformance } from '@/services/core/DatabasePerformanceService';
 
 // Import new components
@@ -59,6 +60,16 @@ const Social: React.FC = () => {
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { usePullToRefresh } = useProgressiveEnhancement();
+
+  // Initialize pull-to-refresh
+  usePullToRefresh(async () => {
+    await Promise.all([fetchPosts(), fetchStories()]);
+    toast({
+      title: "Refreshed",
+      description: "Posts and stories updated"
+    });
+  });
 
   useEffect(() => {
     // Temporarily load data even without user for testing
@@ -449,7 +460,13 @@ const Social: React.FC = () => {
   }
 
   return (
-    <div className={`container mx-auto ${isMobile ? 'px-2 py-2' : 'max-w-2xl px-4 py-4'} space-y-${isMobile ? '4' : '6'}`}>
+    <div className={`container mx-auto ${isMobile ? 'px-2 py-2' : 'max-w-2xl px-4 py-4'} space-y-${isMobile ? '4' : '6'}`} data-pull-refresh>
+      {/* Pull to refresh indicator - only visible on mobile */}
+      {isMobile && (
+        <div className="pull-refresh-indicator">
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
+        </div>
+      )}
       {/* Stories Section */}
       <StoriesBar stories={stories} isMobile={isMobile} />
 

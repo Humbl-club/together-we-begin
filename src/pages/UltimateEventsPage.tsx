@@ -23,6 +23,15 @@ const UltimateEventsPage = memo(() => {
   const { getEvents, createEvent, registerForEvent } = useEnhancedEventService();
   const { getLoadingStrategy, usePullToRefresh } = useProgressiveEnhancement();
   
+  // Initialize pull-to-refresh
+  usePullToRefresh(async () => {
+    await loadEvents(activeTab);
+    toast({
+      title: "Refreshed",
+      description: "Events updated"
+    });
+  });
+  
   const [events, setEvents] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('upcoming');
   const [loading, setLoading] = useState(true);
@@ -202,13 +211,6 @@ const UltimateEventsPage = memo(() => {
     };
   }, [loadEvents, activeTab]);
 
-  // Pull to refresh with performance tracking
-  usePullToRefresh(async () => {
-    performance.mark('pullToRefresh-start');
-    await loadEvents(activeTab);
-    performance.mark('pullToRefresh-end');
-    performance.measure('pullToRefresh-duration', 'pullToRefresh-start', 'pullToRefresh-end');
-  });
 
   // Initial load and tab changes
   useEffect(() => {
@@ -264,6 +266,12 @@ const UltimateEventsPage = memo(() => {
 
   return (
     <div className="min-h-screen bg-background mobile:p-2 sm:p-4 lg:p-6 safe-area-top" data-pull-refresh>
+      {/* Pull to refresh indicator - only visible on mobile */}
+      {isMobileOptimized && (
+        <div className="pull-refresh-indicator">
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
+        </div>
+      )}
       <div className="max-w-4xl mx-auto space-y-4">
         {/* Header */}
         <div className="glass-card-enhanced mobile:p-3 sm:p-4 lg:p-6">

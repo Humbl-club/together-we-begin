@@ -3,6 +3,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useViewport } from '@/hooks/use-mobile';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { useProgressiveEnhancement } from '@/hooks/useProgressiveEnhancement';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import StatsGrid from '@/components/dashboard/StatsGrid';
 import WellnessCard from '@/components/dashboard/WellnessCard';
@@ -11,6 +12,7 @@ import CommunityFeed from '@/components/dashboard/CommunityFeed';
 import WelcomeFlow from '@/components/onboarding/WelcomeFlow';
 import { DashboardSkeleton } from '@/components/ui/optimized-skeleton';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { useToast } from '@/hooks/use-toast';
 
 // Lazy load heavy components for better initial load performance
 const LazyWellnessCard = React.lazy(() => import('@/components/dashboard/WellnessCard'));
@@ -18,10 +20,21 @@ const LazyCommunityFeed = React.lazy(() => import('@/components/dashboard/Commun
 
 const Dashboard: React.FC = memo(() => {
   const { user } = useAuth();
-  const { stats, profile, loading } = useDashboardData(user?.id);
+  const { stats, profile, loading, refetch } = useDashboardData(user?.id);
   const { isMobile } = useViewport();
   const { handleError } = useErrorHandler();
+  const { usePullToRefresh } = useProgressiveEnhancement();
+  const { toast } = useToast();
   const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Initialize pull-to-refresh
+  usePullToRefresh(async () => {
+    await refetch();
+    toast({
+      title: "Refreshed",
+      description: "Dashboard data updated"
+    });
+  });
 
   console.log('Dashboard render:', { user, stats, profile, loading });
 
@@ -46,7 +59,13 @@ const Dashboard: React.FC = memo(() => {
     <ErrorBoundary>
       {showOnboarding && <WelcomeFlow onComplete={handleOnboardingComplete} />}
       
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20" data-pull-refresh>
+        {/* Pull to refresh indicator - only visible on mobile */}
+        {isMobile && (
+          <div className="pull-refresh-indicator">
+            <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
+          </div>
+        )}
         <div className="max-w-7xl mx-auto p-fluid-4 flow-content">
           {/* Header Section */}
           <DashboardHeader profile={profile} />

@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 import { Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react';
 
 interface FeedPostProps {
@@ -72,7 +73,7 @@ const FeedPost: React.FC<FeedPostProps> = memo(({
         {/* Image */}
         {image && (
           <div className="mb-4 rounded-lg overflow-hidden">
-            <img 
+            <OptimizedImage 
               src={image} 
               alt="Post content" 
               className="w-full h-48 object-cover"

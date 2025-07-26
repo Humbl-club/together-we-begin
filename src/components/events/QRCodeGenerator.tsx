@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { QrCode, Download, AlertCircle, CheckCircle2 } from 'lucide-react';
@@ -182,7 +183,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
             {qrDataURL && (
               <div className="text-center space-y-4">
                 <div className="bg-white p-4 rounded-lg inline-block">
-                  <img 
+                  <OptimizedImage 
                     src={qrDataURL} 
                     alt="Event QR Code" 
                     className="w-64 h-64 mx-auto"

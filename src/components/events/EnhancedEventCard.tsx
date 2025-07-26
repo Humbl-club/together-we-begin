@@ -17,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -185,11 +186,10 @@ export const EnhancedEventCard = memo(({
           : 'mobile:h-44 sm:h-52'
       )}>
         {event.image_url ? (
-          <img
+          <OptimizedImage
             src={event.image_url}
             alt={event.title}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-            loading="lazy"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center">

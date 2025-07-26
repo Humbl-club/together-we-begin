@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 import { Heart, MessageCircle, Share2, Flag, MoreHorizontal } from 'lucide-react';
 
 interface Post {
@@ -149,7 +150,7 @@ export const PostList: React.FC<PostListProps> = ({
             {post.image_urls && post.image_urls.length > 0 && (
               <div className="grid grid-cols-1 gap-2">
                 {post.image_urls.map((url, index) => (
-                  <img
+                  <OptimizedImage
                     key={index}
                     src={url}
                     alt={`Post image ${index + 1}`}

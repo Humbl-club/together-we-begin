@@ -106,31 +106,31 @@ const Challenges: React.FC = () => {
     if (!user) return;
     
     try {
-      // Fetch active challenges with user participations in single query
+      // First fetch all active challenges
       const { data: challengesData, error: challengesError } = await supabase
         .from('challenges')
-        .select(`
-          *,
-          challenge_participations!left (
-            id,
-            completed,
-            completion_date,
-            progress_data,
-            joined_at,
-            user_id
-          )
-        `)
+        .select('*')
         .eq('status', 'active')
-        .eq('challenge_participations.user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (challengesError) throw challengesError;
 
-      // Format challenges with participation data
-      const challengesWithParticipation = challengesData?.map(challenge => ({
-        ...challenge,
-        user_participation: (challenge.challenge_participations as any)?.[0] || null
-      })) || [];
+      // Then fetch user participations separately to avoid relationship issues
+      const { data: participationsData, error: participationsError } = await supabase
+        .from('challenge_participations')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (participationsError) throw participationsError;
+
+      // Combine the data
+      const challengesWithParticipation = challengesData?.map(challenge => {
+        const participation = participationsData?.find(p => p.challenge_id === challenge.id);
+        return {
+          ...challenge,
+          user_participation: participation || null
+        };
+      }) || [];
 
       setChallenges(challengesWithParticipation);
     } catch (error) {

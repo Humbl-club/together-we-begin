@@ -23,15 +23,22 @@ export class EventRepository {
   } = {}) {
     const { userId, status = 'upcoming', limit = 20, offset = 0 } = params;
     
-    const { data, error } = await supabase.rpc('get_events_optimized', {
-      user_id_param: userId || null,
-      status_filter: status,
-      limit_param: limit,
-      offset_param: offset
-    });
+    try {
+      const { data, error } = await supabase.rpc('get_events_optimized', {
+        user_id_param: userId || null,
+        status_filter: status,
+        limit_param: limit,
+        offset_param: offset
+      });
 
-    if (error) throw error;
-    return data;
+      if (error) throw error;
+      
+      // CRITICAL FIX: Handle null/undefined returns
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error('getEventsOptimized error:', error);
+      return []; // Fallback to empty array
+    }
   }
 
   // Create event with optimized data validation

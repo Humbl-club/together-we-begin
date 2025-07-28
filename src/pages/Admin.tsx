@@ -7,10 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Users, Calendar, Trophy, MessageSquare, Activity, BarChart3 } from 'lucide-react';
+import { Shield, Users, Calendar, Trophy, MessageSquare, Activity, BarChart3, UserCog } from 'lucide-react';
+import UserManagement from '@/components/admin/UserManagement';
 
 const Admin: React.FC = () => {
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [stats, setStats] = useState({
     totalUsers: 0,
     activeEvents: 0,
@@ -139,55 +141,69 @@ const Admin: React.FC = () => {
       </div>
 
       {/* Admin Navigation */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card className="glass-card hover:scale-105 transition-transform cursor-pointer" onClick={() => navigate('/admin/performance')}>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Activity className="w-8 h-8 text-blue-500" />
-              <div>
-                <h3 className="font-semibold">Performance Monitor</h3>
-                <p className="text-sm text-muted-foreground">Real-time app performance metrics</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card hover:scale-105 transition-transform cursor-pointer opacity-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Users className="w-8 h-8 text-green-500" />
-              <div>
-                <h3 className="font-semibold">User Management</h3>
-                <p className="text-sm text-muted-foreground">Coming soon</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card hover:scale-105 transition-transform cursor-pointer opacity-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <BarChart3 className="w-8 h-8 text-purple-500" />
-              <div>
-                <h3 className="font-semibold">Analytics Dashboard</h3>
-                <p className="text-sm text-muted-foreground">Coming soon</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex gap-2 mb-6">
+        <Button 
+          variant={activeTab === 'dashboard' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('dashboard')}
+          className="flex items-center gap-2"
+        >
+          <BarChart3 className="w-4 h-4" />
+          Dashboard
+        </Button>
+        <Button 
+          variant={activeTab === 'users' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('users')}
+          className="flex items-center gap-2"
+        >
+          <UserCog className="w-4 h-4" />
+          User Management
+        </Button>
       </div>
 
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle>Admin Features Coming Soon</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Advanced admin features including user management, invite system, and analytics will be available soon.
-            For now, you can access the Performance Monitor above to track application performance in real-time.
-          </p>
-        </CardContent>
-      </Card>
+      {activeTab === 'dashboard' && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <Card className="glass-card hover:scale-105 transition-transform cursor-pointer" onClick={() => navigate('/admin/performance')}>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <Activity className="w-8 h-8 text-blue-500" />
+                  <div>
+                    <h3 className="font-semibold">Performance Monitor</h3>
+                    <p className="text-sm text-muted-foreground">Real-time app performance metrics</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="glass-card hover:scale-105 transition-transform cursor-pointer opacity-50">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <BarChart3 className="w-8 h-8 text-purple-500" />
+                  <div>
+                    <h3 className="font-semibold">Analytics Dashboard</h3>
+                    <p className="text-sm text-muted-foreground">Coming soon</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="glass-card">
+            <CardHeader>
+              <CardTitle>Admin Features Coming Soon</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Advanced admin features including invite system and analytics will be available soon.
+                You can now access User Management above to manage user roles and permissions.
+              </p>
+            </CardContent>
+          </Card>
+        </>
+      )}
+
+      {activeTab === 'users' && <UserManagement />}
+
     </div>
   );
 };

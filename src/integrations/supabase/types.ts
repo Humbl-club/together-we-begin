@@ -1259,6 +1259,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_user_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _assigned_by: string
+        }
+        Returns: Json
+      }
       generate_event_qr_code: {
         Args: { event_id_param: string }
         Returns: Json
@@ -1314,6 +1322,17 @@ export type Database = {
           recent_activity: Json
         }[]
       }
+      get_users_with_roles: {
+        Args: { _requesting_user_id: string }
+        Returns: {
+          user_id: string
+          full_name: string
+          username: string
+          avatar_url: string
+          created_at: string
+          roles: Database["public"]["Enums"]["app_role"][]
+        }[]
+      }
       has_role: {
         Args: {
           _user_id: string
@@ -1332,6 +1351,14 @@ export type Database = {
       mark_thread_messages_read: {
         Args: { thread_id_param: string; user_id_param: string }
         Returns: undefined
+      }
+      remove_user_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _removed_by: string
+        }
+        Returns: Json
       }
     }
     Enums: {

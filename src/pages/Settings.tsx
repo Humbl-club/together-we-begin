@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -6,11 +6,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MobileToggle } from '@/components/ui/mobile-toggle';
-import { Bell, Shield, Heart, Users, Palette, Save, MessageCircle, Lock } from 'lucide-react';
+import { Bell, Shield, Heart, Users, Palette, Save, MessageCircle, Lock, Search, ChevronRight } from 'lucide-react';
 import { useUserSettings } from '@/hooks/useUserSettings';
+import { useViewport } from '@/hooks/use-mobile';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { MobileActionSheet } from '@/components/ui/mobile-action-sheet';
+import { SwipeableCard } from '@/components/ui/swipeable-card';
+import { cn } from '@/lib/utils';
 
 const Settings: React.FC = () => {
   const { settings, loading, saving, updateSetting } = useUserSettings();
+  const { isMobile } = useViewport();
+  const feedback = useHapticFeedback();
+  const [searchQuery, setSearchQuery] = useState('');
 
   if (loading) {
     return (
@@ -26,49 +34,138 @@ const Settings: React.FC = () => {
     );
   }
 
+  // Enhanced toggle handler with haptic feedback
+  const handleToggleChange = (section: any, key: any, value: boolean) => {
+    feedback.tap();
+    updateSetting(section, key, value);
+  };
+
+  // Settings sections for mobile
+  const settingSections = [
+    {
+      id: 'notifications',
+      title: 'Notifications',
+      icon: Bell,
+      description: 'Manage how you receive notifications'
+    },
+    {
+      id: 'privacy',
+      title: 'Privacy & Security',
+      icon: Shield,
+      description: 'Control your privacy settings'
+    },
+    {
+      id: 'messaging',
+      title: 'Messaging',
+      icon: MessageCircle,
+      description: 'Communication preferences'
+    },
+    {
+      id: 'wellness',
+      title: 'Wellness & Health',
+      icon: Heart,
+      description: 'Health tracking settings'
+    },
+    {
+      id: 'social',
+      title: 'Social Features',
+      icon: Users,
+      description: 'Social interaction settings'
+    },
+    {
+      id: 'appearance',
+      title: 'Appearance',
+      icon: Palette,
+      description: 'Customize your interface'
+    }
+  ];
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
+      {/* Header */}
       <div className="glass-card-enhanced p-6">
         <div className="flex items-center gap-4">
           <div className="p-3 rounded-xl bg-primary/10">
             <Palette className="w-8 h-8 text-primary" />
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="text-3xl font-bold">Settings</h1>
             <p className="text-muted-foreground">Customize your app experience</p>
           </div>
         </div>
+
+        {/* Search bar for mobile */}
+        {isMobile && (
+          <div className="mt-6 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input
+              placeholder="Search settings..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        )}
       </div>
 
-      <Tabs defaultValue="notifications" className="space-y-6">
-        <div className="w-full overflow-x-auto">
-          <TabsList className="inline-flex w-max min-w-full sm:grid sm:grid-cols-6 gap-1 p-1">
-            <TabsTrigger value="notifications" className="flex items-center gap-2 flex-shrink-0">
-              <Bell className="w-4 h-4" />
-              <span className="text-xs sm:text-sm">Notifications</span>
-            </TabsTrigger>
-            <TabsTrigger value="privacy" className="flex items-center gap-2 flex-shrink-0">
-              <Shield className="w-4 h-4" />
-              <span className="text-xs sm:text-sm">Privacy</span>
-            </TabsTrigger>
-            <TabsTrigger value="messaging" className="flex items-center gap-2 flex-shrink-0">
-              <MessageCircle className="w-4 h-4" />
-              <span className="text-xs sm:text-sm">Messaging</span>
-            </TabsTrigger>
-            <TabsTrigger value="wellness" className="flex items-center gap-2 flex-shrink-0">
-              <Heart className="w-4 h-4" />
-              <span className="text-xs sm:text-sm">Wellness</span>
-            </TabsTrigger>
-            <TabsTrigger value="social" className="flex items-center gap-2 flex-shrink-0">
-              <Users className="w-4 h-4" />
-              <span className="text-xs sm:text-sm">Social</span>
-            </TabsTrigger>
-            <TabsTrigger value="appearance" className="flex items-center gap-2 flex-shrink-0">
-              <Palette className="w-4 h-4" />
-              <span className="text-xs sm:text-sm">Appearance</span>
-            </TabsTrigger>
-          </TabsList>
+      {isMobile ? (
+        // Mobile vertical sections layout
+        <div className="space-y-4">
+          {settingSections.map((section) => {
+            const IconComponent = section.icon;
+            return (
+              <SwipeableCard key={section.id} className="p-0">
+                <Card className="border-0 shadow-none">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <IconComponent className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold">{section.title}</h3>
+                          <p className="text-sm text-muted-foreground">{section.description}</p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </SwipeableCard>
+            );
+          })}
         </div>
+      ) : (
+        // Desktop tabs layout
+        <Tabs defaultValue="notifications" className="space-y-6">
+          <div className="w-full overflow-x-auto">
+            <TabsList className="inline-flex w-max min-w-full sm:grid sm:grid-cols-6 gap-1 p-1">
+              <TabsTrigger value="notifications" className="flex items-center gap-2 flex-shrink-0">
+                <Bell className="w-4 h-4" />
+                <span className="text-xs sm:text-sm">Notifications</span>
+              </TabsTrigger>
+              <TabsTrigger value="privacy" className="flex items-center gap-2 flex-shrink-0">
+                <Shield className="w-4 h-4" />
+                <span className="text-xs sm:text-sm">Privacy</span>
+              </TabsTrigger>
+              <TabsTrigger value="messaging" className="flex items-center gap-2 flex-shrink-0">
+                <MessageCircle className="w-4 h-4" />
+                <span className="text-xs sm:text-sm">Messaging</span>
+              </TabsTrigger>
+              <TabsTrigger value="wellness" className="flex items-center gap-2 flex-shrink-0">
+                <Heart className="w-4 h-4" />
+                <span className="text-xs sm:text-sm">Wellness</span>
+              </TabsTrigger>
+              <TabsTrigger value="social" className="flex items-center gap-2 flex-shrink-0">
+                <Users className="w-4 h-4" />
+                <span className="text-xs sm:text-sm">Social</span>
+              </TabsTrigger>
+              <TabsTrigger value="appearance" className="flex items-center gap-2 flex-shrink-0">
+                <Palette className="w-4 h-4" />
+                <span className="text-xs sm:text-sm">Appearance</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
         <TabsContent value="notifications">
           <Card className="glass-card-enhanced">
@@ -511,7 +608,8 @@ const Settings: React.FC = () => {
             {saving ? 'Saving...' : 'Auto-saved'}
           </Button>
         </div>
-      </Tabs>
+        </Tabs>
+      )}
     </div>
   );
 };

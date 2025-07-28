@@ -35,7 +35,7 @@ export const useDashboardData = (userId?: string) => {
     full_name: 'Alexandra Chen',
     avatar_url: undefined
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start with loading true
   const { fetchWithCache } = useOptimizedData<any>('dashboard', 2 * 60 * 1000); // 2 minute cache
 
   const loadDashboardData = useCallback(async () => {

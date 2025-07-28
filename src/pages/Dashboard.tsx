@@ -80,7 +80,14 @@ const Dashboard: React.FC = memo(() => {
   };
 
   if (loading) {
-    return <DashboardSkeleton />;
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center space-y-4">
+          <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto"></div>
+          <p className="text-muted-foreground font-light">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   if (showOnboarding) {
@@ -245,7 +252,7 @@ const Dashboard: React.FC = memo(() => {
             {/* Community Feed */}
             {isEnhanced && (
               <Suspense fallback={<div className="h-96 bg-muted rounded-xl animate-pulse" />}>
-                <LazyCommunityFeed />
+                <CommunityFeed />
               </Suspense>
             )}
           </div>
@@ -253,7 +260,7 @@ const Dashboard: React.FC = memo(() => {
           <div className="space-y-6">
             {/* Enhanced Wellness Card */}
             <Suspense fallback={<div className="h-64 bg-muted rounded-xl animate-pulse" />}>
-              <LazyWellnessCard
+              <WellnessCard
                 steps={8420}
                 goalSteps={10000}
                 leaderboardPosition={12}

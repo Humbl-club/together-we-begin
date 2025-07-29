@@ -14,6 +14,8 @@ import ContentModeration from '@/components/admin/ContentModeration';
 import EventManagement from '@/components/admin/EventManagement';
 import ChallengeManagement from '@/components/admin/ChallengeManagement';
 import NotificationManagement from '@/components/admin/NotificationManagement';
+import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
+import SystemConfiguration from '@/components/admin/SystemConfiguration';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
 const Admin: React.FC = () => {
@@ -164,12 +166,14 @@ const Admin: React.FC = () => {
                 </Card>
               </>
             )}
+            {activeTab === 'analytics' && <AnalyticsDashboard />}
             {activeTab === 'users' && <UserManagement />}
             {activeTab === 'invites' && <InviteManagement />}
             {activeTab === 'moderation' && <ContentModeration />}
             {activeTab === 'events' && <EventManagement />}
             {activeTab === 'challenges' && <ChallengeManagement />}
             {activeTab === 'notifications' && <NotificationManagement />}
+            {activeTab === 'settings' && <SystemConfiguration />}
 
           </main>
         </div>

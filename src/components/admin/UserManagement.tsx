@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { Search, UserPlus, Shield, ShieldOff, Crown, Users } from 'lucide-react';
+import { Search, UserPlus, Shield, ShieldOff, Crown, Users, UserX, UserCheck } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -34,6 +34,8 @@ interface UserWithRoles {
   avatar_url: string;
   created_at: string;
   roles: string[];
+  is_active?: boolean;
+  last_login?: string;
 }
 
 const UserManagement: React.FC = () => {
@@ -124,6 +126,40 @@ const UserManagement: React.FC = () => {
       toast({
         title: 'Error',
         description: error.message || 'Failed to remove role',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
+    try {
+      // For now, we'll update a field in profiles table to track active status
+      // In a real implementation, you might disable auth access
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_active: !currentStatus })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      // Log admin action
+      await supabase.rpc('log_admin_action', {
+        action_text: currentStatus ? 'user_suspended' : 'user_activated',
+        target_type_text: 'user',
+        target_id_param: userId,
+        details_param: { new_status: !currentStatus }
+      });
+
+      toast({
+        title: 'Success',
+        description: `User ${!currentStatus ? 'activated' : 'suspended'} successfully`,
+      });
+
+      loadUsers();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to update user status',
         variant: 'destructive',
       });
     }
@@ -294,6 +330,56 @@ const UserManagement: React.FC = () => {
                     ) : (
                       <Badge variant="outline">No roles</Badge>
                     )}
+                  </div>
+
+                  {/* User Status Badge */}
+                  <Badge variant={userData.is_active !== false ? "default" : "destructive"}>
+                    {userData.is_active !== false ? "Active" : "Suspended"}
+                  </Badge>
+
+                  {/* User Actions */}
+                  <div className="flex gap-2">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className={userData.is_active !== false ? "text-red-600 hover:text-red-700" : "text-green-600 hover:text-green-700"}
+                        >
+                          {userData.is_active !== false ? (
+                            <>
+                              <UserX className="w-4 h-4 mr-1" />
+                              Suspend
+                            </>
+                          ) : (
+                            <>
+                              <UserCheck className="w-4 h-4 mr-1" />
+                              Activate
+                            </>
+                          )}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            {userData.is_active !== false ? 'Suspend User' : 'Activate User'}
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to {userData.is_active !== false ? 'suspend' : 'activate'} {userData.full_name}?
+                            {userData.is_active !== false && ' This will prevent them from accessing the platform.'}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={() => toggleUserStatus(userData.user_id, userData.is_active !== false)}
+                            className={userData.is_active !== false ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}
+                          >
+                            {userData.is_active !== false ? 'Suspend User' : 'Activate User'}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               </div>

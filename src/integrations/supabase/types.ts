@@ -837,6 +837,7 @@ export type Database = {
           full_name: string | null
           id: string
           instagram_handle: string | null
+          is_active: boolean
           location: string | null
           public_key: string | null
           total_loyalty_points: number | null
@@ -851,6 +852,7 @@ export type Database = {
           full_name?: string | null
           id: string
           instagram_handle?: string | null
+          is_active?: boolean
           location?: string | null
           public_key?: string | null
           total_loyalty_points?: number | null
@@ -865,6 +867,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           instagram_handle?: string | null
+          is_active?: boolean
           location?: string | null
           public_key?: string | null
           total_loyalty_points?: number | null
@@ -1449,6 +1452,7 @@ export type Database = {
           avatar_url: string
           created_at: string
           roles: Database["public"]["Enums"]["app_role"][]
+          is_active: boolean
         }[]
       }
       has_role: {

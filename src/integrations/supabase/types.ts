@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_actions: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          target_id: string | null
+          target_type: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_type: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_type?: string
+        }
+        Relationships: []
+      }
       blocked_users: {
         Row: {
           blocked_id: string
@@ -464,8 +494,12 @@ export type Database = {
           code: string
           created_at: string | null
           created_by: string | null
+          current_uses: number | null
           expires_at: string | null
           id: string
+          invite_type: string | null
+          max_uses: number | null
+          metadata: Json | null
           notes: string | null
           status: Database["public"]["Enums"]["invite_status"] | null
           used_at: string | null
@@ -475,8 +509,12 @@ export type Database = {
           code: string
           created_at?: string | null
           created_by?: string | null
+          current_uses?: number | null
           expires_at?: string | null
           id?: string
+          invite_type?: string | null
+          max_uses?: number | null
+          metadata?: Json | null
           notes?: string | null
           status?: Database["public"]["Enums"]["invite_status"] | null
           used_at?: string | null
@@ -486,8 +524,12 @@ export type Database = {
           code?: string
           created_at?: string | null
           created_by?: string | null
+          current_uses?: number | null
           expires_at?: string | null
           id?: string
+          invite_type?: string | null
+          max_uses?: number | null
+          metadata?: Json | null
           notes?: string | null
           status?: Database["public"]["Enums"]["invite_status"] | null
           used_at?: string | null
@@ -569,6 +611,42 @@ export type Database = {
           last_message_id?: string | null
           participant_1?: string
           participant_2?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notification_templates: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          name: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          title: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          title?: string
+          type?: string
           updated_at?: string
         }
         Relationships: []
@@ -932,6 +1010,36 @@ export type Database = {
         }
         Relationships: []
       }
+      system_config: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       user_analytics: {
         Row: {
           challenges_completed: number | null
@@ -1267,6 +1375,16 @@ export type Database = {
         }
         Returns: Json
       }
+      create_invite_code: {
+        Args: {
+          _created_by: string
+          _invite_type?: string
+          _max_uses?: number
+          _expires_at?: string
+          _notes?: string
+        }
+        Returns: Json
+      }
       generate_event_qr_code: {
         Args: { event_id_param: string }
         Returns: Json
@@ -1344,6 +1462,15 @@ export type Database = {
         Args: { _user_id: string }
         Returns: boolean
       }
+      log_admin_action: {
+        Args: {
+          action_text: string
+          target_type_text: string
+          target_id_param?: string
+          details_param?: Json
+        }
+        Returns: undefined
+      }
       mark_event_attendance: {
         Args: { event_qr_token: string; scanning_user_id: string }
         Returns: Json
@@ -1358,6 +1485,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _removed_by: string
         }
+        Returns: Json
+      }
+      use_invite_code: {
+        Args: { _code: string; _user_id: string }
         Returns: Json
       }
     }

@@ -1,5 +1,5 @@
 import { Layout } from '@/components/layout/Layout';
-import { OptimizedMessaging } from '@/components/messaging/OptimizedMessaging';
+import { DirectMessaging } from '@/components/messaging/DirectMessaging';
 import { MessageCircle } from 'lucide-react';
 
 export default function Messages() {
@@ -15,7 +15,7 @@ export default function Messages() {
             </div>
           </div>
 
-          <OptimizedMessaging />
+          <DirectMessaging />
         </div>
       </div>
     </Layout>

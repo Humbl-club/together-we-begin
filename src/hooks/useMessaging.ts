@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { supabase } from '@/integrations/supabase/client';
 import { MessagingService, MessageThread, DirectMessage } from '@/services/messaging/MessagingService';
 import { useToast } from '@/hooks/use-toast';
 import { useMessageCache } from './useMessageCache';
@@ -36,8 +37,67 @@ export const useMessaging = () => {
     if (user?.id) {
       messagingService.initialize(user.id);
       loadThreads();
+      
+      // Set up global real-time subscription for all threads
+      const subscription = supabase
+        .channel('user_messages')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'direct_messages',
+            filter: `or(sender_id.eq.${user.id},recipient_id.eq.${user.id})`
+          },
+          async (payload) => {
+            console.log('New message received:', payload);
+            
+            // Find which thread this message belongs to
+            const newMessage = payload.new as any;
+            const otherUserId = newMessage.sender_id === user.id 
+              ? newMessage.recipient_id 
+              : newMessage.sender_id;
+            
+            // For now, just refresh threads to update counts
+            // In a real implementation, you'd check if this message belongs to current thread
+            loadThreads();
+            
+            // If this message is for the currently selected thread, add it optimistically
+            if (selectedThread) {
+              const selectedThreadData = threads.find(t => t.id === selectedThread);
+              if (selectedThreadData) {
+                const isMessageForCurrentThread = (
+                  (newMessage.sender_id === selectedThreadData.participant_1 && newMessage.recipient_id === selectedThreadData.participant_2) ||
+                  (newMessage.sender_id === selectedThreadData.participant_2 && newMessage.recipient_id === selectedThreadData.participant_1)
+                );
+                
+                if (isMessageForCurrentThread) {
+                  const displayMessage = {
+                    ...newMessage,
+                    content: newMessage.sender_id === user.id 
+                      ? newMessage.content 
+                      : '[New message - refresh to decrypt]'
+                  };
+                  
+                  setMessages(prev => {
+                    // Avoid duplicates
+                    if (prev.some(msg => msg.id === displayMessage.id)) {
+                      return prev;
+                    }
+                    return [...prev, displayMessage];
+                  });
+                }
+              }
+            }
+          }
+        )
+        .subscribe();
+      
+      return () => {
+        subscription.unsubscribe();
+      };
     }
-  }, [user?.id]);
+  }, [user?.id, selectedThread, threads]);
 
   const loadThreads = useCallback(async () => {
     if (!user?.id) return;

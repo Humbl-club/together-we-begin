@@ -69,7 +69,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
               </Badge>
             )}
           </CardTitle>
-          <UserSearch onStartConversation={onStartConversation} />
+          <UserSearch onSelectUser={(userId, message) => onStartConversation(userId, message)} />
         </div>
         
         {!isMobile && threads.length > 0 && (
@@ -103,7 +103,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
               variant="compact"
             />
             <div className="mt-4">
-              <UserSearch onStartConversation={onStartConversation} />
+              <UserSearch onSelectUser={(userId, message) => onStartConversation(userId, message)} />
             </div>
           </div>
         ) : (

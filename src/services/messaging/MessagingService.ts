@@ -308,7 +308,7 @@ export class MessagingService {
     return true;
   }
 
-  private async findOrCreateThread(recipientId: string): Promise<string> {
+  async findOrCreateThread(recipientId: string): Promise<string> {
     if (!this.currentUserId) throw new Error('Not authenticated');
 
     // Try to find existing thread

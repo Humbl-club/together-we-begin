@@ -1,149 +1,198 @@
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Plus, MessageCircle } from 'lucide-react';
+import { Search, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useToast } from '@/hooks/use-toast';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface User {
   id: string;
   full_name: string;
+  username: string;
   avatar_url?: string;
-  username?: string;
 }
 
 interface UserSearchProps {
-  onStartConversation: (userId: string, userName: string) => void;
+  onSelectUser: (userId: string, message: string) => void;
 }
 
-export const UserSearch: React.FC<UserSearchProps> = ({ onStartConversation }) => {
-  const [open, setOpen] = useState(false);
+export const UserSearch: React.FC<UserSearchProps> = ({ onSelectUser }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [message, setMessage] = useState('');
   const { user: currentUser } = useAuth();
-  const { toast } = useToast();
 
-  const searchUsers = async (query: string) => {
-    if (!query.trim() || !currentUser?.id) return;
+  useEffect(() => {
+    if (searchQuery.trim().length >= 2) {
+      searchUsers();
+    } else {
+      setUsers([]);
+    }
+  }, [searchQuery]);
 
+  const searchUsers = async () => {
+    if (!currentUser?.id) return;
+    
     try {
       setLoading(true);
+      
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url, username')
-        .or(`full_name.ilike.%${query}%,username.ilike.%${query}%`)
-        .neq('id', currentUser.id)
+        .select('id, full_name, username, avatar_url')
+        .neq('id', currentUser.id) // Exclude current user
+        .or(`full_name.ilike.%${searchQuery}%,username.ilike.%${searchQuery}%`)
         .limit(10);
 
       if (error) throw error;
+
       setUsers(data || []);
     } catch (error) {
       console.error('Error searching users:', error);
-      toast({
-        title: "Error",
-        description: "Failed to search users",
-        variant: "destructive"
-      });
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      if (searchQuery.trim().length >= 2) {
-        searchUsers(searchQuery);
-      } else {
-        setUsers([]);
-      }
-    }, 300);
+  const handleStartConversation = () => {
+    if (selectedUser && message.trim()) {
+      onSelectUser(selectedUser.id, message.trim());
+      setSelectedUser(null);
+      setMessage('');
+      setSearchQuery('');
+      setUsers([]);
+    }
+  };
 
-    return () => clearTimeout(debounceTimer);
-  }, [searchQuery]);
-
-  const handleStartConversation = (user: User) => {
-    onStartConversation(user.id, user.full_name);
-    setOpen(false);
-    setSearchQuery('');
+  const handleUserSelect = (user: User) => {
+    setSelectedUser(user);
+    setSearchQuery(user.full_name);
     setUsers([]);
   };
 
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Plus className="h-4 w-4" />
-          New Message
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5" />
-            Start New Conversation
-          </DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search for members..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          
-          <div className="max-h-60 overflow-y-auto space-y-2">
-            {loading && (
-              <div className="text-center py-4 text-muted-foreground">
-                Searching...
-              </div>
+  if (selectedUser) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+          <Avatar>
+            <AvatarImage src={selectedUser.avatar_url} />
+            <AvatarFallback>
+              {selectedUser.full_name.split(' ').map(n => n[0]).join('')}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="font-medium">{selectedUser.full_name}</p>
+            {selectedUser.username && (
+              <p className="text-sm text-muted-foreground">@{selectedUser.username}</p>
             )}
-            
-            {!loading && searchQuery.length >= 2 && users.length === 0 && (
-              <div className="text-center py-4 text-muted-foreground">
-                No users found
-              </div>
-            )}
-            
-            {users.map((user) => (
-              <div
-                key={user.id}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted cursor-pointer transition-colors"
-                onClick={() => handleStartConversation(user)}
-              >
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={user.avatar_url} />
-                  <AvatarFallback>
-                    {user.full_name.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{user.full_name}</p>
-                  {user.username && (
-                    <p className="text-sm text-muted-foreground truncate">@{user.username}</p>
-                  )}
-                </div>
-                <Button variant="ghost" size="sm">
-                  Message
-                </Button>
-              </div>
-            ))}
           </div>
-          
-          {searchQuery.length < 2 && (
-            <div className="text-center py-6 text-muted-foreground">
-              <MessageCircle className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>Enter at least 2 characters to search for members</p>
-            </div>
-          )}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setSelectedUser(null)}
+            className="ml-auto"
+          >
+            Change
+          </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+
+        <div className="space-y-2">
+          <Label htmlFor="message">First Message</Label>
+          <Textarea
+            id="message"
+            placeholder="Write your first message..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            rows={3}
+            maxLength={500}
+          />
+          <p className="text-xs text-muted-foreground">
+            {message.length}/500 characters
+          </p>
+        </div>
+
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleStartConversation}
+            disabled={!message.trim()}
+            className="flex-1"
+          >
+            <Send className="w-4 h-4 mr-2" />
+            Start Conversation
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setSelectedUser(null);
+              setMessage('');
+            }}
+          >
+            Cancel
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search for users by name or username..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
+      {loading && (
+        <div className="text-center py-4">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-sm text-muted-foreground">Searching...</p>
+        </div>
+      )}
+
+      {users.length > 0 && (
+        <div className="space-y-2 max-h-60 overflow-y-auto">
+          {users.map((user) => (
+            <div
+              key={user.id}
+              className="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg cursor-pointer"
+              onClick={() => handleUserSelect(user)}
+            >
+              <Avatar>
+                <AvatarImage src={user.avatar_url} />
+                <AvatarFallback>
+                  {user.full_name.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <p className="font-medium">{user.full_name}</p>
+                {user.username && (
+                  <p className="text-sm text-muted-foreground">@{user.username}</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {searchQuery.length >= 2 && !loading && users.length === 0 && (
+        <div className="text-center py-4">
+          <p className="text-sm text-muted-foreground">No users found matching "{searchQuery}"</p>
+        </div>
+      )}
+
+      {searchQuery.length < 2 && (
+        <div className="text-center py-4">
+          <p className="text-sm text-muted-foreground">Type at least 2 characters to search for users</p>
+        </div>
+      )}
+    </div>
   );
 };

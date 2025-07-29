@@ -50,7 +50,7 @@ interface Challenge {
   winner_reward_points: number;
   runner_up_reward_points: number;
   participation_reward_points: number;
-  status: 'draft' | 'active' | 'completed' | 'cancelled';
+  status: 'draft' | 'active' | 'completed';
   auto_award_enabled: boolean;
   badge_name: string | null;
   badge_image_url: string | null;
@@ -179,7 +179,7 @@ const ChallengeManagement: React.FC = () => {
     }
   };
 
-  const updateChallengeStatus = async (challengeId: string, status: string) => {
+  const updateChallengeStatus = async (challengeId: string, status: 'draft' | 'active' | 'completed') => {
     try {
       const { error } = await supabase
         .from('challenges')
@@ -618,7 +618,7 @@ const ChallengeManagement: React.FC = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Select onValueChange={(value) => updateChallengeStatus(challenge.id, value)}>
+                  <Select onValueChange={(value) => updateChallengeStatus(challenge.id, value as 'draft' | 'active' | 'completed')}>
                     <SelectTrigger className="w-32">
                       <SelectValue placeholder="Actions..." />
                     </SelectTrigger>
@@ -626,7 +626,6 @@ const ChallengeManagement: React.FC = () => {
                       <SelectItem value="draft">Set Draft</SelectItem>
                       <SelectItem value="active">Activate</SelectItem>
                       <SelectItem value="completed">Complete</SelectItem>
-                      <SelectItem value="cancelled">Cancel</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

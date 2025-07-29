@@ -52,42 +52,52 @@ export const useMessaging = () => {
           async (payload) => {
             console.log('New message received:', payload);
             
-            // Find which thread this message belongs to
-            const newMessage = payload.new as any;
-            const otherUserId = newMessage.sender_id === user.id 
-              ? newMessage.recipient_id 
-              : newMessage.sender_id;
-            
-            // For now, just refresh threads to update counts
-            // In a real implementation, you'd check if this message belongs to current thread
-            loadThreads();
-            
-            // If this message is for the currently selected thread, add it optimistically
-            if (selectedThread) {
-              const selectedThreadData = threads.find(t => t.id === selectedThread);
-              if (selectedThreadData) {
-                const isMessageForCurrentThread = (
-                  (newMessage.sender_id === selectedThreadData.participant_1 && newMessage.recipient_id === selectedThreadData.participant_2) ||
-                  (newMessage.sender_id === selectedThreadData.participant_2 && newMessage.recipient_id === selectedThreadData.participant_1)
-                );
-                
-                if (isMessageForCurrentThread) {
-                  const displayMessage = {
-                    ...newMessage,
-                    content: newMessage.sender_id === user.id 
-                      ? newMessage.content 
-                      : '[New message - refresh to decrypt]'
-                  };
+            try {
+              const newMessage = payload.new as any;
+              
+              // Always refresh threads to update last message and counts
+              await loadThreads();
+              
+              // If this message is for the currently selected thread, add it to messages
+              if (selectedThread) {
+                const selectedThreadData = threads.find(t => t.id === selectedThread);
+                if (selectedThreadData) {
+                  const isMessageForCurrentThread = (
+                    (newMessage.sender_id === selectedThreadData.participant_1 && newMessage.recipient_id === selectedThreadData.participant_2) ||
+                    (newMessage.sender_id === selectedThreadData.participant_2 && newMessage.recipient_id === selectedThreadData.participant_1)
+                  );
                   
-                  setMessages(prev => {
-                    // Avoid duplicates
-                    if (prev.some(msg => msg.id === displayMessage.id)) {
-                      return prev;
+                  if (isMessageForCurrentThread) {
+                    // For received messages, show encrypted content placeholder for now
+                    // Real decryption happens when messages are reloaded
+                    const displayMessage = {
+                      ...newMessage,
+                      content: newMessage.sender_id === user.id 
+                        ? newMessage.content 
+                        : '[New message - refresh to decrypt]'
+                    };
+                    
+                    setMessages(prev => {
+                      // Avoid duplicates
+                      if (prev.some(msg => msg.id === displayMessage.id)) {
+                        return prev;
+                      }
+                      return [...prev, displayMessage];
+                    });
+                    
+                    // Mark as read if user is viewing the thread
+                    if (newMessage.recipient_id === user.id) {
+                      setTimeout(() => {
+                        messagingService.markThreadAsRead(selectedThread);
+                      }, 1000);
                     }
-                    return [...prev, displayMessage];
-                  });
+                  }
                 }
               }
+            } catch (error) {
+              console.error('Error handling real-time message:', error);
+              // Fallback: just refresh threads
+              await loadThreads();
             }
           }
         )

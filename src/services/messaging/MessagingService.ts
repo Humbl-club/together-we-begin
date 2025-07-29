@@ -394,20 +394,25 @@ export class MessagingService {
   }
 
   private async isMessageForThread(message: any, threadId: string): Promise<boolean> {
-    // Get thread participants
-    const { data: thread } = await supabase
-      .from('message_threads')
-      .select('participant_1, participant_2')
-      .eq('id', threadId)
-      .single();
-    
-    if (!thread) return false;
-    
-    // Check if message is between the thread participants
-    return (
-      (message.sender_id === thread.participant_1 && message.recipient_id === thread.participant_2) ||
-      (message.sender_id === thread.participant_2 && message.recipient_id === thread.participant_1)
-    );
+    try {
+      // Get thread participants
+      const { data: thread } = await supabase
+        .from('message_threads')
+        .select('participant_1, participant_2')
+        .eq('id', threadId)
+        .single();
+      
+      if (!thread) return false;
+      
+      // Check if message is between the thread participants
+      return (
+        (message.sender_id === thread.participant_1 && message.recipient_id === thread.participant_2) ||
+        (message.sender_id === thread.participant_2 && message.recipient_id === thread.participant_1)
+      );
+    } catch (error) {
+      console.error('Error checking if message is for thread:', error);
+      return false;
+    }
   }
 
   private async getUserProfile(userId: string): Promise<{ public_key: string } | null> {

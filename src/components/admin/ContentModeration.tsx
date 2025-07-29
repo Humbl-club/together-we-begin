@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Search, 
   Eye, 
@@ -16,7 +18,12 @@ import {
   MessageSquare,
   ImageIcon,
   Calendar,
-  Flag
+  Flag,
+  Trash2,
+  Archive,
+  MoreHorizontal,
+  Clock,
+  UserCheck
 } from 'lucide-react';
 import {
   Select,
@@ -58,6 +65,20 @@ interface ContentReport {
   content_preview?: string;
 }
 
+interface ModerationAction {
+  id: string;
+  admin_id: string;
+  action: string;
+  target_type: string;
+  target_id: string;
+  details: any;
+  created_at: string;
+  admin_profile?: {
+    full_name: string;
+    avatar_url: string;
+  };
+}
+
 const ContentModeration: React.FC = () => {
   const [reports, setReports] = useState<ContentReport[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,13 +88,20 @@ const ContentModeration: React.FC = () => {
   const [selectedReport, setSelectedReport] = useState<ContentReport | null>(null);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [reviewNotes, setReviewNotes] = useState('');
+  const [selectedReports, setSelectedReports] = useState<string[]>([]);
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [moderationHistory, setModerationHistory] = useState<ModerationAction[]>([]);
+  const [activeTab, setActiveTab] = useState('reports');
   
   const { user } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
     loadReports();
-  }, []);
+    if (activeTab === 'history') {
+      loadModerationHistory();
+    }
+  }, [activeTab]);
 
   const loadReports = async () => {
     try {
@@ -119,6 +147,85 @@ const ContentModeration: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadModerationHistory = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('admin_actions')
+        .select(`
+          id,
+          admin_id,
+          action,
+          target_type,
+          target_id,
+          details,
+          created_at
+        `)
+        .ilike('action', '%content%')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+      
+      // Get admin profiles separately
+      const adminIds = [...new Set(data?.map(action => action.admin_id) || [])];
+      const { data: adminProfiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', adminIds);
+
+      const historyWithProfiles = data?.map(action => ({
+        ...action,
+        admin_profile: adminProfiles?.find(profile => profile.id === action.admin_id)
+      })) || [];
+
+      setModerationHistory(historyWithProfiles as ModerationAction[]);
+    } catch (error) {
+      console.error('Error loading moderation history:', error);
+    }
+  };
+
+  const handleBulkAction = async (action: 'approve' | 'reject') => {
+    if (selectedReports.length === 0) return;
+    
+    setBulkProcessing(true);
+    try {
+      const { error } = await supabase
+        .from('content_reports')
+        .update({
+          status: action === 'approve' ? 'approved' : 'rejected',
+          reviewed_by: user?.id,
+          reviewed_at: new Date().toISOString()
+        })
+        .in('id', selectedReports);
+
+      if (error) throw error;
+
+      // Log bulk admin action
+      await supabase.rpc('log_admin_action', {
+        action_text: `bulk_content_report_${action}`,
+        target_type_text: 'content_report_bulk',
+        target_id_param: null,
+        details_param: { report_ids: selectedReports, count: selectedReports.length }
+      });
+
+      toast({
+        title: 'Success',
+        description: `${selectedReports.length} reports ${action}d successfully`,
+      });
+
+      setSelectedReports([]);
+      loadReports();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || `Failed to ${action} reports`,
+        variant: 'destructive',
+      });
+    } finally {
+      setBulkProcessing(false);
     }
   };
 
@@ -295,137 +402,264 @@ const ContentModeration: React.FC = () => {
         </Card>
       </div>
 
-      {/* Search and Filters */}
-      <div className="flex gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <Input
-            placeholder="Search reports..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filter by status..." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
-          </SelectContent>
-        </Select>
-        
-        <Select value={filterType} onValueChange={setFilterType}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filter by type..." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="post">Posts</SelectItem>
-            <SelectItem value="comment">Comments</SelectItem>
-            <SelectItem value="event">Events</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="reports" className="flex items-center gap-2">
+            <Flag className="w-4 h-4" />
+            Reports Queue
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            Moderation History
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Reports List */}
-      <div className="space-y-4">
-        {filteredReports.map((report) => (
-          <Card key={report.id} className="glass-card">
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-4 flex-1">
+        <TabsContent value="reports" className="space-y-6">
+          {/* Search and Filters */}
+          <div className="flex gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search reports..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by status..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Select value={filterType} onValueChange={setFilterType}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by type..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="post">Posts</SelectItem>
+                <SelectItem value="comment">Comments</SelectItem>
+                <SelectItem value="event">Events</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Bulk Actions */}
+          {selectedReports.length > 0 && (
+            <Card className="glass-card border-primary">
+              <CardContent className="pt-4">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {getReasonIcon(report.reason)}
-                    {getContentTypeIcon(report.reported_content_type)}
+                    <Badge variant="secondary">{selectedReports.length} selected</Badge>
+                    <span className="text-sm text-muted-foreground">
+                      Bulk actions for selected reports
+                    </span>
                   </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold capitalize">{report.reason}</h3>
-                      <Badge variant={getStatusColor(report.status)}>
-                        {report.status}
-                      </Badge>
-                    </div>
-                    
-                    {report.description && (
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {report.description}
-                      </p>
-                    )}
-                    
-                    {report.content_preview && (
-                      <div className="bg-muted/50 p-3 rounded-lg mb-2">
-                        <p className="text-sm italic">
-                          "{report.content_preview}"
-                        </p>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <span>Reported by:</span>
-                        <Avatar className="w-5 h-5">
-                          <AvatarImage src={report.reporter_profile?.avatar_url} />
-                          <AvatarFallback>
-                            {report.reporter_profile?.full_name?.charAt(0) || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span>{report.reporter_profile?.full_name || 'Unknown'}</span>
-                      </div>
-                      
-                      {report.reported_user_profile && (
-                        <div className="flex items-center gap-1">
-                          <span>Against:</span>
-                          <Avatar className="w-5 h-5">
-                            <AvatarImage src={report.reported_user_profile?.avatar_url} />
-                            <AvatarFallback>
-                              {report.reported_user_profile?.full_name?.charAt(0) || 'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span>{report.reported_user_profile?.full_name || 'Unknown'}</span>
-                        </div>
-                      )}
-                      
-                      <span>{new Date(report.created_at).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {report.status === 'pending' && (
                   <div className="flex gap-2">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleBulkAction('approve')}
+                      disabled={bulkProcessing}
+                    >
+                      <CheckCircle className="w-4 h-4 mr-1" />
+                      Approve All
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => {
-                        setSelectedReport(report);
-                        setShowReviewDialog(true);
-                      }}
+                      onClick={() => handleBulkAction('reject')}
+                      disabled={bulkProcessing}
                     >
-                      <Eye className="w-4 h-4 mr-1" />
-                      Review
+                      <XCircle className="w-4 h-4 mr-1" />
+                      Reject All
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedReports([])}
+                    >
+                      Clear Selection
                     </Button>
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-      {filteredReports.length === 0 && (
-        <div className="text-center py-12">
-          <Flag className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No reports found</h3>
-          <p className="text-muted-foreground">
-            {searchTerm ? 'Try adjusting your search terms.' : 'No content reports match your filters.'}
-          </p>
-        </div>
-      )}
+          {/* Reports List */}
+          <div className="space-y-4">
+            {filteredReports.map((report) => (
+              <Card key={report.id} className="glass-card">
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-4 flex-1">
+                      {report.status === 'pending' && (
+                        <Checkbox
+                          checked={selectedReports.includes(report.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedReports([...selectedReports, report.id]);
+                            } else {
+                              setSelectedReports(selectedReports.filter(id => id !== report.id));
+                            }
+                          }}
+                        />
+                      )}
+                      
+                      <div className="flex items-center gap-2">
+                        {getReasonIcon(report.reason)}
+                        {getContentTypeIcon(report.reported_content_type)}
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="font-semibold capitalize">{report.reason}</h3>
+                          <Badge variant={getStatusColor(report.status)}>
+                            {report.status}
+                          </Badge>
+                        </div>
+                        
+                        {report.description && (
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {report.description}
+                          </p>
+                        )}
+                        
+                        {report.content_preview && (
+                          <div className="bg-muted/50 p-3 rounded-lg mb-2">
+                            <p className="text-sm italic">
+                              "{report.content_preview}"
+                            </p>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <span>Reported by:</span>
+                            <Avatar className="w-5 h-5">
+                              <AvatarImage src={report.reporter_profile?.avatar_url} />
+                              <AvatarFallback>
+                                {report.reporter_profile?.full_name?.charAt(0) || 'U'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{report.reporter_profile?.full_name || 'Unknown'}</span>
+                          </div>
+                          
+                          {report.reported_user_profile && (
+                            <div className="flex items-center gap-1">
+                              <span>Against:</span>
+                              <Avatar className="w-5 h-5">
+                                <AvatarImage src={report.reported_user_profile?.avatar_url} />
+                                <AvatarFallback>
+                                  {report.reported_user_profile?.full_name?.charAt(0) || 'U'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span>{report.reported_user_profile?.full_name || 'Unknown'}</span>
+                            </div>
+                          )}
+                          
+                          <span>{new Date(report.created_at).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {report.status === 'pending' && (
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedReport(report);
+                            setShowReviewDialog(true);
+                          }}
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          Review
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {filteredReports.length === 0 && (
+            <div className="text-center py-12">
+              <Flag className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No reports found</h3>
+              <p className="text-muted-foreground">
+                {searchTerm ? 'Try adjusting your search terms.' : 'No content reports match your filters.'}
+              </p>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-6">
+          <div className="space-y-4">
+            {moderationHistory.map((action) => (
+              <Card key={action.id} className="glass-card">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex items-center gap-2">
+                      <UserCheck className="w-5 h-5 text-blue-500" />
+                    </div>
+                    
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-semibold capitalize">
+                          {action.action.replace(/_/g, ' ')}
+                        </h3>
+                        <Badge variant="outline">{action.target_type}</Badge>
+                      </div>
+                      
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <span>By:</span>
+                          <Avatar className="w-5 h-5">
+                            <AvatarImage src={action.admin_profile?.avatar_url} />
+                            <AvatarFallback>
+                              {action.admin_profile?.full_name?.charAt(0) || 'A'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span>{action.admin_profile?.full_name || 'Admin'}</span>
+                        </div>
+                        
+                        <span>{new Date(action.created_at).toLocaleDateString()}</span>
+                        
+                        {action.details && action.details.count && (
+                          <Badge variant="secondary">
+                            {action.details.count} items
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {moderationHistory.length === 0 && (
+            <div className="text-center py-12">
+              <Clock className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No moderation history</h3>
+              <p className="text-muted-foreground">
+                Moderation actions will appear here once you start reviewing content.
+              </p>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {/* Review Dialog */}
       <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>

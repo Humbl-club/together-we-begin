@@ -11,6 +11,9 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import UserManagement from '@/components/admin/UserManagement';
 import InviteManagement from '@/components/admin/InviteManagement';
 import ContentModeration from '@/components/admin/ContentModeration';
+import EventManagement from '@/components/admin/EventManagement';
+import ChallengeManagement from '@/components/admin/ChallengeManagement';
+import NotificationManagement from '@/components/admin/NotificationManagement';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
 const Admin: React.FC = () => {
@@ -164,6 +167,9 @@ const Admin: React.FC = () => {
             {activeTab === 'users' && <UserManagement />}
             {activeTab === 'invites' && <InviteManagement />}
             {activeTab === 'moderation' && <ContentModeration />}
+            {activeTab === 'events' && <EventManagement />}
+            {activeTab === 'challenges' && <ChallengeManagement />}
+            {activeTab === 'notifications' && <NotificationManagement />}
 
           </main>
         </div>

@@ -142,9 +142,12 @@ class PedometerService {
   public async startTracking(): Promise<boolean> {
     if (!Capacitor.isNativePlatform()) {
       console.warn('Motion tracking only available on native platforms');
-      // Start mock tracking for web development
-      this.startMockTracking();
-      return true;
+      // Only start mock tracking in development
+      if (import.meta.env?.DEV) {
+        this.startMockTracking();
+        return true;
+      }
+      return false;
     }
 
     try {
@@ -173,9 +176,12 @@ class PedometerService {
       return true;
     } catch (error) {
       console.error('Error starting pedometer tracking:', error);
-      // Fallback to mock tracking
-      this.startMockTracking();
-      return true;
+      // Only fallback to mock in development
+      if (import.meta.env?.DEV) {
+        this.startMockTracking();
+        return true;
+      }
+      return false;
     }
   }
 

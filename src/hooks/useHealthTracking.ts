@@ -80,9 +80,18 @@ export const useHealthTracking = () => {
           description: "Step tracking is now active!"
         });
       } else {
-        // Fallback for web/testing
-        setIsConnected(true);
-        startMockTracking();
+        // Only use mock tracking in development
+        if (import.meta.env.DEV) {
+          setIsConnected(true);
+          startMockTracking();
+        } else {
+          setIsConnected(false);
+          toast({
+            title: "Health Tracking Unavailable",
+            description: "Install the mobile app for step tracking",
+            variant: "destructive"
+          });
+        }
       }
     } catch (error) {
       console.error('Error initializing pedometer:', error);

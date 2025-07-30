@@ -9,27 +9,19 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        default: "card-accent text-primary hover:scale-105 shadow-sm touch-feedback",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm",
+        outline: "button-glass hover:card-secondary text-foreground",
+        secondary: "card-secondary text-foreground hover:card-primary",
+        ghost: "hover:card-secondary hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        editorial: "bg-editorial-charcoal text-white hover:bg-editorial-navy shadow-md font-normal tracking-wide",
-        "editorial-outline": "border border-editorial-charcoal text-editorial-charcoal hover:bg-editorial-charcoal hover:text-white font-normal tracking-wide",
-        "editorial-ghost": "text-editorial-charcoal hover:bg-editorial-warm-grey font-normal tracking-wide",
-        glass: "glass-button text-foreground hover:text-primary",
-        "glass-primary": "glass-button bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 hover:border-primary/30",
-        "glass-secondary": "glass-button bg-secondary/10 text-secondary-foreground border-secondary/20 hover:bg-secondary/20",
+        glass: "button-glass hover:card-secondary",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
+        default: "h-10 px-4 py-2 touch-target-large",
+        sm: "h-9 rounded-lg px-3",
+        lg: "h-12 rounded-lg px-8 touch-target-large",
+        icon: "h-10 w-10 touch-target-large",
       },
     },
     defaultVariants: {

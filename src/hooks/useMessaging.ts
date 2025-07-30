@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
-import { MessagingService, MessageThread, DirectMessage } from '@/services/messaging/MessagingService';
+import { OptimizedMessagingService } from '@/services/messaging/OptimizedMessagingService';
+import { MessageThread, DirectMessage } from '@/services/messaging/MessagingService';
 import { useToast } from '@/hooks/use-toast';
 import { useMessageCache } from './useMessageCache';
 import { useMessagePerformance } from './useMessagePerformance';
@@ -16,7 +17,7 @@ export const useMessaging = () => {
   
   const { user } = useAuth();
   const { toast } = useToast();
-  const messagingService = MessagingService.getInstance();
+  const messagingService = OptimizedMessagingService.getInstance();
   const { measureDatabase, measureEncryption } = useMessagePerformance();
   
   const {

@@ -277,12 +277,12 @@ const CommunityFeed: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <Card className="glass-card-enhanced">
+    <div className="space-mobile">
+      <Card className="card-primary">
         <CardHeader>
-          <h2 className="text-xl font-semibold">Community Feed</h2>
+          <h2 className="editorial-heading text-xl">Community Feed</h2>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-mobile">
           {/* Create Post */}
           <div className="space-y-4">
             <Textarea

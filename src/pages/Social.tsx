@@ -452,7 +452,7 @@ const Social: React.FC = () => {
   }
 
   return (
-    <div className={`container mx-auto ${isMobile ? 'px-2 py-2' : 'max-w-2xl px-4 py-4'} space-y-${isMobile ? '4' : '6'}`} data-pull-refresh>
+    <div className={`container mx-auto ${isMobile ? 'p-mobile' : 'max-w-2xl p-mobile'} space-mobile`} data-pull-refresh>
       {/* Pull to refresh indicator - only visible on mobile */}
       {isMobile && (
         <div className="pull-refresh-indicator">

@@ -31,15 +31,15 @@ const MobileStatsCard: React.FC<{
 
   return (
     <Card 
-      className="glass-card-enhanced touch-target-large cursor-pointer hover:scale-[1.03] transition-all duration-500 overflow-hidden"
+      className="card-primary touch-target-large cursor-pointer hover:scale-[1.03] transition-all duration-300 overflow-hidden"
       onClick={() => haptics.tap()}
     >
-      <CardContent className="p-5 space-y-4">
+      <CardContent className="p-mobile space-mobile">
         <div className="flex items-center justify-between">
           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${bgColor} shadow-lg`}>
             <Icon className={`w-6 h-6 ${color}`} strokeWidth={2.5} />
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <TrendingUp className={`w-3 h-3 ${trend === 'up' ? 'text-green-500' : 'text-muted-foreground'}`} />
             <Badge variant="secondary" className="text-xs font-bold bg-primary/15 text-primary border-0 px-2">
               {change}
@@ -47,7 +47,7 @@ const MobileStatsCard: React.FC<{
           </div>
         </div>
         
-        <div className="space-y-3">
+        <div className="space-mobile">
           <div>
             <div className="text-2xl font-bold tracking-tight mb-1">
               {value.toLocaleString()}
@@ -61,9 +61,6 @@ const MobileStatsCard: React.FC<{
             <Progress 
               value={progress} 
               className="h-2.5 bg-muted/30" 
-              style={{
-                '--progress-foreground': color.replace('text-', 'hsl(var(--') + '))'
-              } as React.CSSProperties}
             />
             <div className="flex justify-between items-center">
               <span className="text-xs text-muted-foreground font-medium">
@@ -128,7 +125,7 @@ const StatsGrid: React.FC<StatsGridProps> = memo(({ stats }) => {
 
   if (isMobile) {
     return (
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="responsive-grid grid-cols-2 mb-6">
         {statCards.map((card) => (
           <MobileStatsCard key={card.title} {...card} />
         ))}
@@ -136,17 +133,17 @@ const StatsGrid: React.FC<StatsGridProps> = memo(({ stats }) => {
     );
   }
 
-  // Desktop version with enhanced design
+  // Desktop version with unified design
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div className="responsive-grid grid-cols-2 lg:grid-cols-4 mb-6">
       {statCards.map(({ title, value, icon: Icon, color, bgColor, change, trend }) => (
-        <Card key={title} className="glass-card-enhanced hover:scale-[1.02] transition-all duration-300">
-          <CardContent className="p-6">
+        <Card key={title} className="card-primary hover:scale-[1.02] transition-all duration-300">
+          <CardContent className="p-mobile">
             <div className="flex items-center justify-between mb-4">
               <div className={`p-3 rounded-xl ${bgColor} shadow-sm`}>
                 <Icon className={`w-5 h-5 ${color}`} strokeWidth={2.5} />
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 <TrendingUp className={`w-3 h-3 ${trend === 'up' ? 'text-green-500' : 'text-muted-foreground'}`} />
                 <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-0 font-medium">
                   {change}

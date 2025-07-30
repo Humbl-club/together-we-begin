@@ -11,11 +11,11 @@ import { MobileFirstCard, MobileFirstCardContent, MobileFirstCardHeader, MobileF
 import { MobileNativeButton } from '@/components/ui/mobile-native-button';
 import { PullToRefresh } from '@/components/ui/pull-to-refresh';
 
-// Lazy-loaded components for better performance
+// Lazy-loaded mobile-optimized components
 const LazyStatsGrid = React.lazy(() => import('@/components/dashboard/StatsGrid'));
 const LazyWellnessCard = React.lazy(() => import('@/components/dashboard/WellnessCard'));
-const LazyUpcomingEvents = React.lazy(() => import('@/components/dashboard/UpcomingEvents'));
-const LazyCommunityFeed = React.lazy(() => import('@/components/dashboard/CommunityFeed'));
+const LazyMobileUpcomingEvents = React.lazy(() => import('@/components/dashboard/MobileUpcomingEvents'));
+const LazyMobileCommunityFeed = React.lazy(() => import('@/components/dashboard/MobileCommunityFeed'));
 
 // Icons
 import { RefreshCw, Search, QrCode, Bell, Plus, Calendar, Users, Zap, Menu } from 'lucide-react';
@@ -185,21 +185,15 @@ const MobileDashboard: React.FC = memo(() => {
 
             {/* Events Section */}
             <section>
-              <h2 className="text-lg font-semibold text-foreground mb-3 px-1">
-                What's Coming Up
-              </h2>
               <Suspense fallback={<div className="h-32 bg-muted rounded-2xl animate-pulse" />}>
-                <LazyUpcomingEvents />
+                <LazyMobileUpcomingEvents />
               </Suspense>
             </section>
 
             {/* Community Section */}
             <section>
-              <h2 className="text-lg font-semibold text-foreground mb-3 px-1">
-                Community Vibes
-              </h2>
               <Suspense fallback={<div className="h-64 bg-muted rounded-2xl animate-pulse" />}>
-                <LazyCommunityFeed />
+                <LazyMobileCommunityFeed />
               </Suspense>
             </section>
 

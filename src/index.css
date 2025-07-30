@@ -235,7 +235,7 @@
 
   /* Apple Glass Card System */
   .glass-card-enhanced {
-    @apply glass-card hover:shadow-3xl transition-all duration-500;
+    @apply glass-card hover:shadow-2xl transition-all duration-500;
     background: linear-gradient(135deg, 
       hsl(var(--glass-light)) 0%, 
       hsl(var(--glass-medium)) 100%);

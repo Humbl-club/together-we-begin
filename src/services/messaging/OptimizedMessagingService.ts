@@ -107,55 +107,84 @@ export class OptimizedMessagingService {
     if (!this.currentUserId) throw new Error('Not authenticated');
 
     try {
-      // Use the highly optimized single-query function
       const startTime = performance.now();
       
-      const { data: threadsData, error } = await supabase
-        .rpc('get_user_threads_optimized', {
-          user_id_param: this.currentUserId,
-          page_limit: limit,
-          page_offset: page * limit
-        });
+      // Add retry logic with exponential backoff for failed requests
+      let retries = 3;
+      let backoffMs = 1000;
+      
+      while (retries > 0) {
+        try {
+          const { data: threadsData, error } = await supabase
+            .rpc('get_user_threads_optimized', {
+              user_id_param: this.currentUserId,
+              page_limit: limit,
+              page_offset: page * limit
+            });
 
-      const queryTime = performance.now() - startTime;
-      console.log(`Thread loading took ${queryTime.toFixed(2)}ms`);
+          const queryTime = performance.now() - startTime;
+          
+          // Only log slow queries to reduce noise
+          if (queryTime > 1000) {
+            console.warn(`Slow thread loading: ${queryTime.toFixed(2)}ms`);
+          }
 
-      if (error) {
-        console.error('Error in optimized threads query:', error);
-        throw error;
-      }
+          if (error) {
+            console.error('Error in optimized threads query:', error);
+            throw error;
+          }
 
-      // Transform and cache profile data
-      const threads = (threadsData || []).map((row: any) => {
-        // Cache the profile data we received
-        if (row.other_user_id && row.other_user_name) {
-          this.profileCache.set(row.other_user_id, {
-            full_name: row.other_user_name,
-            avatar_url: row.other_user_avatar
-          });
-          this.cacheTimestamps.set(row.other_user_id, Date.now());
+          return this.processThreadsData(threadsData || []);
+        } catch (error: any) {
+          retries--;
+          if (retries === 0) throw error;
+          
+          // Network error - retry with backoff
+          if (error.message?.includes('fetch') || error.message?.includes('network')) {
+            console.log(`Retrying thread load in ${backoffMs}ms...`);
+            await new Promise(resolve => setTimeout(resolve, backoffMs));
+            backoffMs *= 2; // Exponential backoff
+          } else {
+            throw error; // Non-network errors should not retry
+          }
         }
-
-        return {
-          id: row.thread_id,
-          participant_1: row.participant_1,
-          participant_2: row.participant_2,
-          last_message_at: row.last_message_at,
-          last_message_id: row.last_message_id,
-          other_user: {
-            id: row.other_user_id,
-            full_name: row.other_user_name,
-            avatar_url: row.other_user_avatar
-          },
-          unread_count: Number(row.unread_count) || 0
-        };
-      });
-
-      return threads;
+      }
+      
+      return [];
     } catch (error) {
       console.error('Error fetching threads:', error);
       throw error;
     }
+  }
+
+  private processThreadsData(threadsData: any[]): MessageThread[] {
+    // Transform and cache profile data
+    const threads = threadsData.map((row: any) => {
+      // Cache the profile data we received
+      if (row.other_user_id && row.other_user_name) {
+        this.profileCache.set(row.other_user_id, {
+          full_name: row.other_user_name,
+          avatar_url: row.other_user_avatar
+        });
+        this.cacheTimestamps.set(row.other_user_id, Date.now());
+      }
+
+      return {
+        id: row.thread_id,
+        participant_1: row.participant_1,
+        participant_2: row.participant_2,
+        last_message_at: row.last_message_at,
+        last_message_id: row.last_message_id,
+        other_user: {
+          id: row.other_user_id,
+          full_name: row.other_user_name,
+          avatar_url: row.other_user_avatar
+        },
+        unread_count: Number(row.unread_count) || 0
+      };
+    });
+
+    return threads;
   }
 
   // Optimized mark as read with batching

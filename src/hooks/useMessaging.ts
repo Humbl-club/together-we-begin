@@ -6,6 +6,7 @@ import { MessageThread, DirectMessage } from '@/services/messaging/MessagingServ
 import { useToast } from '@/hooks/use-toast';
 import { useOptimizedMessageCache } from './useOptimizedMessageCache';
 import { useMessagePerformance } from './useMessagePerformance';
+import { useRequestDeduplication } from './useOptimizedRequests';
 
 export const useMessaging = () => {
   const [threads, setThreads] = useState<MessageThread[]>([]);
@@ -19,6 +20,7 @@ export const useMessaging = () => {
   const { toast } = useToast();
   const messagingService = OptimizedMessagingService.getInstance();
   const { measureDatabase, measureEncryption } = useMessagePerformance();
+  const { deduplicate, clearCache: clearRequestCache } = useRequestDeduplication();
   
   const {
     cacheMessages,
@@ -127,24 +129,22 @@ export const useMessaging = () => {
     if (!user?.id) return;
     
     try {
-      setLoading(true);
-      
       // Try to get cached threads first
       const cachedThreads = getCachedThreads();
       if (cachedThreads && cachedThreads.length > 0) {
         setThreads(cachedThreads);
-        setLoading(false);
         
-        // Only do background refresh if cache is getting stale (>2 minutes)
+        // Only do background refresh if cache is getting stale (>5 minutes)
         const cacheAge = Date.now() - (cachedThreads[0]?.last_message_at ? new Date(cachedThreads[0].last_message_at).getTime() : 0);
-        if (cacheAge > 2 * 60 * 1000) {
+        if (cacheAge > 5 * 60 * 1000) {
           setTimeout(() => {
             loadThreadsFromDatabase();
-          }, 2000); // Delayed background refresh
+          }, 5000); // Delayed background refresh to avoid UI blocking
         }
         return;
       }
       
+      setLoading(true);
       await loadThreadsFromDatabase();
     } catch (error) {
       console.error('Error loading threads:', error);
@@ -156,24 +156,34 @@ export const useMessaging = () => {
     } finally {
       setLoading(false);
     }
-  }, [user?.id, toast, getCachedThreads, cacheThreads, updateUnreadCount]);
+  }, [user?.id, toast, getCachedThreads]);
 
   const loadThreadsFromDatabase = useCallback(async () => {
     if (!user?.id) return;
     
-    const userThreads = await measureDatabase(
-      'load_threads',
-      () => messagingService.getThreads(),
-      0
-    );
-    setThreads(userThreads);
-    cacheThreads(userThreads);
-    
-    // Update unread counts in cache
-    userThreads.forEach(thread => {
-      updateUnreadCount(thread.id, thread.unread_count);
-    });
-  }, [user?.id, measureDatabase, messagingService, cacheThreads, updateUnreadCount]);
+    try {
+      // Use request deduplication to prevent multiple simultaneous calls
+      const userThreads = await deduplicate(
+        `threads-${user.id}`,
+        () => measureDatabase(
+          'load_threads',
+          () => messagingService.getThreads(),
+          0
+        )
+      );
+      
+      setThreads(userThreads);
+      cacheThreads(userThreads);
+      
+      // Update unread counts in cache
+      userThreads.forEach(thread => {
+        updateUnreadCount(thread.id, thread.unread_count);
+      });
+    } catch (error) {
+      console.error('Database load threads error:', error);
+      // Don't throw - let the UI handle gracefully
+    }
+  }, [user?.id, measureDatabase, messagingService, cacheThreads, updateUnreadCount, deduplicate]);
 
   const loadMessages = useCallback(async (threadId: string) => {
     try {
@@ -296,9 +306,10 @@ export const useMessaging = () => {
   useEffect(() => {
     if (!user?.id) {
       clearCache();
+      clearRequestCache();
       messagingService.clearUserData(user?.id || '');
     }
-  }, [user?.id, clearCache]);
+  }, [user?.id, clearCache, clearRequestCache]);
 
   return {
     threads,

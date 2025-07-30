@@ -1,9 +1,10 @@
-import React, { memo } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useViewport } from '@/hooks/use-mobile';
 import { Navigation } from './Navigation';
 import { MobileLoading } from '@/components/ui/mobile-loading';
+import { supabase } from '@/integrations/supabase/client';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,6 +13,23 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   const { user, loading } = useAuth();
   const { isMobile, isTablet } = useViewport();
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user?.id) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('full_name, avatar_url')
+          .eq('id', user.id)
+          .single();
+        
+        setProfile(data || user.user_metadata);
+      }
+    };
+
+    fetchProfile();
+  }, [user?.id, user?.user_metadata]);
 
   if (loading) {
     return (
@@ -41,7 +59,7 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
 
   return (
     <div className={`min-h-screen bg-editorial-subtle safe-area-layout ${getLayoutPadding()}`} style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-      <Navigation />
+      <Navigation profile={profile} />
       <main className={`responsive-container max-w-7xl mx-auto ${getMainPadding()}`}>
         <div className="mobile-nav-safe" style={{ paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : '0' }}>
           {children}

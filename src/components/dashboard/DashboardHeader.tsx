@@ -48,27 +48,16 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
     return (
       <div className="glass-card-enhanced p-6 mb-6 relative">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4 flex-1 min-w-0">
-            <div className="relative">
-              <Avatar className="w-16 h-16 ring-3 ring-primary/20 shadow-lg">
-                <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
-                <AvatarFallback className="bg-gradient-to-br from-primary/30 to-secondary/30 text-lg font-bold">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-3 border-background shadow-sm animate-pulse"></div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-bold tracking-tight truncate mb-1">
-                {greeting}!
-              </h1>
-              <p className="text-base text-primary font-semibold truncate">
-                {firstName}
-              </p>
-              <Badge variant="secondary" className="text-xs mt-1 bg-primary/10 text-primary">
-                Your wellness journey continues
-              </Badge>
-            </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl font-bold tracking-tight truncate mb-2">
+              {greeting}!
+            </h1>
+            <p className="text-lg text-primary font-semibold truncate mb-2">
+              Welcome back, {firstName}
+            </p>
+            <Badge variant="secondary" className="text-sm bg-primary/10 text-primary">
+              Your wellness journey continues
+            </Badge>
           </div>
           
           <div className="flex items-center gap-2">

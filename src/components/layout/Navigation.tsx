@@ -19,13 +19,19 @@ import {
   QrCode,
   Plus
 } from 'lucide-react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { ProfileDropdown } from './ProfileDropdown';
 
-export const Navigation: React.FC = () => {
+interface NavigationProps {
+  profile?: {
+    full_name?: string;
+    avatar_url?: string;
+  };
+}
+
+export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
   const { user, signOut, isAdmin } = useAuth();
   const location = useLocation();
   const { isMobile, isTablet, isDesktop } = useViewport();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const haptics = useHapticFeedback();
 
   const navItems = [
@@ -87,118 +93,8 @@ export const Navigation: React.FC = () => {
           <MessageCircle className="w-7 h-7" strokeWidth={isActive('/messages') ? 2.5 : 2} />
         </Link>
 
-        {/* More Menu Sheet */}
-        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          <SheetTrigger asChild>
-            <button 
-              onClick={() => haptics.impact('medium')}
-              className="fixed bottom-28 left-5 z-40 glass-button w-16 h-16 rounded-full flex items-center justify-center shadow-2xl border-2 transition-all duration-500 bg-background/90 text-muted-foreground hover:text-foreground hover:bg-primary/20 hover:scale-110 active:scale-95 hover:shadow-2xl"
-            >
-              <MoreHorizontal className="w-7 h-7" strokeWidth={2} />
-            </button>
-          </SheetTrigger>
-                <SheetContent side="bottom" className="glass-modal border-0 rounded-t-3xl max-h-[85vh] bg-background/95 backdrop-blur-3xl">
-                  <SheetHeader className="mb-8">
-                    <SheetTitle className="font-display text-2xl text-center text-primary">Menu</SheetTitle>
-                  </SheetHeader>
-                  
-                   <div className="spacing-responsive-md px-2">
-                    {/* Profile Section */}
-                    <div className="glass-section p-6 rounded-2xl mb-6 bg-primary/5 border border-primary/10">
-                      <Link 
-                        to="/profile" 
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-4 p-4 rounded-xl hover:bg-primary/10 transition-all duration-300 touch-manipulation min-h-[56px]"
-                      >
-                        <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                          <User className="w-6 h-6 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-semibold text-lg">Profile</div>
-                          <div className="text-sm text-muted-foreground">View and edit your profile</div>
-                        </div>
-                      </Link>
-                    </div>
-
-                    {/* Settings & More */}
-                    <div className="glass-section p-6 rounded-2xl mb-6">
-                      <div className="space-y-3">
-                        {secondaryNavItems.map(({ href, icon: Icon, label }) => (
-                          <Link 
-                            key={href}
-                            to={href} 
-                            onClick={() => setMobileMenuOpen(false)}
-                            className={`flex items-center gap-4 p-4 rounded-xl hover:bg-primary/10 transition-all duration-300 touch-manipulation min-h-[56px] ${
-                              isActive(href) ? 'bg-primary/20 text-primary' : ''
-                            }`}
-                          >
-                            <div className="w-10 h-10 rounded-full bg-muted/20 flex items-center justify-center">
-                              <Icon className="w-5 h-5" />
-                            </div>
-                            <div className="flex-1">
-                              <div className="font-medium text-base">{label}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {href === '/admin' ? 'Manage the community' : ''}
-                              </div>
-                            </div>
-                          </Link>
-                        ))}
-                        
-                        <Link 
-                          to="/qr-scanner" 
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center gap-4 p-4 rounded-xl hover:bg-primary/10 transition-all duration-300 touch-manipulation min-h-[56px] ${
-                            isActive('/qr-scanner') ? 'bg-primary/20 text-primary' : ''
-                          }`}
-                        >
-                          <div className="w-10 h-10 rounded-full bg-muted/20 flex items-center justify-center">
-                            <QrCode className="w-5 h-5" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-base">Scan QR Code</div>
-                            <div className="text-sm text-muted-foreground">Mark event attendance and earn points</div>
-                          </div>
-                        </Link>
-                        
-                        <Link 
-                          to="/settings" 
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center gap-4 p-4 rounded-xl hover:bg-primary/10 transition-all duration-300 touch-manipulation min-h-[56px] ${
-                            isActive('/settings') ? 'bg-primary/20 text-primary' : ''
-                          }`}
-                        >
-                          <div className="w-10 h-10 rounded-full bg-muted/20 flex items-center justify-center">
-                            <Settings className="w-5 h-5" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-base">Settings</div>
-                            <div className="text-sm text-muted-foreground">Customize your experience</div>
-                          </div>
-                        </Link>
-                      </div>
-                    </div>
-
-                    {/* Logout */}
-                    <div className="glass-section p-6 rounded-2xl bg-destructive/5 border border-destructive/10">
-                      <button 
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          signOut();
-                        }}
-                        className="flex items-center gap-4 p-4 rounded-xl hover:bg-destructive/10 transition-all duration-300 touch-manipulation w-full text-left text-destructive min-h-[56px]"
-                      >
-                        <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center">
-                          <LogOut className="w-5 h-5" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium text-base">Sign Out</div>
-                          <div className="text-sm text-muted-foreground">Securely sign out of your account</div>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
+        {/* Profile Dropdown */}
+        <ProfileDropdown profile={profile || user?.user_metadata || {}} />
       </>
     );
   }

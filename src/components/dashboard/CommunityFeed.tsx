@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 import { Heart, MessageCircle, Share2, Camera, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -16,6 +18,9 @@ const CommunityFeed: React.FC = () => {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState<any[]>([]);
+  const [showComments, setShowComments] = useState<string | null>(null);
+  const [comments, setComments] = useState<any[]>([]);
+  const [newComment, setNewComment] = useState('');
   const { user } = useAuth();
   const { toast } = useToast();
   const { compressImage, processing } = useImageCompression();
@@ -96,6 +101,62 @@ const CommunityFeed: React.FC = () => {
       toast({
         title: "Error",
         description: "Failed to update like",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const fetchComments = async (postId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('post_comments')
+        .select(`
+          id,
+          content,
+          created_at,
+          profiles:user_id (
+            full_name,
+            username,
+            avatar_url
+          )
+        `)
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setComments(data || []);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  };
+
+  const addComment = async (postId: string) => {
+    if (!newComment.trim() || !user) return;
+
+    try {
+      const { error } = await supabase
+        .from('post_comments')
+        .insert({
+          post_id: postId,
+          user_id: user.id,
+          content: newComment.trim()
+        });
+
+      if (error) throw error;
+
+      setNewComment('');
+      fetchComments(postId);
+      loadPosts(); // Refresh to get updated comment count
+      
+      toast({
+        title: "Success",
+        description: "Comment added successfully!"
+      });
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add comment",
         variant: "destructive"
       });
     }
@@ -286,6 +347,8 @@ const CommunityFeed: React.FC = () => {
                     </div>
                   )}
                   
+                  <Separator className="mt-4" />
+                  
                   <div className="flex items-center space-x-4 mt-4">
                     <Button 
                       variant="ghost" 
@@ -296,7 +359,18 @@ const CommunityFeed: React.FC = () => {
                       <Heart className={`w-4 h-4 mr-1 ${post.user_liked ? 'fill-current' : ''}`} />
                       {post.likes_count || 0}
                     </Button>
-                    <Button variant="ghost" size="sm">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        if (showComments === post.id) {
+                          setShowComments(null);
+                        } else {
+                          setShowComments(post.id);
+                          fetchComments(post.id);
+                        }
+                      }}
+                    >
                       <MessageCircle className="w-4 h-4 mr-1" />
                       {post.comments_count || 0}
                     </Button>
@@ -305,6 +379,56 @@ const CommunityFeed: React.FC = () => {
                       postContent={post.content || ''} 
                     />
                   </div>
+
+                  {showComments === post.id && (
+                    <div className="space-y-4 pt-4 border-t mt-4">
+                      <div className="space-y-3 max-h-80 overflow-y-auto">
+                        {comments.map((comment) => (
+                          <div key={comment.id} className="flex gap-3">
+                            <Avatar className="w-8 h-8">
+                              <AvatarImage src={comment.profiles?.avatar_url} />
+                              <AvatarFallback>
+                                {comment.profiles?.full_name?.charAt(0) || comment.profiles?.username?.charAt(0) || '?'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 bg-muted/50 rounded-lg p-3">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-semibold text-sm">
+                                  {comment.profiles?.full_name || comment.profiles?.username}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {new Date(comment.created_at).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <p className="text-sm leading-relaxed">
+                                {comment.content}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Write a comment..."
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              addComment(post.id);
+                            }
+                          }}
+                        />
+                        <Button
+                          size="sm"
+                          onClick={() => addComment(post.id)}
+                          disabled={!newComment.trim()}
+                        >
+                          Post
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>

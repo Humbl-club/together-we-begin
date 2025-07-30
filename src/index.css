@@ -329,6 +329,34 @@
       0 0 0 1px hsl(var(--border) / 0.2) inset;
   }
 
+  /* Enhanced Glass Components for Profile Dropdown */
+  .glass-button-enhanced {
+    @apply backdrop-blur-3xl border-border/40;
+    background: hsl(var(--glass-bg));
+    box-shadow: 
+      0 8px 32px hsl(var(--glass-shadow)),
+      0 0 0 1px hsl(var(--border) / 0.3) inset;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-button-enhanced:hover {
+    background: hsl(var(--glass-hover));
+    box-shadow: 
+      0 12px 40px hsl(var(--glass-shadow)),
+      0 0 0 1px hsl(var(--primary) / 0.4) inset,
+      0 0 20px hsl(var(--primary) / 0.2);
+  }
+
+  .glass-modal-enhanced {
+    @apply backdrop-blur-3xl border-border/40;
+    background: hsl(var(--glass-bg));
+    box-shadow: 
+      0 25px 50px hsl(var(--glass-shadow)),
+      0 0 0 1px hsl(var(--foreground) / 0.1) inset;
+    /* Ensure proper z-index for dropdowns */
+    z-index: 60;
+  }
+
   /* Glass Toast */
   .glass-toast {
     @apply backdrop-blur-xl border-border/30;

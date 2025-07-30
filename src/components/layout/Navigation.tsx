@@ -80,19 +80,6 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
           </div>
         </nav>
         
-        {/* Floating Messages Button */}
-        <Link
-          to="/messages"
-          onClick={() => haptics.impact('light')}
-          className={`fixed bottom-28 right-5 z-40 glass-button w-16 h-16 rounded-full flex items-center justify-center shadow-2xl border-2 transition-all duration-500 hover:scale-110 active:scale-95 ${
-            isActive('/messages')
-              ? 'bg-primary/30 text-primary border-primary/50 shadow-primary/25 ring-4 ring-primary/20'
-              : 'bg-background/90 text-muted-foreground hover:text-foreground hover:bg-primary/20 active:scale-95 hover:shadow-2xl'
-          }`}
-        >
-          <MessageCircle className="w-7 h-7" strokeWidth={isActive('/messages') ? 2.5 : 2} />
-        </Link>
-
         {/* Profile Dropdown */}
         <ProfileDropdown profile={profile || user?.user_metadata || {}} />
       </>

@@ -31,8 +31,8 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'New notification',
-    icon: '/favicon.ico',
-    badge: '/favicon.ico',
+    icon: '/favicon.png',
+    badge: '/favicon.png',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -42,18 +42,18 @@ self.addEventListener('push', (event) => {
       {
         action: 'explore',
         title: 'View',
-        icon: '/favicon.ico'
+        icon: '/favicon.png'
       },
       {
         action: 'close',
         title: 'Close',
-        icon: '/favicon.ico'
+        icon: '/favicon.png'
       }
     ]
   };
 
   event.waitUntil(
-    self.registration.showNotification('Together We Begin', options)
+    self.registration.showNotification('HUMBL', options)
   );
 });
 

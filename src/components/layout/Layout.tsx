@@ -57,26 +57,9 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
     return 'px-8 py-8';
   };
 
-  // Mobile-first layout with separate mobile and desktop experiences
-  if (isMobile) {
-    return (
-      <div className="mobile-app-container mobile-layout">
-        {/* Mobile Main Content */}
-        <main className="min-h-screen pb-20">
-          <div className="mobile-content" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
-            {children}
-          </div>
-        </main>
-        
-        {/* Mobile Navigation */}
-        <Navigation profile={profile} />
-      </div>
-    );
-  }
-
-  // Desktop/Tablet layout
+  // Use the new unified mobile-first layout system
   return (
-    <div className="desktop-layout min-h-screen bg-editorial-subtle">
+    <div className="min-h-screen bg-background">
       <Navigation profile={profile} />
       <main className={`responsive-container max-w-7xl mx-auto ${getMainPadding()}`}>
         {children}

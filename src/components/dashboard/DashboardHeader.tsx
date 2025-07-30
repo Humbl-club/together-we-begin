@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Bell, Search, MessageCircle } from 'lucide-react';
-import { useViewport } from '@/hooks/use-mobile';
+import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { useNavigate } from 'react-router-dom';
 import { MessagingOverlay } from '@/components/messaging/MessagingOverlay';
@@ -19,7 +19,7 @@ interface DashboardHeaderProps {
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
-  const { isMobile } = useViewport();
+  const { isMobile } = useMobileFirst();
   const navigate = useNavigate();
   const haptics = useHapticFeedback();
   const [showMessaging, setShowMessaging] = useState(false);

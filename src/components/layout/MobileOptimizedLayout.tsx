@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { useViewport } from '@/hooks/use-mobile';
+import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { Navigation } from './Navigation';
 
 interface MobileOptimizedLayoutProps {
@@ -11,7 +11,7 @@ interface MobileOptimizedLayoutProps {
 }
 
 export const MobileOptimizedLayout: React.FC<MobileOptimizedLayoutProps> = memo(({ children, profile }) => {
-  const { isMobile } = useViewport();
+  const { isMobile } = useMobileFirst();
 
   if (isMobile) {
     return (

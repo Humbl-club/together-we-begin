@@ -8,6 +8,8 @@ import { Separator } from '@/components/ui/separator'
 import { Lock, Eye, MessageCircle, MapPin, UserCheck } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
+import { useMobileFirst } from '@/hooks/useMobileFirst'
+import { MobileContainer } from '@/components/ui/mobile-container'
 
 interface PrivacySettings {
   profile_visibility: 'public' | 'members_only' | 'private'
@@ -24,6 +26,7 @@ interface PrivacyControlsProps {
 }
 
 export const PrivacyControls = ({ userId }: PrivacyControlsProps) => {
+  const { isMobile } = useMobileFirst();
   const [settings, setSettings] = useState<PrivacySettings>({
     profile_visibility: 'members_only',
     allow_direct_messages: true,
@@ -178,14 +181,15 @@ export const PrivacyControls = ({ userId }: PrivacyControlsProps) => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Lock className="h-5 w-5" />
-          Privacy & Safety
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <MobileContainer>
+      <Card>
+        <CardHeader>
+          <CardTitle className={`flex items-center gap-2 ${isMobile ? 'text-lg' : ''}`}>
+            <Lock className="h-5 w-5" />
+            Privacy & Safety
+          </CardTitle>
+        </CardHeader>
+        <CardContent className={`${isMobile ? 'space-y-4' : 'space-y-6'}`}>
         {/* Profile Visibility */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
@@ -240,9 +244,9 @@ export const PrivacyControls = ({ userId }: PrivacyControlsProps) => {
           </div>
           
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="font-medium text-sm">Allow Direct Messages</div>
+            <div className={`flex items-center justify-between ${isMobile ? 'gap-3' : ''}`}>
+              <div className="flex-1">
+                <div className={`font-medium ${isMobile ? 'text-sm' : 'text-sm'}`}>Allow Direct Messages</div>
                 <div className="text-xs text-muted-foreground">
                   Let other members send you private messages
                 </div>
@@ -350,10 +354,16 @@ export const PrivacyControls = ({ userId }: PrivacyControlsProps) => {
 
         <Separator />
 
-        <Button onClick={savePrivacySettings} disabled={isSaving} className="w-full">
+        <Button 
+          onClick={savePrivacySettings} 
+          disabled={isSaving} 
+          className="w-full"
+          size={isMobile ? "default" : "default"}
+        >
           {isSaving ? 'Saving...' : 'Save Privacy Settings'}
         </Button>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </MobileContainer>
   )
 }

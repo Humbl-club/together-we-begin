@@ -205,6 +205,50 @@
     -moz-osx-font-smoothing: grayscale;
   }
   
+  /* Enhanced mobile typography scaling */
+  .mobile-text-xs { @apply text-[11px] leading-tight sm:text-xs; }
+  .mobile-text-sm { @apply text-xs leading-tight sm:text-sm; }
+  .mobile-text-base { @apply text-sm leading-normal sm:text-base; }
+  .mobile-text-lg { @apply text-base leading-normal sm:text-lg; }
+  .mobile-text-xl { @apply text-lg leading-tight sm:text-xl; }
+  .mobile-text-2xl { @apply text-xl leading-tight sm:text-2xl; }
+
+  /* Mobile-optimized spacing */
+  .mobile-space-y-1 { @apply space-y-1 sm:space-y-2; }
+  .mobile-space-y-2 { @apply space-y-2 sm:space-y-3; }
+  .mobile-space-y-3 { @apply space-y-3 sm:space-y-4; }
+  .mobile-space-y-4 { @apply space-y-4 sm:space-y-6; }
+
+  /* Mobile touch targets */
+  .mobile-touch-target {
+    @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+  }
+
+  /* Mobile-first grid patterns */
+  .mobile-grid-auto { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3; }
+  .mobile-grid-2 { @apply grid grid-cols-1 sm:grid-cols-2; }
+  .mobile-grid-3 { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3; }
+  .mobile-grid-4 { @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4; }
+
+  /* Error state styling */
+  .mobile-error-state {
+    @apply rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-center;
+  }
+
+  .mobile-error-button {
+    @apply bg-destructive/10 text-destructive hover:bg-destructive/20 border-destructive/30;
+  }
+
+  /* Success state styling */
+  .mobile-success-state {
+    @apply rounded-lg border border-green-200 bg-green-50 p-4 text-green-800;
+  }
+
+  /* Loading state styling */
+  .mobile-loading-skeleton {
+    @apply animate-pulse bg-muted/50 rounded;
+  }
+
   /* Mobile error states */
   .mobile-error-container {
     @apply flex flex-col items-center justify-center min-h-[50vh] p-6 text-center;

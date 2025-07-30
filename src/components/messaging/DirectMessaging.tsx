@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Send, Search, MessageCircle, Lock, Shield, Plus, ArrowLeft } from 'lucide-react';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useViewport } from '@/hooks/use-mobile';
+import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { UserSearch } from './UserSearch';
 import { 
   Dialog,
@@ -24,7 +24,7 @@ export const DirectMessaging = () => {
   const [showNewMessageDialog, setShowNewMessageDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
-  const { isMobile } = useViewport();
+  const { isMobile } = useMobileFirst();
   
   const {
     threads,

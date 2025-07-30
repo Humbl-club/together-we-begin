@@ -5,6 +5,8 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Activity, Database, Users, Server, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useMobileFirst } from '@/hooks/useMobileFirst';
+import { MobileContainer } from '@/components/ui/mobile-container';
 
 interface PerformanceMetrics {
   dbConnections: number;
@@ -16,6 +18,7 @@ interface PerformanceMetrics {
 }
 
 const AdminPerformanceMonitor: React.FC = () => {
+  const { isMobile } = useMobileFirst();
   const [metrics, setMetrics] = useState<PerformanceMetrics>({
     dbConnections: 0,
     activeUsers: 0,
@@ -92,30 +95,33 @@ const AdminPerformanceMonitor: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Performance Monitor</h2>
-          <p className="text-muted-foreground">Real-time system performance metrics</p>
+    <MobileContainer>
+      <div className="space-y-6">
+        <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'items-center justify-between'}`}>
+          <div>
+            <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>Performance Monitor</h2>
+            <p className="text-muted-foreground">Real-time system performance metrics</p>
+          </div>
+          <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center'} gap-2`}>
+            <Badge variant={autoRefresh ? 'default' : 'outline'}>
+              {autoRefresh ? 'Auto-refresh ON' : 'Auto-refresh OFF'}
+            </Badge>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size={isMobile ? "default" : "sm"}
+                onClick={() => setAutoRefresh(!autoRefresh)}
+              >
+                {autoRefresh ? 'Pause' : 'Resume'}
+              </Button>
+              <Button variant="outline" size={isMobile ? "default" : "sm"} onClick={loadMetrics}>
+                <RefreshCw className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant={autoRefresh ? 'default' : 'outline'}>
-            {autoRefresh ? 'Auto-refresh ON' : 'Auto-refresh OFF'}
-          </Badge>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setAutoRefresh(!autoRefresh)}
-          >
-            {autoRefresh ? 'Pause' : 'Resume'}
-          </Button>
-          <Button variant="outline" size="sm" onClick={loadMetrics}>
-            <RefreshCw className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className={`grid grid-cols-1 ${isMobile ? 'gap-4' : 'md:grid-cols-2 lg:grid-cols-4 gap-4'}`}>
         <Card className="glass-card">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -177,70 +183,71 @@ const AdminPerformanceMonitor: React.FC = () => {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle>Cache Performance</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between mb-2">
-                  <span className="text-sm font-medium">Cache Hit Rate</span>
-                  <span className="text-sm">{metrics.cacheHitRate.toFixed(1)}%</span>
+        <div className={`grid grid-cols-1 ${isMobile ? 'gap-4' : 'lg:grid-cols-2 gap-6'}`}>
+          <Card className="glass-card">
+            <CardHeader>
+              <CardTitle>Cache Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm font-medium">Cache Hit Rate</span>
+                    <span className="text-sm">{metrics.cacheHitRate.toFixed(1)}%</span>
+                  </div>
+                  <Progress value={metrics.cacheHitRate} className="h-3" />
                 </div>
-                <Progress value={metrics.cacheHitRate} className="h-3" />
+                <div className={`grid grid-cols-3 gap-4 text-center ${isMobile ? 'text-sm' : ''}`}>
+                  <div>
+                    <p className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold text-green-500`}>2.1k</p>
+                    <p className="text-sm text-muted-foreground">Cache Hits</p>
+                  </div>
+                  <div>
+                    <p className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold text-red-500`}>234</p>
+                    <p className="text-sm text-muted-foreground">Cache Misses</p>
+                  </div>
+                  <div>
+                    <p className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold text-blue-500`}>42ms</p>
+                    <p className="text-sm text-muted-foreground">Avg Response</p>
+                  </div>
+                </div>
               </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-2xl font-bold text-green-500">2.1k</p>
-                  <p className="text-sm text-muted-foreground">Cache Hits</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-red-500">234</p>
-                  <p className="text-sm text-muted-foreground">Cache Misses</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-blue-500">42ms</p>
-                  <p className="text-sm text-muted-foreground">Avg Response</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle>System Health</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Database</span>
-                <Badge variant="default">Healthy</Badge>
+          <Card className="glass-card">
+            <CardHeader>
+              <CardTitle>System Health</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Database</span>
+                  <Badge variant="default">Healthy</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Authentication</span>
+                  <Badge variant="default">Healthy</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Storage</span>
+                  <Badge variant="default">Healthy</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Edge Functions</span>
+                  <Badge variant={metrics.responseTime > 200 ? 'secondary' : 'default'}>
+                    {metrics.responseTime > 200 ? 'Slow' : 'Healthy'}
+                  </Badge>
+                </div>
+                <div className="text-xs text-muted-foreground mt-4">
+                  Last updated: {metrics.lastUpdate.toLocaleTimeString()}
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Authentication</span>
-                <Badge variant="default">Healthy</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Storage</span>
-                <Badge variant="default">Healthy</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Edge Functions</span>
-                <Badge variant={metrics.responseTime > 200 ? 'secondary' : 'default'}>
-                  {metrics.responseTime > 200 ? 'Slow' : 'Healthy'}
-                </Badge>
-              </div>
-              <div className="text-xs text-muted-foreground mt-4">
-                Last updated: {metrics.lastUpdate.toLocaleTimeString()}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </MobileContainer>
   );
 };
 

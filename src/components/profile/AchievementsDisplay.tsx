@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { Trophy, Calendar, Award } from 'lucide-react';
 import { useStaggeredAnimation } from '@/hooks/useStaggeredAnimation';
+import { useMobileFirst } from '@/hooks/useMobileFirst';
 
 interface CompletedChallenge {
   id: string;
@@ -21,11 +22,12 @@ interface AchievementsDisplayProps {
 
 export const AchievementsDisplay: React.FC<AchievementsDisplayProps> = ({ challenges }) => {
   const visibleChallenges = useStaggeredAnimation(challenges, 150);
+  const { isMobile } = useMobileFirst();
 
   return (
     <Card className="profile-section">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className={`flex items-center gap-2 ${isMobile ? 'text-lg' : ''}`}>
           <Trophy className="w-5 h-5 text-amber-500" />
           Recent Achievements
         </CardTitle>
@@ -42,7 +44,7 @@ export const AchievementsDisplay: React.FC<AchievementsDisplayProps> = ({ challe
             {challenges.slice(0, 5).map((challenge, index) => (
               <div
                 key={challenge.id}
-                className={`achievement-item flex items-center gap-4 p-4 rounded-lg border border-border/30 transition-all duration-500 ${
+                className={`achievement-item flex items-center ${isMobile ? 'gap-3 p-3' : 'gap-4 p-4'} rounded-lg border border-border/30 transition-all duration-500 ${
                   visibleChallenges[index] 
                     ? 'opacity-100 translate-y-0' 
                     : 'opacity-0 translate-y-4'
@@ -53,20 +55,20 @@ export const AchievementsDisplay: React.FC<AchievementsDisplayProps> = ({ challe
                 }}
               >
                 <div className="achievement-badge flex-shrink-0">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
-                    <Trophy className="w-6 h-6 text-primary-foreground" />
+                  <div className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg`}>
+                    <Trophy className={`${isMobile ? 'w-5 h-5' : 'w-6 h-6'} text-primary-foreground`} />
                   </div>
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold truncate">{challenge.challenges.title}</h4>
+                  <h4 className={`${isMobile ? 'text-sm' : ''} font-semibold truncate`}>{challenge.challenges.title}</h4>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="w-4 h-4" />
-                    {format(new Date(challenge.completion_date), 'MMM d, yyyy')}
+                    {format(new Date(challenge.completion_date), isMobile ? 'MMM d' : 'MMM d, yyyy')}
                   </div>
                 </div>
                 
-                <div className="flex flex-col items-end gap-1">
+                <div className={`flex ${isMobile ? 'flex-col items-end gap-1' : 'flex-col items-end gap-1'}`}>
                   {challenge.challenges.badge_name && (
                     <Badge variant="secondary" className="text-xs">
                       {challenge.challenges.badge_name}

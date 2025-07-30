@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
-import { useViewport } from '@/hooks/use-mobile';
+import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { 
   Home, 
@@ -33,7 +33,7 @@ interface NavigationProps {
 export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
   const { user, signOut, isAdmin } = useAuth();
   const location = useLocation();
-  const { isMobile, isTablet, isDesktop } = useViewport();
+  const { isMobile, isTablet, isDesktop } = useMobileFirst();
   const haptics = useHapticFeedback();
   const [showMessaging, setShowMessaging] = useState(false);
   const { totalUnreadCount } = useMessaging();

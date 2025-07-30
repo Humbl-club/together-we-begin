@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
+import { useMobileFirst } from '@/hooks/useMobileFirst';
 import {
   Sidebar,
   SidebarContent,
@@ -69,12 +70,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   onSectionChange 
 }) => {
   const { state } = useSidebar();
+  const { isMobile } = useMobileFirst();
   const isCollapsed = state === 'collapsed';
 
   return (
     <Sidebar
-      className={isCollapsed ? "w-14" : "w-60"}
-      collapsible="icon"
+      className={isMobile ? "w-full" : (isCollapsed ? "w-14" : "w-60")}
+      collapsible={isMobile ? "none" : "icon"}
     >
       <SidebarContent>
         {adminSections.map((section) => (

@@ -340,7 +340,8 @@
   }
 
   .glass-modal-enhanced {
-    @apply backdrop-blur-3xl bg-background/98 border border-border/40 shadow-2xl;
+    @apply backdrop-blur-3xl border border-border/40 shadow-2xl;
+    background: hsl(var(--background) / 0.98);
   }
 
   /* Profile dropdown responsive positioning */

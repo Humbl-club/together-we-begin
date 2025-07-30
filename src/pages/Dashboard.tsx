@@ -11,13 +11,17 @@ import WellnessCard from '@/components/dashboard/WellnessCard';
 import UpcomingEvents from '@/components/dashboard/UpcomingEvents';
 import CommunityFeed from '@/components/dashboard/CommunityFeed';
 import WelcomeFlow from '@/components/onboarding/WelcomeFlow';
-import { DashboardSkeleton } from '@/components/ui/optimized-skeleton';
+import { DashboardLoadingSkeleton } from '@/components/ui/mobile-loading';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { PullToRefresh } from '@/components/ui/pull-to-refresh';
+import { MobileContainer, MobileSection } from '@/components/ui/mobile-container';
+import { MobileOptimizedButton } from '@/components/ui/mobile-optimized-button';
 import { useToast } from '@/hooks/use-toast';
 
 // Mobile-enhanced components
 import { MobileStatsRing } from '@/components/ui/mobile-stats-ring';
-import { SwipeableCard } from '@/components/ui/swipeable-card';
+import { SwipeableCard, GestureZone } from '@/components/ui/gesture-components';
+import { IOSModal } from '@/components/ui/ios-modal';
 import { MobileActionSheet } from '@/components/ui/mobile-action-sheet';
 
 // Icons and UI
@@ -81,18 +85,15 @@ const Dashboard: React.FC = memo(() => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center space-y-4">
-          <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto"></div>
-          <p className="text-muted-foreground font-light">Loading your dashboard...</p>
-        </div>
-      </div>
+      <MobileContainer>
+        <DashboardLoadingSkeleton />
+      </MobileContainer>
     );
   }
 
   if (showOnboarding) {
     return (
-      <Suspense fallback={<DashboardSkeleton />}>
+      <Suspense fallback={<DashboardLoadingSkeleton />}>
         <WelcomeFlow onComplete={handleOnboardingComplete} />
       </Suspense>
     );
@@ -128,10 +129,19 @@ const Dashboard: React.FC = memo(() => {
 
   return (
     <ErrorBoundary>
-      <div 
-        ref={containerRef as React.RefObject<HTMLDivElement>}
-        className="space-y-6 relative overflow-hidden"
-        style={{ minHeight: '100vh' }}
+      <PullToRefresh 
+        onRefresh={async () => {
+          try {
+            await refetch();
+            toast({
+              title: "Dashboard updated",
+              description: "Your latest data has been loaded",
+            });
+          } catch (error) {
+            handleError(error as Error);
+          }
+        }}
+        className="space-y-6 min-h-screen"
       >
         {/* Pull to refresh indicator */}
         {(isPulling || isRefreshing) && (
@@ -189,8 +199,8 @@ const Dashboard: React.FC = memo(() => {
           {isMobile ? (
             // Mobile ring stats
             <>
-              <SwipeableCard 
-                className="p-4 text-center"
+              <GestureZone 
+                className="p-4 text-center glass-card rounded-xl"
                 onTap={() => console.log('Points tapped')}
               >
                 <MobileStatsRing value={stats.loyaltyPoints} max={200} size="md">
@@ -199,10 +209,10 @@ const Dashboard: React.FC = memo(() => {
                     <div className="text-xs text-muted-foreground">Points</div>
                   </div>
                 </MobileStatsRing>
-              </SwipeableCard>
+              </GestureZone>
               
-              <SwipeableCard 
-                className="p-4 text-center"
+              <GestureZone 
+                className="p-4 text-center glass-card rounded-xl"
                 onTap={() => console.log('Events tapped')}
               >
                 <MobileStatsRing value={stats.upcomingEvents} max={10} size="md" color="hsl(var(--blue-500))">
@@ -211,10 +221,10 @@ const Dashboard: React.FC = memo(() => {
                     <div className="text-xs text-muted-foreground">Events</div>
                   </div>
                 </MobileStatsRing>
-              </SwipeableCard>
+              </GestureZone>
               
-              <SwipeableCard 
-                className="p-4 text-center"
+              <GestureZone 
+                className="p-4 text-center glass-card rounded-xl"
                 onTap={() => console.log('Challenges tapped')}
               >
                 <MobileStatsRing value={stats.activeChallenges} max={5} size="md" color="hsl(var(--purple-500))">
@@ -223,10 +233,10 @@ const Dashboard: React.FC = memo(() => {
                     <div className="text-xs text-muted-foreground">Active</div>
                   </div>
                 </MobileStatsRing>
-              </SwipeableCard>
+              </GestureZone>
               
-              <SwipeableCard 
-                className="p-4 text-center"
+              <GestureZone 
+                className="p-4 text-center glass-card rounded-xl"
                 onTap={() => console.log('Posts tapped')}
               >
                 <MobileStatsRing value={stats.totalPosts} max={20} size="md" color="hsl(var(--green-500))">
@@ -235,7 +245,7 @@ const Dashboard: React.FC = memo(() => {
                     <div className="text-xs text-muted-foreground">Posts</div>
                   </div>
                 </MobileStatsRing>
-              </SwipeableCard>
+              </GestureZone>
             </>
           ) : (
             // Desktop stats grid
@@ -294,7 +304,7 @@ const Dashboard: React.FC = memo(() => {
             )}
           </div>
         </div>
-      </div>
+      </PullToRefresh>
     </ErrorBoundary>
   );
 });

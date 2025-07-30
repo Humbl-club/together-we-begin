@@ -19,7 +19,10 @@ export function register(config?: Config) {
       return;
     }
 
-    window.addEventListener('load', () => {
+    // Use AbortController for modern event listener management
+    const controller = new AbortController();
+    
+    const handleLoad = () => {
       const swUrl = `${process.env.PUBLIC_URL}/sw.js`;
 
       if (isLocalhost) {
@@ -34,6 +37,22 @@ export function register(config?: Config) {
       } else {
         registerValidSW(swUrl, config);
       }
+    };
+
+    window.addEventListener('load', handleLoad, { 
+      signal: controller.signal,
+      once: true 
+    });
+
+    // Clean up on page unload using modern approach
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        controller.abort();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange, {
+      signal: controller.signal
     });
   }
 }

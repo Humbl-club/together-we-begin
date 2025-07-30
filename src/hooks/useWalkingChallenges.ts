@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
+import { useStepTracking } from '@/hooks/useStepTracking';
 
 interface WalkingChallenge {
   id: string;
@@ -41,6 +42,7 @@ export const useWalkingChallenges = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { syncSteps } = useStepTracking();
 
   useEffect(() => {
     if (user) {
@@ -331,6 +333,22 @@ export const useWalkingChallenges = () => {
     ]);
   }, [user]);
 
+  // Sync steps for a specific challenge
+  const syncStepsForChallenge = useCallback(async (challengeId: string) => {
+    if (!user) return;
+
+    try {
+      const result = await syncSteps(challengeId);
+      if (result?.success) {
+        await refreshChallenge(challengeId);
+      }
+      return result;
+    } catch (error) {
+      console.error('Error syncing steps for challenge:', error);
+      return null;
+    }
+  }, [user, syncSteps, refreshChallenge]);
+
   return {
     challenges,
     userProgress,
@@ -343,6 +361,7 @@ export const useWalkingChallenges = () => {
     getUserProgressForChallenge,
     getLeaderboardForChallenge,
     refreshChallenge,
+    syncStepsForChallenge,
     refetch: fetchWalkingChallenges
   };
 };

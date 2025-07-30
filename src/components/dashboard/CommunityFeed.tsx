@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { Heart, MessageCircle, Share2, Camera, Send } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Camera, Send, Download, Info } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
@@ -21,9 +21,16 @@ const CommunityFeed: React.FC = () => {
   const [showComments, setShowComments] = useState<string | null>(null);
   const [comments, setComments] = useState<any[]>([]);
   const [newComment, setNewComment] = useState('');
+  const [showStorageInfo, setShowStorageInfo] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const { compressImage, processing } = useImageCompression();
+
+  // Character limits
+  const POST_CHAR_LIMIT = 100;
+  const COMMENT_CHAR_LIMIT = 50;
+  const MAX_IMAGES = 2;
+  const MAX_IMAGE_SIZE_MB = 2;
 
   useEffect(() => {
     loadPosts();
@@ -132,7 +139,7 @@ const CommunityFeed: React.FC = () => {
   };
 
   const addComment = async (postId: string) => {
-    if (!newComment.trim() || !user) return;
+    if (!newComment.trim() || !user || newComment.length > COMMENT_CHAR_LIMIT) return;
 
     try {
       const { error } = await supabase
@@ -163,8 +170,38 @@ const CommunityFeed: React.FC = () => {
     }
   };
 
+  const downloadImage = async (url: string, index: number) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `community_image_${Date.now()}_${index}.webp`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      window.URL.revokeObjectURL(downloadUrl);
+      
+      toast({
+        title: "Success",
+        description: "Image downloaded successfully!"
+      });
+    } catch (error) {
+      console.error('Error downloading image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download image",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleSubmitPost = async () => {
     if (!newPost.trim() && selectedImages.length === 0) return;
+    if (newPost.length > POST_CHAR_LIMIT) return;
 
     setLoading(true);
     try {
@@ -251,35 +288,78 @@ const CommunityFeed: React.FC = () => {
             <Textarea
               placeholder="Share something with the community..."
               value={newPost}
-              onChange={(e) => setNewPost(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value.length <= POST_CHAR_LIMIT) {
+                  setNewPost(e.target.value);
+                }
+              }}
               className="min-h-[100px]"
             />
+            <div className="flex justify-between items-center">
+              <span className={`text-xs ${newPost.length > POST_CHAR_LIMIT * 0.8 ? 'text-red-500' : 'text-muted-foreground'}`}>
+                {newPost.length}/{POST_CHAR_LIMIT} characters
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowStorageInfo(!showStorageInfo)}
+              >
+                <Info className="w-4 h-4 mr-2" />
+                Storage Info
+              </Button>
+            </div>
+            
+            {showStorageInfo && (
+              <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                <h4 className="font-semibold text-sm">Image Storage Details:</h4>
+                <ul className="text-xs space-y-1 text-muted-foreground">
+                  <li>• Bucket: "posts" (public storage)</li>
+                  <li>• Path: user_id/timestamp_index.webp</li>
+                  <li>• Max size: {MAX_IMAGE_SIZE_MB}MB per image</li>
+                  <li>• Max images: {MAX_IMAGES} per post</li>
+                  <li>• Format: WebP (optimized compression)</li>
+                  <li>• Resolution: Max 1920x1920px</li>
+                </ul>
+              </div>
+            )}
             
             <div className="flex items-center justify-between">
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => {
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.id = 'community-image-upload';
-                  input.name = 'community-images';
-                  input.multiple = true;
-                  input.accept = 'image/*';
-                  input.onchange = (e) => {
-                    const files = Array.from((e.target as HTMLInputElement).files || []);
-                    setSelectedImages(prev => [...prev, ...files.slice(0, 4 - prev.length)]);
-                  };
-                  input.click();
-                }}
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.id = 'community-image-upload';
+                    input.name = 'community-images';
+                    input.multiple = true;
+                    input.accept = 'image/*';
+                    input.onchange = (e) => {
+                      const files = Array.from((e.target as HTMLInputElement).files || []);
+                      // Check file sizes
+                      const validFiles = files.filter(file => {
+                        if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+                          toast({
+                            title: "File too large",
+                            description: `${file.name} exceeds ${MAX_IMAGE_SIZE_MB}MB limit`,
+                            variant: "destructive"
+                          });
+                          return false;
+                        }
+                        return true;
+                      });
+                      setSelectedImages(prev => [...prev, ...validFiles.slice(0, MAX_IMAGES - prev.length)]);
+                    };
+                    input.click();
+                  }}
               >
                 <Camera className="w-4 h-4 mr-2" />
-                Add Images
+                Add Images ({selectedImages.length}/{MAX_IMAGES})
               </Button>
               
               <Button 
                 onClick={handleSubmitPost} 
-                disabled={(!newPost.trim() && selectedImages.length === 0) || loading || processing}
+                disabled={(!newPost.trim() && selectedImages.length === 0) || loading || processing || newPost.length > POST_CHAR_LIMIT || selectedImages.length > MAX_IMAGES}
                 className="ml-2"
               >
                 <Send className="w-4 h-4 mr-2" />
@@ -336,14 +416,23 @@ const CommunityFeed: React.FC = () => {
                   <p className="mt-2">{post.content}</p>
                   
                   {post.image_urls && post.image_urls.length > 0 && (
-                    <div className="mt-3 grid grid-cols-2 gap-2">
+                    <div className="mt-3 grid grid-cols-1 gap-2">
                       {post.image_urls.map((url: string, index: number) => (
-                        <img
-                          key={index}
-                          src={url}
-                          alt={`Post image ${index + 1}`}
-                          className="rounded-lg object-cover aspect-square"
-                        />
+                        <div key={index} className="relative group">
+                          <img
+                            src={url}
+                            alt={`Post image ${index + 1}`}
+                            className="rounded-lg object-cover w-full max-h-96"
+                          />
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => downloadImage(url, index)}
+                          >
+                            <Download className="w-4 h-4" />
+                          </Button>
+                        </div>
                       ))}
                     </div>
                   )}
@@ -409,24 +498,33 @@ const CommunityFeed: React.FC = () => {
                         ))}
                       </div>
                       
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Write a comment..."
-                          value={newComment}
-                          onChange={(e) => setNewComment(e.target.value)}
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              addComment(post.id);
-                            }
-                          }}
-                        />
-                        <Button
-                          size="sm"
-                          onClick={() => addComment(post.id)}
-                          disabled={!newComment.trim()}
-                        >
-                          Post
-                        </Button>
+                      <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Write a comment..."
+                            value={newComment}
+                            onChange={(e) => {
+                              if (e.target.value.length <= COMMENT_CHAR_LIMIT) {
+                                setNewComment(e.target.value);
+                              }
+                            }}
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                addComment(post.id);
+                              }
+                            }}
+                          />
+                          <Button
+                            size="sm"
+                            onClick={() => addComment(post.id)}
+                            disabled={!newComment.trim() || newComment.length > COMMENT_CHAR_LIMIT}
+                          >
+                            Post
+                          </Button>
+                        </div>
+                        <div className="text-xs text-muted-foreground text-right">
+                          {newComment.length}/{COMMENT_CHAR_LIMIT} characters
+                        </div>
                       </div>
                     </div>
                   )}

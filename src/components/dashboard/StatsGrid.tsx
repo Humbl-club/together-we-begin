@@ -1,8 +1,10 @@
 import React, { memo, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Award, Calendar, Trophy, Users } from 'lucide-react';
 import { useViewport } from '@/hooks/use-mobile';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
 interface DashboardStats {
   loyaltyPoints: number;
@@ -15,60 +17,120 @@ interface StatsGridProps {
   stats: DashboardStats;
 }
 
+const MobileStatsCard: React.FC<{ 
+  title: string; 
+  value: number; 
+  icon: React.ComponentType<any>; 
+  color: string;
+  progress: number;
+  change: string;
+}> = memo(({ title, value, icon: Icon, color, progress, change }) => {
+  const haptics = useHapticFeedback();
+
+  return (
+    <Card 
+      className="glass-card-enhanced touch-target-large cursor-pointer hover:scale-[1.02] transition-all duration-300"
+      onClick={() => haptics.tap()}
+    >
+      <CardContent className="p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color} bg-opacity-20`}>
+            <Icon className="w-6 h-6" />
+          </div>
+          <Badge variant="secondary" className="text-xs font-medium bg-primary/10 text-primary border-0">
+            {change}
+          </Badge>
+        </div>
+        
+        <div className="space-y-3">
+          <div>
+            <div className="text-3xl font-bold tracking-tight">
+              {value.toLocaleString()}
+            </div>
+            <div className="text-sm text-muted-foreground font-medium">
+              {title}
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Progress value={progress} className="h-2" />
+            <div className="text-xs text-muted-foreground">
+              {progress}% of target
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
+
 const StatsGrid: React.FC<StatsGridProps> = memo(({ stats }) => {
+  const { isMobile } = useViewport();
+  
   const statCards = useMemo(() => [
     {
-      title: 'Points',
+      title: 'Loyalty Points',
       value: stats.loyaltyPoints,
       icon: Award,
-      gradient: 'from-amber-500/10 to-yellow-500/10',
-      change: '+12',
-      color: 'text-amber-600 dark:text-amber-400'
+      color: 'text-amber-600 bg-amber-500',
+      progress: Math.min((stats.loyaltyPoints / 500) * 100, 100),
+      change: '+12'
     },
     {
-      title: 'Events',
+      title: 'Upcoming Events',
       value: stats.upcomingEvents,
       icon: Calendar,
-      gradient: 'from-blue-500/10 to-indigo-500/10',
-      change: '+1',
-      color: 'text-blue-600 dark:text-blue-400'
+      color: 'text-blue-600 bg-blue-500',
+      progress: Math.min((stats.upcomingEvents / 10) * 100, 100),
+      change: '+1'
     },
     {
-      title: 'Active',
+      title: 'Active Challenges',
       value: stats.activeChallenges,
       icon: Trophy,
-      gradient: 'from-purple-500/10 to-pink-500/10',
-      change: 'New',
-      color: 'text-purple-600 dark:text-purple-400'
+      color: 'text-purple-600 bg-purple-500',
+      progress: Math.min((stats.activeChallenges / 5) * 100, 100),
+      change: 'New'
     },
     {
-      title: 'Posts',
+      title: 'Community Posts',
       value: stats.totalPosts,
       icon: Users,
-      gradient: 'from-green-500/10 to-teal-500/10',
-      change: '+3',
-      color: 'text-green-600 dark:text-green-400'
+      color: 'text-green-600 bg-green-500',
+      progress: Math.min((stats.totalPosts / 20) * 100, 100),
+      change: '+3'
     }
   ], [stats]);
 
+  if (isMobile) {
+    return (
+      <div className="grid grid-cols-2 gap-4">
+        {statCards.map((card) => (
+          <MobileStatsCard key={card.title} {...card} />
+        ))}
+      </div>
+    );
+  }
+
+  // Desktop version with traditional layout
   return (
-    <div className="stats-grid">
-      {statCards.map(({ title, value, icon: Icon, gradient, change, color }) => (
-        <Card key={title} className="adaptive-card smooth-entrance">
-          <CardContent className="p-fluid-3">
-            <div className="cluster justify-between mb-fluid-2">
-              <div className={`p-fluid-2 rounded-lg bg-gradient-to-br ${gradient} ring-1 ring-border/20`}>
-                <Icon className={`w-4 h-4 md:w-5 md:h-5 ${color}`} strokeWidth={2.5} />
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      {statCards.map(({ title, value, icon: Icon, color, change }) => (
+        <Card key={title} className="glass-card-enhanced">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`p-3 rounded-xl ${color} bg-opacity-20`}>
+                <Icon className="w-5 h-5" />
               </div>
               <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-0 font-medium">
                 {change}
               </Badge>
             </div>
-            <div className="flow-content">
-              <p className="fluid-xl font-light tracking-tight text-foreground">
+            <div className="space-y-1">
+              <p className="text-2xl font-bold tracking-tight">
                 {value.toLocaleString()}
               </p>
-              <p className="fluid-xs text-muted-foreground font-medium uppercase tracking-wide leading-none">
+              <p className="text-sm text-muted-foreground font-medium">
                 {title}
               </p>
             </div>

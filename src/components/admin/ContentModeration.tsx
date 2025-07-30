@@ -65,6 +65,18 @@ interface ContentReport {
   content_preview?: string;
 }
 
+interface ContentItem {
+  content_id: string;
+  content_type: 'post' | 'comment';
+  content: string;
+  author_id: string;
+  author_name: string;
+  created_at: string;
+  status: string;
+  reports_count: number;
+  latest_report_reason: string;
+}
+
 interface ModerationAction {
   id: string;
   admin_id: string;
@@ -81,14 +93,17 @@ interface ModerationAction {
 
 const ContentModeration: React.FC = () => {
   const [reports, setReports] = useState<ContentReport[]>([]);
+  const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('pending');
   const [filterType, setFilterType] = useState<string>('all');
+  const [filterContentType, setFilterContentType] = useState<string>('all');
   const [selectedReport, setSelectedReport] = useState<ContentReport | null>(null);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [reviewNotes, setReviewNotes] = useState('');
   const [selectedReports, setSelectedReports] = useState<string[]>([]);
+  const [selectedContent, setSelectedContent] = useState<string[]>([]);
   const [bulkProcessing, setBulkProcessing] = useState(false);
   const [moderationHistory, setModerationHistory] = useState<ModerationAction[]>([]);
   const [activeTab, setActiveTab] = useState('reports');
@@ -100,8 +115,10 @@ const ContentModeration: React.FC = () => {
     loadReports();
     if (activeTab === 'history') {
       loadModerationHistory();
+    } else if (activeTab === 'content') {
+      loadContent();
     }
-  }, [activeTab]);
+  }, [activeTab, filterContentType, filterStatus, searchTerm]);
 
   const loadReports = async () => {
     try {
@@ -147,6 +164,30 @@ const ContentModeration: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadContent = async () => {
+    try {
+      const { data, error } = await supabase.rpc('get_content_for_moderation', {
+        content_type_filter: filterContentType,
+        status_filter: filterStatus === 'pending' ? 'active' : filterStatus,
+        search_query: searchTerm || null,
+        limit_param: 50,
+        offset_param: 0
+      });
+
+      if (error) throw error;
+      setContent((data || []).map(item => ({
+        ...item,
+        content_type: item.content_type as 'post' | 'comment'
+      })));
+    } catch (error) {
+      console.error('Failed to load content:', error);
+      toast({
+        title: "Failed to load content",
+        variant: "destructive"
+      });
     }
   };
 
@@ -229,30 +270,59 @@ const ContentModeration: React.FC = () => {
     }
   };
 
-  const reviewReport = async (reportId: string, action: 'approved' | 'rejected') => {
+  const handleBulkContentAction = async (action: 'flagged' | 'removed') => {
+    if (selectedContent.length === 0) return;
+    
+    setBulkProcessing(true);
     try {
-      const { error } = await supabase
-        .from('content_reports')
-        .update({
-          status: action,
-          reviewed_by: user?.id,
-          reviewed_at: new Date().toISOString()
-        })
-        .eq('id', reportId);
+      const { data, error } = await supabase.rpc('moderate_content', {
+        content_type_param: 'post', // We'll handle mixed types later
+        content_ids: selectedContent,
+        new_status: action,
+        moderator_id: user?.id,
+        reason: `Bulk ${action} action`
+      });
 
       if (error) throw error;
 
-      // Log admin action
-      await supabase.rpc('log_admin_action', {
-        action_text: `content_report_${action}`,
-        target_type_text: 'content_report',
-        target_id_param: reportId,
-        details_param: { notes: reviewNotes }
+      toast({
+        title: 'Success',
+        description: (data as any)?.message || `${selectedContent.length} items ${action}`,
       });
+
+      setSelectedContent([]);
+      loadContent();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || `Failed to ${action} content`,
+        variant: 'destructive',
+      });
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
+  const reviewReport = async (reportId: string, action: 'approved' | 'rejected') => {
+    try {
+      const report = reports.find(r => r.id === reportId);
+      if (!report) return;
+
+      // Use the new resolve function to handle both report and content
+      const contentAction = action === 'approved' ? 'removed' : null;
+      
+      const { data, error } = await supabase.rpc('resolve_content_reports', {
+        report_ids: [reportId],
+        resolution: action,
+        content_action: contentAction,
+        moderator_notes: reviewNotes
+      });
+
+      if (error) throw error;
 
       toast({
         title: 'Success',
-        description: `Report ${action} successfully`,
+        description: (data as any)?.message || `Report ${action} successfully`,
       });
 
       setShowReviewDialog(false);
@@ -403,10 +473,14 @@ const ContentModeration: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="reports" className="flex items-center gap-2">
             <Flag className="w-4 h-4" />
             Reports Queue
+          </TabsTrigger>
+          <TabsTrigger value="content" className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4" />
+            Content Management
           </TabsTrigger>
           <TabsTrigger value="history" className="flex items-center gap-2">
             <Clock className="w-4 h-4" />
@@ -599,6 +673,204 @@ const ContentModeration: React.FC = () => {
               <h3 className="text-lg font-semibold mb-2">No reports found</h3>
               <p className="text-muted-foreground">
                 {searchTerm ? 'Try adjusting your search terms.' : 'No content reports match your filters.'}
+              </p>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="content" className="space-y-6">
+          {/* Content Management Search and Filters */}
+          <div className="flex gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search content..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            <Select value={filterContentType} onValueChange={setFilterContentType}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by type..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="post">Posts</SelectItem>
+                <SelectItem value="comment">Comments</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by status..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="flagged">Flagged</SelectItem>
+                <SelectItem value="removed">Removed</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Content Bulk Actions */}
+          {selectedContent.length > 0 && (
+            <Card className="glass-card border-orange-500">
+              <CardContent className="pt-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">{selectedContent.length} selected</Badge>
+                    <span className="text-sm text-muted-foreground">
+                      Bulk actions for selected content
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleBulkContentAction('flagged')}
+                      disabled={bulkProcessing}
+                    >
+                      <Flag className="w-4 h-4 mr-1" />
+                      Flag All
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleBulkContentAction('removed')}
+                      disabled={bulkProcessing}
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Remove All
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedContent([])}
+                    >
+                      Clear Selection
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Content List */}
+          <div className="space-y-4">
+            {content.map((item) => (
+              <Card key={item.content_id} className="glass-card">
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-4 flex-1">
+                      <Checkbox
+                        checked={selectedContent.includes(item.content_id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedContent([...selectedContent, item.content_id]);
+                          } else {
+                            setSelectedContent(selectedContent.filter(id => id !== item.content_id));
+                          }
+                        }}
+                      />
+                      
+                      <div className="flex items-center gap-2">
+                        {getContentTypeIcon(item.content_type)}
+                        {item.reports_count > 0 && (
+                          <Badge variant="destructive" className="text-xs">
+                            {item.reports_count} reports
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="font-semibold">
+                            {item.content_type === 'post' ? 'Post' : 'Comment'}
+                          </h3>
+                          <Badge variant={
+                            item.status === 'active' ? 'default' :
+                            item.status === 'flagged' ? 'secondary' : 'destructive'
+                          }>
+                            {item.status}
+                          </Badge>
+                        </div>
+                        
+                        <div className="bg-muted/50 p-3 rounded-lg mb-2">
+                          <p className="text-sm">
+                            {item.content.length > 200 
+                              ? item.content.substring(0, 200) + "..." 
+                              : item.content
+                            }
+                          </p>
+                        </div>
+                        
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <span>By:</span>
+                            <span>{item.author_name}</span>
+                          </div>
+                          
+                          <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                          
+                          {item.latest_report_reason && (
+                            <div className="flex items-center gap-1">
+                              <Flag className="w-3 h-3 text-red-500" />
+                              <span className="text-red-600 text-xs">
+                                Latest: {item.latest_report_reason}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      {item.status === 'active' && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleBulkContentAction('flagged')}
+                          >
+                            <Flag className="w-4 h-4 mr-1" />
+                            Flag
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleBulkContentAction('removed')}
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Remove
+                          </Button>
+                        </>
+                      )}
+                      {item.status === 'flagged' && (
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleBulkContentAction('removed')}
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {content.length === 0 && (
+            <div className="text-center py-12">
+              <MessageSquare className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No content found</h3>
+              <p className="text-muted-foreground">
+                {searchTerm ? 'Try adjusting your search terms.' : 'No content matches your filters.'}
               </p>
             </div>
           )}

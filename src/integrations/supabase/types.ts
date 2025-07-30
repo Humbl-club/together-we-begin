@@ -1392,6 +1392,26 @@ export type Database = {
         Args: { event_id_param: string }
         Returns: Json
       }
+      get_content_for_moderation: {
+        Args: {
+          content_type_filter?: string
+          status_filter?: string
+          search_query?: string
+          limit_param?: number
+          offset_param?: number
+        }
+        Returns: {
+          content_id: string
+          content_type: string
+          content: string
+          author_id: string
+          author_name: string
+          created_at: string
+          status: string
+          reports_count: number
+          latest_report_reason: string
+        }[]
+      }
       get_dashboard_data_v2: {
         Args: { user_id_param: string }
         Returns: {
@@ -1483,11 +1503,30 @@ export type Database = {
         Args: { thread_id_param: string; user_id_param: string }
         Returns: undefined
       }
+      moderate_content: {
+        Args: {
+          content_type_param: string
+          content_ids: string[]
+          new_status: string
+          moderator_id: string
+          reason?: string
+        }
+        Returns: Json
+      }
       remove_user_role: {
         Args: {
           _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
           _removed_by: string
+        }
+        Returns: Json
+      }
+      resolve_content_reports: {
+        Args: {
+          report_ids: string[]
+          resolution: string
+          content_action?: string
+          moderator_notes?: string
         }
         Returns: Json
       }

@@ -1131,7 +1131,15 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       step_validation_logs: {
         Row: {
@@ -1647,6 +1655,26 @@ export type Database = {
           created_at: string
           is_registered: boolean
           registration_status: Database["public"]["Enums"]["payment_status"]
+        }[]
+      }
+      get_social_posts_optimized: {
+        Args: {
+          limit_param?: number
+          offset_param?: number
+          user_id_filter?: string
+        }
+        Returns: {
+          id: string
+          user_id: string
+          content: string
+          image_urls: string[]
+          likes_count: number
+          comments_count: number
+          created_at: string
+          is_story: boolean
+          expires_at: string
+          status: Database["public"]["Enums"]["post_status"]
+          profile_data: Json
         }[]
       }
       get_unread_counts_for_user: {

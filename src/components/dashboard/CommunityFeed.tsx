@@ -23,18 +23,10 @@ const CommunityFeed: React.FC = () => {
 
   const loadPosts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('social_posts')
-        .select(`
-          *,
-          profiles!social_posts_user_id_fkey (
-            full_name,
-            avatar_url
-          )
-        `)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(10);
+      const { data, error } = await supabase.rpc('get_social_posts_optimized', {
+        limit_param: 10,
+        offset_param: 0
+      });
 
       if (error) throw error;
       setPosts(data || []);
@@ -199,14 +191,14 @@ const CommunityFeed: React.FC = () => {
             <CardContent className="p-4">
               <div className="flex items-start space-x-3">
                 <Avatar>
-                  <AvatarImage src={post.profiles?.avatar_url} />
+                  <AvatarImage src={post.profile_data?.avatar_url} />
                   <AvatarFallback>
-                    {post.profiles?.full_name?.charAt(0) || 'U'}
+                    {post.profile_data?.full_name?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
-                    <h4 className="font-semibold">{post.profiles?.full_name || 'Anonymous'}</h4>
+                    <h4 className="font-semibold">{post.profile_data?.full_name || 'Anonymous'}</h4>
                     <span className="text-sm text-muted-foreground">
                       {new Date(post.created_at).toLocaleDateString()}
                     </span>

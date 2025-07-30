@@ -15,6 +15,7 @@ import ChallengeManagement from '@/components/admin/ChallengeManagement';
 import NotificationManagement from '@/components/admin/NotificationManagement';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import SystemConfiguration from '@/components/admin/SystemConfiguration';
+import AdminErrorBoundary from '@/components/admin/AdminErrorBoundary';
 
 const Admin: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -76,8 +77,16 @@ const Admin: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container max-w-6xl mx-auto p-4">
-        <div className="text-center">Loading admin dashboard...</div>
+      <div className="min-h-screen bg-editorial-hero">
+        <div className="container max-w-7xl mx-auto p-4">
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <Card className="glass-card p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <h2 className="text-lg font-semibold mb-2">Loading Admin Dashboard</h2>
+              <p className="text-muted-foreground">Setting up your administrative interface...</p>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -97,37 +106,37 @@ const Admin: React.FC = () => {
         {/* Mobile-First Tab Interface */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="glass-nav rounded-lg p-1 mb-6 overflow-x-auto">
-            <TabsList className="grid w-full grid-cols-4 bg-transparent gap-1 min-w-max">
+            <TabsList className="grid w-full grid-cols-4 bg-transparent gap-1 min-w-max md:min-w-0">
               <TabsTrigger 
                 value="dashboard" 
-                className="flex items-center gap-2 px-3 py-2 min-h-[44px] data-[state=active]:bg-background/90 data-[state=active]:text-foreground"
+                className="flex items-center gap-2 px-2 md:px-3 py-2 min-h-[44px] data-[state=active]:bg-background/90 data-[state=active]:text-foreground"
               >
                 <BarChart3 className="w-4 h-4" />
-                <span className="hidden sm:inline">Dashboard</span>
+                <span className="text-xs md:text-sm">Dashboard</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="users" 
-                className="flex items-center gap-2 px-3 py-2 min-h-[44px] data-[state=active]:bg-background/90 data-[state=active]:text-foreground"
+                className="flex items-center gap-2 px-2 md:px-3 py-2 min-h-[44px] data-[state=active]:bg-background/90 data-[state=active]:text-foreground"
               >
                 <Users className="w-4 h-4" />
-                <span className="hidden sm:inline">Users</span>
+                <span className="text-xs md:text-sm">Users</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="content" 
-                className="flex items-center gap-2 px-3 py-2 min-h-[44px] data-[state=active]:bg-background/90 data-[state=active]:text-foreground"
+                className="flex items-center gap-2 px-2 md:px-3 py-2 min-h-[44px] data-[state=active]:bg-background/90 data-[state=active]:text-foreground"
               >
                 <MessageSquare className="w-4 h-4" />
-                <span className="hidden sm:inline">Content</span>
+                <span className="text-xs md:text-sm">Content</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="system" 
-                className="flex items-center gap-2 px-3 py-2 min-h-[44px] data-[state=active]:bg-background/90 data-[state=active]:text-foreground"
+                className="flex items-center gap-2 px-2 md:px-3 py-2 min-h-[44px] data-[state=active]:bg-background/90 data-[state=active]:text-foreground"
               >
                 <Settings className="w-4 h-4" />
-                <span className="hidden sm:inline">System</span>
+                <span className="text-xs md:text-sm">System</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -214,14 +223,26 @@ const Admin: React.FC = () => {
             <Tabs defaultValue="management" className="w-full">
               <div className="glass-nav rounded-lg p-1 mb-4">
                 <TabsList className="grid w-full grid-cols-3 bg-transparent gap-1">
-                  <TabsTrigger value="management" className="data-[state=active]:bg-background/90">Management</TabsTrigger>
-                  <TabsTrigger value="invites" className="data-[state=active]:bg-background/90">Invites</TabsTrigger>
-                  <TabsTrigger value="moderation" className="data-[state=active]:bg-background/90">Moderation</TabsTrigger>
+                  <TabsTrigger value="management" className="data-[state=active]:bg-background/90 text-xs md:text-sm">Management</TabsTrigger>
+                  <TabsTrigger value="invites" className="data-[state=active]:bg-background/90 text-xs md:text-sm">Invites</TabsTrigger>
+                  <TabsTrigger value="moderation" className="data-[state=active]:bg-background/90 text-xs md:text-sm">Moderation</TabsTrigger>
                 </TabsList>
               </div>
-              <TabsContent value="management"><UserManagement /></TabsContent>
-              <TabsContent value="invites"><InviteManagement /></TabsContent>
-              <TabsContent value="moderation"><ContentModeration /></TabsContent>
+              <TabsContent value="management">
+                <AdminErrorBoundary>
+                  <UserManagement />
+                </AdminErrorBoundary>
+              </TabsContent>
+              <TabsContent value="invites">
+                <AdminErrorBoundary>
+                  <InviteManagement />
+                </AdminErrorBoundary>
+              </TabsContent>
+              <TabsContent value="moderation">
+                <AdminErrorBoundary>
+                  <ContentModeration />
+                </AdminErrorBoundary>
+              </TabsContent>
             </Tabs>
           </TabsContent>
 
@@ -230,12 +251,20 @@ const Admin: React.FC = () => {
             <Tabs defaultValue="events" className="w-full">
               <div className="glass-nav rounded-lg p-1 mb-4">
                 <TabsList className="grid w-full grid-cols-2 bg-transparent gap-1">
-                  <TabsTrigger value="events" className="data-[state=active]:bg-background/90">Events</TabsTrigger>
-                  <TabsTrigger value="challenges" className="data-[state=active]:bg-background/90">Challenges</TabsTrigger>
+                  <TabsTrigger value="events" className="data-[state=active]:bg-background/90 text-xs md:text-sm">Events</TabsTrigger>
+                  <TabsTrigger value="challenges" className="data-[state=active]:bg-background/90 text-xs md:text-sm">Challenges</TabsTrigger>
                 </TabsList>
               </div>
-              <TabsContent value="events"><EventManagement /></TabsContent>
-              <TabsContent value="challenges"><ChallengeManagement /></TabsContent>
+              <TabsContent value="events">
+                <AdminErrorBoundary>
+                  <EventManagement />
+                </AdminErrorBoundary>
+              </TabsContent>
+              <TabsContent value="challenges">
+                <AdminErrorBoundary>
+                  <ChallengeManagement />
+                </AdminErrorBoundary>
+              </TabsContent>
             </Tabs>
           </TabsContent>
 
@@ -244,14 +273,26 @@ const Admin: React.FC = () => {
             <Tabs defaultValue="analytics" className="w-full">
               <div className="glass-nav rounded-lg p-1 mb-4">
                 <TabsList className="grid w-full grid-cols-3 bg-transparent gap-1">
-                  <TabsTrigger value="analytics" className="data-[state=active]:bg-background/90">Analytics</TabsTrigger>
-                  <TabsTrigger value="notifications" className="data-[state=active]:bg-background/90">Notifications</TabsTrigger>
-                  <TabsTrigger value="settings" className="data-[state=active]:bg-background/90">Settings</TabsTrigger>
+                  <TabsTrigger value="analytics" className="data-[state=active]:bg-background/90 text-xs md:text-sm">Analytics</TabsTrigger>
+                  <TabsTrigger value="notifications" className="data-[state=active]:bg-background/90 text-xs md:text-sm">Notifications</TabsTrigger>
+                  <TabsTrigger value="settings" className="data-[state=active]:bg-background/90 text-xs md:text-sm">Settings</TabsTrigger>
                 </TabsList>
               </div>
-              <TabsContent value="analytics"><AnalyticsDashboard /></TabsContent>
-              <TabsContent value="notifications"><NotificationManagement /></TabsContent>
-              <TabsContent value="settings"><SystemConfiguration /></TabsContent>
+              <TabsContent value="analytics">
+                <AdminErrorBoundary>
+                  <AnalyticsDashboard />
+                </AdminErrorBoundary>
+              </TabsContent>
+              <TabsContent value="notifications">
+                <AdminErrorBoundary>
+                  <NotificationManagement />
+                </AdminErrorBoundary>
+              </TabsContent>
+              <TabsContent value="settings">
+                <AdminErrorBoundary>
+                  <SystemConfiguration />
+                </AdminErrorBoundary>
+              </TabsContent>
             </Tabs>
           </TabsContent>
         </Tabs>

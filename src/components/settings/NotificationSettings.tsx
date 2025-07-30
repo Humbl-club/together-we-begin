@@ -67,9 +67,9 @@ export const NotificationSettings: React.FC = () => {
           challenge_updates: data.challenge_updates,
           social_interactions: data.social_interactions,
           marketing_emails: data.marketing_emails,
-          notification_frequency: 'immediate', // Default value
-          quiet_hours_start: '22:00', // Default value
-          quiet_hours_end: '07:00', // Default value
+          notification_frequency: data.notification_frequency || 'immediate',
+          quiet_hours_start: data.quiet_hours_start || '22:00',
+          quiet_hours_end: data.quiet_hours_end || '07:00',
         });
       }
     } catch (error) {
@@ -100,6 +100,9 @@ export const NotificationSettings: React.FC = () => {
           challenge_updates: settings.challenge_updates,
           social_interactions: settings.social_interactions,
           marketing_emails: settings.marketing_emails,
+          notification_frequency: settings.notification_frequency,
+          quiet_hours_start: settings.quiet_hours_start,
+          quiet_hours_end: settings.quiet_hours_end,
           updated_at: new Date().toISOString()
         });
 

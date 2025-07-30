@@ -1354,7 +1354,10 @@ export type Database = {
           event_reminders: boolean
           id: string
           marketing_emails: boolean
+          notification_frequency: string | null
           push_enabled: boolean
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
           sms_enabled: boolean
           social_interactions: boolean
           updated_at: string
@@ -1367,7 +1370,10 @@ export type Database = {
           event_reminders?: boolean
           id?: string
           marketing_emails?: boolean
+          notification_frequency?: string | null
           push_enabled?: boolean
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
           sms_enabled?: boolean
           social_interactions?: boolean
           updated_at?: string
@@ -1380,7 +1386,10 @@ export type Database = {
           event_reminders?: boolean
           id?: string
           marketing_emails?: boolean
+          notification_frequency?: string | null
           push_enabled?: boolean
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
           sms_enabled?: boolean
           social_interactions?: boolean
           updated_at?: string

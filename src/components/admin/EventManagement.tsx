@@ -69,6 +69,7 @@ const EventManagement: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showQRDialog, setShowQRDialog] = useState(false);
   const [qrCode, setQrCode] = useState<string>('');
+  const [qrGenerating, setQrGenerating] = useState<string | null>(null);
   const [createForm, setCreateForm] = useState({
     title: '',
     description: '',
@@ -669,9 +670,10 @@ const EventManagement: React.FC = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => generateQRCode(event.id)}
+                      disabled={qrGenerating === event.id}
                     >
                       <QrCode className="w-4 h-4 mr-1" />
-                      Generate QR
+                      {qrGenerating === event.id ? 'Generating...' : 'Generate QR'}
                     </Button>
                   )}
                   

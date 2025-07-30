@@ -32,8 +32,17 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending message:', error);
+      
+      // Show user-friendly error message
+      const errorMessage = error?.message || 'Failed to send message';
+      
+      // You can add a toast notification here if you have access to toast
+      // For now, we'll just log it and let the parent component handle it
+      if (errorMessage.includes('Rate limit')) {
+        console.warn('Rate limit reached - please wait before sending another message');
+      }
     } finally {
       setSending(false);
     }

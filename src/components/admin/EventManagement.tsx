@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { AttendanceManager } from '@/components/events/AttendanceManager';
 
 interface Event {
   id: string;
@@ -63,10 +64,23 @@ const EventManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showAttendeeDialog, setShowAttendeeDialog] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showQRDialog, setShowQRDialog] = useState(false);
   const [qrCode, setQrCode] = useState<string>('');
   const [createForm, setCreateForm] = useState({
+    title: '',
+    description: '',
+    start_time: '',
+    end_time: '',
+    location: '',
+    price_cents: 0,
+    loyalty_points_price: null as number | null,
+    max_capacity: null as number | null,
+    attendance_points: 0
+  });
+  const [editForm, setEditForm] = useState({
     title: '',
     description: '',
     start_time: '',
@@ -154,6 +168,66 @@ const EventManagement: React.FC = () => {
         variant: 'destructive',
       });
     }
+  };
+
+  const openEditDialog = (event: Event) => {
+    setSelectedEvent(event);
+    setEditForm({
+      title: event.title,
+      description: event.description || '',
+      start_time: event.start_time.slice(0, 16), // Format for datetime-local
+      end_time: event.end_time?.slice(0, 16) || '',
+      location: event.location || '',
+      price_cents: event.price_cents,
+      loyalty_points_price: event.loyalty_points_price,
+      max_capacity: event.max_capacity,
+      attendance_points: event.attendance_points
+    });
+    setShowEditDialog(true);
+  };
+
+  const updateEvent = async () => {
+    if (!selectedEvent) return;
+    
+    try {
+      const { error } = await supabase
+        .from('events')
+        .update({
+          ...editForm,
+          end_time: editForm.end_time || null
+        })
+        .eq('id', selectedEvent.id);
+
+      if (error) throw error;
+
+      // Log admin action
+      await supabase.rpc('log_admin_action', {
+        action_text: 'event_updated',
+        target_type_text: 'event',
+        target_id_param: selectedEvent.id,
+        details_param: { title: editForm.title }
+      });
+
+      toast({
+        title: 'Success',
+        description: 'Event updated successfully',
+      });
+
+      setShowEditDialog(false);
+      setSelectedEvent(null);
+      loadEvents();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to update event',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const openAttendeeDialog = (event: Event) => {
+    setSelectedEvent(event);
+    setShowAttendeeDialog(true);
   };
 
   const generateQRCode = async (eventId: string) => {
@@ -553,6 +627,23 @@ const EventManagement: React.FC = () => {
                 </div>
 
                 <div className="flex gap-2">
+                  <Button
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => openEditDialog(event)}
+                  >
+                    <Edit className="w-4 h-4 mr-1" />
+                    Edit
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openAttendeeDialog(event)}
+                  >
+                    <Users className="w-4 h-4 mr-1" />
+                    Attendees
+                  </Button>
                   {event.status === 'upcoming' && !event.qr_code_token && (
                     <Button
                       variant="outline"
@@ -642,6 +733,165 @@ const EventManagement: React.FC = () => {
             >
               Copy QR Code
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Event Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="glass-card max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Event</DialogTitle>
+            <DialogDescription>
+              Update event details and information
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <Label htmlFor="edit-title">Event Title</Label>
+                <Input
+                  id="edit-title"
+                  value={editForm.title}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Enter event title..."
+                />
+              </div>
+              
+              <div className="col-span-2">
+                <Label htmlFor="edit-description">Description</Label>
+                <Textarea
+                  id="edit-description"
+                  value={editForm.description}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Describe your event..."
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-start-time">Start Time</Label>
+                <Input
+                  id="edit-start-time"
+                  type="datetime-local"
+                  value={editForm.start_time}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, start_time: e.target.value }))}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-end-time">End Time</Label>
+                <Input
+                  id="edit-end-time"
+                  type="datetime-local"
+                  value={editForm.end_time}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, end_time: e.target.value }))}
+                />
+              </div>
+              
+              <div className="col-span-2">
+                <Label htmlFor="edit-location">Location</Label>
+                <Input
+                  id="edit-location"
+                  value={editForm.location}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, location: e.target.value }))}
+                  placeholder="Event location..."
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-price">Price (cents)</Label>
+                <Input
+                  id="edit-price"
+                  type="number"
+                  min="0"
+                  value={editForm.price_cents}
+                  onChange={(e) => setEditForm(prev => ({ 
+                    ...prev, 
+                    price_cents: parseInt(e.target.value) || 0 
+                  }))}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-loyalty-price">Loyalty Points Price</Label>
+                <Input
+                  id="edit-loyalty-price"
+                  type="number"
+                  min="0"
+                  value={editForm.loyalty_points_price || ''}
+                  onChange={(e) => setEditForm(prev => ({ 
+                    ...prev, 
+                    loyalty_points_price: e.target.value ? parseInt(e.target.value) : null
+                  }))}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-capacity">Max Capacity</Label>
+                <Input
+                  id="edit-capacity"
+                  type="number"
+                  min="1"
+                  value={editForm.max_capacity || ''}
+                  onChange={(e) => setEditForm(prev => ({ 
+                    ...prev, 
+                    max_capacity: e.target.value ? parseInt(e.target.value) : null
+                  }))}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-attendance-points">Attendance Points</Label>
+                <Input
+                  id="edit-attendance-points"
+                  type="number"
+                  min="0"
+                  value={editForm.attendance_points}
+                  onChange={(e) => setEditForm(prev => ({ 
+                    ...prev, 
+                    attendance_points: parseInt(e.target.value) || 0
+                  }))}
+                />
+              </div>
+            </div>
+            
+            <div className="flex gap-2 pt-4">
+              <Button onClick={updateEvent} className="flex-1">
+                Update Event
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowEditDialog(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Attendee Management Dialog */}
+      <Dialog open={showAttendeeDialog} onOpenChange={setShowAttendeeDialog}>
+        <DialogContent className="glass-card max-w-4xl max-h-[80vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>Event Attendees</DialogTitle>
+            <DialogDescription>
+              Manage attendance and view QR codes for {selectedEvent?.title}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-auto">
+            {selectedEvent && (
+              <AttendanceManager
+                eventId={selectedEvent.id}
+                eventTitle={selectedEvent.title}
+                eventDate={selectedEvent.start_time}
+                attendancePoints={selectedEvent.attendance_points}
+                qrCodeToken={selectedEvent.qr_code_token || undefined}
+              />
+            )}
           </div>
         </DialogContent>
       </Dialog>

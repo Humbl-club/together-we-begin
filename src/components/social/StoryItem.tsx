@@ -26,18 +26,18 @@ interface StoryItemProps {
 
 export const StoryItem: React.FC<StoryItemProps> = ({ story, isMobile }) => {
   return (
-    <div className="flex-shrink-0 text-center">
-      <div className={`${isMobile ? 'w-16 h-16' : 'w-20 h-20'} rounded-full bg-gradient-to-br from-primary via-primary/80 to-primary/60 p-0.5 hover:scale-105 transition-transform duration-300 cursor-pointer`}>
-        <div className="w-full h-full rounded-full bg-background p-0.5">
-          <Avatar className="w-full h-full">
-            <AvatarImage src={story.profiles.avatar_url} />
-            <AvatarFallback className={`${isMobile ? 'text-sm' : 'text-base'} font-medium`}>
+    <div className="flex-shrink-0 text-center touch-target-large">
+      <div className={`${isMobile ? 'w-20 h-20' : 'w-24 h-24'} rounded-full bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-1 hover:scale-110 transition-transform duration-500 cursor-pointer shadow-lg hover:shadow-xl`}>
+        <div className="w-full h-full rounded-full bg-background p-1 shadow-inner">
+          <Avatar className="w-full h-full shadow-md">
+            <AvatarImage src={story.profiles.avatar_url} className="object-cover" />
+            <AvatarFallback className={`${isMobile ? 'text-sm' : 'text-base'} font-bold bg-gradient-to-br from-primary/20 to-secondary/20`}>
               {story.profiles.full_name?.charAt(0) || story.profiles.username?.charAt(0) || '?'}
             </AvatarFallback>
           </Avatar>
         </div>
       </div>
-      <p className={`text-xs mt-2 truncate ${isMobile ? 'w-16' : 'w-20'} font-medium`}>
+      <p className={`text-xs mt-2 truncate ${isMobile ? 'w-20' : 'w-24'} font-semibold`}>
         {story.profiles.username || story.profiles.full_name?.split(' ')[0] || 'User'}
       </p>
     </div>

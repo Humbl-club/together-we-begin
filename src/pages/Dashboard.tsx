@@ -156,102 +156,14 @@ const Dashboard: React.FC = memo(() => {
         )}
 
         {/* Enhanced Mobile Header */}
-        {isMobile && (
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <img 
-                  src={profile?.avatar_url || '/placeholder.svg'} 
-                  alt="Profile"
-                  className="w-12 h-12 rounded-full ring-2 ring-primary/20"
-                />
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background"></div>
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold">
-                  Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  {profile?.full_name?.split(' ')[0] || 'Welcome back'}
-                </p>
-              </div>
-            </div>
-            
-            <MobileActionSheet
-              trigger={
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Plus className="w-5 h-5" />
-                </Button>
-              }
-              title="Quick Actions"
-              actions={quickActions}
-            />
-          </div>
-        )}
-
-        {/* Desktop Header */}
-        {!isMobile && (
+        {isMobile ? (
+          <DashboardHeader profile={profile} />
+        ) : (
           <DashboardHeader profile={profile} />
         )}
 
-        {/* Enhanced Stats Grid with Mobile Rings */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {isMobile ? (
-            // Mobile ring stats
-            <>
-              <GestureZone 
-                className="p-4 text-center glass-card rounded-xl"
-                onTap={() => console.log('Points tapped')}
-              >
-                <MobileStatsRing value={stats.loyaltyPoints} max={200} size="md">
-                  <div className="text-center">
-                    <div className="text-lg font-bold">{stats.loyaltyPoints}</div>
-                    <div className="text-xs text-muted-foreground">Points</div>
-                  </div>
-                </MobileStatsRing>
-              </GestureZone>
-              
-              <GestureZone 
-                className="p-4 text-center glass-card rounded-xl"
-                onTap={() => console.log('Events tapped')}
-              >
-                <MobileStatsRing value={stats.upcomingEvents} max={10} size="md" color="hsl(var(--blue-500))">
-                  <div className="text-center">
-                    <div className="text-lg font-bold">{stats.upcomingEvents}</div>
-                    <div className="text-xs text-muted-foreground">Events</div>
-                  </div>
-                </MobileStatsRing>
-              </GestureZone>
-              
-              <GestureZone 
-                className="p-4 text-center glass-card rounded-xl"
-                onTap={() => console.log('Challenges tapped')}
-              >
-                <MobileStatsRing value={stats.activeChallenges} max={5} size="md" color="hsl(var(--purple-500))">
-                  <div className="text-center">
-                    <div className="text-lg font-bold">{stats.activeChallenges}</div>
-                    <div className="text-xs text-muted-foreground">Active</div>
-                  </div>
-                </MobileStatsRing>
-              </GestureZone>
-              
-              <GestureZone 
-                className="p-4 text-center glass-card rounded-xl"
-                onTap={() => console.log('Posts tapped')}
-              >
-                <MobileStatsRing value={stats.totalPosts} max={20} size="md" color="hsl(var(--green-500))">
-                  <div className="text-center">
-                    <div className="text-lg font-bold">{stats.totalPosts}</div>
-                    <div className="text-xs text-muted-foreground">Posts</div>
-                  </div>
-                </MobileStatsRing>
-              </GestureZone>
-            </>
-          ) : (
-            // Desktop stats grid
-            <StatsGrid stats={stats} />
-          )}
-        </div>
+        {/* Enhanced Stats Grid with Mobile-First Design */}
+        <StatsGrid stats={stats} />
 
         {/* Content Grid */}
         <div className="grid gap-6 lg:grid-cols-3">
@@ -261,8 +173,8 @@ const Dashboard: React.FC = memo(() => {
 
             {/* Community Feed */}
             {isEnhanced && (
-              <Suspense fallback={<div className="h-96 bg-muted rounded-xl animate-pulse" />}>
-                <CommunityFeed />
+              <Suspense fallback={<div className="h-96 bg-muted/20 rounded-xl animate-pulse" />}>
+                <LazyCommunityFeed />
               </Suspense>
             )}
           </div>

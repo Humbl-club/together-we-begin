@@ -50,22 +50,22 @@ export const Navigation: React.FC = () => {
     return (
       <>
         <nav className="fixed bottom-0 left-0 right-0 z-50 mobile-nav-safe">
-          <div className="glass-nav border-t border-border/20 mx-3 mb-3 rounded-3xl shadow-xl backdrop-blur-2xl bg-background/90 border border-border/30">
-            <div className="grid grid-cols-4 gap-2 p-3">
+          <div className="glass-nav border-t border-border/40 mx-3 mb-3 rounded-3xl shadow-2xl backdrop-blur-3xl bg-background/95 border border-border/40">
+            <div className="grid grid-cols-4 gap-3 p-4">
               {/* Main navigation items - reduced to 4 */}
               {navItems.map(({ href, icon: Icon, label }) => (
                 <Link
                   key={href}
                   to={href}
                   onClick={() => haptics.tap()}
-                  className={`glass-button flex flex-col items-center justify-center min-h-[56px] min-w-[56px] p-3 rounded-2xl transition-all duration-300 touch-manipulation ${
+                  className={`glass-button flex flex-col items-center justify-center min-h-[60px] min-w-[60px] p-4 rounded-2xl transition-all duration-500 touch-manipulation ${
                     isActive(href)
-                      ? 'bg-primary/25 text-primary border-primary/40 shadow-xl scale-105 transform'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-primary/10 active:scale-95'
+                      ? 'bg-primary/30 text-primary border-primary/50 shadow-2xl scale-110 transform ring-2 ring-primary/20'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-primary/15 active:scale-95 hover:shadow-lg'
                   }`}
                 >
-                  <Icon className="w-6 h-6 mb-1.5" strokeWidth={isActive(href) ? 2.5 : 2} />
-                  <span className="text-[11px] font-medium tracking-tight leading-none">
+                  <Icon className="w-7 h-7 mb-2" strokeWidth={isActive(href) ? 2.5 : 2} />
+                  <span className="text-xs font-semibold tracking-tight leading-none">
                     {label}
                   </span>
                 </Link>
@@ -77,20 +77,24 @@ export const Navigation: React.FC = () => {
         {/* Floating Messages Button */}
         <Link
           to="/messages"
-          className={`fixed bottom-24 right-4 z-40 glass-button w-14 h-14 rounded-full flex items-center justify-center shadow-2xl border-2 transition-all duration-300 ${
+          onClick={() => haptics.impact('light')}
+          className={`fixed bottom-28 right-5 z-40 glass-button w-16 h-16 rounded-full flex items-center justify-center shadow-2xl border-2 transition-all duration-500 hover:scale-110 active:scale-95 ${
             isActive('/messages')
-              ? 'bg-primary/30 text-primary border-primary/50 shadow-primary/20'
-              : 'bg-background/80 text-muted-foreground hover:text-foreground hover:bg-primary/15 active:scale-95'
+              ? 'bg-primary/30 text-primary border-primary/50 shadow-primary/25 ring-4 ring-primary/20'
+              : 'bg-background/90 text-muted-foreground hover:text-foreground hover:bg-primary/20 active:scale-95 hover:shadow-2xl'
           }`}
         >
-          <MessageCircle className="w-6 h-6" strokeWidth={isActive('/messages') ? 2.5 : 2} />
+          <MessageCircle className="w-7 h-7" strokeWidth={isActive('/messages') ? 2.5 : 2} />
         </Link>
 
         {/* More Menu Sheet */}
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
-            <button className="fixed bottom-24 left-4 z-40 glass-button w-14 h-14 rounded-full flex items-center justify-center shadow-2xl border-2 transition-all duration-300 bg-background/80 text-muted-foreground hover:text-foreground hover:bg-primary/15 active:scale-95">
-              <MoreHorizontal className="w-6 h-6" strokeWidth={2} />
+            <button 
+              onClick={() => haptics.impact('medium')}
+              className="fixed bottom-28 left-5 z-40 glass-button w-16 h-16 rounded-full flex items-center justify-center shadow-2xl border-2 transition-all duration-500 bg-background/90 text-muted-foreground hover:text-foreground hover:bg-primary/20 hover:scale-110 active:scale-95 hover:shadow-2xl"
+            >
+              <MoreHorizontal className="w-7 h-7" strokeWidth={2} />
             </button>
           </SheetTrigger>
                 <SheetContent side="bottom" className="glass-modal border-0 rounded-t-3xl max-h-[85vh] bg-background/95 backdrop-blur-3xl">

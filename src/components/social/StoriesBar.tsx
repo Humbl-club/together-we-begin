@@ -31,17 +31,17 @@ export const StoriesBar: React.FC<StoriesBarProps> = ({ stories, isMobile }) => 
 
   return (
     <Card className="glass-card-enhanced">
-      <CardHeader className={isMobile ? 'pb-4 px-4 pt-4' : 'pb-4'}>
-        <CardTitle className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold`}>Stories</CardTitle>
+      <CardHeader className={isMobile ? 'pb-4 px-5 pt-5' : 'pb-4'}>
+        <CardTitle className={`${isMobile ? 'text-xl' : 'text-xl'} font-bold`}>Stories</CardTitle>
       </CardHeader>
-      <CardContent className={isMobile ? 'pt-0 px-4 pb-4' : 'pt-0'}>
-        <div className={`flex ${isMobile ? 'gap-4' : 'gap-6'} overflow-x-auto pb-2 scrollbar-hide`}>
+      <CardContent className={isMobile ? 'pt-0 px-5 pb-5' : 'pt-0'}>
+        <div className={`flex ${isMobile ? 'gap-5' : 'gap-6'} overflow-x-auto pb-3 scrollbar-hide ios-scroll`}>
           {/* Add Story Button */}
-          <div className="flex-shrink-0 text-center">
-            <div className={`${isMobile ? 'w-16 h-16' : 'w-20 h-20'} rounded-full bg-gradient-to-br from-primary/20 to-primary/10 border-2 border-dashed border-primary/30 flex items-center justify-center hover:border-primary/50 transition-all duration-300 cursor-pointer`}>
-              <Plus className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-primary`} />
+          <div className="flex-shrink-0 text-center touch-target-large">
+            <div className={`${isMobile ? 'w-20 h-20' : 'w-24 h-24'} rounded-full bg-gradient-to-br from-primary/25 to-primary/15 border-3 border-dashed border-primary/40 flex items-center justify-center hover:border-primary/60 transition-all duration-500 cursor-pointer shadow-lg hover:shadow-xl hover:scale-105 active:scale-95`}>
+              <Plus className={`${isMobile ? 'w-8 h-8' : 'w-10 h-10'} text-primary`} strokeWidth={2.5} />
             </div>
-            <p className={`text-xs mt-2 truncate ${isMobile ? 'w-16' : 'w-20'} font-medium text-primary`}>
+            <p className={`text-xs mt-2 truncate ${isMobile ? 'w-20' : 'w-24'} font-bold text-primary`}>
               Add Story
             </p>
           </div>

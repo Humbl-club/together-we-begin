@@ -351,7 +351,7 @@ const EventManagement: React.FC = () => {
               Create Event
             </Button>
           </DialogTrigger>
-          <DialogContent className="glass-card max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <DialogHeader>
               <DialogTitle>Create New Event</DialogTitle>
               <DialogDescription>
@@ -359,7 +359,7 @@ const EventManagement: React.FC = () => {
               </DialogDescription>
             </DialogHeader>
             
-            <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+            <div className="space-y-4 overflow-y-auto pr-2 -mr-2 max-h-[calc(90vh-120px)]">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <Label htmlFor="title">Event Title</Label>
@@ -469,13 +469,30 @@ const EventManagement: React.FC = () => {
                 </div>
               </div>
               
-              <div className="flex gap-2 pt-4">
-                <Button onClick={createEvent} className="flex-1">
-                  Create Event
+              <div className="flex gap-2 pt-6 mt-6 border-t bg-background/80 backdrop-blur -mx-6 px-6 py-4 sticky bottom-0">
+                <Button 
+                  onClick={createEvent} 
+                  className="flex-1"
+                  disabled={loading || !createForm.title || !createForm.start_time}
+                >
+                  {loading ? "Creating..." : "Create Event"}
                 </Button>
                 <Button 
                   variant="outline" 
-                  onClick={() => setShowCreateDialog(false)}
+                  onClick={() => {
+                    setShowCreateDialog(false);
+                    setCreateForm({
+                      title: '',
+                      description: '',
+                      start_time: '',
+                      end_time: '',
+                      location: '',
+                      price_cents: 0,
+                      loyalty_points_price: null,
+                      max_capacity: null,
+                      attendance_points: 0
+                    });
+                  }}
                 >
                   Cancel
                 </Button>
@@ -702,7 +719,7 @@ const EventManagement: React.FC = () => {
 
       {/* QR Code Dialog */}
       <Dialog open={showQRDialog} onOpenChange={setShowQRDialog}>
-        <DialogContent className="glass-card">
+        <DialogContent className="max-w-md bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <DialogHeader>
             <DialogTitle>Event QR Code</DialogTitle>
             <DialogDescription>
@@ -742,7 +759,7 @@ const EventManagement: React.FC = () => {
 
       {/* Edit Event Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="glass-card max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <DialogHeader>
             <DialogTitle>Edit Event</DialogTitle>
             <DialogDescription>
@@ -877,7 +894,7 @@ const EventManagement: React.FC = () => {
 
       {/* Attendee Management Dialog */}
       <Dialog open={showAttendeeDialog} onOpenChange={setShowAttendeeDialog}>
-        <DialogContent className="glass-card max-w-4xl max-h-[80vh] overflow-hidden">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <DialogHeader>
             <DialogTitle>Event Attendees</DialogTitle>
             <DialogDescription>

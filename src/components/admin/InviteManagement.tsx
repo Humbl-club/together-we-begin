@@ -205,7 +205,7 @@ const InviteManagement: React.FC = () => {
               Create Invite
             </Button>
           </DialogTrigger>
-          <DialogContent className="glass-card">
+          <DialogContent className="max-w-md bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <DialogHeader>
               <DialogTitle>Create New Invite Code</DialogTitle>
               <DialogDescription>
@@ -267,12 +267,24 @@ const InviteManagement: React.FC = () => {
               </div>
               
               <div className="flex gap-2 pt-4">
-                <Button onClick={createInvite} className="flex-1">
-                  Create Invite
+                <Button 
+                  onClick={createInvite} 
+                  className="flex-1"
+                  disabled={loading || !createForm.invite_type}
+                >
+                  {loading ? "Creating..." : "Create Invite"}
                 </Button>
                 <Button 
                   variant="outline" 
-                  onClick={() => setShowCreateDialog(false)}
+                  onClick={() => {
+                    setShowCreateDialog(false);
+                    setCreateForm({
+                      invite_type: 'general',
+                      max_uses: 1,
+                      expires_at: '',
+                      notes: ''
+                    });
+                  }}
                 >
                   Cancel
                 </Button>

@@ -114,7 +114,8 @@ const CommunityFeed: React.FC = () => {
           id,
           content,
           created_at,
-          profiles:user_id (
+          user_id,
+          profiles!inner(
             full_name,
             username,
             avatar_url

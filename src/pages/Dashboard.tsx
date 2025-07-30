@@ -166,8 +166,8 @@ const Dashboard: React.FC = memo(() => {
         <StatsGrid stats={stats} />
 
         {/* Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="responsive-grid lg:grid-cols-3">
+          <div className="lg:col-span-2 space-mobile">
             {/* Upcoming Events */}
             <UpcomingEvents />
 
@@ -179,7 +179,7 @@ const Dashboard: React.FC = memo(() => {
             )}
           </div>
 
-          <div className="space-y-6">
+          <div className="space-mobile">
             {/* Enhanced Wellness Card */}
             <Suspense fallback={<div className="h-64 bg-muted rounded-xl animate-pulse" />}>
               <WellnessCard
@@ -194,20 +194,20 @@ const Dashboard: React.FC = memo(() => {
 
             {/* Quick Actions Card for Desktop */}
             {!isMobile && (
-              <Card className="glass-card">
+              <Card className="card-secondary">
                 <CardHeader>
-                  <CardTitle className="text-lg">Quick Actions</CardTitle>
+                  <CardTitle className="editorial-heading text-lg">Quick Actions</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start" size="sm">
+                <CardContent className="space-mobile">
+                  <Button variant="outline" className="w-full justify-start button-glass" size="sm">
                     <Calendar className="w-4 h-4 mr-2" />
                     Create Event
                   </Button>
-                  <Button variant="outline" className="w-full justify-start" size="sm">
+                  <Button variant="outline" className="w-full justify-start button-glass" size="sm">
                     <Users className="w-4 h-4 mr-2" />
                     Find Friends
                   </Button>
-                  <Button variant="outline" className="w-full justify-start" size="sm">
+                  <Button variant="outline" className="w-full justify-start button-glass" size="sm">
                     <Zap className="w-4 h-4 mr-2" />
                     Start Challenge
                   </Button>

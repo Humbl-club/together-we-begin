@@ -55,29 +55,34 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Mobile Navigation with floating Messages button
+  // Mobile Navigation - unified design system
   if (isMobile) {
     return (
       <>
         <nav className="fixed bottom-0 left-0 right-0 z-50 mobile-nav-safe">
-          <div className="glass-nav border-t border-border/40 mx-3 mb-3 rounded-3xl shadow-2xl backdrop-blur-3xl bg-background/95 border border-border/40">
-            <div className="grid grid-cols-4 gap-3 p-4">
-              {/* Main navigation items - all 4 */}
+          <div className="nav-glass mx-3 mb-3 rounded-3xl shadow-xl">
+            <div className="grid grid-cols-4 gap-2 p-4">
               {navItems.map(({ href, icon: Icon, label }) => (
                 <Link
                   key={href}
                   to={href}
                   onClick={() => haptics.tap()}
-                  className={`glass-button flex flex-col items-center justify-center min-h-[60px] min-w-[60px] p-4 rounded-2xl transition-all duration-500 touch-manipulation ${
-                    isActive(href)
-                      ? 'bg-primary/30 text-primary border-primary/50 shadow-2xl scale-110 transform ring-2 ring-primary/20'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-primary/15 active:scale-95 hover:shadow-lg'
-                  }`}
+                  className={`
+                    flex flex-col items-center justify-center p-3 rounded-2xl 
+                    touch-target-large touch-feedback transition-all duration-300
+                    ${isActive(href)
+                      ? 'card-accent text-primary scale-105 shadow-lg' 
+                      : 'text-muted-foreground hover:text-foreground hover:card-secondary'
+                    }
+                  `}
                 >
-                  <Icon className="w-7 h-7 mb-2" strokeWidth={isActive(href) ? 2.5 : 2} />
-                  <span className="text-xs font-semibold tracking-tight leading-none">
+                  <Icon className="w-6 h-6 mb-1" strokeWidth={isActive(href) ? 2.5 : 2} />
+                  <span className="text-xs font-medium tracking-tight">
                     {label}
                   </span>
+                  {isActive(href) && (
+                    <div className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full" />
+                  )}
                 </Link>
               ))}
             </div>
@@ -90,18 +95,16 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
             haptics.tap();
             setShowMessaging(true);
           }}
-          className={`
-            fixed z-50 glass-button-enhanced rounded-full flex items-center justify-center 
-            shadow-2xl border-2 transition-all duration-500 group
-            bg-background/95 hover:bg-primary/15 hover:scale-110 active:scale-95 
-            ring-2 ring-primary/20 hover:ring-primary/40 backdrop-blur-3xl
-            bottom-28 right-5 w-16 h-16 p-0
-          `}
+          className="
+            fixed bottom-28 right-4 z-50 w-16 h-16 rounded-full 
+            card-accent shadow-lg touch-feedback
+            transition-all duration-300 hover:scale-110 active:scale-95
+          "
           aria-label="Messages"
         >
-          <MessageCircle className="w-7 h-7" strokeWidth={2} />
+          <MessageCircle className="w-6 h-6" strokeWidth={2} />
           {totalUnreadCount > 0 && (
-            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-background">
+            <div className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full flex items-center justify-center text-destructive-foreground text-xs font-bold border-2 border-background">
               {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
             </div>
           )}

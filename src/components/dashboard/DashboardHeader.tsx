@@ -50,21 +50,21 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
 
   if (isMobile) {
     return (
-      <div className="glass-card-enhanced p-6 mb-6 relative">
+      <div className="card-primary p-6 mb-6 relative">
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold tracking-tight truncate mb-2">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground mb-2">
               {greeting}!
             </h1>
-            <p className="text-lg text-primary font-semibold truncate mb-2">
+            <p className="text-lg font-semibold text-primary mb-2">
               Welcome back, {firstName}
             </p>
-            <Badge variant="secondary" className="text-sm bg-primary/10 text-primary">
+            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
               Your wellness journey continues
             </Badge>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Button 
               variant="ghost"
               size="icon"
@@ -72,7 +72,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
                 haptics.tap();
                 setShowMessaging(true);
               }}
-              className="w-12 h-12 rounded-full glass-button relative"
+              className="touch-target-large rounded-full button-glass relative"
             >
               <MessageCircle className="w-5 h-5" />
               {totalUnreadCount > 0 && (
@@ -91,7 +91,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
                 haptics.tap();
                 navigate('/search');
               }}
-              className="w-12 h-12 rounded-full glass-button"
+              className="touch-target-large rounded-full button-glass"
             >
               <Search className="w-5 h-5" />
             </Button>
@@ -102,17 +102,17 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
                 haptics.tap();
                 navigate('/notifications');
               }}
-              className="w-12 h-12 rounded-full glass-button relative"
+              className="touch-target-large rounded-full button-glass relative"
             >
               <Bell className="w-5 h-5" />
-              <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></div>
+              <div className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full"></div>
             </Button>
             <Button 
               onClick={() => {
                 haptics.impact('medium');
                 navigate('/social');
               }}
-              className="w-12 h-12 rounded-full glass-button bg-primary/20 text-primary border-primary/30 hover:bg-primary/30 transition-all shadow-lg"
+              className="touch-target-large rounded-full card-accent text-primary hover:scale-105 touch-feedback"
             >
               <Plus className="w-6 h-6" />
             </Button>
@@ -127,15 +127,15 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
     );
   }
 
-  // Desktop version - without redundant avatar
+  // Desktop version - unified design
   return (
-    <div className="glass-card-enhanced p-6 mb-6 relative">
-        <div className="cluster justify-between">
+    <div className="card-primary p-6 mb-6 relative">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="fluid-heading font-medium">
+            <h1 className="text-2xl font-semibold text-foreground">
               {greeting}, {firstName}
             </h1>
-            <p className="fluid-body text-muted-foreground">
+            <p className="text-muted-foreground mt-1">
               Your wellness journey continues
             </p>
           </div>
@@ -147,7 +147,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
                 haptics.tap();
                 setShowMessaging(true);
               }}
-              className="glass-button bg-background/60 border-border/40 hover:bg-background/80 relative"
+              className="button-glass hover:card-secondary relative"
             >
               <MessageCircle className="w-4 h-4 mr-2" />
               Messages
@@ -166,7 +166,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
                 haptics.impact('medium');
                 navigate('/social');
               }}
-              className="modern-button glass-button bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-all"
+              className="card-accent text-primary hover:scale-105 transition-all"
             >
               <Plus className="w-4 h-4 mr-2" />
               Share Update

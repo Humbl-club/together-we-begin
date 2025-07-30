@@ -6,13 +6,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MobileToggle } from '@/components/ui/mobile-toggle';
-import { Bell, Shield, Heart, Users, Palette, Save, MessageCircle, Lock, Search, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Bell, Shield, Heart, Users, Palette, Save, MessageCircle, Lock, Search, ChevronRight, ArrowLeft, User } from 'lucide-react';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import { useViewport } from '@/hooks/use-mobile';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { MobileActionSheet } from '@/components/ui/mobile-action-sheet';
 import { SwipeableCard } from '@/components/ui/swipeable-card';
 import { cn } from '@/lib/utils';
+import { PrivacySettings } from '@/components/settings/PrivacySettings';
+import { NotificationSettings } from '@/components/settings/NotificationSettings';
+import { AccountManagement } from '@/components/settings/AccountManagement';
 
 const Settings: React.FC = () => {
   const { settings, loading, saving, updateSetting } = useUserSettings();
@@ -44,6 +47,13 @@ const Settings: React.FC = () => {
   // Settings sections for mobile
   const settingSections = [
     {
+      id: 'privacy',
+      title: 'Privacy & Security',
+      icon: Shield,
+      description: 'Control your privacy settings',
+      keywords: ['profile', 'visibility', 'security', 'private', 'public', 'messages', 'groups']
+    },
+    {
       id: 'notifications',
       title: 'Notifications',
       icon: Bell,
@@ -51,11 +61,11 @@ const Settings: React.FC = () => {
       keywords: ['push', 'email', 'sms', 'alerts', 'reminders', 'events', 'challenges', 'social']
     },
     {
-      id: 'privacy',
-      title: 'Privacy & Security',
-      icon: Shield,
-      description: 'Control your privacy settings',
-      keywords: ['profile', 'visibility', 'security', 'private', 'public', 'messages', 'groups']
+      id: 'account',
+      title: 'Account Management',
+      icon: User,
+      description: 'Password, email, and account settings',
+      keywords: ['password', 'email', 'delete', 'export', 'security', 'account']
     },
     {
       id: 'messaging',
@@ -191,16 +201,20 @@ const Settings: React.FC = () => {
         )
       ) : (
         // Desktop tabs layout
-        <Tabs defaultValue="notifications" className="space-y-6">
+        <Tabs defaultValue="privacy" className="space-y-6">
           <div className="w-full overflow-x-auto">
-            <TabsList className="inline-flex w-max min-w-full sm:grid sm:grid-cols-6 gap-1 p-1">
+            <TabsList className="inline-flex w-max min-w-full sm:grid sm:grid-cols-7 gap-1 p-1">
+              <TabsTrigger value="privacy" className="flex items-center gap-2 flex-shrink-0">
+                <Shield className="w-4 h-4" />
+                <span className="text-xs sm:text-sm">Privacy</span>
+              </TabsTrigger>
               <TabsTrigger value="notifications" className="flex items-center gap-2 flex-shrink-0">
                 <Bell className="w-4 h-4" />
                 <span className="text-xs sm:text-sm">Notifications</span>
               </TabsTrigger>
-              <TabsTrigger value="privacy" className="flex items-center gap-2 flex-shrink-0">
-                <Shield className="w-4 h-4" />
-                <span className="text-xs sm:text-sm">Privacy</span>
+              <TabsTrigger value="account" className="flex items-center gap-2 flex-shrink-0">
+                <User className="w-4 h-4" />
+                <span className="text-xs sm:text-sm">Account</span>
               </TabsTrigger>
               <TabsTrigger value="messaging" className="flex items-center gap-2 flex-shrink-0">
                 <MessageCircle className="w-4 h-4" />
@@ -221,168 +235,16 @@ const Settings: React.FC = () => {
             </TabsList>
           </div>
 
-        <TabsContent value="notifications">
-          <Card className="glass-card-enhanced">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="w-5 h-5" />
-                Notifications
-              </CardTitle>
-              <CardDescription>
-                Manage how you receive notifications and updates
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-6">
-                <div className="flex items-start justify-between gap-4 py-3">
-                  <div className="flex-1">
-                    <Label htmlFor="pushNotifications" className="text-base font-medium">Push Notifications</Label>
-                    <p className="text-sm text-muted-foreground mt-1">Get instant updates on your device</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.notifications.push_enabled}
-                    onCheckedChange={(checked) => updateSetting('notifications', 'push_enabled', checked)}
-                    className="flex-shrink-0"
-                  />
-                </div>
-
-                <div className="flex items-start justify-between gap-4 py-3">
-                  <div className="flex-1">
-                    <Label htmlFor="emailNotifications" className="text-base font-medium">Email Notifications</Label>
-                    <p className="text-sm text-muted-foreground mt-1">Receive updates via email</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.notifications.email_enabled}
-                    onCheckedChange={(checked) => updateSetting('notifications', 'email_enabled', checked)}
-                    className="flex-shrink-0"
-                  />
-                </div>
-
-                <div className="flex items-start justify-between gap-4 py-3">
-                  <div className="flex-1">
-                    <Label htmlFor="smsNotifications" className="text-base font-medium">SMS Notifications</Label>
-                    <p className="text-sm text-muted-foreground mt-1">Get text messages for important updates</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.notifications.sms_enabled}
-                    onCheckedChange={(checked) => updateSetting('notifications', 'sms_enabled', checked)}
-                    className="flex-shrink-0"
-                  />
-                </div>
-
-                <div className="flex items-start justify-between gap-4 py-3">
-                  <div className="flex-1">
-                    <Label htmlFor="eventReminders" className="text-base font-medium">Event Reminders</Label>
-                    <p className="text-sm text-muted-foreground mt-1">Never miss upcoming events</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.notifications.event_reminders}
-                    onCheckedChange={(checked) => updateSetting('notifications', 'event_reminders', checked)}
-                    className="flex-shrink-0"
-                  />
-                </div>
-
-                <div className="flex items-start justify-between gap-4 py-3">
-                  <div className="flex-1">
-                    <Label htmlFor="challengeUpdates" className="text-base font-medium">Challenge Updates</Label>
-                    <p className="text-sm text-muted-foreground mt-1">Stay updated on wellness challenges</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.notifications.challenge_updates}
-                    onCheckedChange={(checked) => updateSetting('notifications', 'challenge_updates', checked)}
-                    className="flex-shrink-0"
-                  />
-                </div>
-
-                <div className="flex items-start justify-between gap-4 py-3">
-                  <div className="flex-1">
-                    <Label htmlFor="socialInteractions" className="text-base font-medium">Social Interactions</Label>
-                    <p className="text-sm text-muted-foreground mt-1">Likes, comments, and new followers</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.notifications.social_interactions}
-                    onCheckedChange={(checked) => updateSetting('notifications', 'social_interactions', checked)}
-                    className="flex-shrink-0"
-                  />
-                </div>
-
-                <div className="flex items-start justify-between gap-4 py-3">
-                  <div className="flex-1">
-                    <Label htmlFor="marketingEmails" className="text-base font-medium">Marketing Emails</Label>
-                    <p className="text-sm text-muted-foreground mt-1">Community updates and promotions</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.notifications.marketing_emails}
-                    onCheckedChange={(checked) => updateSetting('notifications', 'marketing_emails', checked)}
-                    className="flex-shrink-0"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="privacy">
+          <PrivacySettings />
         </TabsContent>
 
-        <TabsContent value="privacy">
-          <Card className="glass-card-enhanced">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5" />
-                Privacy & Security
-              </CardTitle>
-              <CardDescription>
-                Control your privacy and data sharing preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="profileVisibility">Profile Visibility</Label>
-                  <Select value={settings.social.activity_visibility} onValueChange={(value) => updateSetting('social', 'activity_visibility', value)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="public">Public</SelectItem>
-                      <SelectItem value="friends">Friends Only</SelectItem>
-                      <SelectItem value="private">Private</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+        <TabsContent value="notifications">
+          <NotificationSettings />
+        </TabsContent>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="messageRequests">Allow Message Requests</Label>
-                  <MobileToggle
-                    checked={settings.social.message_requests}
-                    onCheckedChange={(checked) => updateSetting('social', 'message_requests', checked)}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="groupInvitations">Group Invitations</Label>
-                  <MobileToggle
-                    checked={settings.social.group_invitations}
-                    onCheckedChange={(checked) => updateSetting('social', 'group_invitations', checked)}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="contentSuggestions">Content Suggestions</Label>
-                  <MobileToggle
-                    checked={settings.social.content_suggestions}
-                    onCheckedChange={(checked) => updateSetting('social', 'content_suggestions', checked)}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="storySharing">Story Sharing</Label>
-                  <MobileToggle
-                    checked={settings.social.story_sharing}
-                    onCheckedChange={(checked) => updateSetting('social', 'story_sharing', checked)}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="account">
+          <AccountManagement />
         </TabsContent>
 
         <TabsContent value="messaging">
@@ -670,158 +532,15 @@ const Settings: React.FC = () => {
   // Render mobile section content
   function renderMobileSectionContent(sectionId: string) {
     switch (sectionId) {
-      case 'notifications':
-        return (
-          <Card className="glass-card-enhanced">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="w-5 h-5" />
-                Notifications
-              </CardTitle>
-              <CardDescription>
-                Manage how you receive notifications and updates
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-6">
-                <div className="flex items-start justify-between gap-4 py-3">
-                  <div className="flex-1">
-                    <Label htmlFor="pushNotifications" className="text-base font-medium">Push Notifications</Label>
-                    <p className="text-sm text-muted-foreground mt-1">Get instant updates on your device</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.notifications.push_enabled}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('notifications', 'push_enabled', checked);
-                    }}
-                    className="flex-shrink-0"
-                  />
-                </div>
-
-                <div className="flex items-start justify-between gap-4 py-3">
-                  <div className="flex-1">
-                    <Label htmlFor="emailNotifications" className="text-base font-medium">Email Notifications</Label>
-                    <p className="text-sm text-muted-foreground mt-1">Receive updates via email</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.notifications.email_enabled}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('notifications', 'email_enabled', checked);
-                    }}
-                    className="flex-shrink-0"
-                  />
-                </div>
-
-                <div className="flex items-start justify-between gap-4 py-3">
-                  <div className="flex-1">
-                    <Label htmlFor="eventReminders" className="text-base font-medium">Event Reminders</Label>
-                    <p className="text-sm text-muted-foreground mt-1">Never miss upcoming events</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.notifications.event_reminders}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('notifications', 'event_reminders', checked);
-                    }}
-                    className="flex-shrink-0"
-                  />
-                </div>
-
-                <div className="flex items-start justify-between gap-4 py-3">
-                  <div className="flex-1">
-                    <Label htmlFor="challengeUpdates" className="text-base font-medium">Challenge Updates</Label>
-                    <p className="text-sm text-muted-foreground mt-1">Stay updated on wellness challenges</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.notifications.challenge_updates}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('notifications', 'challenge_updates', checked);
-                    }}
-                    className="flex-shrink-0"
-                  />
-                </div>
-
-                <div className="flex items-start justify-between gap-4 py-3">
-                  <div className="flex-1">
-                    <Label htmlFor="socialInteractions" className="text-base font-medium">Social Interactions</Label>
-                    <p className="text-sm text-muted-foreground mt-1">Likes, comments, and new followers</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.notifications.social_interactions}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('notifications', 'social_interactions', checked);
-                    }}
-                    className="flex-shrink-0"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
 
       case 'privacy':
-        return (
-          <Card className="glass-card-enhanced">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5" />
-                Privacy & Security
-              </CardTitle>
-              <CardDescription>
-                Control your privacy and data sharing preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="profileVisibility">Profile Visibility</Label>
-                  <Select 
-                    value={settings.social.activity_visibility} 
-                    onValueChange={(value) => {
-                      feedback.tap();
-                      updateSetting('social', 'activity_visibility', value);
-                    }}
-                  >
-                    <SelectTrigger className="h-12">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="public">Public</SelectItem>
-                      <SelectItem value="friends">Friends Only</SelectItem>
-                      <SelectItem value="private">Private</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+        return <PrivacySettings />;
 
-                <div className="flex items-center justify-between py-3">
-                  <Label htmlFor="messageRequests">Allow Message Requests</Label>
-                  <MobileToggle
-                    checked={settings.social.message_requests}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('social', 'message_requests', checked);
-                    }}
-                  />
-                </div>
+      case 'account':
+        return <AccountManagement />;
 
-                <div className="flex items-center justify-between py-3">
-                  <Label htmlFor="groupInvitations">Group Invitations</Label>
-                  <MobileToggle
-                    checked={settings.social.group_invitations}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('social', 'group_invitations', checked);
-                    }}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
+      case 'notifications':
+        return <NotificationSettings />;
 
       case 'wellness':
         return (

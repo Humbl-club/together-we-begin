@@ -1744,6 +1744,24 @@ export type Database = {
           recent_activity: Json
         }[]
       }
+      get_user_threads_optimized: {
+        Args: {
+          user_id_param: string
+          page_limit?: number
+          page_offset?: number
+        }
+        Returns: {
+          thread_id: string
+          participant_1: string
+          participant_2: string
+          last_message_at: string
+          last_message_id: string
+          other_user_id: string
+          other_user_name: string
+          other_user_avatar: string
+          unread_count: number
+        }[]
+      }
       get_users_with_roles: {
         Args: { _requesting_user_id: string }
         Returns: {

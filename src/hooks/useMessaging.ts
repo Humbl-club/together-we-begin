@@ -117,24 +117,18 @@ export const useMessaging = () => {
       
       // Try to get cached threads first
       const cachedThreads = getCachedThreads();
-      if (cachedThreads) {
+      if (cachedThreads && cachedThreads.length > 0) {
         setThreads(cachedThreads);
         setLoading(false);
+        
+        // Background refresh for cache updates
+        setTimeout(() => {
+          loadThreadsFromDatabase();
+        }, 1000);
         return;
       }
       
-      const userThreads = await measureDatabase(
-        'load_threads',
-        () => messagingService.getThreads(),
-        0 // Will be updated with actual count
-      );
-      setThreads(userThreads);
-      cacheThreads(userThreads);
-      
-      // Update unread counts in cache
-      userThreads.forEach(thread => {
-        updateUnreadCount(thread.id, thread.unread_count);
-      });
+      await loadThreadsFromDatabase();
     } catch (error) {
       console.error('Error loading threads:', error);
       toast({
@@ -146,6 +140,23 @@ export const useMessaging = () => {
       setLoading(false);
     }
   }, [user?.id, toast, getCachedThreads, cacheThreads, updateUnreadCount]);
+
+  const loadThreadsFromDatabase = useCallback(async () => {
+    if (!user?.id) return;
+    
+    const userThreads = await measureDatabase(
+      'load_threads',
+      () => messagingService.getThreads(),
+      0
+    );
+    setThreads(userThreads);
+    cacheThreads(userThreads);
+    
+    // Update unread counts in cache
+    userThreads.forEach(thread => {
+      updateUnreadCount(thread.id, thread.unread_count);
+    });
+  }, [user?.id, measureDatabase, messagingService, cacheThreads, updateUnreadCount]);
 
   const loadMessages = useCallback(async (threadId: string) => {
     try {

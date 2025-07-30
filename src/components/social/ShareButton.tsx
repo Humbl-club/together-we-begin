@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 interface ShareButtonProps {
   postId: string;
   postContent: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'lg' | 'default' | 'icon';
   isMobile?: boolean;
 }
 

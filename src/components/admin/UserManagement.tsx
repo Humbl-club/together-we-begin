@@ -214,12 +214,15 @@ const UserManagement: React.FC = () => {
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-        <Input
-          placeholder="Search users..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
+          <Input
+            id="user-search"
+            name="userSearch"
+            placeholder="Search users..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+            autoComplete="off"
+          />
       </div>
 
       {/* Role Assignment */}

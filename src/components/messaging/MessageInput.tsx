@@ -62,6 +62,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       <div className="flex gap-2 items-end">
         <div className="flex-1 relative">
           <Textarea
+            id="message-input"
+            name="message"
             ref={textareaRef}
             placeholder={placeholder}
             value={message}
@@ -71,6 +73,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             maxLength={1000}
             disabled={disabled || sending}
             rows={1}
+            autoComplete="off"
           />
           <div className="absolute right-3 bottom-3 flex items-center gap-1">
             <button

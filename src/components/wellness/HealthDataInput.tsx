@@ -182,6 +182,8 @@ export function HealthDataInput({ onDataSubmit, currentData }: HealthDataInputPr
                 
                 <div className="space-y-1">
                   <Input
+                    id={`health-${metric.key}`}
+                    name={metric.key}
                     type="number"
                     value={value}
                     onChange={(e) => setData(prev => ({
@@ -190,6 +192,7 @@ export function HealthDataInput({ onDataSubmit, currentData }: HealthDataInputPr
                     }))}
                     placeholder={`Enter ${metric.label.toLowerCase()}`}
                     className="h-8"
+                    autoComplete="off"
                   />
                   
                   <div className="flex justify-between text-xs text-muted-foreground">
@@ -219,6 +222,8 @@ export function HealthDataInput({ onDataSubmit, currentData }: HealthDataInputPr
             Resting Heart Rate (Optional)
           </Label>
           <Input
+            id="heart-rate"
+            name="heartRate"
             type="number"
             value={data.heartRate || ''}
             onChange={(e) => setData(prev => ({
@@ -227,6 +232,7 @@ export function HealthDataInput({ onDataSubmit, currentData }: HealthDataInputPr
             }))}
             placeholder="Enter BPM"
             className="w-32"
+            autoComplete="off"
           />
         </div>
 

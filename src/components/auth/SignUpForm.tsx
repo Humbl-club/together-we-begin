@@ -127,6 +127,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
             <Label htmlFor="fullName" className="text-sm font-medium">Full Name</Label>
             <Input
               id="fullName"
+              name="fullName"
               type="text"
               value={formData.fullName}
               onChange={(e) => handleInputChange('fullName', e.target.value)}
@@ -134,6 +135,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
               disabled={loading}
               className="h-12 text-base"
               placeholder="Enter your full name"
+              autoComplete="name"
             />
           </div>
 
@@ -141,6 +143,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
             <Label htmlFor="username" className="text-sm font-medium">Username</Label>
             <Input
               id="username"
+              name="username"
               type="text"
               value={formData.username}
               onChange={(e) => handleInputChange('username', e.target.value)}
@@ -148,6 +151,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
               disabled={loading}
               className="h-12 text-base"
               placeholder="Choose a username"
+              autoComplete="username"
             />
           </div>
 
@@ -155,6 +159,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
             <Label htmlFor="email" className="text-sm font-medium">Email</Label>
             <Input
               id="email"
+              name="email"
               type="email"
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
@@ -162,6 +167,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
               disabled={loading}
               className="h-12 text-base"
               placeholder="Enter your email"
+              autoComplete="email"
             />
           </div>
 
@@ -169,6 +175,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
             <Label htmlFor="password" className="text-sm font-medium">Password</Label>
             <Input
               id="password"
+              name="password"
               type="password"
               value={formData.password}
               onChange={(e) => handleInputChange('password', e.target.value)}
@@ -176,6 +183,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
               disabled={loading}
               className="h-12 text-base"
               placeholder="Create a password"
+              autoComplete="new-password"
             />
           </div>
 
@@ -183,6 +191,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
             <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</Label>
             <Input
               id="confirmPassword"
+              name="confirmPassword"
               type="password"
               value={formData.confirmPassword}
               onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
@@ -190,6 +199,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
               disabled={loading}
               className="h-12 text-base"
               placeholder="Confirm your password"
+              autoComplete="new-password"
             />
           </div>
 

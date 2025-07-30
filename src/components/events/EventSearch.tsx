@@ -70,10 +70,13 @@ export function EventSearch({
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
+          id="event-search"
+          name="event-search"
           placeholder="Search events..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           className="glass-input pl-10 pr-10 mobile:h-12 sm:h-10"
+          autoComplete="off"
         />
         {searchQuery && (
           <Button

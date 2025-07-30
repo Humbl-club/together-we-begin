@@ -1,6 +1,6 @@
 import React, { memo, useRef, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { useAdvancedMobileOptimization } from '@/hooks/useAdvancedMobileOptimization';
+import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { MobileLoading } from './mobile-loading';
 
 interface PullToRefreshProps {
@@ -18,7 +18,7 @@ export const PullToRefresh = memo(({
   className,
   disabled = false 
 }: PullToRefreshProps) => {
-  const { isMobile } = useAdvancedMobileOptimization();
+  const { isMobile } = useMobileFirst();
   const [isPulling, setIsPulling] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);

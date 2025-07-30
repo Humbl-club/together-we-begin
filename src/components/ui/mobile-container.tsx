@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { cn } from '@/lib/utils';
-import { useAdvancedMobileOptimization } from '@/hooks/useAdvancedMobileOptimization';
+import { useMobileFirst } from '@/hooks/useMobileFirst';
 
 interface MobileContainerProps {
   children: React.ReactNode;
@@ -19,7 +19,7 @@ export const MobileContainer = memo(({
   centerContent = false,
   safeArea = true
 }: MobileContainerProps) => {
-  const { isMobile, safeAreaInsets } = useAdvancedMobileOptimization();
+  const { isMobile, safeAreaInsets } = useMobileFirst();
 
   const paddingClasses = {
     none: '',
@@ -82,7 +82,7 @@ export const MobileSection = memo(({
   title?: string;
   description?: string;
 }) => {
-  const { isMobile } = useAdvancedMobileOptimization();
+  const { isMobile } = useMobileFirst();
 
   return (
     <section className={cn(

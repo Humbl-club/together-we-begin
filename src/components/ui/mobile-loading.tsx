@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { useAdvancedMobileOptimization } from '@/hooks/useAdvancedMobileOptimization';
+import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { cn } from '@/lib/utils';
 
 interface MobileLoadingProps {
@@ -15,10 +15,10 @@ export const MobileLoading = memo(({
   className,
   text 
 }: MobileLoadingProps) => {
-  const { isMobile, prefersReducedMotion, networkConnection } = useAdvancedMobileOptimization();
+  const { isMobile } = useMobileFirst();
   
-  // Use simpler animations on slow networks or for reduced motion
-  const shouldUseReducedAnimation = prefersReducedMotion || networkConnection === 'slow';
+  // Use simpler animations for mobile to save battery
+  const shouldUseReducedAnimation = isMobile;
   
   const sizeClasses = {
     sm: 'w-4 h-4',

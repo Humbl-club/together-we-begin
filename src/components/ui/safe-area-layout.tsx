@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { cn } from '@/lib/utils';
-import { useAdvancedMobileOptimization } from '@/hooks/useAdvancedMobileOptimization';
+import { useMobileFirst } from '@/hooks/useMobileFirst';
 
 interface SafeAreaLayoutProps {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ export const SafeAreaLayout = memo(({
   edges = ['top', 'bottom', 'left', 'right'],
   mode = 'padding'
 }: SafeAreaLayoutProps) => {
-  const { isMobile, safeAreaInsets } = useAdvancedMobileOptimization();
+  const { isMobile, safeAreaInsets } = useMobileFirst();
 
   if (!isMobile) {
     return <div className={className}>{children}</div>;

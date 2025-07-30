@@ -3,12 +3,43 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Editorial Magazine Design System */
+/* Mobile-First Editorial Design System */
 @layer base {
   :root {
     /* Base Editorial Colors - Sophisticated neutrals */
     --background: 0 0% 99%;
     --foreground: 210 11% 15%;
+    
+    /* Mobile-First Design Tokens */
+    --mobile-header-height: 60px;
+    --mobile-nav-height: 80px;
+    --mobile-safe-area-top: env(safe-area-inset-top, 0px);
+    --mobile-safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --mobile-safe-area-left: env(safe-area-inset-left, 0px);
+    --mobile-safe-area-right: env(safe-area-inset-right, 0px);
+    
+  /* Mobile Touch Targets */
+  --touch-target-min: 44px;
+  --touch-target-comfortable: 48px;
+  --touch-target-large: 56px;
+  
+  /* Mobile-First Spacing Scale */
+  --space-mobile-xs: 0.25rem;
+  --space-mobile-sm: 0.5rem;
+  --space-mobile-md: 1rem;
+  --space-mobile-lg: 1.5rem;
+  --space-mobile-xl: 2rem;
+  --space-mobile-2xl: 3rem;
+  
+  /* Mobile-First Typography Scale */
+  --text-mobile-xs: 0.75rem;
+  --text-mobile-sm: 0.875rem;
+  --text-mobile-base: 1rem;
+  --text-mobile-lg: 1.125rem;
+  --text-mobile-xl: 1.25rem;
+  --text-mobile-2xl: 1.5rem;
+  --text-mobile-3xl: 1.875rem;
+}
 
     --card: 0 0% 98%;
     --card-foreground: 210 11% 15%;
@@ -65,6 +96,104 @@
     /* Glass Hover States */
     --glass-hover: 0 0% 100% / 0.95;
     --glass-active: 0 0% 90% / 0.85;
+  }
+
+  /* Mobile-First Responsive Utilities */
+  @media (max-width: 767px) {
+    /* Mobile Typography */
+    .text-responsive {
+      font-size: var(--text-mobile-base);
+      line-height: 1.5;
+    }
+    
+    .heading-responsive {
+      font-size: var(--text-mobile-xl);
+      line-height: 1.3;
+      font-weight: 600;
+    }
+    
+    .subheading-responsive {
+      font-size: var(--text-mobile-lg);
+      line-height: 1.4;
+      font-weight: 500;
+    }
+    
+    /* Mobile Spacing */
+    .space-mobile {
+      gap: var(--space-mobile-md);
+    }
+    
+    .space-mobile > * + * {
+      margin-top: var(--space-mobile-md);
+    }
+    
+    .p-mobile {
+      padding: var(--space-mobile-md);
+    }
+    
+    .px-mobile {
+      padding-left: var(--space-mobile-md);
+      padding-right: var(--space-mobile-md);
+    }
+    
+    .py-mobile {
+      padding-top: var(--space-mobile-md);
+      padding-bottom: var(--space-mobile-md);
+    }
+    
+    .m-mobile {
+      margin: var(--space-mobile-md);
+    }
+    
+    /* Mobile Touch Targets */
+    .touch-target {
+      min-height: var(--touch-target-min);
+      min-width: var(--touch-target-min);
+    }
+    
+    .touch-target-large {
+      min-height: var(--touch-target-large);
+      min-width: var(--touch-target-large);
+    }
+    
+    .touch-feedback {
+      transition: all 0.15s ease;
+      transform-origin: center;
+    }
+    
+    .touch-feedback:active {
+      transform: scale(0.96);
+      filter: brightness(0.95);
+    }
+    
+    /* Mobile-specific animations */
+    .mobile-bounce-in {
+      animation: mobileSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .mobile-fade-in {
+      animation: mobileFadeIn 0.25s ease-out;
+    }
+  }
+  
+  @keyframes mobileSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes mobileFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   .dark {

@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Award, Calendar, Trophy, Users, TrendingUp } from 'lucide-react';
-import { useViewport } from '@/hooks/use-mobile';
+import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
 interface DashboardStats {
@@ -78,7 +78,7 @@ const MobileStatsCard: React.FC<{
 });
 
 const StatsGrid: React.FC<StatsGridProps> = memo(({ stats }) => {
-  const { isMobile } = useViewport();
+  const { isMobile, safeAreaInsets } = useMobileFirst();
   const haptics = useHapticFeedback();
   
   const statCards = useMemo(() => [

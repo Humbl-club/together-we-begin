@@ -57,13 +57,29 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
     return 'px-8 py-8';
   };
 
+  // Mobile-first layout with separate mobile and desktop experiences
+  if (isMobile) {
+    return (
+      <div className="mobile-app-container mobile-layout">
+        {/* Mobile Main Content */}
+        <main className="min-h-screen pb-20">
+          <div className="mobile-content" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+            {children}
+          </div>
+        </main>
+        
+        {/* Mobile Navigation */}
+        <Navigation profile={profile} />
+      </div>
+    );
+  }
+
+  // Desktop/Tablet layout
   return (
-    <div className={`min-h-screen bg-editorial-subtle safe-area-layout ${getLayoutPadding()}`} style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+    <div className="desktop-layout min-h-screen bg-editorial-subtle">
       <Navigation profile={profile} />
       <main className={`responsive-container max-w-7xl mx-auto ${getMainPadding()}`}>
-        <div className="mobile-nav-safe" style={{ paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : '0' }}>
-          {children}
-        </div>
+        {children}
       </main>
     </div>
   );

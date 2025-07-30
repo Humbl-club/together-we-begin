@@ -1,4 +1,5 @@
 import React, { memo, forwardRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
@@ -18,6 +19,7 @@ const MobileFirstNavigation = forwardRef<HTMLElement, MobileFirstNavigationProps
   ({ profile }, ref) => {
     const { isMobile, isTablet, safeAreaInsets } = useMobileFirst();
     const feedback = useHapticFeedback();
+    const location = useLocation();
 
     // Return desktop navigation for non-mobile devices
     if (!isMobile) {
@@ -25,18 +27,14 @@ const MobileFirstNavigation = forwardRef<HTMLElement, MobileFirstNavigationProps
     }
 
     const navItems = [
-      { id: 'home', icon: Home, label: 'Home', href: '/dashboard', active: true },
+      { id: 'home', icon: Home, label: 'Home', href: '/dashboard' },
       { id: 'events', icon: Calendar, label: 'Events', href: '/events' },
       { id: 'social', icon: Heart, label: 'Social', href: '/social' },
       { id: 'messages', icon: MessageCircle, label: 'Messages', href: '/messages' },
       { id: 'profile', icon: User, label: 'Profile', href: '/profile' },
     ];
 
-    const handleNavTap = (item: typeof navItems[0]) => {
-      feedback.tap();
-      // Navigation logic here
-      console.log('Navigate to:', item.href);
-    };
+    const isActive = (path: string) => location.pathname === path;
 
     return (
       <nav 
@@ -50,30 +48,31 @@ const MobileFirstNavigation = forwardRef<HTMLElement, MobileFirstNavigationProps
       >
         <div className="flex items-center justify-around px-2 pt-2">
           {navItems.map((item) => (
-            <button
+            <Link
               key={item.id}
-              onClick={() => handleNavTap(item)}
+              to={item.href}
+              onClick={() => feedback.tap()}
               className={cn(
                 "flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200",
                 "min-h-[60px] min-w-[60px]", // Touch target
                 "transform-gpu touch-manipulation",
                 "active:scale-95 active:bg-accent/50",
-                item.active 
+                isActive(item.href)
                   ? "text-primary bg-primary/10" 
                   : "text-muted-foreground hover:text-foreground hover:bg-accent/30"
               )}
             >
               <item.icon className={cn(
                 "h-5 w-5 mb-1 transition-colors",
-                item.active && "text-primary"
+                isActive(item.href) && "text-primary"
               )} />
               <span className={cn(
                 "text-xs font-medium",
-                item.active ? "text-primary" : "text-muted-foreground"
+                isActive(item.href) ? "text-primary" : "text-muted-foreground"
               )}>
                 {item.label}
               </span>
-            </button>
+            </Link>
           ))}
         </div>
       </nav>

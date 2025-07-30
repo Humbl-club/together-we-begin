@@ -99,29 +99,24 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
     );
   }
 
-  // Desktop version
+  // Desktop version - without redundant avatar
   return (
     <div className="glass-card-enhanced p-6 mb-6 relative">
       <div className="cluster justify-between">
-        <div className="cluster">
-          <Avatar className="w-12 h-12 md:w-16 md:h-16 border-2 border-primary/20 ring-2 ring-primary/10">
-            <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
-            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-sm md:text-lg font-medium">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="fluid-heading font-medium">
-              {greeting}, {firstName}
-            </h1>
-            <p className="fluid-body text-muted-foreground">
-              Your wellness journey continues
-            </p>
-          </div>
+        <div>
+          <h1 className="fluid-heading font-medium">
+            {greeting}, {firstName}
+          </h1>
+          <p className="fluid-body text-muted-foreground">
+            Your wellness journey continues
+          </p>
         </div>
         
         <Button 
-          onClick={() => navigate('/social')}
+          onClick={() => {
+            haptics.impact('medium');
+            navigate('/social');
+          }}
           className="modern-button glass-button bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-all"
         >
           <Plus className="w-4 h-4 mr-2" />

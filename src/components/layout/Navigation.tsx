@@ -51,14 +51,14 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Mobile Navigation with Settings Sheet
+  // Mobile Navigation with floating Messages button
   if (isMobile) {
     return (
       <>
         <nav className="fixed bottom-0 left-0 right-0 z-50 mobile-nav-safe">
           <div className="glass-nav border-t border-border/40 mx-3 mb-3 rounded-3xl shadow-2xl backdrop-blur-3xl bg-background/95 border border-border/40">
             <div className="grid grid-cols-4 gap-3 p-4">
-              {/* Main navigation items - reduced to 4 */}
+              {/* Main navigation items - all 4 */}
               {navItems.map(({ href, icon: Icon, label }) => (
                 <Link
                   key={href}
@@ -79,6 +79,27 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
             </div>
           </div>
         </nav>
+        
+        {/* Floating Messages Button */}
+        <Link
+          to="/messages"
+          onClick={() => haptics.tap()}
+          className={`
+            fixed z-50 glass-button-enhanced rounded-full flex items-center justify-center 
+            shadow-2xl border-2 transition-all duration-500 group
+            bg-background/95 hover:bg-primary/15 hover:scale-110 active:scale-95 
+            ring-2 ring-primary/20 hover:ring-primary/40 backdrop-blur-3xl
+            bottom-28 right-5 w-16 h-16
+            ${isActive('/messages') ? 'bg-primary/20 text-primary border-primary/30 scale-110 ring-primary/50' : ''}
+          `}
+          aria-label="Messages"
+        >
+          <MessageCircle className="w-7 h-7" strokeWidth={isActive('/messages') ? 2.5 : 2} />
+          {/* Message notification badge - optional */}
+          <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-background">
+            2
+          </div>
+        </Link>
         
         {/* Profile Dropdown */}
         <ProfileDropdown profile={profile || user?.user_metadata || {}} />

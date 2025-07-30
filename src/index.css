@@ -339,6 +339,26 @@
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  .glass-modal-enhanced {
+    @apply backdrop-blur-3xl bg-background/98 border border-border/40 shadow-2xl;
+  }
+
+  /* Profile dropdown responsive positioning */
+  .profile-dropdown-mobile {
+    @apply transform -translate-x-1/2 translate-y-2;
+    max-width: calc(100vw - 2rem);
+  }
+
+  .profile-dropdown-tablet {
+    @apply transform translate-x-2;
+    max-width: 320px;
+  }
+
+  .profile-dropdown-desktop {
+    @apply transform translate-x-2;
+    max-width: 320px;
+  }
+
   .glass-button-enhanced:hover {
     background: hsl(var(--glass-hover));
     box-shadow: 

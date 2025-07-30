@@ -9,6 +9,7 @@ import { useContentModeration, ReportModal, ContentWarning } from '@/components/
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useProgressiveEnhancement } from '@/hooks/useProgressiveEnhancement';
 import { dbPerformance } from '@/services/core/DatabasePerformanceService';
+import { MobileLoading } from '@/components/ui/mobile-loading';
 
 // Import new components
 import { CreatePostForm } from '@/components/social/CreatePostForm';
@@ -440,21 +441,12 @@ const Social: React.FC = () => {
   if (loading && posts.length === 0) {
     return (
       <div className={`container mx-auto ${isMobile ? 'px-2 py-2' : 'max-w-2xl px-4 py-4'}`}>
-        <Card className="glass-card">
-          <CardContent className={`text-center ${isMobile ? 'py-8' : 'py-12'}`}>
-            <div className="animate-pulse space-y-6">
-              <div className="space-y-3">
-                <div className="h-4 bg-muted rounded w-3/4 mx-auto"></div>
-                <div className="h-4 bg-muted rounded w-1/2 mx-auto"></div>
-              </div>
-              <div className="space-y-2">
-                <div className={`bg-muted rounded ${isMobile ? 'h-24' : 'h-32'}`}></div>
-                <div className="h-4 bg-muted rounded w-1/4"></div>
-              </div>
-            </div>
-            <p className="text-muted-foreground mt-4">Loading social feed...</p>
-          </CardContent>
-        </Card>
+        <MobileLoading 
+          variant="skeleton"
+          size={isMobile ? "md" : "lg"}
+          text="Loading social feed..."
+          className="glass-card p-6"
+        />
       </div>
     );
   }

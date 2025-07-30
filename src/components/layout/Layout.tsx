@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useViewport } from '@/hooks/use-mobile';
 import { Navigation } from './Navigation';
-import { OptimizedSkeleton } from '@/components/ui/optimized-skeleton';
+import { MobileLoading } from '@/components/ui/mobile-loading';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -16,12 +16,12 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-editorial-hero safe-area-layout">
-        <div className="editorial-card rounded-xl p-8 text-center max-w-sm mobile:max-w-xs mobile:p-6">
-          <OptimizedSkeleton className="w-6 h-6 rounded-full mx-auto mb-4" />
-          <p className="text-muted-foreground font-light tracking-wide mobile:text-sm">
-            Loading your experience...
-          </p>
-        </div>
+        <MobileLoading 
+          variant="ios"
+          size={isMobile ? "md" : "lg"}
+          text="Loading your experience..."
+          className="glass-card rounded-xl p-8 max-w-sm mobile:max-w-xs mobile:p-6"
+        />
       </div>
     );
   }

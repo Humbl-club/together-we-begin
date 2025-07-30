@@ -16,8 +16,13 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-editorial-hero">
-        <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full"></div>
+      <div className="min-h-screen flex items-center justify-center bg-editorial-hero safe-area-layout">
+        <div className="glass-card rounded-xl p-8 text-center max-w-sm mobile:max-w-xs mobile:p-6">
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground font-light tracking-wide mobile:text-sm">
+            Loading your experience...
+          </p>
+        </div>
       </div>
     );
   }

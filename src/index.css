@@ -132,6 +132,16 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    
+    /* Mobile-optimized text handling */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    
+    /* Prevent text from overflowing containers */
+    overflow-x: hidden;
   }
 
   /* Premium Typography Classes */
@@ -516,18 +526,46 @@
       padding-bottom: max(1rem, env(safe-area-inset-bottom));
     }
     
-    /* Ensure text remains readable on mobile */
-    .break-anywhere {
+    /* Global text overflow prevention */
+    * {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      -webkit-hyphens: auto;
+      -moz-hyphens: auto;
+    }
+    
+    /* Prevent horizontal overflow */
+    .mobile-container {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+    
+    /* Ensure all text containers handle overflow */
+    p, h1, h2, h3, h4, h5, h6, span, div {
       word-break: break-word;
       overflow-wrap: anywhere;
-      hyphens: auto;
+      max-width: 100%;
     }
     
     /* Touch-friendly interactions */
-    .mobile-touch {
+    .mobile-touch, button, a, [role="button"] {
       min-height: 44px;
       min-width: 44px;
       touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Better mobile input handling */
+    input, textarea, select {
+      font-size: 16px; /* Prevent zoom on iOS */
+      max-width: 100%;
+    }
+    
+    /* Mobile-specific spacing */
+    .mobile-spacing {
+      padding: clamp(0.75rem, 3vw, 1.5rem);
+      margin: clamp(0.5rem, 2vw, 1rem);
     }
   }
 

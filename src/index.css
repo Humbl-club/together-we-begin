@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import './styles/mobile-enhancements.css';
 
 /* Mobile-First Editorial Design System */
 @layer base {

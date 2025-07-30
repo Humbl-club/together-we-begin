@@ -1,119 +1,119 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
 interface EnhancedLoadingProps {
-  variant?: 'card' | 'list' | 'table' | 'form';
-  count?: number;
+  variant?: 'spinner' | 'skeleton' | 'pulse' | 'ios';
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
+  text?: string;
+  showText?: boolean;
 }
 
 export const EnhancedLoading: React.FC<EnhancedLoadingProps> = ({
-  variant = 'card',
-  count = 3,
-  className
+  variant = 'spinner',
+  size = 'md',
+  className,
+  text = 'Loading...',
+  showText = false
 }) => {
-  const renderCardSkeleton = () => (
-    <Card className="glass-card">
-      <CardContent className="pt-6">
-        <div className="flex items-start gap-4">
-          <Skeleton className="h-12 w-12 rounded-full" />
-          <div className="space-y-2 flex-1">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-3 w-1/2" />
-            <div className="flex gap-2 pt-2">
-              <Skeleton className="h-8 w-16" />
-              <Skeleton className="h-8 w-20" />
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const renderListSkeleton = () => (
-    <div className="space-y-3">
-      <div className="flex items-center gap-3">
-        <Skeleton className="h-8 w-8 rounded-full" />
-        <div className="space-y-1 flex-1">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-3 w-2/3" />
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderTableSkeleton = () => (
-    <div className="space-y-2">
-      <div className="flex gap-4">
-        <Skeleton className="h-10 flex-1" />
-        <Skeleton className="h-10 flex-1" />
-        <Skeleton className="h-10 flex-1" />
-        <Skeleton className="h-10 w-20" />
-      </div>
-    </div>
-  );
-
-  const renderFormSkeleton = () => (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-24 w-full" />
-      </div>
-      <div className="flex gap-2">
-        <Skeleton className="h-10 w-24" />
-        <Skeleton className="h-10 w-20" />
-      </div>
-    </div>
-  );
-
-  const renderSkeleton = () => {
-    switch (variant) {
-      case 'card':
-        return renderCardSkeleton();
-      case 'list':
-        return renderListSkeleton();
-      case 'table':
-        return renderTableSkeleton();
-      case 'form':
-        return renderFormSkeleton();
-      default:
-        return renderCardSkeleton();
-    }
+  const sizeClasses = {
+    sm: 'w-4 h-4',
+    md: 'w-6 h-6',
+    lg: 'w-8 h-8'
   };
 
+  if (variant === 'ios') {
+    return (
+      <div className={cn('flex flex-col items-center justify-center', className)}>
+        <div className={cn(
+          'animate-spin rounded-full border-2 border-primary/20 border-t-primary',
+          sizeClasses[size]
+        )} />
+        {showText && (
+          <p className="text-sm text-muted-foreground mt-2">{text}</p>
+        )}
+      </div>
+    );
+  }
+
+  if (variant === 'skeleton') {
+    return (
+      <div className={cn('space-y-3', className)}>
+        <div className="h-4 bg-muted rounded-lg animate-pulse" />
+        <div className="h-4 bg-muted rounded-lg animate-pulse w-5/6" />
+        <div className="h-4 bg-muted rounded-lg animate-pulse w-4/6" />
+      </div>
+    );
+  }
+
+  if (variant === 'pulse') {
+    return (
+      <div className={cn('flex flex-col items-center justify-center', className)}>
+        <div className={cn(
+          'bg-primary/20 rounded-full animate-pulse',
+          sizeClasses[size]
+        )} />
+        {showText && (
+          <p className="text-sm text-muted-foreground mt-2">{text}</p>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className={cn("space-y-4 animate-pulse", className)}>
-      {Array.from({ length: count }, (_, i) => (
-        <div key={i}>
-          {renderSkeleton()}
-        </div>
-      ))}
+    <div className={cn('flex flex-col items-center justify-center', className)}>
+      <Loader2 className={cn('animate-spin text-primary', sizeClasses[size])} />
+      {showText && (
+        <p className="text-sm text-muted-foreground mt-2">{text}</p>
+      )}
     </div>
   );
 };
 
-interface LoadingWrapperProps {
-  loading: boolean;
-  variant?: 'card' | 'list' | 'table' | 'form';
-  count?: number;
-  children: React.ReactNode;
-}
+// Skeleton components for different layouts
+export const CardSkeleton: React.FC<{ className?: string }> = ({ className }) => (
+  <div className={cn('glass-card p-6 space-y-4', className)}>
+    <div className="flex items-center space-x-4">
+      <div className="w-12 h-12 bg-muted rounded-full animate-pulse" />
+      <div className="space-y-2 flex-1">
+        <div className="h-4 bg-muted rounded animate-pulse" />
+        <div className="h-3 bg-muted rounded animate-pulse w-3/4" />
+      </div>
+    </div>
+    <div className="space-y-2">
+      <div className="h-3 bg-muted rounded animate-pulse" />
+      <div className="h-3 bg-muted rounded animate-pulse w-5/6" />
+      <div className="h-3 bg-muted rounded animate-pulse w-4/6" />
+    </div>
+  </div>
+);
 
-export const LoadingWrapper: React.FC<LoadingWrapperProps> = ({
-  loading,
-  variant,
-  count,
-  children
-}) => {
-  if (loading) {
-    return <EnhancedLoading variant={variant} count={count} />;
-  }
-  
-  return <>{children}</>;
-};
+export const ListSkeleton: React.FC<{ items?: number; className?: string }> = ({ 
+  items = 3, 
+  className 
+}) => (
+  <div className={cn('space-y-3', className)}>
+    {Array.from({ length: items }).map((_, i) => (
+      <div key={i} className="flex items-center space-x-4 p-4 rounded-lg bg-muted/20">
+        <div className="w-10 h-10 bg-muted rounded-full animate-pulse" />
+        <div className="space-y-2 flex-1">
+          <div className="h-4 bg-muted rounded animate-pulse" />
+          <div className="h-3 bg-muted rounded animate-pulse w-2/3" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+export const StatsSkeleton: React.FC<{ className?: string }> = ({ className }) => (
+  <div className={cn('grid grid-cols-2 gap-4', className)}>
+    {Array.from({ length: 4 }).map((_, i) => (
+      <div key={i} className="glass-card p-4 space-y-2">
+        <div className="h-8 w-8 bg-muted rounded animate-pulse" />
+        <div className="h-6 bg-muted rounded animate-pulse w-1/2" />
+        <div className="h-4 bg-muted rounded animate-pulse w-3/4" />
+      </div>
+    ))}
+  </div>
+);

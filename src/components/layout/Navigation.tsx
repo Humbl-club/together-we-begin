@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { useViewport } from '@/hooks/use-mobile';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { 
   Home, 
   Users, 
@@ -15,7 +16,8 @@ import {
   MoreHorizontal,
   X,
   MessageCircle,
-  QrCode
+  QrCode,
+  Plus
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
@@ -24,6 +26,7 @@ export const Navigation: React.FC = () => {
   const location = useLocation();
   const { isMobile, isTablet, isDesktop } = useViewport();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const haptics = useHapticFeedback();
 
   const navItems = [
     { href: '/dashboard', icon: Home, label: 'Home' },
@@ -47,74 +50,91 @@ export const Navigation: React.FC = () => {
     return (
       <>
         <nav className="fixed bottom-0 left-0 right-0 z-50 mobile-nav-safe">
-          <div className="glass-nav border-t border-border/20 mx-2 mb-2 rounded-2xl shadow-lg">
-            <div className="grid grid-cols-5 gap-1 p-2">
-              {/* Main navigation items including Messages */}
+          <div className="glass-nav border-t border-border/20 mx-3 mb-3 rounded-3xl shadow-xl backdrop-blur-2xl bg-background/90 border border-border/30">
+            <div className="grid grid-cols-4 gap-2 p-3">
+              {/* Main navigation items - reduced to 4 */}
               {navItems.map(({ href, icon: Icon, label }) => (
                 <Link
                   key={href}
                   to={href}
-                  className={`glass-button flex flex-col items-center justify-center min-h-[48px] min-w-[48px] p-2 rounded-xl transition-all duration-300 touch-manipulation ${
+                  onClick={() => haptics.tap()}
+                  className={`glass-button flex flex-col items-center justify-center min-h-[56px] min-w-[56px] p-3 rounded-2xl transition-all duration-300 touch-manipulation ${
                     isActive(href)
-                      ? 'bg-primary/20 text-primary border-primary/30 shadow-lg scale-105'
+                      ? 'bg-primary/25 text-primary border-primary/40 shadow-xl scale-105 transform'
                       : 'text-muted-foreground hover:text-foreground hover:bg-primary/10 active:scale-95'
                   }`}
                 >
-                  <Icon className="w-5 h-5 mb-1" strokeWidth={isActive(href) ? 2.5 : 2} />
-                  <span className="text-[10px] font-medium tracking-tight leading-none">
-                    {label.length > 7 ? label.substring(0, 6) + '.' : label}
+                  <Icon className="w-6 h-6 mb-1.5" strokeWidth={isActive(href) ? 2.5 : 2} />
+                  <span className="text-[11px] font-medium tracking-tight leading-none">
+                    {label}
                   </span>
                 </Link>
               ))}
-              
-              {/* More button that opens Sheet */}
-              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                <SheetTrigger asChild>
-                  <button className="glass-button flex flex-col items-center justify-center min-h-[48px] min-w-[48px] p-2 rounded-xl transition-all duration-300 touch-manipulation text-muted-foreground hover:text-foreground hover:bg-primary/10 active:scale-95">
-                    <MoreHorizontal className="w-5 h-5 mb-1" strokeWidth={2} />
-                    <span className="text-[10px] font-medium tracking-tight leading-none">More</span>
-                  </button>
-                </SheetTrigger>
-                <SheetContent side="bottom" className="glass-modal border-0 rounded-t-3xl max-h-[80vh]">
-                  <SheetHeader className="mb-6">
-                    <SheetTitle className="font-display text-xl text-center">Menu</SheetTitle>
+            </div>
+          </div>
+        </nav>
+        
+        {/* Floating Messages Button */}
+        <Link
+          to="/messages"
+          className={`fixed bottom-24 right-4 z-40 glass-button w-14 h-14 rounded-full flex items-center justify-center shadow-2xl border-2 transition-all duration-300 ${
+            isActive('/messages')
+              ? 'bg-primary/30 text-primary border-primary/50 shadow-primary/20'
+              : 'bg-background/80 text-muted-foreground hover:text-foreground hover:bg-primary/15 active:scale-95'
+          }`}
+        >
+          <MessageCircle className="w-6 h-6" strokeWidth={isActive('/messages') ? 2.5 : 2} />
+        </Link>
+
+        {/* More Menu Sheet */}
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <SheetTrigger asChild>
+            <button className="fixed bottom-24 left-4 z-40 glass-button w-14 h-14 rounded-full flex items-center justify-center shadow-2xl border-2 transition-all duration-300 bg-background/80 text-muted-foreground hover:text-foreground hover:bg-primary/15 active:scale-95">
+              <MoreHorizontal className="w-6 h-6" strokeWidth={2} />
+            </button>
+          </SheetTrigger>
+                <SheetContent side="bottom" className="glass-modal border-0 rounded-t-3xl max-h-[85vh] bg-background/95 backdrop-blur-3xl">
+                  <SheetHeader className="mb-8">
+                    <SheetTitle className="font-display text-2xl text-center text-primary">Menu</SheetTitle>
                   </SheetHeader>
                   
-                   <div className="spacing-responsive-md">
+                   <div className="spacing-responsive-md px-2">
                     {/* Profile Section */}
-                    <div className="glass-section p-4 rounded-xl mb-4">
+                    <div className="glass-section p-6 rounded-2xl mb-6 bg-primary/5 border border-primary/10">
                       <Link 
                         to="/profile" 
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors touch-manipulation"
+                        className="flex items-center gap-4 p-4 rounded-xl hover:bg-primary/10 transition-all duration-300 touch-manipulation min-h-[56px]"
                       >
-                        <User className="w-6 h-6 text-primary" />
+                        <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                          <User className="w-6 h-6 text-primary" />
+                        </div>
                         <div className="flex-1">
-                          <div className="font-medium">Profile</div>
+                          <div className="font-semibold text-lg">Profile</div>
                           <div className="text-sm text-muted-foreground">View and edit your profile</div>
                         </div>
                       </Link>
                     </div>
 
                     {/* Settings & More */}
-                    <div className="glass-section p-4 rounded-xl mb-4">
-                      <div className="space-y-2">
+                    <div className="glass-section p-6 rounded-2xl mb-6">
+                      <div className="space-y-3">
                         {secondaryNavItems.map(({ href, icon: Icon, label }) => (
                           <Link 
                             key={href}
                             to={href} 
                             onClick={() => setMobileMenuOpen(false)}
-                            className={`flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors touch-manipulation ${
+                            className={`flex items-center gap-4 p-4 rounded-xl hover:bg-primary/10 transition-all duration-300 touch-manipulation min-h-[56px] ${
                               isActive(href) ? 'bg-primary/20 text-primary' : ''
                             }`}
                           >
-                            <Icon className="w-6 h-6" />
+                            <div className="w-10 h-10 rounded-full bg-muted/20 flex items-center justify-center">
+                              <Icon className="w-5 h-5" />
+                            </div>
                             <div className="flex-1">
-                              <div className="font-medium">{label}</div>
+                              <div className="font-medium text-base">{label}</div>
                               <div className="text-sm text-muted-foreground">
-                                {href === '/messages' ? 'Direct messages with members' : 
-                                 href === '/profile' ? 'View and edit your profile' :
-                                 href === '/admin' ? 'Manage the community' : ''}
+                                {href === '/admin' ? 'Manage the community' : ''}
                               </div>
                             </div>
                           </Link>
@@ -123,13 +143,15 @@ export const Navigation: React.FC = () => {
                         <Link 
                           to="/qr-scanner" 
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors touch-manipulation ${
+                          className={`flex items-center gap-4 p-4 rounded-xl hover:bg-primary/10 transition-all duration-300 touch-manipulation min-h-[56px] ${
                             isActive('/qr-scanner') ? 'bg-primary/20 text-primary' : ''
                           }`}
                         >
-                          <QrCode className="w-6 h-6" />
+                          <div className="w-10 h-10 rounded-full bg-muted/20 flex items-center justify-center">
+                            <QrCode className="w-5 h-5" />
+                          </div>
                           <div className="flex-1">
-                            <div className="font-medium">Scan QR Code</div>
+                            <div className="font-medium text-base">Scan QR Code</div>
                             <div className="text-sm text-muted-foreground">Mark event attendance and earn points</div>
                           </div>
                         </Link>
@@ -137,13 +159,15 @@ export const Navigation: React.FC = () => {
                         <Link 
                           to="/settings" 
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors touch-manipulation ${
+                          className={`flex items-center gap-4 p-4 rounded-xl hover:bg-primary/10 transition-all duration-300 touch-manipulation min-h-[56px] ${
                             isActive('/settings') ? 'bg-primary/20 text-primary' : ''
                           }`}
                         >
-                          <Settings className="w-6 h-6" />
+                          <div className="w-10 h-10 rounded-full bg-muted/20 flex items-center justify-center">
+                            <Settings className="w-5 h-5" />
+                          </div>
                           <div className="flex-1">
-                            <div className="font-medium">Settings</div>
+                            <div className="font-medium text-base">Settings</div>
                             <div className="text-sm text-muted-foreground">Customize your experience</div>
                           </div>
                         </Link>
@@ -151,17 +175,19 @@ export const Navigation: React.FC = () => {
                     </div>
 
                     {/* Logout */}
-                    <div className="glass-section p-4 rounded-xl">
+                    <div className="glass-section p-6 rounded-2xl bg-destructive/5 border border-destructive/10">
                       <button 
                         onClick={() => {
                           setMobileMenuOpen(false);
                           signOut();
                         }}
-                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-destructive/10 transition-colors touch-manipulation w-full text-left text-destructive"
+                        className="flex items-center gap-4 p-4 rounded-xl hover:bg-destructive/10 transition-all duration-300 touch-manipulation w-full text-left text-destructive min-h-[56px]"
                       >
-                        <LogOut className="w-6 h-6" />
+                        <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center">
+                          <LogOut className="w-5 h-5" />
+                        </div>
                         <div className="flex-1">
-                          <div className="font-medium">Sign Out</div>
+                          <div className="font-medium text-base">Sign Out</div>
                           <div className="text-sm text-muted-foreground">Securely sign out of your account</div>
                         </div>
                       </button>
@@ -169,9 +195,6 @@ export const Navigation: React.FC = () => {
                   </div>
                 </SheetContent>
               </Sheet>
-            </div>
-          </div>
-        </nav>
       </>
     );
   }

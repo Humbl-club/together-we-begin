@@ -400,7 +400,7 @@
   }
 
   .touch-optimized {
-    @apply min-h-[44px] relative;
+    @apply min-h-[48px] relative;
     touch-action: manipulation;
   }
 
@@ -409,6 +409,22 @@
     position: absolute;
     inset: -8px;
     z-index: -1;
+  }
+  
+  /* Enhanced Touch Targets */
+  .touch-target-large {
+    @apply min-h-[56px] min-w-[56px] relative;
+    touch-action: manipulation;
+  }
+  
+  /* Hide scrollbars */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 
   .swipe-enabled {

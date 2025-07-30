@@ -27,16 +27,18 @@ interface StoryItemProps {
 export const StoryItem: React.FC<StoryItemProps> = ({ story, isMobile }) => {
   return (
     <div className="flex-shrink-0 text-center">
-      <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-primary p-1`}>
-        <Avatar className="w-full h-full">
-          <AvatarImage src={story.profiles.avatar_url} />
-          <AvatarFallback className={isMobile ? 'text-xs' : ''}>
-            {story.profiles.full_name?.charAt(0) || story.profiles.username?.charAt(0) || '?'}
-          </AvatarFallback>
-        </Avatar>
+      <div className={`${isMobile ? 'w-16 h-16' : 'w-20 h-20'} rounded-full bg-gradient-to-br from-primary via-primary/80 to-primary/60 p-0.5 hover:scale-105 transition-transform duration-300 cursor-pointer`}>
+        <div className="w-full h-full rounded-full bg-background p-0.5">
+          <Avatar className="w-full h-full">
+            <AvatarImage src={story.profiles.avatar_url} />
+            <AvatarFallback className={`${isMobile ? 'text-sm' : 'text-base'} font-medium`}>
+              {story.profiles.full_name?.charAt(0) || story.profiles.username?.charAt(0) || '?'}
+            </AvatarFallback>
+          </Avatar>
+        </div>
       </div>
-      <p className={`text-xs mt-1 truncate ${isMobile ? 'w-14' : 'w-16'}`}>
-        {story.profiles.username || story.profiles.full_name}
+      <p className={`text-xs mt-2 truncate ${isMobile ? 'w-16' : 'w-20'} font-medium`}>
+        {story.profiles.username || story.profiles.full_name?.split(' ')[0] || 'User'}
       </p>
     </div>
   );

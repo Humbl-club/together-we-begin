@@ -126,8 +126,8 @@ const ContentModeration: React.FC = () => {
         .from('content_reports')
         .select(`
           *,
-          reporter_profile:profiles!content_reports_reporter_id_fkey(full_name, avatar_url),
-          reported_user_profile:profiles!content_reports_reported_user_id_fkey(full_name, avatar_url)
+          reporter_profile:reporter_id(full_name, avatar_url),
+          reported_user_profile:reported_user_id(full_name, avatar_url)
         `)
         .order('created_at', { ascending: false });
 

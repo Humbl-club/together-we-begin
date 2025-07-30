@@ -31,9 +31,13 @@ export const useProgressiveEnhancement = () => {
     return 'full';
   }, [networkInfo]);
 
-  // Battery-aware optimizations
-  const getBatteryOptimizations = useCallback(() => {
-    if (isLowBattery) {
+  // Performance optimizations based on page visibility and network
+  const getPerformanceOptimizations = useCallback(() => {
+    const shouldOptimize = isLowBattery || networkInfo?.saveData || 
+                          networkInfo?.effectiveType === 'slow-2g' || 
+                          networkInfo?.effectiveType === '2g';
+    
+    if (shouldOptimize) {
       return {
         reduceAnimations: true,
         limitBackgroundTasks: true,
@@ -46,7 +50,7 @@ export const useProgressiveEnhancement = () => {
       limitBackgroundTasks: false,
       reducePolling: false
     };
-  }, [isLowBattery]);
+  }, [isLowBattery, networkInfo]);
 
   // Pull-to-refresh gesture
   const usePullToRefresh = useCallback((onRefresh: () => Promise<void>) => {
@@ -172,53 +176,62 @@ export const useProgressiveEnhancement = () => {
 
   // Initialize progressive enhancements
   useEffect(() => {
-    // Network information
-    const connection = (navigator as any).connection;
-    if (connection) {
-      const updateNetworkInfo = () => {
-        setNetworkInfo({
-          effectiveType: connection.effectiveType,
-          downlink: connection.downlink,
-          rtt: connection.rtt,
-          saveData: connection.saveData
-        });
-      };
+    // Network information with proper error handling
+    try {
+      const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+      if (connection) {
+        const updateNetworkInfo = () => {
+          try {
+            setNetworkInfo({
+              effectiveType: connection.effectiveType || '4g',
+              downlink: connection.downlink || 10,
+              rtt: connection.rtt || 100,
+              saveData: connection.saveData || false
+            });
+          } catch (error) {
+            // Graceful fallback for network info
+            setNetworkInfo({
+              effectiveType: '4g',
+              downlink: 10,
+              rtt: 100,
+              saveData: false
+            });
+          }
+        };
 
-      updateNetworkInfo();
-      connection.addEventListener('change', updateNetworkInfo);
+        updateNetworkInfo();
+        connection.addEventListener('change', updateNetworkInfo);
 
-      return () => {
-        connection.removeEventListener('change', updateNetworkInfo);
-      };
+        return () => {
+          connection.removeEventListener('change', updateNetworkInfo);
+        };
+      }
+    } catch (error) {
+      // Network API not available - use defaults
+      setNetworkInfo({
+        effectiveType: '4g',
+        downlink: 10,
+        rtt: 100,
+        saveData: false
+      });
     }
   }, []);
 
-  // Battery information
+  // Modern performance-aware optimizations using Page Visibility API
   useEffect(() => {
-    const checkBattery = async () => {
-      if ('getBattery' in navigator) {
-        try {
-          const battery = await (navigator as any).getBattery();
-          
-          const updateBatteryInfo = () => {
-            setIsLowBattery(battery.level < 0.2 && !battery.charging);
-          };
-
-          updateBatteryInfo();
-          battery.addEventListener('levelchange', updateBatteryInfo);
-          battery.addEventListener('chargingchange', updateBatteryInfo);
-
-          return () => {
-            battery.removeEventListener('levelchange', updateBatteryInfo);
-            battery.removeEventListener('chargingchange', updateBatteryInfo);
-          };
-        } catch (error) {
-          console.warn('Battery API not available:', error);
-        }
-      }
+    const handleVisibilityChange = () => {
+      // Reduce activity when page is hidden to conserve battery
+      setIsLowBattery(document.hidden);
     };
 
-    checkBattery();
+    // Use Page Visibility API instead of deprecated Battery API
+    if ('visibilityState' in document) {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    }
   }, []);
 
   // Service Worker support
@@ -231,7 +244,7 @@ export const useProgressiveEnhancement = () => {
     isLowBattery,
     supportsServiceWorker,
     getLoadingStrategy,
-    getBatteryOptimizations,
+    getPerformanceOptimizations,
     usePullToRefresh,
     useSwipeGestures
   };

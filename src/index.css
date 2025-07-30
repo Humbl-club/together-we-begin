@@ -344,6 +344,33 @@
     background: hsl(var(--background) / 0.98);
   }
 
+  /* Messaging overlay animations */
+  .animate-in {
+    animation-duration: 300ms;
+    animation-fill-mode: both;
+  }
+
+  .slide-in-from-bottom-full {
+    animation-name: slide-in-from-bottom-full;
+  }
+
+  .fade-in {
+    animation-name: fade-in;
+  }
+
+  .scale-in {
+    animation-name: scale-in;
+  }
+
+  @keyframes slide-in-from-bottom-full {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
   /* Profile dropdown responsive positioning */
   .profile-dropdown-mobile {
     @apply transform -translate-x-1/2 translate-y-2;

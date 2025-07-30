@@ -1,11 +1,13 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Bell, Search } from 'lucide-react';
+import { Plus, Bell, Search, MessageCircle } from 'lucide-react';
 import { useViewport } from '@/hooks/use-mobile';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { useNavigate } from 'react-router-dom';
+import { MessagingOverlay } from '@/components/messaging/MessagingOverlay';
+import { useMessaging } from '@/hooks/useMessaging';
 
 interface Profile {
   full_name?: string;
@@ -20,6 +22,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
   const { isMobile } = useViewport();
   const navigate = useNavigate();
   const haptics = useHapticFeedback();
+  const [showMessaging, setShowMessaging] = useState(false);
+  const { totalUnreadCount } = useMessaging();
   
   const { initials, firstName, greeting } = useMemo(() => {
     const getInitials = (name?: string) => {
@@ -66,6 +70,25 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
               size="icon"
               onClick={() => {
                 haptics.tap();
+                setShowMessaging(true);
+              }}
+              className="w-12 h-12 rounded-full glass-button relative"
+            >
+              <MessageCircle className="w-5 h-5" />
+              {totalUnreadCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 h-5 min-w-5 text-xs font-bold border-2 border-background"
+                >
+                  {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+                </Badge>
+              )}
+            </Button>
+            <Button 
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                haptics.tap();
                 navigate('/search');
               }}
               className="w-12 h-12 rounded-full glass-button"
@@ -95,6 +118,11 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
             </Button>
           </div>
         </div>
+        
+        <MessagingOverlay 
+          isOpen={showMessaging} 
+          onClose={() => setShowMessaging(false)} 
+        />
       </div>
     );
   }
@@ -102,27 +130,54 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
   // Desktop version - without redundant avatar
   return (
     <div className="glass-card-enhanced p-6 mb-6 relative">
-      <div className="cluster justify-between">
-        <div>
-          <h1 className="fluid-heading font-medium">
-            {greeting}, {firstName}
-          </h1>
-          <p className="fluid-body text-muted-foreground">
-            Your wellness journey continues
-          </p>
+        <div className="cluster justify-between">
+          <div>
+            <h1 className="fluid-heading font-medium">
+              {greeting}, {firstName}
+            </h1>
+            <p className="fluid-body text-muted-foreground">
+              Your wellness journey continues
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="outline"
+              onClick={() => {
+                haptics.tap();
+                setShowMessaging(true);
+              }}
+              className="glass-button bg-background/60 border-border/40 hover:bg-background/80 relative"
+            >
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Messages
+              {totalUnreadCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="ml-2 h-4 min-w-4 text-xs"
+                >
+                  {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+                </Badge>
+              )}
+            </Button>
+            
+            <Button 
+              onClick={() => {
+                haptics.impact('medium');
+                navigate('/social');
+              }}
+              className="modern-button glass-button bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-all"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Share Update
+            </Button>
+          </div>
         </div>
         
-        <Button 
-          onClick={() => {
-            haptics.impact('medium');
-            navigate('/social');
-          }}
-          className="modern-button glass-button bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-all"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Share Update
-        </Button>
-      </div>
+        <MessagingOverlay 
+          isOpen={showMessaging} 
+          onClose={() => setShowMessaging(false)} 
+        />
     </div>
   );
 });

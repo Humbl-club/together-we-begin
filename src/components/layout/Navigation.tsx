@@ -20,6 +20,8 @@ import {
   Plus
 } from 'lucide-react';
 import { ProfileDropdown } from './ProfileDropdown';
+import { MessagingOverlay } from '@/components/messaging/MessagingOverlay';
+import { useMessaging } from '@/hooks/useMessaging';
 
 interface NavigationProps {
   profile?: {
@@ -33,6 +35,8 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
   const location = useLocation();
   const { isMobile, isTablet, isDesktop } = useViewport();
   const haptics = useHapticFeedback();
+  const [showMessaging, setShowMessaging] = useState(false);
+  const { totalUnreadCount } = useMessaging();
 
   const navItems = [
     { href: '/dashboard', icon: Home, label: 'Home' },
@@ -81,25 +85,32 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
         </nav>
         
         {/* Floating Messages Button */}
-        <Link
-          to="/messages"
-          onClick={() => haptics.tap()}
+        <Button
+          onClick={() => {
+            haptics.tap();
+            setShowMessaging(true);
+          }}
           className={`
             fixed z-50 glass-button-enhanced rounded-full flex items-center justify-center 
             shadow-2xl border-2 transition-all duration-500 group
             bg-background/95 hover:bg-primary/15 hover:scale-110 active:scale-95 
             ring-2 ring-primary/20 hover:ring-primary/40 backdrop-blur-3xl
-            bottom-28 right-5 w-16 h-16
-            ${isActive('/messages') ? 'bg-primary/20 text-primary border-primary/30 scale-110 ring-primary/50' : ''}
+            bottom-28 right-5 w-16 h-16 p-0
           `}
           aria-label="Messages"
         >
-          <MessageCircle className="w-7 h-7" strokeWidth={isActive('/messages') ? 2.5 : 2} />
-          {/* Message notification badge - optional */}
-          <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-background">
-            2
-          </div>
-        </Link>
+          <MessageCircle className="w-7 h-7" strokeWidth={2} />
+          {totalUnreadCount > 0 && (
+            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-background">
+              {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+            </div>
+          )}
+        </Button>
+        
+        <MessagingOverlay 
+          isOpen={showMessaging} 
+          onClose={() => setShowMessaging(false)} 
+        />
         
         {/* Profile Dropdown */}
         <ProfileDropdown profile={profile || user?.user_metadata || {}} />

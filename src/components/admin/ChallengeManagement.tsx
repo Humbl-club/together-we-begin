@@ -304,9 +304,11 @@ const ChallengeManagement: React.FC = () => {
                   <Label htmlFor="title">Challenge Title</Label>
                   <Input
                     id="title"
+                    name="title"
                     value={createForm.title}
                     onChange={(e) => setCreateForm(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="Enter challenge title..."
+                    autoComplete="off"
                   />
                 </div>
                 
@@ -314,6 +316,7 @@ const ChallengeManagement: React.FC = () => {
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
+                    name="description"
                     value={createForm.description}
                     onChange={(e) => setCreateForm(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="Describe your challenge..."
@@ -325,6 +328,7 @@ const ChallengeManagement: React.FC = () => {
                   <Label htmlFor="instructions">Instructions</Label>
                   <Textarea
                     id="instructions"
+                    name="instructions"
                     value={createForm.instructions}
                     onChange={(e) => setCreateForm(prev => ({ ...prev, instructions: e.target.value }))}
                     placeholder="How to participate in this challenge..."
@@ -353,6 +357,7 @@ const ChallengeManagement: React.FC = () => {
                   <Label htmlFor="step-goal">Step Goal</Label>
                   <Input
                     id="step-goal"
+                    name="stepGoal"
                     type="number"
                     min="0"
                     value={createForm.step_goal || ''}
@@ -361,6 +366,7 @@ const ChallengeManagement: React.FC = () => {
                       step_goal: e.target.value ? parseInt(e.target.value) : null
                     }))}
                     placeholder="Daily step goal..."
+                    autoComplete="off"
                   />
                 </div>
                 
@@ -529,10 +535,13 @@ const ChallengeManagement: React.FC = () => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
+            id="search-challenges"
+            name="searchChallenges"
             placeholder="Search challenges..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
+            autoComplete="off"
           />
         </div>
         

@@ -111,6 +111,7 @@ export const PasswordResetForm: React.FC = () => {
             <Label htmlFor="password" className="text-sm font-medium">New Password</Label>
             <Input
               id="password"
+              name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -118,6 +119,7 @@ export const PasswordResetForm: React.FC = () => {
               disabled={loading}
               className="h-12 text-base"
               placeholder="Enter your new password"
+              autoComplete="new-password"
             />
           </div>
 
@@ -125,6 +127,7 @@ export const PasswordResetForm: React.FC = () => {
             <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm New Password</Label>
             <Input
               id="confirmPassword"
+              name="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -132,6 +135,7 @@ export const PasswordResetForm: React.FC = () => {
               disabled={loading}
               className="h-12 text-base"
               placeholder="Confirm your new password"
+              autoComplete="new-password"
             />
           </div>
 

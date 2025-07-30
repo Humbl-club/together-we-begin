@@ -78,12 +78,14 @@ export const InviteCodeForm: React.FC<InviteCodeFormProps> = ({ onValidCode }) =
           <Label htmlFor="invite-code">Invite Code</Label>
           <Input
             id="invite-code"
+            name="inviteCode"
             type="text"
             placeholder="Enter your invite code"
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             className="mt-1 text-center text-lg tracking-widest font-mono"
             disabled={loading}
+            autoComplete="off"
           />
         </div>
 

@@ -100,6 +100,7 @@ export const NotificationSettings: React.FC = () => {
           challenge_updates: settings.challenge_updates,
           social_interactions: settings.social_interactions,
           marketing_emails: settings.marketing_emails,
+          updated_at: new Date().toISOString()
         });
 
       if (error) throw error;

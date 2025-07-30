@@ -357,6 +357,27 @@
     z-index: 60;
   }
 
+  /* Enhanced Profile Dropdown Responsive Styles */
+  .profile-dropdown-mobile {
+    @apply w-80 max-w-[calc(100vw-2rem)];
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .profile-dropdown-tablet {
+    @apply w-72 max-w-[calc(100vw-2rem)];
+  }
+
+  .profile-dropdown-desktop {
+    @apply w-80 max-w-96;
+  }
+
+  /* Enhanced shadow utilities */
+  .shadow-3xl {
+    box-shadow: 0 35px 60px -12px hsl(var(--glass-shadow));
+  }
+
   /* Glass Toast */
   .glass-toast {
     @apply backdrop-blur-xl border-border/30;

@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { OptimizedMessagingService } from '@/services/messaging/OptimizedMessagingService';
 import { MessageThread, DirectMessage } from '@/services/messaging/MessagingService';
 import { useToast } from '@/hooks/use-toast';
-import { useMessageCache } from './useMessageCache';
+import { useOptimizedMessageCache } from './useOptimizedMessageCache';
 import { useMessagePerformance } from './useMessagePerformance';
 
 export const useMessaging = () => {
@@ -31,7 +31,7 @@ export const useMessaging = () => {
     markThreadAsRead,
     totalUnreadCount,
     clearCache
-  } = useMessageCache();
+  } = useOptimizedMessageCache();
 
   // Initialize messaging service when user is available
   useEffect(() => {
@@ -56,8 +56,21 @@ export const useMessaging = () => {
             try {
               const newMessage = payload.new as any;
               
-              // Always refresh threads to update last message and counts
-              await loadThreads();
+              // Smart update: only refresh if this is the first new message or affects current view
+              const needsRefresh = threads.length === 0 || 
+                (selectedThread && threads.find(t => t.id === selectedThread));
+              
+              if (needsRefresh) {
+                // Use cached threads first, then background refresh
+                const cachedThreads = getCachedThreads();
+                if (cachedThreads) {
+                  setThreads(cachedThreads);
+                  // Background refresh without blocking UI
+                  setTimeout(() => loadThreadsFromDatabase(), 500);
+                } else {
+                  await loadThreadsFromDatabase();
+                }
+              }
               
               // If this message is for the currently selected thread, add it to messages
               if (selectedThread) {
@@ -122,10 +135,13 @@ export const useMessaging = () => {
         setThreads(cachedThreads);
         setLoading(false);
         
-        // Background refresh for cache updates
-        setTimeout(() => {
-          loadThreadsFromDatabase();
-        }, 1000);
+        // Only do background refresh if cache is getting stale (>2 minutes)
+        const cacheAge = Date.now() - (cachedThreads[0]?.last_message_at ? new Date(cachedThreads[0].last_message_at).getTime() : 0);
+        if (cacheAge > 2 * 60 * 1000) {
+          setTimeout(() => {
+            loadThreadsFromDatabase();
+          }, 2000); // Delayed background refresh
+        }
         return;
       }
       
@@ -222,8 +238,19 @@ export const useMessaging = () => {
         addMessageToCache(selectedThread, sentMessage);
       }
       
-      // Refresh threads to update last message
-      await loadThreads();
+      // Smart thread refresh: only if needed
+      if (selectedThread) {
+        // Update local thread state instead of full reload
+        setThreads(prev => prev.map(t => 
+          t.id === selectedThread 
+            ? { ...t, last_message_at: new Date().toISOString() }
+            : t
+        ));
+        // Background refresh without blocking
+        setTimeout(() => loadThreadsFromDatabase(), 1000);
+      } else {
+        await loadThreadsFromDatabase();
+      }
       
       return sentMessage;
     } catch (error) {

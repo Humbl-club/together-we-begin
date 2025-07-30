@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { encryptMessage, decryptMessage, generateKeyPair, encodeKey, decodeKey } from '@/utils/encryption';
 import { SecureStorage } from '@/utils/secureStorage';
 import { MessageDecryption } from '@/utils/messageDecryption';
-import { useEncryptionWorker } from '@/hooks/useEncryptionWorker';
+
 import { MessageThread, DirectMessage } from './MessagingService';
 
 export class OptimizedMessagingService {
@@ -16,6 +16,9 @@ export class OptimizedMessagingService {
   private profileCache = new Map<string, { full_name: string; avatar_url?: string; public_key?: string }>();
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
   private cacheTimestamps = new Map<string, number>();
+  
+  // Worker for encryption tasks
+  private encryptionWorker: Worker | null = null;
 
   static getInstance(): OptimizedMessagingService {
     if (!OptimizedMessagingService.instance) {
@@ -27,6 +30,15 @@ export class OptimizedMessagingService {
   async initialize(userId: string) {
     this.currentUserId = userId;
     await this.initializeEncryption(userId);
+    this.initializeWorker();
+  }
+
+  private initializeWorker() {
+    try {
+      this.encryptionWorker = new Worker('/src/workers/encryptionWorker.ts', { type: 'module' });
+    } catch (error) {
+      console.warn('Web Worker not available, falling back to main thread encryption:', error);
+    }
   }
 
   private async initializeEncryption(userId: string) {
@@ -211,12 +223,36 @@ export class OptimizedMessagingService {
     const decryptionStartTime = performance.now();
     
     const otherUserPublicKey = decodeKey(otherUserProfile.public_key);
-    const decryptedMessages = await MessageDecryption.batchDecryptMessages(
-      encryptedMessages,
-      this.userKeyPair.secretKey,
-      otherUserPublicKey,
-      this.currentUserId
-    );
+    
+    let decryptedMessages: DirectMessage[];
+    
+    if (this.encryptionWorker && encryptedMessages.length > 5) {
+      // Use Web Worker for larger batches
+      try {
+        decryptedMessages = await this.batchDecryptWithWorker(
+          encryptedMessages,
+          this.userKeyPair.secretKey,
+          otherUserPublicKey,
+          this.currentUserId
+        );
+      } catch (error) {
+        console.warn('Worker decryption failed, falling back to main thread:', error);
+        decryptedMessages = await MessageDecryption.batchDecryptMessages(
+          encryptedMessages,
+          this.userKeyPair.secretKey,
+          otherUserPublicKey,
+          this.currentUserId
+        );
+      }
+    } else {
+      // Use main thread for small batches or if worker unavailable
+      decryptedMessages = await MessageDecryption.batchDecryptMessages(
+        encryptedMessages,
+        this.userKeyPair.secretKey,
+        otherUserPublicKey,
+        this.currentUserId
+      );
+    }
 
     const decryptionTime = performance.now() - decryptionStartTime;
     console.log(`Message decryption took ${decryptionTime.toFixed(2)}ms for ${encryptedMessages.length} messages`);
@@ -350,6 +386,53 @@ export class OptimizedMessagingService {
     return newThread.id;
   }
 
+  private async batchDecryptWithWorker(
+    messages: any[],
+    userPrivateKey: Uint8Array,
+    otherUserPublicKey: Uint8Array,
+    currentUserId: string
+  ): Promise<DirectMessage[]> {
+    return new Promise((resolve, reject) => {
+      if (!this.encryptionWorker) {
+        reject(new Error('Worker not available'));
+        return;
+      }
+
+      const requestId = Math.random().toString(36).substr(2, 9);
+      
+      const handleMessage = (event: MessageEvent) => {
+        if (event.data.requestId === requestId) {
+          this.encryptionWorker!.removeEventListener('message', handleMessage);
+          
+          if (event.data.type === 'success') {
+            resolve(event.data.result);
+          } else {
+            reject(new Error(event.data.error));
+          }
+        }
+      };
+
+      this.encryptionWorker.addEventListener('message', handleMessage);
+      
+      this.encryptionWorker.postMessage({
+        type: 'batchDecrypt',
+        requestId,
+        payload: {
+          messages,
+          userPrivateKey: Array.from(userPrivateKey),
+          otherUserPublicKey: Array.from(otherUserPublicKey),
+          currentUserId
+        }
+      });
+
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        this.encryptionWorker!.removeEventListener('message', handleMessage);
+        reject(new Error('Worker timeout'));
+      }, 10000);
+    });
+  }
+
   async clearUserData(userId: string): Promise<void> {
     await SecureStorage.clearKeys(userId);
     this.currentUserId = null;
@@ -357,6 +440,11 @@ export class OptimizedMessagingService {
     this.rateLimiter.clear();
     this.profileCache.clear();
     this.cacheTimestamps.clear();
+    
+    if (this.encryptionWorker) {
+      this.encryptionWorker.terminate();
+      this.encryptionWorker = null;
+    }
   }
 
   // Get cache stats for debugging

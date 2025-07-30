@@ -1,8 +1,11 @@
-import React, { memo } from 'react';
+import React, { memo, Suspense } from 'react';
 import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
+import { MobileEnhancedSkeleton, MobileHeaderSkeleton } from '@/components/ui/mobile-enhanced-skeleton';
+import { MobileErrorBoundary } from '@/components/ui/mobile-error-boundary';
+import { MobileOfflineIndicator } from '@/components/ui/mobile-offline-indicator';
 
 // Import mobile-optimized components for events page
 import { MobileFirstCard, MobileFirstCardContent, MobileFirstCardHeader, MobileFirstCardTitle } from '@/components/ui/mobile-first-card';
@@ -28,32 +31,36 @@ const MobileEventsPage: React.FC = memo(() => {
   }
 
   return (
-    <UnifiedLayout profile={profile}>
-      <div 
-        className="space-y-4"
-        style={{
-          paddingTop: `max(16px, ${safeAreaInsets.top}px)`,
-          paddingBottom: `max(24px, ${safeAreaInsets.bottom}px)`,
-          paddingLeft: `max(16px, ${safeAreaInsets.left}px)`,
-          paddingRight: `max(16px, ${safeAreaInsets.right}px)`
-        }}
-      >
+    <MobileErrorBoundary>
+      <MobileOfflineIndicator />
+      <UnifiedLayout profile={profile}>
+        <div 
+          className="space-y-4"
+          style={{
+            paddingTop: `max(16px, ${safeAreaInsets.top}px)`,
+            paddingBottom: `max(24px, ${safeAreaInsets.bottom}px)`,
+            paddingLeft: `max(16px, ${safeAreaInsets.left}px)`,
+            paddingRight: `max(16px, ${safeAreaInsets.right}px)`
+          }}
+        >
         {/* Mobile Header */}
-        <header className="flex items-center justify-between py-2">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Events</h1>
-            <p className="text-sm text-muted-foreground">Discover amazing gatherings</p>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <MobileNativeButton variant="ghost" size="sm">
-              <Search className="h-5 w-5" />
-            </MobileNativeButton>
-            <MobileNativeButton variant="ghost" size="sm">
-              <Filter className="h-5 w-5" />
-            </MobileNativeButton>
-          </div>
-        </header>
+        <Suspense fallback={<MobileHeaderSkeleton />}>
+          <header className="flex items-center justify-between py-2">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Events</h1>
+              <p className="text-sm text-muted-foreground">Discover amazing gatherings</p>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <MobileNativeButton variant="ghost" size="sm">
+                <Search className="h-5 w-5" />
+              </MobileNativeButton>
+              <MobileNativeButton variant="ghost" size="sm">
+                <Filter className="h-5 w-5" />
+              </MobileNativeButton>
+            </div>
+          </header>
+        </Suspense>
 
         {/* Quick Filters */}
         <div className="flex gap-2 overflow-x-auto pb-2">
@@ -107,11 +114,14 @@ const MobileEventsPage: React.FC = memo(() => {
         </MobileNativeButton>
 
         {/* Events List */}
-        <div className="space-y-4">
-          {/* More events would be loaded here */}
+        <Suspense fallback={<MobileEnhancedSkeleton variant="mobile-list" />}>
+          <div className="space-y-4">
+            {/* More events would be loaded here */}
+          </div>
+        </Suspense>
         </div>
-      </div>
-    </UnifiedLayout>
+      </UnifiedLayout>
+    </MobileErrorBoundary>
   );
 });
 

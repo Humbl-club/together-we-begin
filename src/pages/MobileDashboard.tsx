@@ -5,6 +5,8 @@ import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { useToast } from '@/hooks/use-toast';
+import { MobileErrorBoundary } from '@/components/ui/mobile-error-boundary';
+import { MobileOfflineIndicator } from '@/components/ui/mobile-offline-indicator';
 
 // Mobile-optimized components
 import { MobileFirstCard, MobileFirstCardContent, MobileFirstCardHeader, MobileFirstCardTitle } from '@/components/ui/mobile-first-card';
@@ -91,13 +93,15 @@ const MobileDashboard: React.FC = memo(() => {
   ];
 
   return (
-    <div 
-      className="mobile-app-container bg-background"
-      style={{
-        paddingTop: `max(16px, ${safeAreaInsets.top}px)`,
-        paddingBottom: `max(100px, ${safeAreaInsets.bottom + 80}px)`
-      }}
-    >
+    <MobileErrorBoundary>
+      <MobileOfflineIndicator />
+      <div 
+        className="mobile-app-container bg-background"
+        style={{
+          paddingTop: `max(16px, ${safeAreaInsets.top}px)`,
+          paddingBottom: `max(100px, ${safeAreaInsets.bottom + 80}px)`
+        }}
+      >
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="space-y-6 px-4">
           {/* Mobile Header */}
@@ -202,7 +206,8 @@ const MobileDashboard: React.FC = memo(() => {
           </div>
         </div>
       </PullToRefresh>
-    </div>
+      </div>
+    </MobileErrorBoundary>
   );
 });
 

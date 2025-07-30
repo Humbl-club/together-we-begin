@@ -31,7 +31,7 @@
     --space-mobile-xl: 2rem;
     --space-mobile-2xl: 3rem;
     
-    /* Mobile-First Typography Scale */
+    /* Enhanced mobile-first typography scaling */
     --text-mobile-xs: 0.75rem;
     --text-mobile-sm: 0.875rem;
     --text-mobile-base: 1rem;
@@ -39,6 +39,12 @@
     --text-mobile-xl: 1.25rem;
     --text-mobile-2xl: 1.5rem;
     --text-mobile-3xl: 1.875rem;
+    
+    /* Improved line heights for mobile readability */
+    --mobile-leading-tight: 1.25;
+    --mobile-leading-snug: 1.375;
+    --mobile-leading-normal: 1.5;
+    --mobile-leading-relaxed: 1.625;
 
     --card: 0 0% 98%;
     --card-foreground: 210 11% 15%;
@@ -186,6 +192,22 @@
   
   .touch-target {
     @apply min-h-[44px] min-w-[44px];
+  }
+  
+  .touch-target-large {
+    @apply min-h-[56px] min-w-[56px];
+  }
+  
+  /* Mobile typography optimizations */
+  .mobile-optimized-text {
+    line-height: var(--mobile-leading-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Mobile error states */
+  .mobile-error-container {
+    @apply flex flex-col items-center justify-center min-h-[50vh] p-6 text-center;
   }
   
   .mobile-bounce-in {

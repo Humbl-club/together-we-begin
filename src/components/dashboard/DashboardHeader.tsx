@@ -50,21 +50,21 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
 
   if (isMobile) {
     return (
-      <div className="card-primary p-6 mb-6 relative">
-        <div className="flex items-center justify-between">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground mb-2">
+      <div className="card-primary p-4 mb-4 mx-1 rounded-2xl">
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0 pr-3">
+            <h1 className="text-xl font-bold tracking-tight text-foreground mb-1 leading-tight">
               {greeting}!
             </h1>
-            <p className="text-lg font-semibold text-primary mb-2">
+            <p className="text-base font-medium text-primary mb-3 leading-tight">
               Welcome back, {firstName}
             </p>
-            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 text-xs px-2 py-1">
               Your wellness journey continues
             </Badge>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-start gap-2 flex-shrink-0">
             <Button 
               variant="ghost"
               size="icon"
@@ -72,49 +72,26 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = memo(({ profile }) => {
                 haptics.tap();
                 setShowMessaging(true);
               }}
-              className="touch-target-large rounded-full button-glass relative"
+              className="w-10 h-10 rounded-full button-glass relative touch-feedback"
             >
               <MessageCircle className="w-5 h-5" />
               {totalUnreadCount > 0 && (
                 <Badge 
                   variant="destructive" 
-                  className="absolute -top-1 -right-1 h-5 min-w-5 text-xs font-bold border-2 border-background"
+                  className="absolute -top-1 -right-1 h-4 min-w-4 text-xs font-bold border border-background text-[10px] px-1"
                 >
                   {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
                 </Badge>
               )}
             </Button>
             <Button 
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                haptics.tap();
-                navigate('/search');
-              }}
-              className="touch-target-large rounded-full button-glass"
-            >
-              <Search className="w-5 h-5" />
-            </Button>
-            <Button 
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                haptics.tap();
-                navigate('/notifications');
-              }}
-              className="touch-target-large rounded-full button-glass relative"
-            >
-              <Bell className="w-5 h-5" />
-              <div className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full"></div>
-            </Button>
-            <Button 
               onClick={() => {
                 haptics.impact('medium');
                 navigate('/social');
               }}
-              className="touch-target-large rounded-full card-accent text-primary hover:scale-105 touch-feedback"
+              className="w-10 h-10 rounded-full card-accent text-primary hover:scale-105 touch-feedback"
             >
-              <Plus className="w-6 h-6" />
+              <Plus className="w-5 h-5" />
             </Button>
           </div>
         </div>

@@ -79,6 +79,7 @@ const MobileStatsCard: React.FC<{
 
 const StatsGrid: React.FC<StatsGridProps> = memo(({ stats }) => {
   const { isMobile } = useViewport();
+  const haptics = useHapticFeedback();
   
   const statCards = useMemo(() => [
     {
@@ -125,9 +126,32 @@ const StatsGrid: React.FC<StatsGridProps> = memo(({ stats }) => {
 
   if (isMobile) {
     return (
-      <div className="responsive-grid grid-cols-2 mb-6">
+      <div className="grid grid-cols-2 gap-3 mx-1 mb-4">
         {statCards.map((card) => (
-          <MobileStatsCard key={card.title} {...card} />
+          <Card 
+            key={card.title}
+            className="card-secondary touch-feedback p-3 rounded-xl"
+            onClick={() => haptics.tap()}
+          >
+            <CardContent className="p-0">
+              <div className="flex flex-col items-center text-center space-y-2">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${card.bgColor}`}>
+                  <card.icon className={`w-4 h-4 ${card.color}`} strokeWidth={2.5} />
+                </div>
+                <div>
+                  <p className="text-lg font-bold tracking-tight leading-none">
+                    {card.value.toLocaleString()}
+                  </p>
+                  <p className="text-xs text-muted-foreground font-medium mt-1 leading-tight">
+                    {card.title}
+                  </p>
+                </div>
+                <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-0 px-2 py-0.5">
+                  {card.change}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     );

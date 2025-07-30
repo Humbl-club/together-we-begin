@@ -48,8 +48,6 @@ const Dashboard: React.FC = memo(() => {
   const { stats, profile, loading, refetch } = useDashboardData(user?.id);
   const { isMobile, isTablet } = useViewport();
   const { handleError } = useErrorHandler();
-  const progressiveEnhancement = useProgressiveEnhancement();
-  const isEnhanced = true; // Enable enhanced features for now
   const { toast } = useToast();
   const [showOnboarding, setShowOnboarding] = useState(false);
 
@@ -128,96 +126,106 @@ const Dashboard: React.FC = memo(() => {
   ];
 
   return (
-    <ErrorBoundary>
-      <PullToRefresh 
-        onRefresh={async () => {
-          try {
-            await refetch();
-            toast({
-              title: "Dashboard updated",
-              description: "Your latest data has been loaded",
-            });
-          } catch (error) {
-            handleError(error as Error);
-          }
-        }}
-        className="space-y-6 min-h-screen"
-      >
-        {/* Pull to refresh indicator */}
-        {(isPulling || isRefreshing) && (
-          <div 
-            className="absolute top-0 left-1/2 transform -translate-x-1/2 z-50"
-            style={refreshIndicatorStyle}
+    <div className={`mobile-app-container ${isMobile ? 'mobile-layout' : 'desktop-layout'}`}>
+      <ErrorBoundary>
+        {isMobile ? (
+          <PullToRefresh 
+            onRefresh={async () => {
+              try {
+                await refetch();
+                toast({
+                  title: "Dashboard updated",
+                  description: "Your latest data has been loaded",
+                });
+              } catch (error) {
+                handleError(error as Error);
+              }
+            }}
+            className="mobile-dashboard-container"
           >
-            <div className="bg-background/80 backdrop-blur-sm rounded-full p-3 shadow-lg border">
-              <RefreshCw className={`w-5 h-5 text-primary ${isRefreshing ? 'animate-spin' : ''}`} />
+            {/* Mobile-First Layout */}
+            <div className="space-y-3 px-4 pb-24">
+              {/* Mobile Header */}
+              <DashboardHeader profile={profile} />
+
+              {/* Mobile Stats Grid */}
+              <StatsGrid stats={stats} />
+
+              {/* Mobile Content Stack */}
+              <div className="space-y-4">
+                {/* Wellness Card - Priority #1 for mobile */}
+                <Suspense fallback={<div className="h-48 skeleton-mobile" />}>
+                  <WellnessCard
+                    steps={8420}
+                    goalSteps={10000}
+                    leaderboardPosition={12}
+                    totalParticipants={247}
+                    challengeName="Spring Steps"
+                    weeklyProgress={15}
+                  />
+                </Suspense>
+
+                {/* Upcoming Events */}
+                <UpcomingEvents />
+
+                {/* Community Feed */}
+                <Suspense fallback={<div className="h-64 skeleton-mobile" />}>
+                  <LazyCommunityFeed />
+                </Suspense>
+              </div>
+            </div>
+          </PullToRefresh>
+        ) : (
+          /* Desktop Layout - Keep Original */
+          <div className="desktop-dashboard-container p-6 space-y-6">
+            <DashboardHeader profile={profile} />
+            <StatsGrid stats={stats} />
+            
+            <div className="responsive-grid lg:grid-cols-3">
+              <div className="lg:col-span-2 space-mobile">
+                <UpcomingEvents />
+                <Suspense fallback={<div className="h-96 bg-muted/20 rounded-xl animate-pulse" />}>
+                  <LazyCommunityFeed />
+                </Suspense>
+              </div>
+
+              <div className="space-mobile">
+                <Suspense fallback={<div className="h-64 bg-muted rounded-xl animate-pulse" />}>
+                  <WellnessCard
+                    steps={8420}
+                    goalSteps={10000}
+                    leaderboardPosition={12}
+                    totalParticipants={247}
+                    challengeName="Spring Steps"
+                    weeklyProgress={15}
+                  />
+                </Suspense>
+
+                <Card className="card-secondary">
+                  <CardHeader>
+                    <CardTitle className="editorial-heading text-lg">Quick Actions</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-mobile">
+                    <Button variant="outline" className="w-full justify-start button-glass" size="sm">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Create Event
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start button-glass" size="sm">
+                      <Users className="w-4 h-4 mr-2" />
+                      Find Friends
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start button-glass" size="sm">
+                      <Zap className="w-4 h-4 mr-2" />
+                      Start Challenge
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         )}
-
-        {/* Enhanced Mobile Header */}
-        {isMobile ? (
-          <DashboardHeader profile={profile} />
-        ) : (
-          <DashboardHeader profile={profile} />
-        )}
-
-        {/* Enhanced Stats Grid with Mobile-First Design */}
-        <StatsGrid stats={stats} />
-
-        {/* Content Grid */}
-        <div className="responsive-grid lg:grid-cols-3">
-          <div className="lg:col-span-2 space-mobile">
-            {/* Upcoming Events */}
-            <UpcomingEvents />
-
-            {/* Community Feed */}
-            {isEnhanced && (
-              <Suspense fallback={<div className="h-96 bg-muted/20 rounded-xl animate-pulse" />}>
-                <LazyCommunityFeed />
-              </Suspense>
-            )}
-          </div>
-
-          <div className="space-mobile">
-            {/* Enhanced Wellness Card */}
-            <Suspense fallback={<div className="h-64 bg-muted rounded-xl animate-pulse" />}>
-              <WellnessCard
-                steps={8420}
-                goalSteps={10000}
-                leaderboardPosition={12}
-                totalParticipants={247}
-                challengeName="Spring Steps"
-                weeklyProgress={15}
-              />
-            </Suspense>
-
-            {/* Quick Actions Card for Desktop */}
-            {!isMobile && (
-              <Card className="card-secondary">
-                <CardHeader>
-                  <CardTitle className="editorial-heading text-lg">Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-mobile">
-                  <Button variant="outline" className="w-full justify-start button-glass" size="sm">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Create Event
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start button-glass" size="sm">
-                    <Users className="w-4 h-4 mr-2" />
-                    Find Friends
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start button-glass" size="sm">
-                    <Zap className="w-4 h-4 mr-2" />
-                    Start Challenge
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </div>
-      </PullToRefresh>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </div>
   );
 });
 

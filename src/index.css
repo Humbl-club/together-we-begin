@@ -210,6 +210,32 @@
 @layer components {
   /* ===== UNIFIED DESIGN SYSTEM ===== */
   
+  /* ===== MOBILE-FIRST OPTIMIZATION ===== */
+  
+  /* Mobile App Container */
+  .mobile-app-container {
+    @apply min-h-screen;
+  }
+  
+  .mobile-layout {
+    @apply bg-background;
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .desktop-layout {
+    @apply ml-20; /* Account for sidebar */
+  }
+  
+  .mobile-dashboard-container {
+    @apply min-h-screen;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .desktop-dashboard-container {
+    @apply container mx-auto max-w-7xl;
+  }
+  
   /* Touch-Friendly Mobile Components */
   .touch-target-large {
     @apply min-h-[44px] min-w-[44px];
@@ -221,6 +247,10 @@
   
   .mobile-nav-safe {
     padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .mb-safe {
+    margin-bottom: env(safe-area-inset-bottom, 0.75rem);
   }
   
   /* Component Hierarchy */

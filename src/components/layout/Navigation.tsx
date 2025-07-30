@@ -55,60 +55,40 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Mobile Navigation - unified design system
+  // Mobile Navigation - optimized design system
   if (isMobile) {
     return (
       <>
+        {/* Clean Mobile Bottom Navigation */}
         <nav className="fixed bottom-0 left-0 right-0 z-50 mobile-nav-safe">
-          <div className="nav-glass mx-3 mb-3 rounded-3xl shadow-xl">
-            <div className="grid grid-cols-4 gap-2 p-4">
+          <div className="nav-glass mx-2 mb-safe rounded-2xl shadow-xl border border-border/30">
+            <div className="grid grid-cols-4 gap-1 p-3">
               {navItems.map(({ href, icon: Icon, label }) => (
                 <Link
                   key={href}
                   to={href}
                   onClick={() => haptics.tap()}
                   className={`
-                    flex flex-col items-center justify-center p-3 rounded-2xl 
-                    touch-target-large touch-feedback transition-all duration-300
+                    flex flex-col items-center justify-center p-3 rounded-xl
+                    touch-feedback transition-all duration-200 min-h-[50px]
                     ${isActive(href)
-                      ? 'card-accent text-primary scale-105 shadow-lg' 
-                      : 'text-muted-foreground hover:text-foreground hover:card-secondary'
+                      ? 'card-accent text-primary' 
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/20'
                     }
                   `}
                 >
-                  <Icon className="w-6 h-6 mb-1" strokeWidth={isActive(href) ? 2.5 : 2} />
-                  <span className="text-xs font-medium tracking-tight">
+                  <Icon className="w-5 h-5 mb-1" strokeWidth={isActive(href) ? 2.5 : 2} />
+                  <span className="text-[10px] font-medium tracking-tight leading-none">
                     {label}
                   </span>
                   {isActive(href) && (
-                    <div className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full" />
+                    <div className="absolute bottom-1 w-1 h-1 bg-primary rounded-full" />
                   )}
                 </Link>
               ))}
             </div>
           </div>
         </nav>
-        
-        {/* Floating Messages Button */}
-        <Button
-          onClick={() => {
-            haptics.tap();
-            setShowMessaging(true);
-          }}
-          className="
-            fixed bottom-28 right-4 z-50 w-16 h-16 rounded-full 
-            card-accent shadow-lg touch-feedback
-            transition-all duration-300 hover:scale-110 active:scale-95
-          "
-          aria-label="Messages"
-        >
-          <MessageCircle className="w-6 h-6" strokeWidth={2} />
-          {totalUnreadCount > 0 && (
-            <div className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full flex items-center justify-center text-destructive-foreground text-xs font-bold border-2 border-background">
-              {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
-            </div>
-          )}
-        </Button>
         
         <MessagingOverlay 
           isOpen={showMessaging} 

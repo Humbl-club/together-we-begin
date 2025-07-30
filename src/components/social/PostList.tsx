@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Heart, MessageCircle, Share2, Flag, MoreHorizontal, Users } from 'lucide-react';
+import { ShareButton } from './ShareButton';
 
 interface Post {
   id: string;
@@ -183,9 +184,12 @@ export const PostList: React.FC<PostListProps> = ({
                   <span className={isMobile ? 'text-xs' : ''}>{post.comments_count}</span>
                 </Button>
                 
-                <Button variant="ghost" size="sm" className={isMobile ? 'px-2' : ''}>
-                  <Share2 className={isMobile ? 'w-3 h-3' : 'w-4 h-4'} />
-                </Button>
+                <ShareButton 
+                  postId={post.id} 
+                  postContent={post.content || ''} 
+                  size="sm"
+                  isMobile={isMobile}
+                />
               </div>
             </div>
             

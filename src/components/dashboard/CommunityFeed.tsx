@@ -5,15 +5,18 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Heart, MessageCircle, Share2, Camera, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
 import { ImageUpload } from '@/components/image/ImageUpload';
 import { useImageCompression } from '@/hooks/useImageCompression';
+import { ShareButton } from '@/components/social/ShareButton';
 
 const CommunityFeed: React.FC = () => {
   const [newPost, setNewPost] = useState('');
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState<any[]>([]);
+  const { user } = useAuth();
   const { toast } = useToast();
   const { compressImage, processing } = useImageCompression();
 
@@ -29,9 +32,72 @@ const CommunityFeed: React.FC = () => {
       });
 
       if (error) throw error;
-      setPosts(data || []);
+      
+      // Add user_liked information
+      const postsWithLikes = await Promise.all((data || []).map(async (post: any) => {
+        if (!user) return { ...post, user_liked: false };
+        
+        const { data: likeData } = await supabase
+          .from('post_likes')
+          .select('id')
+          .eq('post_id', post.id)
+          .eq('user_id', user.id)
+          .single();
+          
+        return { ...post, user_liked: !!likeData };
+      }));
+      
+      setPosts(postsWithLikes);
     } catch (error) {
       console.error('Error loading posts:', error);
+    }
+  };
+
+  const toggleLike = async (postId: string) => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to like posts",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      if (post.user_liked) {
+        // Remove like
+        await supabase
+          .from('post_likes')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user.id);
+      } else {
+        // Add like
+        await supabase
+          .from('post_likes')
+          .insert([{ post_id: postId, user_id: user.id }]);
+      }
+
+      // Update local state
+      setPosts(prev => prev.map(p => 
+        p.id === postId 
+          ? { 
+              ...p, 
+              user_liked: !p.user_liked,
+              likes_count: p.user_liked ? p.likes_count - 1 : p.likes_count + 1
+            }
+          : p
+      ));
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update like",
+        variant: "destructive"
+      });
     }
   };
 
@@ -221,18 +287,23 @@ const CommunityFeed: React.FC = () => {
                   )}
                   
                   <div className="flex items-center space-x-4 mt-4">
-                    <Button variant="ghost" size="sm">
-                      <Heart className="w-4 h-4 mr-1" />
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => toggleLike(post.id)}
+                      className={post.user_liked ? 'text-red-500' : ''}
+                    >
+                      <Heart className={`w-4 h-4 mr-1 ${post.user_liked ? 'fill-current' : ''}`} />
                       {post.likes_count || 0}
                     </Button>
                     <Button variant="ghost" size="sm">
                       <MessageCircle className="w-4 h-4 mr-1" />
                       {post.comments_count || 0}
                     </Button>
-                    <Button variant="ghost" size="sm">
-                      <Share2 className="w-4 h-4 mr-1" />
-                      Share
-                    </Button>
+                    <ShareButton 
+                      postId={post.id} 
+                      postContent={post.content || ''} 
+                    />
                   </div>
                 </div>
               </div>

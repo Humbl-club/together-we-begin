@@ -456,6 +456,48 @@ export type Database = {
         }
         Relationships: []
       }
+      expired_points: {
+        Row: {
+          expired_at: string
+          expiry_reason: string
+          id: string
+          original_transaction_id: string | null
+          points_expired: number
+          user_id: string
+        }
+        Insert: {
+          expired_at?: string
+          expiry_reason?: string
+          id?: string
+          original_transaction_id?: string | null
+          points_expired: number
+          user_id: string
+        }
+        Update: {
+          expired_at?: string
+          expiry_reason?: string
+          id?: string
+          original_transaction_id?: string | null
+          points_expired?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expired_points_original_transaction_id_fkey"
+            columns: ["original_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "loyalty_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expired_points_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       integration_settings: {
         Row: {
           calendar_sync: boolean | null
@@ -556,30 +598,39 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string | null
+          expires_at: string | null
           id: string
+          metadata: Json | null
           points: number
           reference_id: string | null
           reference_type: string | null
+          source_category: string | null
           type: string
           user_id: string | null
         }
         Insert: {
           created_at?: string | null
           description?: string | null
+          expires_at?: string | null
           id?: string
+          metadata?: Json | null
           points: number
           reference_id?: string | null
           reference_type?: string | null
+          source_category?: string | null
           type: string
           user_id?: string | null
         }
         Update: {
           created_at?: string | null
           description?: string | null
+          expires_at?: string | null
           id?: string
+          metadata?: Json | null
           points?: number
           reference_id?: string | null
           reference_type?: string | null
+          source_category?: string | null
           type?: string
           user_id?: string | null
         }
@@ -711,6 +762,33 @@ export type Database = {
           page_url?: string
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      points_expiration_policies: {
+        Row: {
+          applies_to_point_type: string | null
+          created_at: string
+          expiration_months: number
+          id: string
+          is_active: boolean
+          policy_name: string
+        }
+        Insert: {
+          applies_to_point_type?: string | null
+          created_at?: string
+          expiration_months: number
+          id?: string
+          is_active?: boolean
+          policy_name: string
+        }
+        Update: {
+          applies_to_point_type?: string | null
+          created_at?: string
+          expiration_months?: number
+          id?: string
+          is_active?: boolean
+          policy_name?: string
         }
         Relationships: []
       }
@@ -902,6 +980,116 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      reward_redemptions: {
+        Row: {
+          created_at: string
+          fulfilled_at: string | null
+          id: string
+          notes: string | null
+          points_spent: number
+          redeemed_at: string
+          redemption_code: string | null
+          reward_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          fulfilled_at?: string | null
+          id?: string
+          notes?: string | null
+          points_spent: number
+          redeemed_at?: string
+          redemption_code?: string | null
+          reward_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          fulfilled_at?: string | null
+          id?: string
+          notes?: string | null
+          points_spent?: number
+          redeemed_at?: string
+          redemption_code?: string | null
+          reward_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_redemptions_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "rewards_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reward_redemptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rewards_catalog: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          expiry_date: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          points_cost: number
+          redemption_limit_per_user: number | null
+          stock_quantity: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          points_cost: number
+          redemption_limit_per_user?: number | null
+          stock_quantity?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          points_cost?: number
+          redemption_limit_per_user?: number | null
+          stock_quantity?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rewards_catalog_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       social_posts: {
         Row: {
@@ -1370,6 +1558,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_adjust_user_points: {
+        Args: {
+          target_user_id: string
+          points_adjustment: number
+          reason: string
+          admin_user_id: string
+        }
+        Returns: Json
+      }
       assign_user_role: {
         Args: {
           _user_id: string
@@ -1387,6 +1584,10 @@ export type Database = {
           _notes?: string
         }
         Returns: Json
+      }
+      expire_old_points: {
+        Args: Record<PropertyKey, never>
+        Returns: number
       }
       generate_event_qr_code: {
         Args: { event_id_param: string }
@@ -1455,6 +1656,10 @@ export type Database = {
           unread_count: number
         }[]
       }
+      get_user_available_points: {
+        Args: { user_id_param: string }
+        Returns: number
+      }
       get_user_dashboard_optimized: {
         Args: { user_id_param: string }
         Returns: {
@@ -1511,6 +1716,10 @@ export type Database = {
           moderator_id: string
           reason?: string
         }
+        Returns: Json
+      }
+      redeem_reward: {
+        Args: { reward_id_param: string; user_id_param: string }
         Returns: Json
       }
       remove_user_role: {

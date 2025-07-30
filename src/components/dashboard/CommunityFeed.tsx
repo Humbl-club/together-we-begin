@@ -134,6 +134,8 @@ const CommunityFeed: React.FC = () => {
                 onClick={() => {
                   const input = document.createElement('input');
                   input.type = 'file';
+                  input.id = 'community-image-upload';
+                  input.name = 'community-images';
                   input.multiple = true;
                   input.accept = 'image/*';
                   input.onchange = (e) => {

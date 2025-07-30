@@ -131,6 +131,8 @@ export const ReportModal = ({ isOpen, onClose, contentId, contentType, onReport 
               {reasons.map((r) => (
                 <label key={r} className="flex items-center space-x-2 cursor-pointer">
                   <input
+                    id={`reason-${r.replace(/\s+/g, '-').toLowerCase()}`}
+                    name="report-reason"
                     type="radio"
                     value={r}
                     checked={reason === r}

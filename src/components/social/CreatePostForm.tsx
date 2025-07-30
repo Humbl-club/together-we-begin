@@ -58,6 +58,7 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
                 </Button>
                 <input
                   id="image-upload"
+                  name="post-images"
                   type="file"
                   accept="image/*"
                   multiple
@@ -119,6 +120,7 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
                 </Button>
                 <input
                   id="story-image-upload"
+                  name="story-images"
                   type="file"
                   accept="image/*"
                   multiple

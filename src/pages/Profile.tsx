@@ -180,6 +180,7 @@ const Profile: React.FC = () => {
               
               <input
                 id="avatar-upload"
+                name="avatar-upload"
                 type="file"
                 accept="image/*"
                 onChange={handleAvatarSelect}

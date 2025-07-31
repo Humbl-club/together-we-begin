@@ -70,7 +70,7 @@ const Dashboard: React.FC = memo(() => {
   // Use dedicated mobile component for optimal mobile experience
   if (isMobile) {
     return (
-      <div className="mobile-app-container">
+      <div className="mobile-app-container" data-pull-refresh>
         <MobileDashboard />
         <MobileFirstNavigation profile={profile} />
       </div>
@@ -79,7 +79,7 @@ const Dashboard: React.FC = memo(() => {
 
   // Desktop experience
   return (
-    <div className="desktop-layout min-h-screen bg-background">
+    <div className="desktop-layout min-h-screen bg-background" data-pull-refresh>
       <ErrorBoundary>
         <div className="desktop-dashboard-container p-6 space-y-6 ml-20">
           <DashboardHeader profile={profile} />

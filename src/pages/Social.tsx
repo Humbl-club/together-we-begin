@@ -63,13 +63,24 @@ const Social: React.FC = () => {
   const isMobile = useIsMobile();
   const { usePullToRefresh } = useProgressiveEnhancement();
 
-  // Initialize pull-to-refresh
+  // Add pull to refresh functionality
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   usePullToRefresh(async () => {
-    await Promise.all([fetchPosts(), fetchStories()]);
-    toast({
-      title: "Refreshed",
-      description: "Posts and stories updated"
-    });
+    if (isRefreshing) return; // Prevent multiple refreshes
+    
+    setIsRefreshing(true);
+    try {
+      await Promise.all([fetchPosts(), fetchStories()]);
+      toast({
+        title: "Refreshed",
+        description: "Posts and stories updated"
+      });
+    } catch (error) {
+      console.error('Pull to refresh failed:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
   });
 
   useEffect(() => {

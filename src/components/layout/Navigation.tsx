@@ -4,6 +4,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { cn } from '@/lib/utils';
 import { 
   Home, 
   Users, 
@@ -60,7 +61,10 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
     return (
       <>
         {/* Clean Mobile Bottom Navigation */}
-        <nav className="fixed bottom-0 left-0 right-0 z-50 mobile-nav-safe">
+        <nav className={cn(
+          "fixed bottom-0 left-0 right-0 z-50 mobile-nav-safe",
+          "pb-[env(safe-area-inset-bottom,0px)]"
+        )}>
           <div className="nav-glass mx-2 mb-safe rounded-2xl shadow-xl border border-border/30">
             <div className="grid grid-cols-4 gap-1 p-3">
               {navItems.map(({ href, icon: Icon, label }) => (

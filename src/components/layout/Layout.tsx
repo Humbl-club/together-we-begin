@@ -5,6 +5,7 @@ import { useViewport } from '@/hooks/use-mobile';
 import { Navigation } from './Navigation';
 import { MobileLoading } from '@/components/ui/mobile-loading';
 import { supabase } from '@/integrations/supabase/client';
+import { cn } from '@/lib/utils';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -33,7 +34,10 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-editorial-hero safe-area-layout">
+      <div className={cn(
+        "min-h-screen flex items-center justify-center bg-editorial-hero safe-area-layout",
+        "pt-[env(safe-area-inset-top,0px)]"
+      )}>
         <MobileLoading 
           variant="ios"
           size={isMobile ? "md" : "lg"}
@@ -59,9 +63,16 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
 
   // Use the new unified mobile-first layout system
   return (
-    <div className="min-h-screen bg-background">
+    <div className={cn(
+      "min-h-screen bg-background text-foreground",
+      "pt-[env(safe-area-inset-top,0px)]"
+    )}>
       <Navigation profile={profile} />
-      <main className={`responsive-container max-w-7xl mx-auto ${getMainPadding()}`}>
+      <main className={cn(
+        `responsive-container max-w-7xl mx-auto ${getMainPadding()}`,
+        "px-[env(safe-area-inset-left,0px)]",
+        "pr-[env(safe-area-inset-right,0px)]"
+      )}>
         {children}
       </main>
     </div>

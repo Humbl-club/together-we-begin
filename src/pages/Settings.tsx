@@ -44,8 +44,8 @@ const Settings: React.FC = () => {
     updateSetting(section, key, value);
   };
 
-  // Settings sections for mobile
-  const settingSections = [
+  // Settings sections for mobile - stable reference
+  const settingSections = useMemo(() => [
     {
       id: 'privacy',
       title: 'Privacy & Security',
@@ -95,7 +95,7 @@ const Settings: React.FC = () => {
       description: 'Customize your interface',
       keywords: ['theme', 'dark', 'light', 'font', 'contrast', 'animations', 'glass']
     }
-  ];
+  ], []);
 
   // Filter sections based on search query
   const filteredSections = useMemo(() => {

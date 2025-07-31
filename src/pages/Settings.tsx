@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -108,6 +108,296 @@ const Settings: React.FC = () => {
       section.keywords.some(keyword => keyword.includes(query))
     );
   }, [searchQuery, settingSections]);
+
+  // Render mobile section content - stable reference with useCallback
+  const renderMobileSectionContent = useCallback((sectionId: string) => {
+    switch (sectionId) {
+      case 'privacy':
+        return <PrivacySettings />;
+
+      case 'account':
+        return <AccountManagement />;
+
+      case 'notifications':
+        return <NotificationSettings />;
+
+      case 'wellness':
+        return (
+          <Card className="glass-card-enhanced">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Heart className="w-5 h-5" />
+                Wellness & Health
+              </CardTitle>
+              <CardDescription>
+                Manage your wellness tracking and reminders
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between py-3">
+                  <Label htmlFor="activityReminders">Activity Reminders</Label>
+                  <MobileToggle
+                    checked={settings.wellness.activity_reminders}
+                    onCheckedChange={(checked) => {
+                      feedback.tap();
+                      updateSetting('wellness', 'activity_reminders', checked);
+                    }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="dailySteps">Daily Step Goal</Label>
+                  <Input
+                    id="dailySteps"
+                    type="number"
+                    value={settings.wellness.daily_goal_steps}
+                    onChange={(e) => updateSetting('wellness', 'daily_goal_steps', parseInt(e.target.value) || 8000)}
+                    min="1000"
+                    max="50000"
+                    className="h-12 text-lg"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between py-3">
+                  <Label htmlFor="waterReminders">Water Reminders</Label>
+                  <MobileToggle
+                    checked={settings.wellness.water_reminders}
+                    onCheckedChange={(checked) => {
+                      feedback.tap();
+                      updateSetting('wellness', 'water_reminders', checked);
+                    }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between py-3">
+                  <Label htmlFor="sleepTracking">Sleep Tracking</Label>
+                  <MobileToggle
+                    checked={settings.wellness.sleep_tracking}
+                    onCheckedChange={(checked) => {
+                      feedback.tap();
+                      updateSetting('wellness', 'sleep_tracking', checked);
+                    }}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case 'appearance':
+        return (
+          <Card className="glass-card-enhanced">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="w-5 h-5" />
+                Appearance & Theme
+              </CardTitle>
+              <CardDescription>
+                Customize the look and feel of your app
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="theme">Theme</Label>
+                  <Select 
+                    value={settings.appearance.theme} 
+                    onValueChange={(value) => {
+                      feedback.tap();
+                      updateSetting('appearance', 'theme', value);
+                    }}
+                  >
+                    <SelectTrigger className="h-12">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="light">Light</SelectItem>
+                      <SelectItem value="dark">Dark</SelectItem>
+                      <SelectItem value="system">System</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="fontSize">Font Size</Label>
+                  <Select 
+                    value={settings.appearance.font_size} 
+                    onValueChange={(value) => {
+                      feedback.tap();
+                      updateSetting('appearance', 'font_size', value);
+                    }}
+                  >
+                    <SelectTrigger className="h-12">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="small">Small</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="large">Large</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center justify-between py-3">
+                  <Label htmlFor="glassmorphism">Glassmorphism Effects</Label>
+                  <MobileToggle
+                    checked={settings.appearance.glassmorphism_enabled}
+                    onCheckedChange={(checked) => {
+                      feedback.tap();
+                      updateSetting('appearance', 'glassmorphism_enabled', checked);
+                    }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between py-3">
+                  <Label htmlFor="animations">Enable Animations</Label>
+                  <MobileToggle
+                    checked={settings.appearance.animations_enabled}
+                    onCheckedChange={(checked) => {
+                      feedback.tap();
+                      updateSetting('appearance', 'animations_enabled', checked);
+                    }}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case 'messaging':
+        return (
+          <Card className="glass-card-enhanced">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageCircle className="w-5 h-5" />
+                Messaging & Communication
+              </CardTitle>
+              <CardDescription>
+                Control your messaging preferences and encryption settings
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between py-3">
+                  <div>
+                    <Label htmlFor="allowMessages">Allow Direct Messages</Label>
+                    <p className="text-sm text-muted-foreground">Enable direct messaging with other members</p>
+                  </div>
+                  <MobileToggle
+                    checked={settings.social.message_requests}
+                    onCheckedChange={(checked) => {
+                      feedback.tap();
+                      updateSetting('social', 'message_requests', checked);
+                    }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between py-3">
+                  <div>
+                    <Label htmlFor="messagePreview">Message Previews</Label>
+                    <p className="text-sm text-muted-foreground">Show message previews in notifications</p>
+                  </div>
+                  <MobileToggle
+                    checked={settings.notifications.social_interactions}
+                    onCheckedChange={(checked) => {
+                      feedback.tap();
+                      updateSetting('notifications', 'social_interactions', checked);
+                    }}
+                  />
+                </div>
+
+                <div className="p-4 bg-muted/50 rounded-lg border border-primary/20">
+                  <div className="flex items-start gap-3">
+                    <Lock className="w-5 h-5 text-primary mt-0.5" />
+                    <div>
+                      <h4 className="font-medium text-sm">End-to-End Encryption</h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        All messages are encrypted with client-side keys. Even administrators cannot read your conversations.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case 'social':
+        return (
+          <Card className="glass-card-enhanced">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Social Features
+              </CardTitle>
+              <CardDescription>
+                Configure your social interaction preferences
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between py-3">
+                  <Label htmlFor="autoFollowFriends">Auto-Follow Event Attendees</Label>
+                  <MobileToggle
+                    checked={settings.social.auto_follow_friends}
+                    onCheckedChange={(checked) => {
+                      feedback.tap();
+                      updateSetting('social', 'auto_follow_friends', checked);
+                    }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between py-3">
+                  <Label htmlFor="contentSuggestions">Content Suggestions</Label>
+                  <MobileToggle
+                    checked={settings.social.content_suggestions}
+                    onCheckedChange={(checked) => {
+                      feedback.tap();
+                      updateSetting('social', 'content_suggestions', checked);
+                    }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between py-3">
+                  <Label htmlFor="storySharing">Story Sharing</Label>
+                  <MobileToggle
+                    checked={settings.social.story_sharing}
+                    onCheckedChange={(checked) => {
+                      feedback.tap();
+                      updateSetting('social', 'story_sharing', checked);
+                    }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="activityVisibility">Activity Visibility</Label>
+                  <Select 
+                    value={settings.social.activity_visibility} 
+                    onValueChange={(value) => {
+                      feedback.tap();
+                      updateSetting('social', 'activity_visibility', value);
+                    }}
+                  >
+                    <SelectTrigger className="h-12">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="public">Public</SelectItem>
+                      <SelectItem value="friends">Friends Only</SelectItem>
+                      <SelectItem value="private">Private</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      default:
+        return null;
+    }
+  }, [settings, feedback, updateSetting]);
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -528,297 +818,6 @@ const Settings: React.FC = () => {
       )}
     </div>
   );
-
-  // Render mobile section content
-  function renderMobileSectionContent(sectionId: string) {
-    switch (sectionId) {
-
-      case 'privacy':
-        return <PrivacySettings />;
-
-      case 'account':
-        return <AccountManagement />;
-
-      case 'notifications':
-        return <NotificationSettings />;
-
-      case 'wellness':
-        return (
-          <Card className="glass-card-enhanced">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Heart className="w-5 h-5" />
-                Wellness & Health
-              </CardTitle>
-              <CardDescription>
-                Manage your wellness tracking and reminders
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between py-3">
-                  <Label htmlFor="activityReminders">Activity Reminders</Label>
-                  <MobileToggle
-                    checked={settings.wellness.activity_reminders}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('wellness', 'activity_reminders', checked);
-                    }}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="dailySteps">Daily Step Goal</Label>
-                  <Input
-                    id="dailySteps"
-                    type="number"
-                    value={settings.wellness.daily_goal_steps}
-                    onChange={(e) => updateSetting('wellness', 'daily_goal_steps', parseInt(e.target.value) || 8000)}
-                    min="1000"
-                    max="50000"
-                    className="h-12 text-lg"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between py-3">
-                  <Label htmlFor="waterReminders">Water Reminders</Label>
-                  <MobileToggle
-                    checked={settings.wellness.water_reminders}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('wellness', 'water_reminders', checked);
-                    }}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between py-3">
-                  <Label htmlFor="sleepTracking">Sleep Tracking</Label>
-                  <MobileToggle
-                    checked={settings.wellness.sleep_tracking}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('wellness', 'sleep_tracking', checked);
-                    }}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-
-      case 'appearance':
-        return (
-          <Card className="glass-card-enhanced">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="w-5 h-5" />
-                Appearance & Theme
-              </CardTitle>
-              <CardDescription>
-                Customize the look and feel of your app
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="theme">Theme</Label>
-                  <Select 
-                    value={settings.appearance.theme} 
-                    onValueChange={(value) => {
-                      feedback.tap();
-                      updateSetting('appearance', 'theme', value);
-                    }}
-                  >
-                    <SelectTrigger className="h-12">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="light">Light</SelectItem>
-                      <SelectItem value="dark">Dark</SelectItem>
-                      <SelectItem value="system">System</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="fontSize">Font Size</Label>
-                  <Select 
-                    value={settings.appearance.font_size} 
-                    onValueChange={(value) => {
-                      feedback.tap();
-                      updateSetting('appearance', 'font_size', value);
-                    }}
-                  >
-                    <SelectTrigger className="h-12">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="small">Small</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="large">Large</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex items-center justify-between py-3">
-                  <Label htmlFor="glassmorphism">Glassmorphism Effects</Label>
-                  <MobileToggle
-                    checked={settings.appearance.glassmorphism_enabled}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('appearance', 'glassmorphism_enabled', checked);
-                    }}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between py-3">
-                  <Label htmlFor="animations">Enable Animations</Label>
-                  <MobileToggle
-                    checked={settings.appearance.animations_enabled}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('appearance', 'animations_enabled', checked);
-                    }}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-
-      case 'messaging':
-        return (
-          <Card className="glass-card-enhanced">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageCircle className="w-5 h-5" />
-                Messaging & Communication
-              </CardTitle>
-              <CardDescription>
-                Control your messaging preferences and encryption settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between py-3">
-                  <div>
-                    <Label htmlFor="allowMessages">Allow Direct Messages</Label>
-                    <p className="text-sm text-muted-foreground">Enable direct messaging with other members</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.social.message_requests}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('social', 'message_requests', checked);
-                    }}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between py-3">
-                  <div>
-                    <Label htmlFor="messagePreview">Message Previews</Label>
-                    <p className="text-sm text-muted-foreground">Show message previews in notifications</p>
-                  </div>
-                  <MobileToggle
-                    checked={settings.notifications.social_interactions}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('notifications', 'social_interactions', checked);
-                    }}
-                  />
-                </div>
-
-                <div className="p-4 bg-muted/50 rounded-lg border border-primary/20">
-                  <div className="flex items-start gap-3">
-                    <Lock className="w-5 h-5 text-primary mt-0.5" />
-                    <div>
-                      <h4 className="font-medium text-sm">End-to-End Encryption</h4>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        All messages are encrypted with client-side keys. Even administrators cannot read your conversations.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-
-      case 'social':
-        return (
-          <Card className="glass-card-enhanced">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Social Features
-              </CardTitle>
-              <CardDescription>
-                Configure your social interaction preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between py-3">
-                  <Label htmlFor="autoFollowFriends">Auto-Follow Event Attendees</Label>
-                  <MobileToggle
-                    checked={settings.social.auto_follow_friends}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('social', 'auto_follow_friends', checked);
-                    }}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between py-3">
-                  <Label htmlFor="contentSuggestions">Content Suggestions</Label>
-                  <MobileToggle
-                    checked={settings.social.content_suggestions}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('social', 'content_suggestions', checked);
-                    }}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between py-3">
-                  <Label htmlFor="storySharing">Story Sharing</Label>
-                  <MobileToggle
-                    checked={settings.social.story_sharing}
-                    onCheckedChange={(checked) => {
-                      feedback.tap();
-                      updateSetting('social', 'story_sharing', checked);
-                    }}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="activityVisibility">Activity Visibility</Label>
-                  <Select 
-                    value={settings.social.activity_visibility} 
-                    onValueChange={(value) => {
-                      feedback.tap();
-                      updateSetting('social', 'activity_visibility', value);
-                    }}
-                  >
-                    <SelectTrigger className="h-12">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="public">Public</SelectItem>
-                      <SelectItem value="friends">Friends Only</SelectItem>
-                      <SelectItem value="private">Private</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-
-      default:
-        return null;
-    }
-  }
 };
 
 export default Settings;

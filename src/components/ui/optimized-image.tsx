@@ -1,123 +1,117 @@
-import React, { memo, useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, ImgHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
-import { useLazyLoading } from '@/hooks/usePerformanceOptimization';
 
-interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
-  src?: string;
-  fallbackSrc?: string;
-  lowQualitySrc?: string;
-  blurhash?: string;
-  aspectRatio?: string;
-  sizes?: string;
-  priority?: boolean;
-  fallback?: string; // Keep for backward compatibility
+interface OptimizedImageProps extends ImgHTMLAttributes<HTMLImageElement> {
+  fallback?: string;
+  onLoadComplete?: () => void;
+  aspectRatio?: 'square' | 'video' | 'auto';
 }
 
-export const OptimizedImage = memo(({ 
+export const OptimizedImage: React.FC<OptimizedImageProps> = ({ 
   src, 
-  fallbackSrc, 
-  lowQualitySrc,
-  blurhash,
-  aspectRatio,
-  sizes,
-  priority = false,
-  fallback = '/placeholder.svg', // Backward compatibility
-  className,
   alt = '',
+  fallback = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Crect width="400" height="400" fill="%23f3f4f6"/%3E%3C/svg%3E',
+  onLoadComplete,
+  className,
+  aspectRatio = 'auto',
   ...props 
-}: OptimizedImageProps) => {
-  const finalSrc = src || fallback;
-  const [imageSrc, setImageSrc] = useState(priority ? finalSrc : lowQualitySrc || '');
-  const [imageState, setImageState] = useState<'loading' | 'loaded' | 'error'>('loading');
-  const [shouldLoad, setShouldLoad] = useState(priority);
-  const { observe } = useLazyLoading();
-
-  const imageRef = React.useRef<HTMLImageElement>(null);
-
-  // Use fallback prop for backward compatibility
-  const finalFallback = fallbackSrc || fallback;
-
+}) => {
+  const [imageSrc, setImageSrc] = useState<string>(fallback);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isInView, setIsInView] = useState(false);
+  const imgRef = useRef<HTMLDivElement>(null);
+  
+  // Intersection Observer for lazy loading
   useEffect(() => {
-    if (!priority && imageRef.current && finalSrc) {
-      const img = imageRef.current;
-      img.dataset.src = finalSrc;
-      observe(img);
-      
-      // Set up intersection observer callback
-      const checkLoad = () => {
-        if (img.src === finalSrc) {
-          setShouldLoad(true);
-        }
-      };
-      
-      img.addEventListener('load', checkLoad);
-      return () => img.removeEventListener('load', checkLoad);
-    }
-  }, [finalSrc, priority, observe]);
-
-  useEffect(() => {
-    if (!shouldLoad || !finalSrc) return;
-
-    const img = new Image();
-    
-    img.onload = () => {
-      setImageSrc(finalSrc);
-      setImageState('loaded');
-    };
-    
-    img.onerror = () => {
-      if (finalFallback) {
-        setImageSrc(finalFallback);
-        setImageState('loaded');
-      } else {
-        setImageState('error');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true);
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        rootMargin: '50px', // Start loading 50px before entering viewport
       }
+    );
+    
+    if (imgRef.current) {
+      observer.observe(imgRef.current);
+    }
+    
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+  
+  // Load image when in view
+  useEffect(() => {
+    if (!isInView || !src) return;
+    
+    const img = new Image();
+    img.src = src;
+    
+    const handleLoad = () => {
+      setImageSrc(src);
+      setIsLoading(false);
+      onLoadComplete?.();
     };
     
-    img.src = finalSrc;
-  }, [finalSrc, shouldLoad, finalFallback]);
-
-  if (imageState === 'error' && !finalFallback) {
-    return (
-      <div 
-        className={cn(
-          'bg-muted flex items-center justify-center text-muted-foreground',
-          className
-        )}
-        style={{ aspectRatio }}
-      >
-        <span className="text-xs">Failed to load</span>
-      </div>
-    );
-  }
-
+    const handleError = () => {
+      console.error(`Failed to load image: ${src}`);
+      setImageSrc(fallback);
+      setIsLoading(false);
+    };
+    
+    img.addEventListener('load', handleLoad);
+    img.addEventListener('error', handleError);
+    
+    // Clean up
+    return () => {
+      img.removeEventListener('load', handleLoad);
+      img.removeEventListener('error', handleError);
+    };
+  }, [isInView, src, fallback, onLoadComplete]);
+  
+  const aspectRatioClasses = {
+    square: 'aspect-square',
+    video: 'aspect-video',
+    auto: ''
+  };
+  
   return (
-    <div className={cn('relative overflow-hidden', className)} style={{ aspectRatio }}>
-      {/* Blurhash or low quality placeholder */}
-      {(imageState === 'loading' || (lowQualitySrc && imageState !== 'loaded')) && (
-        <div className="absolute inset-0 bg-muted animate-pulse" />
+    <div 
+      ref={imgRef}
+      className={cn(
+        'relative overflow-hidden bg-muted',
+        aspectRatioClasses[aspectRatio],
+        className
+      )}
+    >
+      {/* Loading skeleton */}
+      {isLoading && (
+        <div className="absolute inset-0 loading-skeleton" />
       )}
       
-      {/* Main image */}
+      {/* Actual image */}
       <img
-        ref={imageRef}
         src={imageSrc}
         alt={alt}
-        sizes={sizes}
         className={cn(
           'w-full h-full object-cover transition-opacity duration-300',
-          imageState === 'loaded' ? 'opacity-100' : 'opacity-0',
+          isLoading ? 'opacity-0' : 'opacity-100'
         )}
-        loading={priority ? 'eager' : 'lazy'}
+        loading="lazy"
+        decoding="async"
         {...props}
       />
-      
-      {/* Loading overlay */}
-      {imageState === 'loading' && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        </div>
-      )}
     </div>
   );
-});
+};
+
+// Export a simpler version for avatars that doesn't need aspect ratio wrapper
+export const OptimizedAvatar: React.FC<OptimizedImageProps> = (props) => {
+  return <OptimizedImage {...props} aspectRatio="square" />;
+};

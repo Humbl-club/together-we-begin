@@ -1,44 +1,117 @@
 
-import React, { useEffect, Suspense } from 'react';
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/components/auth/AuthProvider";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { Layout } from "@/components/layout/Layout";
-import NotificationService from "@/services/notificationService";
+import React, { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from '@/components/ui/toaster';
+import { Toaster as Sonner } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { AuthProvider } from '@/components/auth/AuthProvider';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { Layout } from '@/components/layout/Layout';
+import NotificationService from '@/services/notificationService';
 
-// Critical routes - loaded immediately
-import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-
-// Lazy-loaded routes for better performance
-const Social = React.lazy(() => import("./pages/Social"));
-const Events = React.lazy(() => import("./pages/Events"));
-const Challenges = React.lazy(() => import("./pages/Challenges"));
-const Profile = React.lazy(() => import("./pages/Profile"));
-const Settings = React.lazy(() => import("./pages/Settings"));
-const Messages = React.lazy(() => import("./pages/Messages"));
-const Admin = React.lazy(() => import("./pages/Admin"));
-const PerformanceMonitor = React.lazy(() => import("./pages/admin/PerformanceMonitor"));
-const QRScanner = React.lazy(() => import("./pages/QRScanner"));
-
-// Loading component that matches Auth.tsx styling
+// Create a page loader component
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-editorial-hero">
-    <div className="editorial-card max-w-md mx-auto text-center p-8">
-      <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-      <p className="text-muted-foreground font-light">Loading...</p>
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="text-center space-y-4">
+      <div className="animate-spin w-12 h-12 border-2 border-primary border-t-transparent rounded-full mx-auto" />
+      <p className="text-muted-foreground">Loading...</p>
     </div>
   </div>
 );
 
-const queryClient = new QueryClient();
+// Error boundary for lazy loading failures
+class LazyBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <div className="text-center space-y-4">
+            <h2 className="text-xl font-semibold">Failed to load page</h2>
+            <p className="text-muted-foreground">Please refresh the page to try again.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Keep critical pages non-lazy for immediate loading
+import Index from './pages/Index';
+import Auth from './pages/Auth';
+import NotFound from './pages/NotFound';
+
+// Lazy load all other pages
+const Dashboard = lazy(() => 
+  import('./pages/Dashboard').then(module => ({ default: module.default }))
+);
+
+const Social = lazy(() => 
+  import('./pages/Social').then(module => ({ default: module.default }))
+);
+
+const Events = lazy(() => 
+  import('./pages/Events').then(module => ({ default: module.default }))
+);
+
+const Challenges = lazy(() => 
+  import('./pages/Challenges').then(module => ({ default: module.default }))
+);
+
+const Messages = lazy(() => 
+  import('./pages/Messages').then(module => ({ default: module.default }))
+);
+
+const Profile = lazy(() => 
+  import('./pages/Profile').then(module => ({ default: module.default }))
+);
+
+const Settings = lazy(() => 
+  import('./pages/Settings').then(module => ({ default: module.default }))
+);
+
+const Admin = lazy(() => 
+  import('./pages/Admin').then(module => ({ default: module.default }))
+);
+
+const PerformanceMonitor = lazy(() => 
+  import('./pages/admin/PerformanceMonitor').then(module => ({ default: module.default }))
+);
+
+const QRScanner = lazy(() => 
+  import('./pages/QRScanner').then(module => ({ default: module.default }))
+);
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => {
   useEffect(() => {
@@ -85,11 +158,14 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <ErrorBoundary>
+            <LazyBoundary>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
+                  {/* Public routes */}
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
+                  
+                  {/* Protected routes */}
                   <Route path="/dashboard" element={
                     <ProtectedRoute>
                       <Layout><Dashboard /></Layout>
@@ -143,7 +219,7 @@ const App = () => {
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
-            </ErrorBoundary>
+            </LazyBoundary>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

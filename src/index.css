@@ -269,3 +269,28 @@
     }
   }
 }
+
+/* iOS Input Zoom Fix - Prevents automatic zoom on input focus */
+/* This must be 16px or larger to prevent iOS zoom behavior */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+input[type="url"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+textarea,
+select {
+  font-size: 16px !important;
+}
+
+/* Ensure the font size doesn't break our design */
+/* Apply smaller visual size through transform if needed */
+.small-input {
+  font-size: 16px !important;
+  transform: scale(0.875);
+  transform-origin: left center;
+}

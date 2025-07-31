@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Send, Search, MessageCircle, Plus, ArrowLeft, Lock } from 'lucide-react';
+import { X, Send, Search, MessageCircle, MessageSquare, Plus, ArrowLeft, Lock } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -204,20 +205,17 @@ export const MessagingOverlay: React.FC<MessagingOverlayProps> = ({ isOpen, onCl
                   </div>
                 ) : filteredThreads.length === 0 ? (
                   <div className="flex items-center justify-center py-12">
-                    <div className="text-center">
-                      <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                      <p className="text-sm text-muted-foreground mb-3">
-                        {searchQuery ? 'No conversations match your search' : 'No conversations yet'}
-                      </p>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setView('new')}
-                        className="bg-background/60 hover:bg-background/80"
-                      >
-                        Start a conversation
-                      </Button>
-                    </div>
+                    <EmptyState
+                      icon={<MessageSquare className="w-full h-full" />}
+                      title={searchQuery ? 'No conversations match your search' : 'No conversations yet'}
+                      description={searchQuery ? 'Try different search terms' : 'Start a conversation with someone'}
+                      action={{
+                        label: "Start a conversation",
+                        onClick: () => setView('new'),
+                        variant: "default"
+                      }}
+                      className="py-8"
+                    />
                   </div>
                 ) : (
                   <div className="space-y-1 p-2">

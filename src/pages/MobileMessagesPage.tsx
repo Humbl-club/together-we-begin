@@ -6,6 +6,7 @@ import { MobileFirstCard, MobileFirstCardContent } from '@/components/ui/mobile-
 import { MobileNativeButton } from '@/components/ui/mobile-native-button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { EmptyState } from '@/components/ui/empty-state';
 import { 
   Send,
   Search,
@@ -425,13 +426,17 @@ const MobileMessagesPage: React.FC = memo(() => {
                   <div className="h-16 w-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
                     <Send className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">No conversations yet</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Start connecting with other members
-                  </p>
-                  <MobileNativeButton variant="primary" onClick={() => feedback.tap()}>
-                    Find People to Connect
-                  </MobileNativeButton>
+                  <EmptyState
+                    icon={<Send className="w-full h-full" />}
+                    title="No conversations yet"
+                    description="Start connecting with other members"
+                    action={{
+                      label: "Find People to Connect",
+                      onClick: () => feedback.tap(),
+                      variant: "default"
+                    }}
+                    className="py-8"
+                  />
                 </div>
               </MobileFirstCardContent>
             </MobileFirstCard>

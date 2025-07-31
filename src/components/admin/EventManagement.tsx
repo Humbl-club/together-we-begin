@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Search, 
@@ -711,11 +712,11 @@ const EventManagement: React.FC = () => {
 
       {filteredEvents.length === 0 && (
         <div className="text-center py-12">
-          <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No events found</h3>
-          <p className="text-muted-foreground">
-            {searchTerm ? 'Try adjusting your search terms.' : 'Create your first event to get started.'}
-          </p>
+          <EmptyState
+            icon={<Calendar className="w-full h-full" />}
+            title="No events found"
+            description={searchTerm ? 'Try adjusting your search terms.' : 'Create your first event to get started.'}
+          />
         </div>
       )}
 

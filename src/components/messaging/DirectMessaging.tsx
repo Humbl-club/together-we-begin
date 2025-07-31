@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Send, Search, MessageCircle, Lock, Shield, Plus, ArrowLeft } from 'lucide-react';
+import { Send, Search, MessageCircle, MessageSquare, Lock, Shield, Plus, ArrowLeft } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useMobileFirst } from '@/hooks/useMobileFirst';
@@ -152,18 +153,16 @@ export const DirectMessaging = () => {
             <div className="space-y-1 max-h-[400px] overflow-y-auto">
               {filteredThreads.length === 0 ? (
                 <div className="p-6 text-center">
-                  <MessageCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">
-                    {searchQuery ? 'No conversations match your search' : 'No conversations yet'}
-                  </p>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="mt-2"
-                    onClick={() => setShowNewMessageDialog(true)}
-                  >
-                    Start a conversation
-                  </Button>
+                  <EmptyState
+                    icon={<MessageSquare className="w-full h-full" />}
+                    title={searchQuery ? 'No conversations match your search' : 'No conversations yet'}
+                    description={searchQuery ? 'Try different search terms' : 'Start a conversation with someone from the community'}
+                    action={!searchQuery ? {
+                      label: "Start a conversation",
+                      onClick: () => setShowNewMessageDialog(true),
+                      variant: "default"
+                    } : undefined}
+                  />
                 </div>
               ) : (
                 filteredThreads.map((thread) => (

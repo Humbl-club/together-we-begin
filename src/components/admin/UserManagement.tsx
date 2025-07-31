@@ -26,6 +26,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface UserWithRoles {
   user_id: string;
@@ -392,13 +393,16 @@ const UserManagement: React.FC = () => {
       </div>
 
       {filteredUsers.length === 0 && (
-        <div className="text-center py-12">
-          <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No users found</h3>
-          <p className="text-muted-foreground">
-            {searchTerm ? 'Try adjusting your search terms.' : 'No users are registered yet.'}
-          </p>
-        </div>
+        <EmptyState
+          icon={<Users className="w-full h-full" />}
+          title="No users found"
+          description={searchTerm ? 'Try adjusting your search terms.' : 'No users are registered yet.'}
+          action={searchTerm ? {
+            label: "Clear Search",
+            onClick: () => setSearchTerm(''),
+            variant: "outline"
+          } : undefined}
+        />
       )}
     </div>
   );

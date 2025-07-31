@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface Challenge {
   id: string;
@@ -645,13 +646,16 @@ const ChallengeManagement: React.FC = () => {
       </div>
 
       {filteredChallenges.length === 0 && (
-        <div className="text-center py-12">
-          <Trophy className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No challenges found</h3>
-          <p className="text-muted-foreground">
-            {searchTerm ? 'Try adjusting your search terms.' : 'Create your first challenge to get started.'}
-          </p>
-        </div>
+        <EmptyState
+          icon={<Trophy className="w-full h-full" />}
+          title="No challenges found"
+          description={searchTerm ? 'Try adjusting your search terms.' : 'Create your first challenge to get started.'}
+          action={!searchTerm ? {
+            label: "Create Challenge",
+            onClick: () => setShowCreateDialog(true),
+            variant: "default"
+          } : undefined}
+        />
       )}
     </div>
   );

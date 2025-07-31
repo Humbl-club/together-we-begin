@@ -7,6 +7,7 @@ import { useUpcomingEvents } from '@/hooks/useUpcomingEvents';
 import { useViewport } from '@/hooks/use-mobile';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { OptimizedSkeleton } from '@/components/ui/optimized-skeleton';
+import { EmptyState } from '@/components/ui/empty-state';
 
 const UpcomingEvents: React.FC = memo(() => {
   const { events, loading } = useUpcomingEvents();
@@ -80,10 +81,12 @@ const UpcomingEvents: React.FC = memo(() => {
               </div>
             ))
           ) : (
-            <div className="text-center py-6">
-              <Calendar className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">No upcoming events</p>
-            </div>
+            <EmptyState
+              icon={<Calendar className="w-full h-full" />}
+              title="No upcoming events"
+              description="Check back soon for exciting new events!"
+              className="py-6"
+            />
           )}
         </CardContent>
       </Card>

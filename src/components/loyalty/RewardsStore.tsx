@@ -9,6 +9,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Gift, Trophy, Star, Coffee, ShoppingCart, Ticket } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface Reward {
   id: string;
@@ -286,16 +287,14 @@ export const RewardsStore: React.FC = () => {
           </div>
 
           {filteredRewards.length === 0 && (
-            <div className="text-center py-12">
-              <Gift className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No Rewards Available</h3>
-              <p className="text-muted-foreground">
-                {categoryFilter === 'all' ? 
-                  'Check back later for new rewards!' : 
-                  'No rewards in this category yet.'
-                }
-              </p>
-            </div>
+            <EmptyState
+              icon={<Gift className="w-full h-full" />}
+              title="No Rewards Available"
+              description={categoryFilter === 'all' ? 
+                'Check back later for new rewards!' : 
+                'No rewards in this category yet.'
+              }
+            />
           )}
         </TabsContent>
 

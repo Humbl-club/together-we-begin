@@ -46,18 +46,16 @@ interface Comment {
 }
 
 const Social: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<any[]>([]);
   const [stories, setStories] = useState<Post[]>([]);
-  const [newPost, setNewPost] = useState('');
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showComments, setShowComments] = useState<string | null>(null);
-  const [searchItems, setSearchItems] = useState<SearchableItem[]>([]);
-  const [reportModalOpen, setReportModalOpen] = useState(false);
-  const [reportingPostId, setReportingPostId] = useState<string>('');
-  const [contentWarning, setContentWarning] = useState<{ flags: any, show: boolean }>({ flags: {}, show: false });
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState('');
+  const [showCreatePost, setShowCreatePost] = useState(false);
+  const [profiles, setProfiles] = useState<Record<string, any>>({});
+  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -143,23 +141,26 @@ const Social: React.FC = () => {
 
       if (likesError) throw likesError;
 
-      // Combine the data
-      const postsWithProfiles = postsData?.map(post => {
-        const profile = profilesData?.find(p => p.id === post.user_id) || {
-          full_name: 'Unknown User',
-          username: 'unknown',
-          avatar_url: null
-        };
-        const postLikes = likesData?.filter(like => like.post_id === post.id) || [];
-        
-        return {
-          ...post,
-          profiles: profile,
-          user_liked: postLikes.some(like => like.user_id === user?.id)
-        };
-      }) || [];
+      // Store profiles and create lookup maps
+      const profilesMap = profilesData?.reduce((acc, profile) => {
+        acc[profile.id] = profile;
+        return acc;
+      }, {} as Record<string, any>) || {};
 
-      setPosts(postsWithProfiles);
+      const likesMap = likesData?.reduce((acc, like) => {
+        if (!acc[like.post_id]) acc[like.post_id] = 0;
+        acc[like.post_id]++;
+        return acc;
+      }, {} as Record<string, number>) || {};
+
+      const userLikedSet = new Set(
+        likesData?.filter(like => like.user_id === user?.id).map(like => like.post_id) || []
+      );
+
+      setProfiles(profilesMap);
+      setLikeCounts(likesMap);
+      setLikedPosts(userLikedSet);
+      setPosts(postsData || []);
     } catch (error) {
       console.error('Error fetching posts:', error);
       toast({
@@ -214,8 +215,8 @@ const Social: React.FC = () => {
     }
   };
 
-  const createPost = async (isStory = false) => {
-    if (!newPost.trim() && selectedImages.length === 0) return;
+  const handleCreatePost = async (content: string, images: File[], isStory: boolean) => {
+    if (!content.trim() && images.length === 0) return;
     
     // Check if user is authenticated
     if (!user) {
@@ -228,13 +229,13 @@ const Social: React.FC = () => {
     }
 
     try {
-      setLoading(true);
+      setIsSubmitting(true);
       
       let imageUrls: string[] = [];
       
       // Upload images if any
-      if (selectedImages.length > 0) {
-        for (const image of selectedImages) {
+      if (images.length > 0) {
+        for (const image of images) {
           const fileName = `${user.id}/${Date.now()}_${image.name}`;
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('posts')
@@ -252,7 +253,7 @@ const Social: React.FC = () => {
 
       const postData = {
         user_id: user.id,
-        content: newPost.trim() || null,
+        content: content.trim() || null,
         image_urls: imageUrls.length > 0 ? imageUrls : null,
         is_story: isStory,
         expires_at: isStory ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() : null
@@ -263,15 +264,13 @@ const Social: React.FC = () => {
         .insert([postData]);
 
       if (error) throw error;
-
-      setNewPost('');
-      setSelectedImages([]);
       
       toast({
         title: "Success",
         description: `${isStory ? 'Story' : 'Post'} created successfully!`
       });
       
+      setShowCreatePost(false);
       fetchPosts();
       if (isStory) fetchStories();
     } catch (error) {
@@ -282,25 +281,37 @@ const Social: React.FC = () => {
         variant: "destructive"
       });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
-  const toggleLike = async (postId: string, currentlyLiked: boolean) => {
+  const handleLike = async (postId: string) => {
+    if (!user) return;
+    
     try {
-      if (currentlyLiked) {
+      const isLiked = likedPosts.has(postId);
+      
+      if (isLiked) {
         await supabase
           .from('post_likes')
           .delete()
           .eq('post_id', postId)
-          .eq('user_id', user!.id);
+          .eq('user_id', user.id);
+        
+        setLikedPosts(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(postId);
+          return newSet;
+        });
+        setLikeCounts(prev => ({ ...prev, [postId]: (prev[postId] || 1) - 1 }));
       } else {
         await supabase
           .from('post_likes')
-          .insert([{ post_id: postId, user_id: user!.id }]);
+          .insert([{ post_id: postId, user_id: user.id }]);
+        
+        setLikedPosts(prev => new Set([...prev, postId]));
+        setLikeCounts(prev => ({ ...prev, [postId]: (prev[postId] || 0) + 1 }));
       }
-      
-      fetchPosts();
     } catch (error) {
       console.error('Error toggling like:', error);
       toast({
@@ -309,6 +320,48 @@ const Social: React.FC = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleComment = async (postId: string, content: string) => {
+    if (!user || !content.trim()) return;
+    
+    try {
+      const { error } = await supabase
+        .from('post_comments')
+        .insert([{ 
+          post_id: postId, 
+          user_id: user.id, 
+          content: content.trim() 
+        }]);
+      
+      if (error) throw error;
+      
+      setCommentCounts(prev => ({ ...prev, [postId]: (prev[postId] || 0) + 1 }));
+      
+      toast({
+        title: "Comment added",
+        description: "Your comment has been posted successfully"
+      });
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add comment",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const toggleComments = (postId: string) => {
+    setExpandedComments(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
+      }
+      return newSet;
+    });
   };
 
   const fetchComments = async (postId: string) => {
@@ -327,42 +380,7 @@ const Social: React.FC = () => {
 
       if (commentsError) throw commentsError;
 
-      if (!commentsData || commentsData.length === 0) {
-        setComments([]);
-        return;
-      }
-
-      // Batch fetch profiles for better performance with Map for O(1) lookups
-      const userIds = [...new Set(commentsData.map(comment => comment.user_id))].filter(Boolean);
-      
-      if (userIds.length === 0) {
-        setComments(commentsData.map(comment => ({
-          ...comment,
-          profiles: { full_name: 'Anonymous User', username: 'anonymous', avatar_url: null }
-        })));
-        return;
-      }
-
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, full_name, username, avatar_url')
-        .in('id', userIds);
-
-      if (profilesError) throw profilesError;
-
-      // Use Map for O(1) profile lookups instead of O(n) find operations
-      const profileMap = new Map(profilesData?.map(profile => [profile.id, profile]) || []);
-
-      const commentsWithProfiles = commentsData.map(comment => ({
-        ...comment,
-        profiles: profileMap.get(comment.user_id) || { 
-          full_name: 'Unknown User',
-          username: 'unknown',
-          avatar_url: null 
-        }
-      }));
-
-      setComments(commentsWithProfiles);
+      // This function is no longer needed as comments are handled by PostComments component
     } catch (error) {
       console.error('Error fetching comments:', error);
       toast({
@@ -373,30 +391,7 @@ const Social: React.FC = () => {
     }
   };
 
-  const addComment = async (postId: string) => {
-    if (!newComment.trim() || !user) return;
-
-    try {
-      // Use optimized insertion with performance tracking
-      await dbPerformance.insertCommentOptimized(postId, user.id, newComment);
-
-      setNewComment('');
-      fetchComments(postId);
-      fetchPosts(); // Refresh to update comment count
-      
-      toast({
-        title: "Comment added",
-        description: "Your comment has been posted successfully"
-      });
-    } catch (error) {
-      console.error('Error adding comment:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add comment",
-        variant: "destructive"
-      });
-    }
-  };
+  // addComment is now handled by handleComment
 
   const reportPost = async (postId: string) => {
     try {
@@ -444,10 +439,7 @@ const Social: React.FC = () => {
     }
   };
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setSelectedImages(prev => [...prev, ...files].slice(0, 5)); // Max 5 images
-  };
+  // handleImageSelect is now handled within CreatePostForm
 
   if (loading && posts.length === 0) {
     return (
@@ -473,33 +465,39 @@ const Social: React.FC = () => {
       {/* Stories Section */}
       <StoriesBar stories={stories} isMobile={isMobile} />
 
+      {/* Create Post Button */}
+      {!showCreatePost && (
+        <Card className="glass-card p-4 mb-4">
+          <button
+            onClick={() => setShowCreatePost(true)}
+            className="w-full text-left p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+          >
+            What's on your mind?
+          </button>
+        </Card>
+      )}
+
       {/* Create Post Section */}
-      <CreatePostForm
-        newPost={newPost}
-        setNewPost={setNewPost}
-        selectedImages={selectedImages}
-        setSelectedImages={setSelectedImages}
-        createPost={createPost}
-        handleImageSelect={handleImageSelect}
-        isMobile={isMobile}
-      />
+      {showCreatePost && (
+        <CreatePostForm
+          onSubmit={handleCreatePost}
+          isSubmitting={isSubmitting}
+          onClose={() => setShowCreatePost(false)}
+        />
+      )}
 
       {/* Posts Feed */}
       <PostList
         posts={posts}
-        loading={loading}
-        isMobile={isMobile}
-        isAdmin={isAdmin}
-        showComments={showComments}
-        comments={comments}
-        newComment={newComment}
-        setNewComment={setNewComment}
-        toggleLike={toggleLike}
-        setShowComments={setShowComments}
-        fetchComments={fetchComments}
-        addComment={addComment}
-        reportPost={reportPost}
-        removePost={removePost}
+        profiles={profiles}
+        currentUserId={user?.id}
+        onLike={handleLike}
+        onComment={handleComment}
+        likeCounts={likeCounts}
+        likedPosts={likedPosts}
+        commentCounts={commentCounts}
+        expandedComments={expandedComments}
+        toggleComments={toggleComments}
       />
     </div>
   );

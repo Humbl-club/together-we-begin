@@ -8,35 +8,49 @@ import { ImagePlus, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface CreatePostFormProps {
-  newPost: string;
-  setNewPost: (content: string) => void;
-  selectedImages: File[];
-  setSelectedImages: (images: File[]) => void;
-  createPost: (isStory?: boolean) => void;
-  handleImageSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  isMobile: boolean;
+  onSubmit: (content: string, images: File[], isStory: boolean) => Promise<void>;
+  isSubmitting: boolean;
+  onClose: () => void;
 }
 
 export const CreatePostForm: React.FC<CreatePostFormProps> = ({
-  newPost,
-  setNewPost,
-  selectedImages,
-  setSelectedImages,
-  createPost,
-  handleImageSelect,
-  isMobile,
+  onSubmit,
+  isSubmitting,
+  onClose,
 }) => {
+  const [content, setContent] = useState('');
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isStory, setIsStory] = useState(false);
   const { toast } = useToast();
 
-  const removeImage = (index: number) => {
-    const newImages = selectedImages.filter((_, i) => i !== index);
-    setSelectedImages(newImages);
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length + selectedImages.length > 4) {
+      toast({
+        title: 'Too many images',
+        description: 'You can only upload up to 4 images per post',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const newFiles = files.slice(0, 4 - selectedImages.length);
+    const newUrls = newFiles.map(file => URL.createObjectURL(file));
+    
+    setSelectedImages([...selectedImages, ...newFiles]);
+    setPreviewUrls([...previewUrls, ...newUrls]);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const removeImage = (index: number) => {
+    URL.revokeObjectURL(previewUrls[index]);
+    setSelectedImages(selectedImages.filter((_, i) => i !== index));
+    setPreviewUrls(previewUrls.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPost.trim() && selectedImages.length === 0) {
+    if (!content.trim() && selectedImages.length === 0) {
       toast({
         title: 'Post is empty',
         description: 'Please add some content or images to your post',
@@ -44,30 +58,46 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
       });
       return;
     }
-    createPost(isStory);
+
+    await onSubmit(content, selectedImages, isStory);
+    
+    // Clean up
+    previewUrls.forEach(url => URL.revokeObjectURL(url));
+    setContent('');
+    setSelectedImages([]);
+    setPreviewUrls([]);
+    setIsStory(false);
   };
 
   return (
-    <Card className="glass-card p-4 mb-6">
+    <Card className="glass-card p-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold">Create Post</h3>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+          >
+            <X className="w-4 h-4" />
+          </Button>
         </div>
 
         <Textarea
           placeholder="What's on your mind?"
-          value={newPost}
-          onChange={(e) => setNewPost(e.target.value)}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
           className="min-h-[100px] resize-none"
         />
 
         {/* Image Previews */}
-        {selectedImages.length > 0 && (
+        {previewUrls.length > 0 && (
           <div className="grid grid-cols-2 gap-2">
-            {selectedImages.map((file, index) => (
+            {previewUrls.map((url, index) => (
               <div key={index} className="relative">
                 <img
-                  src={URL.createObjectURL(file)}
+                  src={url}
                   alt={`Preview ${index + 1}`}
                   className="rounded-lg w-full h-32 object-cover"
                 />
@@ -75,7 +105,7 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
                   type="button"
                   variant="destructive"
                   size="sm"
-                  className="absolute top-1 right-1 h-6 w-6 p-0"
+                  className="absolute top-1 right-1"
                   onClick={() => removeImage(index)}
                 >
                   <X className="w-3 h-3" />
@@ -99,6 +129,7 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
                 multiple
                 onChange={handleImageSelect}
                 className="hidden"
+                disabled={isSubmitting}
               />
             </Label>
 
@@ -107,6 +138,7 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
                 id="story-mode"
                 checked={isStory}
                 onCheckedChange={setIsStory}
+                disabled={isSubmitting}
               />
               <Label htmlFor="story-mode" className="text-sm">
                 24hr Story
@@ -114,8 +146,8 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
             </div>
           </div>
 
-          <Button type="submit" disabled={!newPost.trim() && selectedImages.length === 0}>
-            Post
+          <Button type="submit" disabled={isSubmitting || (!content.trim() && selectedImages.length === 0)}>
+            {isSubmitting ? 'Posting...' : 'Post'}
           </Button>
         </div>
       </form>

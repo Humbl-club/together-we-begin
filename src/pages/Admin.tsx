@@ -16,6 +16,7 @@ import NotificationManagement from '@/components/admin/NotificationManagement';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import SystemConfiguration from '@/components/admin/SystemConfiguration';
 import AdminErrorBoundary from '@/components/admin/AdminErrorBoundary';
+import { PerformanceMonitor } from './admin/PerformanceMonitor';
 
 const Admin: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -192,7 +193,7 @@ const Admin: React.FC = () => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="glass-card hover:scale-105 transition-transform cursor-pointer" onClick={() => navigate('/admin/performance')}>
+              <Card className="glass-card">
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
                     <Activity className="w-8 h-8 text-primary" />
@@ -272,8 +273,9 @@ const Admin: React.FC = () => {
           <TabsContent value="system" className="space-y-6">
             <Tabs defaultValue="analytics" className="w-full">
               <div className="glass-nav rounded-lg p-1 mb-4">
-                <TabsList className="grid w-full grid-cols-3 bg-transparent gap-1">
+                <TabsList className="grid w-full grid-cols-4 bg-transparent gap-1">
                   <TabsTrigger value="analytics" className="data-[state=active]:bg-background/90 text-xs md:text-sm">Analytics</TabsTrigger>
+                  <TabsTrigger value="performance" className="data-[state=active]:bg-background/90 text-xs md:text-sm">Performance</TabsTrigger>
                   <TabsTrigger value="notifications" className="data-[state=active]:bg-background/90 text-xs md:text-sm">Notifications</TabsTrigger>
                   <TabsTrigger value="settings" className="data-[state=active]:bg-background/90 text-xs md:text-sm">Settings</TabsTrigger>
                 </TabsList>
@@ -281,6 +283,11 @@ const Admin: React.FC = () => {
               <TabsContent value="analytics">
                 <AdminErrorBoundary>
                   <AnalyticsDashboard />
+                </AdminErrorBoundary>
+              </TabsContent>
+              <TabsContent value="performance">
+                <AdminErrorBoundary>
+                  <PerformanceMonitor />
                 </AdminErrorBoundary>
               </TabsContent>
               <TabsContent value="notifications">

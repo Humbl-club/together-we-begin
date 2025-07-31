@@ -1,485 +1,368 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/components/auth/AuthProvider';
+import React, { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { dbPerformance } from '@/services/core/DatabasePerformanceService';
 import { 
   LineChart, 
   Line, 
+  BarChart,
+  Bar,
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell
+  Legend 
 } from 'recharts';
-import { 
-  Activity, 
-  Clock, 
-  Database, 
-  Users, 
-  TrendingUp, 
-  AlertTriangle,
-  CheckCircle,
-  Zap,
-  Shield
-} from 'lucide-react';
+import { format, subDays } from 'date-fns';
+import { Activity, Clock, TrendingUp, AlertCircle } from 'lucide-react';
 
-interface PerformanceMetric {
-  id: string;
-  user_id: string | null;
-  page_url: string;
-  load_time_ms: number;
-  user_agent: string | null;
-  created_at: string;
-}
-
-interface QueryMetrics {
-  totalQueries: number;
-  averageQueryTime: number;
-  indexEfficiency: number;
-  recentAverageTime: number;
-  indexHits: number;
-  indexMisses: number;
-}
-
-interface PageMetrics {
-  page: string;
-  averageLoadTime: number;
-  visits: number;
-}
-
-const PerformanceMonitor: React.FC = () => {
-  const [metrics, setMetrics] = useState<PerformanceMetric[]>([]);
-  const [queryMetrics, setQueryMetrics] = useState<QueryMetrics | null>(null);
-  const [pageMetrics, setPageMetrics] = useState<PageMetrics[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState<'1h' | '24h' | '7d' | '30d'>('24h');
-  
-  const { user, isAdmin } = useAuth();
-
-  useEffect(() => {
-    if (user && isAdmin) {
-      fetchPerformanceData();
-      // Refresh every 30 seconds
-      const interval = setInterval(fetchPerformanceData, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [user, isAdmin, timeRange]);
-
-  const fetchPerformanceData = async () => {
-    try {
-      setLoading(true);
+export function PerformanceMonitor() {
+  // Fetch performance metrics from the last 7 days
+  const { data: metrics, isLoading } = useQuery({
+    queryKey: ['performance-metrics'],
+    queryFn: async () => {
+      const sevenDaysAgo = subDays(new Date(), 7);
       
-      // Calculate time filter based on selected range
-      const now = new Date();
-      const timeFilter = new Date();
-      switch (timeRange) {
-        case '1h':
-          timeFilter.setHours(now.getHours() - 1);
-          break;
-        case '24h':
-          timeFilter.setDate(now.getDate() - 1);
-          break;
-        case '7d':
-          timeFilter.setDate(now.getDate() - 7);
-          break;
-        case '30d':
-          timeFilter.setDate(now.getDate() - 30);
-          break;
-      }
-
-      // Fetch performance metrics from database
-      const { data: perfData, error } = await supabase
+      const { data, error } = await supabase
         .from('performance_metrics')
         .select('*')
-        .gte('created_at', timeFilter.toISOString())
-        .order('created_at', { ascending: false })
-        .limit(1000);
-
+        .gte('created_at', sevenDaysAgo.toISOString())
+        .order('created_at', { ascending: false });
+      
       if (error) throw error;
+      return data || [];
+    },
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
 
-      setMetrics(perfData || []);
-
-      // Get database query metrics from service
-      const dbStats = dbPerformance.getPerformanceStats();
-      setQueryMetrics(dbStats);
-
-      // Process page metrics
-      const pageStats = processPageMetrics(perfData || []);
-      setPageMetrics(pageStats);
-
-    } catch (error) {
-      console.error('Error fetching performance data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const processPageMetrics = (data: PerformanceMetric[]): PageMetrics[] => {
-    const pageMap = new Map<string, { totalTime: number; count: number }>();
-    
-    data.forEach(metric => {
-      const page = metric.page_url || 'Unknown';
-      const existing = pageMap.get(page) || { totalTime: 0, count: 0 };
-      pageMap.set(page, {
-        totalTime: existing.totalTime + metric.load_time_ms,
-        count: existing.count + 1
-      });
-    });
-
-    return Array.from(pageMap.entries())
-      .map(([page, stats]) => ({
-        page: page.replace(/^https?:\/\/[^\/]+/, ''), // Remove domain
-        averageLoadTime: Math.round(stats.totalTime / stats.count),
-        visits: stats.count
-      }))
-      .sort((a, b) => b.visits - a.visits)
-      .slice(0, 10);
-  };
-
-  const formatChartData = () => {
-    const now = new Date();
-    const intervals: { time: string; loadTime: number; count: number }[] = [];
-    
-    // Create time intervals based on selected range
-    const intervalCount = timeRange === '1h' ? 12 : timeRange === '24h' ? 24 : timeRange === '7d' ? 7 : 30;
-    const intervalMs = timeRange === '1h' ? 5 * 60 * 1000 : 
-                     timeRange === '24h' ? 60 * 60 * 1000 :
-                     timeRange === '7d' ? 24 * 60 * 60 * 1000 :
-                     24 * 60 * 60 * 1000;
-
-    for (let i = intervalCount - 1; i >= 0; i--) {
-      const intervalTime = new Date(now.getTime() - (i * intervalMs));
-      const timeLabel = timeRange === '1h' || timeRange === '24h' 
-        ? intervalTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-        : intervalTime.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      
-      intervals.push({ time: timeLabel, loadTime: 0, count: 0 });
+  // Calculate statistics
+  const stats = useMemo(() => {
+    if (!metrics || metrics.length === 0) {
+      return {
+        avgLoadTime: 0,
+        totalPageViews: 0,
+        slowPageRate: 0,
+        slowestPage: null,
+      };
     }
 
-    // Aggregate metrics into intervals
-    metrics.forEach(metric => {
-      const metricTime = new Date(metric.created_at);
-      const intervalIndex = Math.floor((now.getTime() - metricTime.getTime()) / intervalMs);
-      const actualIndex = intervalCount - 1 - intervalIndex;
-      
-      if (actualIndex >= 0 && actualIndex < intervals.length) {
-        intervals[actualIndex].loadTime += metric.load_time_ms;
-        intervals[actualIndex].count += 1;
+    const totalLoadTime = metrics.reduce((sum, m) => sum + (m.load_time_ms || 0), 0);
+    const slowPageCount = metrics.filter(m => (m.load_time_ms || 0) > 3000).length;
+    const slowest = metrics.reduce((max, m) => 
+      (m.load_time_ms || 0) > (max.load_time_ms || 0) ? m : max
+    );
+
+    return {
+      avgLoadTime: Math.round(totalLoadTime / metrics.length),
+      totalPageViews: metrics.length,
+      slowPageRate: ((slowPageCount / metrics.length) * 100).toFixed(1),
+      slowestPage: slowest,
+    };
+  }, [metrics]);
+
+  // Group metrics by page for the chart
+  const chartData = useMemo(() => {
+    if (!metrics) return [];
+
+    const grouped = metrics.reduce((acc, metric) => {
+      const date = format(new Date(metric.created_at), 'MMM dd');
+      if (!acc[date]) {
+        acc[date] = { date };
       }
-    });
+      
+      const page = new URL(metric.page_url).pathname;
+      if (!acc[date][page]) {
+        acc[date][page] = [];
+      }
+      
+      acc[date][page].push(metric.load_time_ms || 0);
+      return acc;
+    }, {} as Record<string, any>);
 
-    return intervals.map(interval => ({
-      ...interval,
-      averageLoadTime: interval.count > 0 ? Math.round(interval.loadTime / interval.count) : 0
+    // Calculate averages for each page per day
+    return Object.values(grouped).map((day: any) => {
+      const result: any = { date: day.date };
+      
+      Object.keys(day).forEach(key => {
+        if (key !== 'date' && Array.isArray(day[key])) {
+          const avg = day[key].reduce((a: number, b: number) => a + b, 0) / day[key].length;
+          result[key] = Math.round(avg);
+        }
+      });
+      
+      return result;
+    }).reverse();
+  }, [metrics]);
+
+  // Get unique page paths for the chart
+  const pageTypes = useMemo(() => {
+    if (!metrics) return [];
+    const pages = new Set(metrics.map(m => {
+      try {
+        return new URL(m.page_url).pathname;
+      } catch {
+        return m.page_url;
+      }
     }));
-  };
+    return Array.from(pages).slice(0, 5); // Limit to top 5 pages
+  }, [metrics]);
 
-  const getPerformanceStatus = (avgTime: number) => {
-    if (avgTime < 1000) return { status: 'Excellent', color: 'text-green-500', icon: CheckCircle };
-    if (avgTime < 2000) return { status: 'Good', color: 'text-blue-500', icon: CheckCircle };
-    if (avgTime < 3000) return { status: 'Fair', color: 'text-yellow-500', icon: AlertTriangle };
-    return { status: 'Poor', color: 'text-red-500', icon: AlertTriangle };
-  };
+  // Group metrics by page for the bar chart
+  const pageStats = useMemo(() => {
+    if (!metrics) return [];
 
-  const chartData = formatChartData();
-  const avgLoadTime = metrics.length > 0 ? Math.round(metrics.reduce((sum, m) => sum + m.load_time_ms, 0) / metrics.length) : 0;
-  const performanceStatus = getPerformanceStatus(avgLoadTime);
+    const grouped = metrics.reduce((acc, metric) => {
+      let page;
+      try {
+        page = new URL(metric.page_url).pathname;
+      } catch {
+        page = metric.page_url;
+      }
+      
+      if (!acc[page]) {
+        acc[page] = { page: page, count: 0, totalLoadTime: 0, slowViews: 0 };
+      }
+      
+      acc[page].count++;
+      acc[page].totalLoadTime += metric.load_time_ms || 0;
+      if ((metric.load_time_ms || 0) > 3000) acc[page].slowViews++;
+      
+      return acc;
+    }, {} as Record<string, any>);
 
-  if (!isAdmin) {
+    return Object.values(grouped)
+      .map((stat: any) => ({
+        ...stat,
+        avgLoadTime: Math.round(stat.totalLoadTime / stat.count),
+        slowRate: ((stat.slowViews / stat.count) * 100).toFixed(1),
+      }))
+      .sort((a: any, b: any) => b.count - a.count)
+      .slice(0, 10); // Top 10 pages
+  }, [metrics]);
+
+  // Browser stats
+  const browserStats = useMemo(() => {
+    if (!metrics) return [];
+
+    const grouped = metrics.reduce((acc, metric) => {
+      const userAgent = metric.user_agent || 'Unknown';
+      let browser = 'Unknown';
+      
+      if (userAgent.includes('Chrome')) browser = 'Chrome';
+      else if (userAgent.includes('Firefox')) browser = 'Firefox';
+      else if (userAgent.includes('Safari')) browser = 'Safari';
+      else if (userAgent.includes('Edge')) browser = 'Edge';
+      
+      if (!acc[browser]) {
+        acc[browser] = { browser, count: 0, totalLoadTime: 0 };
+      }
+      
+      acc[browser].count++;
+      acc[browser].totalLoadTime += metric.load_time_ms || 0;
+      
+      return acc;
+    }, {} as Record<string, any>);
+
+    return Object.values(grouped).map((stat: any) => ({
+      ...stat,
+      avgLoadTime: Math.round(stat.totalLoadTime / stat.count),
+    }));
+  }, [metrics]);
+
+  if (isLoading) {
     return (
-      <div className="container max-w-4xl mx-auto p-4">
-        <Card className="glass-card">
-          <CardContent className="text-center py-12">
-            <Shield className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
-            <p className="text-muted-foreground">
-              You need admin privileges to access this page.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="space-y-6">
+        <h2 className="text-2xl font-bold">Performance Monitoring</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => (
+            <Card key={i} className="p-6">
+              <div className="h-20 bg-muted animate-pulse rounded" />
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }
 
+  const colors = ['#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#ef4444'];
+
   return (
-    <div className="container max-w-7xl mx-auto p-4 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold gradient-text">Performance Monitor</h1>
-          <p className="text-muted-foreground">Real-time application performance insights</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Badge variant="secondary" className="flex items-center gap-2">
-            <Activity className="w-4 h-4" />
-            Live Monitoring
-          </Badge>
-          <div className="flex gap-1">
-            {(['1h', '24h', '7d', '30d'] as const).map((range) => (
-              <Button
-                key={range}
-                variant={timeRange === range ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setTimeRange(range)}
-              >
-                {range}
-              </Button>
-            ))}
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Performance Monitoring</h2>
+        <Badge variant="outline" className="gap-1">
+          <Activity className="w-3 h-3" />
+          Live
+        </Badge>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="glass-card p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Avg Load Time</p>
+              <p className="text-2xl font-bold">{stats.avgLoadTime}ms</p>
+            </div>
+            <Clock className="w-8 h-8 text-primary/20" />
           </div>
-        </div>
-      </div>
-
-      {/* Key Performance Indicators */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="glass-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2">
-              <Clock className={`w-5 h-5 ${performanceStatus.color}`} />
-              <div>
-                <p className="text-sm text-muted-foreground">Avg Load Time</p>
-                <p className="text-2xl font-bold">{avgLoadTime}ms</p>
-                <p className={`text-xs ${performanceStatus.color}`}>{performanceStatus.status}</p>
-              </div>
-            </div>
-          </CardContent>
         </Card>
 
-        <Card className="glass-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-500" />
-              <div>
-                <p className="text-sm text-muted-foreground">Total Requests</p>
-                <p className="text-2xl font-bold">{metrics.length}</p>
-                <p className="text-xs text-muted-foreground">Last {timeRange}</p>
-              </div>
+        <Card className="glass-card p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Total Page Views</p>
+              <p className="text-2xl font-bold">{stats.totalPageViews.toLocaleString()}</p>
             </div>
-          </CardContent>
+            <TrendingUp className="w-8 h-8 text-primary/20" />
+          </div>
         </Card>
 
-        <Card className="glass-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2">
-              <Database className="w-5 h-5 text-purple-500" />
-              <div>
-                <p className="text-sm text-muted-foreground">DB Queries</p>
-                <p className="text-2xl font-bold">{queryMetrics?.totalQueries || 0}</p>
-                <p className="text-xs text-muted-foreground">
-                  {queryMetrics?.averageQueryTime ? `${queryMetrics.averageQueryTime.toFixed(1)}ms avg` : 'No data'}
-                </p>
-              </div>
+        <Card className="glass-card p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Slow Page Rate</p>
+              <p className="text-2xl font-bold">{stats.slowPageRate}%</p>
             </div>
-          </CardContent>
+            <AlertCircle className="w-8 h-8 text-destructive/20" />
+          </div>
         </Card>
 
-        <Card className="glass-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-green-500" />
-              <div>
-                <p className="text-sm text-muted-foreground">Index Efficiency</p>
-                <p className="text-2xl font-bold">
-                  {queryMetrics?.indexEfficiency ? `${queryMetrics.indexEfficiency.toFixed(1)}%` : 'N/A'}
-                </p>
-                <p className="text-xs text-muted-foreground">Query optimization</p>
-              </div>
+        <Card className="glass-card p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Slowest Page</p>
+              <p className="text-lg font-bold truncate">
+                {stats.slowestPage ? new URL(stats.slowestPage.page_url).pathname : 'N/A'}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {stats.slowestPage?.load_time_ms || 0}ms
+              </p>
             </div>
-          </CardContent>
+            <Clock className="w-8 h-8 text-warning/20" />
+          </div>
         </Card>
       </div>
 
-      {/* Performance Charts */}
+      {/* Load Time Trend */}
+      <Card className="glass-card p-6">
+        <h3 className="text-lg font-semibold mb-4">Load Time Trend (7 days)</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <XAxis dataKey="date" />
+            <YAxis label={{ value: 'Load Time (ms)', angle: -90, position: 'insideLeft' }} />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: 'rgba(0, 0, 0, 0.8)', 
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '8px'
+              }} 
+            />
+            <Legend />
+            {pageTypes.map((page, index) => (
+              <Line
+                key={page}
+                type="monotone"
+                dataKey={page}
+                stroke={colors[index % colors.length]}
+                strokeWidth={2}
+                dot={{ r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </Card>
+
+      {/* Page Performance Breakdown */}
+      <Card className="glass-card p-6">
+        <h3 className="text-lg font-semibold mb-4">Page Performance Breakdown</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={pageStats}>
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <XAxis dataKey="page" angle={-45} textAnchor="end" height={100} />
+            <YAxis />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: 'rgba(0, 0, 0, 0.8)', 
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '8px'
+              }} 
+            />
+            <Legend />
+            <Bar dataKey="avgLoadTime" fill="#8b5cf6" name="Avg Load Time (ms)" />
+            <Bar dataKey="count" fill="#10b981" name="Page Views" />
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5" />
-              Load Time Trends
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis 
-                  dataKey="time" 
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                />
-                <YAxis 
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                  label={{ value: 'Load Time (ms)', angle: -90, position: 'insideLeft' }}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'hsl(var(--background))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
-                  }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="averageLoadTime" 
-                  stroke="hsl(var(--primary))" 
-                  strokeWidth={2}
-                  dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="w-5 h-5" />
-              Page Performance
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={pageMetrics.slice(0, 8)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis 
-                  dataKey="page" 
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={10}
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis 
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                  label={{ value: 'Load Time (ms)', angle: -90, position: 'insideLeft' }}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'hsl(var(--background))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
-                  }}
-                />
-                <Bar dataKey="averageLoadTime" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Detailed Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="glass-card lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Database className="w-5 h-5" />
-              Database Performance
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {queryMetrics ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-muted/30 rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground">Recent Avg Query Time</p>
-                    <p className="text-xl font-semibold">{queryMetrics.recentAverageTime.toFixed(2)}ms</p>
-                  </div>
-                  <div className="bg-muted/30 rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground">Index Hit Rate</p>
-                    <p className="text-xl font-semibold text-green-500">
-                      {((queryMetrics.indexHits / (queryMetrics.indexHits + queryMetrics.indexMisses)) * 100).toFixed(1)}%
-                    </p>
-                  </div>
+        {/* Browser Performance */}
+        <Card className="glass-card p-6">
+          <h3 className="text-lg font-semibold mb-4">Browser Performance</h3>
+          <div className="space-y-3">
+            {browserStats.map((browser, index) => (
+              <div key={browser.browser} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div>
+                  <p className="font-medium">{browser.browser}</p>
+                  <p className="text-sm text-muted-foreground">{browser.count} views</p>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Index Hits: {queryMetrics.indexHits}</span>
-                    <span>Index Misses: {queryMetrics.indexMisses}</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-green-500 h-2 rounded-full transition-all duration-300" 
-                      style={{ 
-                        width: `${(queryMetrics.indexHits / (queryMetrics.indexHits + queryMetrics.indexMisses)) * 100}%` 
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <p className="text-muted-foreground">No database metrics available</p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              Top Pages
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {pageMetrics.slice(0, 5).map((page, index) => (
-                <div key={page.page} className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      {page.page || '/'}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {page.visits} visits
-                    </p>
-                  </div>
-                  <Badge variant="outline" className="ml-2">
-                    {page.averageLoadTime}ms
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Activity */}
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="w-5 h-5" />
-            Recent Performance Events
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 max-h-60 overflow-y-auto">
-            {metrics.slice(0, 20).map((metric) => (
-              <div key={metric.id} className="flex items-center justify-between py-2 border-b border-border/50 last:border-b-0">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{metric.page_url}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(metric.created_at).toLocaleString()}
-                  </p>
-                </div>
-                <Badge 
-                  variant={metric.load_time_ms < 1000 ? 'default' : metric.load_time_ms < 3000 ? 'secondary' : 'destructive'}
-                  className="ml-2"
-                >
-                  {metric.load_time_ms}ms
+                <Badge variant="outline">
+                  {browser.avgLoadTime}ms
                 </Badge>
               </div>
             ))}
+            {browserStats.length === 0 && (
+              <p className="text-muted-foreground text-center py-4">
+                No browser data available
+              </p>
+            )}
           </div>
-        </CardContent>
-      </Card>
+        </Card>
+
+        {/* Recent Slow Pages */}
+        <Card className="glass-card p-6">
+          <h3 className="text-lg font-semibold mb-4">Recent Slow Pages (&gt;3000ms)</h3>
+          <div className="space-y-2">
+            {metrics
+              ?.filter(m => (m.load_time_ms || 0) > 3000)
+              .slice(0, 10)
+              .map((metric) => (
+                <div key={metric.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div className="flex-1">
+                    <p className="font-medium truncate">
+                      {(() => {
+                        try {
+                          return new URL(metric.page_url).pathname;
+                        } catch {
+                          return metric.page_url;
+                        }
+                      })()}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {format(new Date(metric.created_at), 'MMM dd, HH:mm:ss')}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <Badge variant="destructive">
+                      {metric.load_time_ms}ms
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            {(!metrics || metrics.filter(m => (m.load_time_ms || 0) > 3000).length === 0) && (
+              <p className="text-muted-foreground text-center py-4">
+                No slow pages detected
+              </p>
+            )}
+          </div>
+        </Card>
+      </div>
     </div>
   );
-};
+}
 
 export default PerformanceMonitor;

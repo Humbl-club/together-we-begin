@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from './AuthProvider';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Lock, Shield, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -97,18 +97,35 @@ export const PasswordResetForm: React.FC = () => {
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="editorial-card p-8">
+        {/* Floating gradient background */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl" />
+          <div className="absolute top-40 right-10 w-24 h-24 bg-secondary/20 rounded-full blur-2xl" />
+        </div>
+
         <div className="text-center mb-8">
+          {/* Icon with gradient background */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 blur-2xl" />
+            <div className="relative w-20 h-20 mx-auto flex items-center justify-center rounded-full bg-gradient-to-br from-primary/10 to-secondary/10 text-primary">
+              <Shield className="w-10 h-10" />
+            </div>
+          </div>
+
           <h1 className="text-3xl editorial-heading mb-4 text-foreground">
             Reset Your Password
           </h1>
           <p className="text-muted-foreground font-light text-lg">
-            Enter your new password below
+            Create a new secure password for your account
           </p>
         </div>
 
         <form onSubmit={handlePasswordReset} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium">New Password</Label>
+            <Label htmlFor="password" className="text-sm font-medium flex items-center gap-2">
+              <Lock className="w-4 h-4" />
+              New Password
+            </Label>
             <Input
               id="password"
               name="password"
@@ -117,14 +134,17 @@ export const PasswordResetForm: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={loading}
-              className="h-12 text-base"
+              className="h-12 text-base bg-background/50 border-2 focus:border-primary/50"
               placeholder="Enter your new password"
               autoComplete="new-password"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm New Password</Label>
+            <Label htmlFor="confirmPassword" className="text-sm font-medium flex items-center gap-2">
+              <Lock className="w-4 h-4" />
+              Confirm New Password
+            </Label>
             <Input
               id="confirmPassword"
               name="confirmPassword"
@@ -133,16 +153,23 @@ export const PasswordResetForm: React.FC = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               disabled={loading}
-              className="h-12 text-base"
+              className="h-12 text-base bg-background/50 border-2 focus:border-primary/50"
               placeholder="Confirm your new password"
               autoComplete="new-password"
             />
           </div>
 
+          <div className="bg-gradient-to-br from-muted/30 to-muted/10 border border-muted/50 p-4 rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Shield className="w-4 h-4 text-primary" />
+              <span>Password must be at least 6 characters long</span>
+            </div>
+          </div>
+
           <Button 
             type="submit" 
             disabled={loading}
-            className="w-full h-12 bg-primary hover:bg-primary/90 transition-all text-base font-medium"
+            className="w-full h-12 bg-primary hover:bg-primary/90 transition-all text-base font-medium group"
           >
             {loading ? (
               <>
@@ -150,7 +177,10 @@ export const PasswordResetForm: React.FC = () => {
                 Updating...
               </>
             ) : (
-              'Update Password'
+              <>
+                <CheckCircle className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                Update Password
+              </>
             )}
           </Button>
         </form>

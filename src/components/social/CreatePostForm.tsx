@@ -1,16 +1,18 @@
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Camera } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { ImagePlus, X } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface CreatePostFormProps {
   newPost: string;
-  setNewPost: (value: string) => void;
+  setNewPost: (content: string) => void;
   selectedImages: File[];
-  setSelectedImages: React.Dispatch<React.SetStateAction<File[]>>;
-  createPost: (isStory?: boolean) => Promise<void>;
+  setSelectedImages: (images: File[]) => void;
+  createPost: (isStory?: boolean) => void;
   handleImageSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isMobile: boolean;
 }
@@ -22,124 +24,101 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
   setSelectedImages,
   createPost,
   handleImageSelect,
-  isMobile
+  isMobile,
 }) => {
+  const [isStory, setIsStory] = useState(false);
+  const { toast } = useToast();
+
+  const removeImage = (index: number) => {
+    const newImages = selectedImages.filter((_, i) => i !== index);
+    setSelectedImages(newImages);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPost.trim() && selectedImages.length === 0) {
+      toast({
+        title: 'Post is empty',
+        description: 'Please add some content or images to your post',
+        variant: 'destructive',
+      });
+      return;
+    }
+    createPost(isStory);
+  };
+
   return (
-    <Card className="glass-card">
-      <CardContent className={isMobile ? 'pt-4' : 'pt-6'}>
-        <Tabs defaultValue="post" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="post" className={isMobile ? 'text-sm' : ''}>
-              {isMobile ? 'Post' : 'Create Post'}
-            </TabsTrigger>
-            <TabsTrigger value="story" className={isMobile ? 'text-sm' : ''}>
-              {isMobile ? 'Story' : 'Create Story'}
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="post" className={`space-y-${isMobile ? '3' : '4'}`}>
-            <Textarea
-              placeholder="Share your thoughts with the community..."
-              value={newPost}
-              onChange={(e) => setNewPost(e.target.value)}
-              className={`${isMobile ? 'min-h-[80px] text-sm' : 'min-h-[100px]'}`}
-            />
-            
-            <div className={`flex items-center ${isMobile ? 'flex-col gap-3' : 'justify-between'}`}>
-              <div className={`flex gap-2 ${isMobile ? 'w-full justify-center' : ''}`}>
-                <Button
-                  variant="outline"
-                  size={isMobile ? 'sm' : 'sm'}
-                  onClick={() => document.getElementById('image-upload')?.click()}
-                  className={isMobile ? 'flex-1' : ''}
-                >
-                  <Camera className="w-4 h-4 mr-2" />
-                  {isMobile ? `Photos (${selectedImages.length}/5)` : `Photos (${selectedImages.length}/5)`}
-                </Button>
-                <input
-                  id="image-upload"
-                  name="post-images"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageSelect}
-                  className="hidden"
+    <Card className="glass-card p-4 mb-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold">Create Post</h3>
+        </div>
+
+        <Textarea
+          placeholder="What's on your mind?"
+          value={newPost}
+          onChange={(e) => setNewPost(e.target.value)}
+          className="min-h-[100px] resize-none"
+        />
+
+        {/* Image Previews */}
+        {selectedImages.length > 0 && (
+          <div className="grid grid-cols-2 gap-2">
+            {selectedImages.map((file, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt={`Preview ${index + 1}`}
+                  className="rounded-lg w-full h-32 object-cover"
                 />
-              </div>
-              
-              <Button
-                onClick={() => createPost(false)}
-                disabled={!newPost.trim() && selectedImages.length === 0}
-                className={`bg-primary hover:bg-primary/90 ${isMobile ? 'w-full' : ''}`}
-              >
-                {isMobile ? 'Share' : 'Share Post'}
-              </Button>
-            </div>
-            
-            {selectedImages.length > 0 && (
-              <div className={`flex gap-2 flex-wrap ${isMobile ? 'justify-center' : ''}`}>
-                {selectedImages.map((image, index) => (
-                  <div key={index} className="relative">
-                    <img
-                      src={URL.createObjectURL(image)}
-                      alt={`Preview ${index + 1}`}
-                      className={`${isMobile ? 'w-16 h-16' : 'w-20 h-20'} object-cover rounded-lg`}
-                    />
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className={`absolute -top-2 -right-2 ${isMobile ? 'w-5 h-5 text-xs' : 'w-6 h-6'} rounded-full p-0`}
-                      onClick={() => setSelectedImages(prev => prev.filter((_, i) => i !== index))}
-                    >
-                      ×
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="story" className={`space-y-${isMobile ? '3' : '4'}`}>
-            <Textarea
-              placeholder="Share a 24-hour story..."
-              value={newPost}
-              onChange={(e) => setNewPost(e.target.value)}
-              className={`${isMobile ? 'min-h-[80px] text-sm' : 'min-h-[100px]'}`}
-            />
-            
-            <div className={`flex items-center ${isMobile ? 'flex-col gap-3' : 'justify-between'}`}>
-              <div className={`flex gap-2 ${isMobile ? 'w-full justify-center' : ''}`}>
                 <Button
-                  variant="outline"
+                  type="button"
+                  variant="destructive"
                   size="sm"
-                  onClick={() => document.getElementById('story-image-upload')?.click()}
-                  className={isMobile ? 'flex-1' : ''}
+                  className="absolute top-1 right-1 h-6 w-6 p-0"
+                  onClick={() => removeImage(index)}
                 >
-                  <Camera className="w-4 h-4 mr-2" />
-                  {isMobile ? `Photos (${selectedImages.length}/5)` : `Photos (${selectedImages.length}/5)`}
+                  <X className="w-3 h-3" />
                 </Button>
-                <input
-                  id="story-image-upload"
-                  name="story-images"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageSelect}
-                  className="hidden"
-                />
               </div>
-              
-              <Button
-                onClick={() => createPost(true)}
-                disabled={!newPost.trim() && selectedImages.length === 0}
-                className={`bg-gradient-primary text-white ${isMobile ? 'w-full' : ''}`}
-              >
-                {isMobile ? 'Share' : 'Share Story'}
-              </Button>
+            ))}
+          </div>
+        )}
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Label htmlFor="image-upload" className="cursor-pointer">
+              <div className="flex items-center space-x-2 text-primary hover:text-primary/80">
+                <ImagePlus className="w-5 h-5" />
+                <span className="text-sm">Add Images</span>
+              </div>
+              <input
+                id="image-upload"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageSelect}
+                className="hidden"
+              />
+            </Label>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="story-mode"
+                checked={isStory}
+                onCheckedChange={setIsStory}
+              />
+              <Label htmlFor="story-mode" className="text-sm">
+                24hr Story
+              </Label>
             </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
+          </div>
+
+          <Button type="submit" disabled={!newPost.trim() && selectedImages.length === 0}>
+            Post
+          </Button>
+        </div>
+      </form>
     </Card>
   );
 };

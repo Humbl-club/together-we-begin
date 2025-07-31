@@ -2,7 +2,8 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Heart, MessageCircle } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Heart, MessageCircle, Sparkles } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Tables } from '@/integrations/supabase/types';
 import { PostComments } from './PostComments';
@@ -18,6 +19,7 @@ interface PostListProps {
   commentCounts: Record<string, number>;
   expandedComments: Set<string>;
   toggleComments: (postId: string) => void;
+  onCreatePost?: () => void;
 }
 
 export const PostList: React.FC<PostListProps> = ({
@@ -31,12 +33,20 @@ export const PostList: React.FC<PostListProps> = ({
   commentCounts,
   expandedComments,
   toggleComments,
+  onCreatePost,
 }) => {
   if (posts.length === 0) {
     return (
-      <Card className="p-8 text-center">
-        <p className="text-muted-foreground">No posts yet. Be the first to share!</p>
-      </Card>
+      <EmptyState
+        icon={<Sparkles className="w-full h-full" />}
+        title="No posts yet"
+        description="Be the first to share something inspiring with the community!"
+        action={onCreatePost ? {
+          label: "Create First Post",
+          onClick: onCreatePost,
+          variant: "default"
+        } : undefined}
+      />
     );
   }
 

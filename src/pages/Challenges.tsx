@@ -581,11 +581,14 @@ const Challenges: React.FC = () => {
           
           {activeChallenges.length === 0 && (
             <EmptyState
-              icon={Target}
+              icon={<Target className="w-full h-full" />}
               title="Ready for a Challenge?"
               description="New challenges are on the way! These exciting opportunities will help you grow, achieve your goals, and earn rewards along the journey."
-              actionLabel="Create Challenge"
-              onAction={() => setShowCreateChallenge(true)}
+              action={{
+                label: "Create Challenge",
+                onClick: () => setShowCreateChallenge(true),
+                variant: "default"
+              }}
             />
           )}
         </TabsContent>
@@ -644,18 +647,21 @@ const Challenges: React.FC = () => {
           
           {joinedChallenges.length === 0 && (
             <EmptyState
-              icon={Zap}
+              icon={<Zap className="w-full h-full" />}
               title="Your Challenge Journey Awaits!"
               description="Join your first challenge to start building healthy habits, earning rewards, and achieving your goals with our supportive community."
-              actionLabel="Browse Available Challenges"
-              onAction={() => {
-                const allTab = document.querySelector('[data-state="active"][value="all"]');
-                if (allTab) {
-                  (allTab as HTMLElement).click();
-                } else {
-                  // Fallback: scroll to top to see available challenges
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
+              action={{
+                label: "Browse Available Challenges",
+                onClick: () => {
+                  const allTab = document.querySelector('[data-state="active"][value="all"]');
+                  if (allTab) {
+                    (allTab as HTMLElement).click();
+                  } else {
+                    // Fallback: scroll to top to see available challenges
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                },
+                variant: "default"
               }}
             />
           )}
@@ -706,19 +712,21 @@ const Challenges: React.FC = () => {
           
           {completedChallenges.length === 0 && (
             <EmptyState
-              icon={Trophy}
+              icon={<Trophy className="w-full h-full" />}
               title="Your Trophy Case Awaits!"
               description="Complete challenges to see your achievements here. Each completed challenge brings you closer to your goals and unlocks amazing rewards!"
-              actionLabel="Start Your First Challenge"
-              onAction={() => {
-                const allTab = document.querySelector('[data-state="active"][value="all"]');
-                if (allTab) {
-                  (allTab as HTMLElement).click();
-                } else {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
+              action={{
+                label: "Start Your First Challenge",
+                onClick: () => {
+                  const allTab = document.querySelector('[data-state="active"][value="all"]');
+                  if (allTab) {
+                    (allTab as HTMLElement).click();
+                  } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                },
+                variant: "default"
               }}
-              variant="compact"
             />
           )}
         </TabsContent>

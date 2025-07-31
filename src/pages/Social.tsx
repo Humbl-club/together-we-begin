@@ -498,6 +498,7 @@ const Social: React.FC = () => {
         commentCounts={commentCounts}
         expandedComments={expandedComments}
         toggleComments={toggleComments}
+        onCreatePost={() => setShowCreatePost(true)}
       />
     </div>
   );

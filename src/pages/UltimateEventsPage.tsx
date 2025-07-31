@@ -363,21 +363,24 @@ const UltimateEventsPage = memo(() => {
                 </div>
               ) : filteredEvents.length === 0 ? (
                 <EmptyState
-                  icon={searchQuery || activeFilters.length > 0 ? Search : Calendar}
+                  icon={searchQuery || activeFilters.length > 0 ? <Search className="w-full h-full" /> : <Calendar className="w-full h-full" />}
                   title={searchQuery || activeFilters.length > 0 
                     ? "No events match your search" 
                     : `No ${activeTab} events found`}
                   description={searchQuery || activeFilters.length > 0
                     ? "Try adjusting your search criteria or filters to find events that match your interests."
                     : "New exciting events are added regularly. Check back soon to discover amazing experiences!"}
-                  actionLabel={searchQuery || activeFilters.length > 0 ? "Clear Filters" : "Explore All Events"}
-                  onAction={() => {
-                    if (searchQuery || activeFilters.length > 0) {
-                      setSearchQuery('');
-                      setActiveFilters([]);
-                    } else {
-                      setActiveTab('all');
-                    }
+                  action={{
+                    label: searchQuery || activeFilters.length > 0 ? "Clear Filters" : "Explore All Events",
+                    onClick: () => {
+                      if (searchQuery || activeFilters.length > 0) {
+                        setSearchQuery('');
+                        setActiveFilters([]);
+                      } else {
+                        setActiveTab('all');
+                      }
+                    },
+                    variant: "default"
                   }}
                 />
               ) : (
@@ -426,10 +429,9 @@ const UltimateEventsPage = memo(() => {
                 </div>
               ) : filteredEvents.length === 0 ? (
                 <EmptyState
-                  icon={Calendar}
+                  icon={<Calendar className="w-full h-full" />}
                   title="No ongoing events"
                   description="There are currently no events in progress. Check back later for live events and activities!"
-                  variant="compact"
                 />
               ) : (
                 <div className="mobile:space-y-3 sm:space-y-4">
@@ -459,12 +461,14 @@ const UltimateEventsPage = memo(() => {
                 </div>
               ) : filteredEvents.length === 0 ? (
                 <EmptyState
-                  icon={Calendar}
+                  icon={<Calendar className="w-full h-full" />}
                   title="No past events"
                   description="Past events will appear here once they're completed. Check out upcoming events to join the community!"
-                  actionLabel="View Upcoming Events"
-                  onAction={() => setActiveTab('upcoming')}
-                  variant="compact"
+                  action={{
+                    label: "View Upcoming Events",
+                    onClick: () => setActiveTab('upcoming'),
+                    variant: "default"
+                  }}
                 />
               ) : (
                 <div className="mobile:space-y-3 sm:space-y-4">

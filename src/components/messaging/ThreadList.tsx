@@ -89,18 +89,20 @@ export const ThreadList: React.FC<ThreadListProps> = ({
         {threads.length === 0 ? (
           <div className="p-6">
             <EmptyState
-              icon={Users}
+              icon={<Users className="w-full h-full" />}
               title="Start Your First Conversation"
               description="Connect with amazing women in our community! Share experiences, support each other, and build meaningful friendships."
-              actionLabel="Find Someone to Message"
-              onAction={() => {
-                // Focus on the user search component if it exists
-                const userSearchButton = document.querySelector('[data-user-search-trigger]');
-                if (userSearchButton) {
-                  (userSearchButton as HTMLElement).click();
-                }
+              action={{
+                label: "Find Someone to Message",
+                onClick: () => {
+                  // Focus on the user search component if it exists
+                  const userSearchButton = document.querySelector('[data-user-search-trigger]');
+                  if (userSearchButton) {
+                    (userSearchButton as HTMLElement).click();
+                  }
+                },
+                variant: "default"
               }}
-              variant="compact"
             />
             <div className="mt-4">
               <UserSearch onSelectUser={(userId, message) => onStartConversation(userId, message)} />

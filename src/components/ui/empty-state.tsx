@@ -1,70 +1,61 @@
 import React from 'react';
-import { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 interface EmptyStateProps {
-  icon: LucideIcon;
+  icon: React.ReactNode;
   title: string;
-  description: string;
-  actionLabel?: string;
-  onAction?: () => void;
+  description?: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+    variant?: 'default' | 'secondary' | 'outline';
+  };
   className?: string;
-  variant?: 'default' | 'compact';
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
-  icon: Icon,
+  icon,
   title,
   description,
-  actionLabel,
-  onAction,
-  className,
-  variant = 'default'
+  action,
+  className
 }) => {
-  const isCompact = variant === 'compact';
-
   return (
-    <Card className={cn('glass-card border-0', className)}>
-      <CardContent className={cn(
-        'text-center',
-        isCompact ? 'py-8' : 'py-12'
-      )}>
-        <div className={cn(
-          'mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center',
-          isCompact ? 'w-12 h-12' : 'w-16 h-16'
-        )}>
-          <Icon className={cn(
-            'text-primary/70',
-            isCompact ? 'w-6 h-6' : 'w-8 h-8'
-          )} />
+    <div className={cn(
+      "flex flex-col items-center justify-center py-12 px-4 text-center",
+      className
+    )}>
+      {/* Icon with gradient background */}
+      <div className="relative mb-4">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 blur-2xl" />
+        <div className="relative w-20 h-20 flex items-center justify-center rounded-full bg-gradient-to-br from-primary/10 to-secondary/10 text-muted-foreground">
+          <div className="w-10 h-10">
+            {icon}
+          </div>
         </div>
-        
-        <h3 className={cn(
-          'font-semibold gradient-text mb-2',
-          isCompact ? 'text-lg' : 'text-xl'
-        )}>
-          {title}
-        </h3>
-        
-        <p className={cn(
-          'text-muted-foreground mb-6 max-w-md mx-auto',
-          isCompact ? 'text-sm' : 'text-base'
-        )}>
+      </div>
+
+      {/* Title */}
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+
+      {/* Description */}
+      {description && (
+        <p className="text-muted-foreground max-w-sm mb-6">
           {description}
         </p>
-        
-        {actionLabel && onAction && (
-          <Button 
-            onClick={onAction}
-            className="bg-gradient-primary hover:opacity-90 transition-opacity"
-            size={isCompact ? 'sm' : 'default'}
-          >
-            {actionLabel}
-          </Button>
-        )}
-      </CardContent>
-    </Card>
+      )}
+
+      {/* Action button */}
+      {action && (
+        <Button
+          onClick={action.onClick}
+          variant={action.variant || 'secondary'}
+          className="min-w-[140px]"
+        >
+          {action.label}
+        </Button>
+      )}
+    </div>
   );
 };

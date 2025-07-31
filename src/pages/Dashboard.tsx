@@ -4,6 +4,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { useToast } from '@/hooks/use-toast';
+import { useProgressiveEnhancement } from '@/hooks/useProgressiveEnhancement';
 import { MobileFirstNavigation } from '@/components/layout/MobileFirstNavigation';
 import MobileDashboard from './MobileDashboard';
 
@@ -27,6 +28,20 @@ const Dashboard: React.FC = memo(() => {
   const { isMobile, isTablet, safeAreaInsets } = useMobileFirst();
   const { handleError } = useErrorHandler();
   const { toast } = useToast();
+  const { usePullToRefresh } = useProgressiveEnhancement();
+
+  // Add pull to refresh functionality
+  usePullToRefresh(async () => {
+    try {
+      await refetch();
+      toast({
+        title: "Refreshed",
+        description: "Dashboard data updated"
+      });
+    } catch (error) {
+      console.error('Pull to refresh failed:', error);
+    }
+  });
 
   console.log('Dashboard render:', { user, stats, profile, loading });
 

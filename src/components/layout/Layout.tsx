@@ -73,6 +73,8 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
         "px-[env(safe-area-inset-left,0px)]",
         "pr-[env(safe-area-inset-right,0px)]"
       )}>
+        {/* Pull to refresh indicator */}
+        <div className="pull-refresh-indicator" />
         {children}
       </main>
     </div>

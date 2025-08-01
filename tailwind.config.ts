@@ -166,8 +166,9 @@ export default {
 			// Premium Typography System
 			fontFamily: {
 				'sans': ['Inter', 'system-ui', 'sans-serif'],
-				'serif': ['Playfair Display', 'serif'],
-				'display': ['Playfair Display', 'serif'],
+				'serif': ['Crimson Text', 'serif'],
+				'display': ['Cormorant Garamond', 'serif'],
+				'editorial': ['Crimson Text', 'serif'],
 			},
 			// Enhanced Animations
 			animation: {

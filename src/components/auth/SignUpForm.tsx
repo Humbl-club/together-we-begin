@@ -112,29 +112,48 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      {/* Futuristic Background Effects */}
+      {/* Multi-Step Progress Neural Network Background */}
       <div className="relative">
-        {/* Complex animated background */}
+        {/* Advanced neural network system */}
         <div className="absolute inset-0 overflow-hidden rounded-3xl">
-          <div className="absolute -top-20 -left-20 w-56 h-56 bg-gradient-conic from-primary/50 via-accent/40 to-secondary/50 rounded-full blur-3xl animate-spin" style={{ animationDuration: '25s' }} />
-          <div className="absolute -bottom-16 -right-16 w-44 h-44 bg-gradient-radial from-accent/40 via-primary/30 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute top-1/4 left-1/3 w-32 h-32 bg-gradient-to-br from-secondary/40 to-accent/30 rounded-full blur-xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '0.5s' }} />
-          <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-gradient-to-tl from-primary/30 to-secondary/40 rounded-full blur-lg animate-pulse" style={{ animationDelay: '2s' }} />
+          <div className="auth-neural-network" />
+          <div className="absolute -top-24 -left-24 w-60 h-60 auth-liquid bg-gradient-conic from-primary/45 via-accent/35 to-secondary/45 rounded-full blur-3xl" />
+          <div className="absolute -bottom-20 -right-20 w-48 h-48 auth-float bg-gradient-radial from-accent/35 via-primary/25 to-transparent rounded-full blur-2xl" style={{ animationDelay: '1.5s' }} />
+          <div className="absolute top-1/4 left-1/3 w-36 h-36 auth-neural bg-gradient-to-br from-secondary/35 to-accent/25 rounded-full blur-xl" />
+          <div className="absolute bottom-1/3 right-1/4 w-28 h-28 auth-constellation bg-gradient-to-tl from-primary/25 to-secondary/35 rounded-full blur-lg" style={{ animationDelay: '2.5s' }} />
+          {/* Field connection lines */}
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent auth-field-connect"
+              style={{
+                top: `${20 + i * 10}%`,
+                left: '10%',
+                right: '10%',
+                animationDelay: `${i * 0.3}s`,
+              }}
+            />
+          ))}
         </div>
         
-        {/* Next-gen glass container */}
-        <div className="relative backdrop-blur-3xl bg-gradient-to-br from-background/95 via-background/85 to-card/95 border border-white/25 rounded-3xl p-12 shadow-2xl shadow-primary/15">
-          {/* Dynamic particle system */}
+        {/* Ultra-Advanced Glass Morphism Registration Hub */}
+        <div className="relative backdrop-blur-3xl bg-gradient-to-br from-background/97 via-background/88 to-card/97 border border-white/35 rounded-3xl p-14 shadow-2xl shadow-primary/20 auth-gesture-responsive">
+          {/* Multi-layered particle intelligence */}
           <div className="absolute inset-0 overflow-hidden rounded-3xl">
-            {[...Array(12)].map((_, i) => (
+            <div className="auth-glass absolute inset-0 rounded-3xl" />
+            {[...Array(20)].map((_, i) => (
               <div
                 key={i}
-                className="absolute w-1 h-1 bg-gradient-to-r from-primary/60 to-accent/60 rounded-full animate-ping"
+                className="absolute auth-particle"
                 style={{
-                  top: `${10 + Math.random() * 80}%`,
-                  left: `${10 + Math.random() * 80}%`,
-                  animationDelay: `${i * 0.4}s`,
-                  animationDuration: '3s'
+                  width: `${1.5 + Math.random() * 4}px`,
+                  height: `${1.5 + Math.random() * 4}px`,
+                  background: `linear-gradient(${Math.random() * 360}deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--secondary)))`,
+                  borderRadius: '50%',
+                  top: `${5 + Math.random() * 90}%`,
+                  left: `${5 + Math.random() * 90}%`,
+                  animationDelay: `${i * 0.3}s`,
+                  filter: 'blur(0.5px)',
                 }}
               />
             ))}
@@ -198,17 +217,19 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
           </div>
 
           <form onSubmit={handleSignUp} className="space-y-8">
-            {/* Premium form grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Full Name */}
-              <div className="group space-y-3">
-                <Label htmlFor="fullName" className="text-sm font-semibold flex items-center gap-3 text-foreground/90 group-focus-within:text-primary transition-all">
-                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/15 to-accent/15 group-focus-within:from-primary/25 group-focus-within:to-accent/25 transition-all shadow-sm">
-                    <User className="w-4 h-4" />
+            {/* Progressive Multi-Step Registration Form */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              {/* Full Name with Smart Intelligence */}
+              <div className="group space-y-4 auth-form-field">
+                <Label htmlFor="fullName" className="text-base font-semibold flex items-center gap-3 text-foreground/90 group-focus-within:text-primary transition-all">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 group-focus-within:from-primary/30 group-focus-within:to-accent/30 transition-all shadow-lg auth-security-scan">
+                    <User className="w-5 h-5" />
                   </div>
-                  Full Name
+                  <span className="text-lg">Full Name</span>
                 </Label>
                 <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/15 via-accent/15 to-primary/15 rounded-2xl blur-lg opacity-0 group-focus-within:opacity-100 transition-all duration-500" />
+                  
                   <Input
                     id="fullName"
                     name="fullName"
@@ -217,11 +238,17 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
                     onChange={(e) => handleInputChange('fullName', e.target.value)}
                     required
                     disabled={loading}
-                    className="h-14 text-base bg-gradient-to-br from-background/95 to-card/95 backdrop-blur-sm border-2 border-border/50 focus:border-primary/70 focus:bg-background/98 rounded-xl pl-6 pr-6 shadow-sm transition-all duration-300 group-focus-within:shadow-lg"
+                    className="auth-magnetic h-16 text-lg bg-gradient-to-br from-background/98 to-card/98 backdrop-blur-2xl border-2 border-border/50 focus:border-primary/80 rounded-2xl px-6 shadow-lg transition-all duration-300 focus:shadow-xl focus:shadow-primary/20"
                     placeholder="Your full name"
                     autoComplete="name"
                   />
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/3 to-accent/3 opacity-0 group-focus-within:opacity-100 transition-opacity -z-10" />
+                  
+                  {/* Progressive completion indicator */}
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                    {formData.fullName && (
+                      <div className="w-3 h-3 bg-green-400 rounded-full auth-trust shadow-lg shadow-green-400/50" />
+                    )}
+                  </div>
                 </div>
               </div>
 

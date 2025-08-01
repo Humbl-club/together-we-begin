@@ -98,9 +98,9 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onSwitchToSignUp }) => {
       <div className="relative">
         {/* Animated gradient orbs */}
         <div className="absolute inset-0 overflow-hidden rounded-3xl">
-          <div className="absolute -top-10 -left-10 w-40 h-40 bg-gradient-to-br from-primary/30 to-accent/30 rounded-full blur-3xl auth-float" />
-          <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-tr from-secondary/40 to-primary/20 rounded-full blur-2xl auth-float" style={{ animationDelay: '2s' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-r from-accent/20 to-secondary/30 rounded-full blur-xl auth-float" style={{ animationDelay: '4s' }} />
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-gradient-to-br from-primary/30 to-accent/30 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-tr from-secondary/40 to-primary/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-r from-accent/20 to-secondary/30 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }} />
         </div>
         
         {/* Glass morphism container */}

@@ -170,126 +170,69 @@ export const PasswordResetForm: React.FC = () => {
             </div>
           </div>
 
-          <form onSubmit={handlePasswordReset} className="space-y-8">
-            {/* Biometric Password Input */}
-            <div className="group space-y-4 auth-form-field">
-              <Label htmlFor="password" className="text-base font-semibold flex items-center gap-3 text-foreground/90 group-focus-within:text-primary transition-all">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-green-400/20 via-primary/20 to-green-400/20 group-focus-within:from-green-400/30 group-focus-within:to-primary/30 transition-all shadow-lg auth-security-scan">
-                  <Lock className="w-5 h-5" />
-                </div>
-                <span className="text-lg">New Secure Password</span>
-              </Label>
-              
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 via-primary/20 to-green-400/20 rounded-2xl blur-xl opacity-0 group-focus-within:opacity-100 transition-all duration-500" />
-                
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="auth-magnetic h-16 text-lg bg-gradient-to-br from-background/98 via-card/98 to-background/98 backdrop-blur-2xl border-2 border-border/50 focus:border-green-400/70 rounded-2xl px-6 shadow-lg transition-all duration-300 focus:shadow-xl focus:shadow-green-400/20"
-                  placeholder="Enter your new secure password"
-                  autoComplete="new-password"
-                />
-                
-                {/* Biometric strength indicator */}
-                <div className="absolute bottom-3 left-6 right-6">
-                  <div className="h-1 bg-background/30 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full auth-biometric rounded-full"
-                      style={{ 
-                        width: `${Math.min((password.length / 8) * 100, 100)}%`,
-                        background: password.length < 4 ? 'hsl(0, 70%, 50%)' : 
-                                   password.length < 6 ? 'hsl(30, 70%, 50%)' : 
-                                   password.length < 8 ? 'hsl(60, 70%, 50%)' : 'hsl(120, 70%, 50%)'
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+          <form onSubmit={handlePasswordReset} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-sm font-medium flex items-center gap-2">
+              <Lock className="w-4 h-4" />
+              New Password
+            </Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+              className="h-12 text-base bg-background/50 border-2 focus:border-primary/50"
+              placeholder="Enter your new password"
+              autoComplete="new-password"
+            />
+          </div>
 
-            {/* Biometric Confirmation Input */}
-            <div className="group space-y-4 auth-form-field">
-              <Label htmlFor="confirmPassword" className="text-base font-semibold flex items-center gap-3 text-foreground/90 group-focus-within:text-primary transition-all">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-green-400/20 via-primary/20 to-green-400/20 group-focus-within:from-green-400/30 group-focus-within:to-primary/30 transition-all shadow-lg auth-security-scan">
-                  <Lock className="w-5 h-5" />
-                </div>
-                <span className="text-lg">Confirm Secure Password</span>
-              </Label>
-              
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 via-primary/20 to-green-400/20 rounded-2xl blur-xl opacity-0 group-focus-within:opacity-100 transition-all duration-500" />
-                
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="auth-magnetic h-16 text-lg bg-gradient-to-br from-background/98 via-card/98 to-background/98 backdrop-blur-2xl border-2 border-border/50 focus:border-green-400/70 rounded-2xl px-6 shadow-lg transition-all duration-300 focus:shadow-xl focus:shadow-green-400/20"
-                  placeholder="Confirm your secure password"
-                  autoComplete="new-password"
-                />
-                
-                {/* Match indicator */}
-                <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                  {confirmPassword && (
-                    <div className={`w-3 h-3 rounded-full auth-trust ${
-                      password === confirmPassword ? 'bg-green-400' : 'bg-red-400'
-                    }`} />
-                  )}
-                </div>
-              </div>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="text-sm font-medium flex items-center gap-2">
+              <Lock className="w-4 h-4" />
+              Confirm New Password
+            </Label>
+            <Input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              disabled={loading}
+              className="h-12 text-base bg-background/50 border-2 focus:border-primary/50"
+              placeholder="Confirm your new password"
+              autoComplete="new-password"
+            />
+          </div>
 
-            {/* Security Requirements Panel */}
-            <div className="backdrop-blur-lg bg-gradient-to-br from-green-400/10 via-primary/10 to-green-400/10 border border-green-400/30 rounded-2xl p-6 auth-gesture-responsive">
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 text-sm font-medium">
-                  <Shield className="w-5 h-5 text-green-400 auth-trust" />
-                  <span className="text-foreground/90">Security Requirements</span>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-muted-foreground">
-                  <div className={`flex items-center gap-2 ${password.length >= 6 ? 'text-green-400' : ''}`}>
-                    <div className={`w-2 h-2 rounded-full ${password.length >= 6 ? 'bg-green-400' : 'bg-muted-foreground/40'}`} />
-                    <span>Minimum 6 characters</span>
-                  </div>
-                  <div className={`flex items-center gap-2 ${password === confirmPassword && password ? 'text-green-400' : ''}`}>
-                    <div className={`w-2 h-2 rounded-full ${password === confirmPassword && password ? 'bg-green-400' : 'bg-muted-foreground/40'}`} />
-                    <span>Passwords match</span>
-                  </div>
-                </div>
-              </div>
+          <div className="bg-gradient-to-br from-muted/30 to-muted/10 border border-muted/50 p-4 rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Shield className="w-4 h-4 text-primary" />
+              <span>Password must be at least 6 characters long</span>
             </div>
+          </div>
 
-            {/* Biometric-Style Update Button */}
-            <Button 
-              type="submit" 
-              disabled={loading || password.length < 6 || password !== confirmPassword}
-              className="auth-magnetic w-full h-18 bg-gradient-to-r from-green-400 via-primary to-green-400 hover:from-green-400/90 hover:via-primary/90 hover:to-green-400/90 text-primary-foreground font-bold text-lg rounded-2xl transition-all duration-500 hover:shadow-2xl hover:shadow-green-400/30 group overflow-hidden disabled:opacity-50"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 opacity-0 group-hover:opacity-100 transition-all duration-500" />
-              
-              {loading ? (
-                <>
-                  <Loader2 className="w-6 h-6 mr-3 animate-spin" />
-                  <span className="text-lg tracking-wide">Securing Account...</span>
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform duration-300" />
-                  <span className="text-lg tracking-wide">Update Security</span>
-                  <Shield className="w-6 h-6 ml-3 group-hover:rotate-12 transition-transform duration-300" />
-                </>
-              )}
-            </Button>
+          <Button 
+            type="submit" 
+            disabled={loading}
+            className="w-full h-12 bg-primary hover:bg-primary/90 transition-all text-base font-medium group"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              <>
+                <CheckCircle className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                Update Password
+              </>
+            )}
+          </Button>
           </form>
         </div>
       </div>

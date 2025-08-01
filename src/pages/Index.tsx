@@ -29,14 +29,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 relative overflow-hidden">
       
-      {/* Background */}
-      <div className="absolute inset-0">
-        <img 
-          src={exclusiveHero} 
-          alt="Women community" 
-          className="w-full h-full object-cover opacity-20"
-        />
-      </div>
+      {/* Simple Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-secondary/5"></div>
 
       {/* Main Content */}
       <MobileContainer 
@@ -60,18 +54,20 @@ const Index = () => {
               <MobileHeading 
                 level={1}
                 className={cn(
-                  "font-display font-light tracking-wide mb-3",
+                  "font-display font-bold tracking-wide mb-4",
                   isMobile 
-                    ? "text-3xl leading-none" 
-                    : "text-4xl md:text-5xl"
+                    ? "text-4xl leading-tight" 
+                    : "text-5xl md:text-6xl"
                 )}
               >
-                <span className="block">Humbl</span>
-                <span className="block font-editorial italic text-primary/80 text-lg md:text-xl -mt-1">
+                <span className="block bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                  Humbl
+                </span>
+                <span className="block font-editorial italic text-primary/90 text-xl md:text-2xl -mt-2">
                   Girls Club
                 </span>
               </MobileHeading>
-              <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent mx-auto"></div>
+              <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent mx-auto"></div>
             </div>
 
             {/* Description */}

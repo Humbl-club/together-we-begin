@@ -1,14 +1,21 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.humblclub.togetherwebegin',
-  appName: 'final girls app',
+  appId: 'app.lovable.945e8026291f443493b5949dcf1fab6b',
+  appName: 'HUMBL',
   webDir: 'dist',
   server: {
     url: 'https://945e8026-291f-4434-93b5-949dcf1fab6b.lovableproject.com?forceHideBadge=true',
     cleartext: true
   },
   plugins: {
+    SplashScreen: {
+      launchShowDuration: 2000,
+      backgroundColor: "#FCFCFC",
+      showSpinner: false,
+      androidSpinnerStyle: "small",
+      iosSpinnerStyle: "small"
+    },
     Motion: {
       permissions: {
         'ios': {

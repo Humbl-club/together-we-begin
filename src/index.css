@@ -341,3 +341,23 @@ select {
   border-radius: 50%;
   animation: pullRefreshSpin 1s linear infinite;
 }
+
+/* Enhanced auth form animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.auth-float { animation: float 6s ease-in-out infinite; }
+.auth-shimmer { animation: shimmer 2s infinite; }
+.auth-glow { animation: glow-pulse 2s ease-in-out infinite; }

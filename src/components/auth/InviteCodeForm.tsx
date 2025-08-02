@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Mail, Sparkles, Lock, ArrowRight } from 'lucide-react';
+import { Loader2, Mail, Sparkles, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
 
 interface InviteCodeFormProps {
   onValidCode: (inviteCode: string) => void;
@@ -14,6 +15,7 @@ interface InviteCodeFormProps {
 export const InviteCodeForm: React.FC<InviteCodeFormProps> = ({ onValidCode }) => {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   const validateInviteCode = async (e: React.FormEvent) => {
@@ -65,6 +67,17 @@ export const InviteCodeForm: React.FC<InviteCodeFormProps> = ({ onValidCode }) =
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="bg-background border border-border rounded-2xl p-8 shadow-sm">
+        <div className="flex justify-start mb-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/')}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+        </div>
+        
         <div className="text-center mb-8">
           <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-full bg-primary/10">
             <Sparkles className="w-8 h-8 text-primary" />

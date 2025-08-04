@@ -10,12 +10,12 @@ import { cn } from '@/lib/utils';
 interface Event {
   id: string;
   title: string;
-  date: string;
-  time: string;
-  location: string;
-  attendees: number;
-  maxAttendees?: number;
-  category: 'wellness' | 'social' | 'learning' | 'networking';
+  start_time: string;
+  end_time?: string;
+  location?: string;
+  current_capacity?: number;
+  max_capacity?: number;
+  status: string;
   featured?: boolean;
 }
 
@@ -27,50 +27,34 @@ const MobileUpcomingEvents: React.FC<MobileUpcomingEventsProps> = memo(({ events
   const { isMobile, safeAreaInsets } = useMobileFirst();
   const feedback = useHapticFeedback();
 
-  const mockEvents: Event[] = [
-    {
-      id: '1',
-      title: 'Morning Mindfulness & Coffee',
-      date: 'Today',
-      time: '9:00 AM',
-      location: 'Central Park',
-      attendees: 12,
-      maxAttendees: 15,
-      category: 'wellness',
-      featured: true
-    },
-    {
-      id: '2',
-      title: 'Women in Tech Networking',
-      date: 'Tomorrow',
-      time: '6:30 PM',
-      location: 'WeWork SoHo',
-      attendees: 28,
-      maxAttendees: 40,
-      category: 'networking'
-    },
-    {
-      id: '3',
-      title: 'Book Club: "Atomic Habits"',
-      date: 'Sat, Mar 16',
-      time: '2:00 PM',
-      location: 'Cozy Corner Café',
-      attendees: 8,
-      maxAttendees: 12,
-      category: 'learning'
+  const displayEvents = events || [];
+
+  const formatEventDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    } else if (date.toDateString() === tomorrow.toDateString()) {
+      return 'Tomorrow';
+    } else {
+      return date.toLocaleDateString('en-US', { 
+        weekday: 'short', 
+        month: 'short', 
+        day: 'numeric' 
+      });
     }
-  ];
+  };
 
-  const displayEvents = events || mockEvents;
-
-  const getCategoryColor = (category: Event['category']) => {
-    const colors = {
-      wellness: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-      social: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300',
-      learning: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-      networking: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
-    };
-    return colors[category];
+  const formatEventTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit', 
+      hour12: true 
+    });
   };
 
   const handleEventTap = (event: Event) => {
@@ -96,9 +80,9 @@ const MobileUpcomingEvents: React.FC<MobileUpcomingEventsProps> = memo(({ events
               <div key={event.id} className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors">
                 <div className="flex-1">
                   <h4 className="font-medium text-sm">{event.title}</h4>
-                  <p className="text-xs text-muted-foreground">{event.date} • {event.time}</p>
+                  <p className="text-xs text-muted-foreground">{formatEventDate(event.start_time)} • {formatEventTime(event.start_time)}</p>
                 </div>
-                <Badge variant="outline" className="text-xs">{event.attendees}</Badge>
+                <Badge variant="outline" className="text-xs">{event.current_capacity || 0}</Badge>
               </div>
             ))}
           </div>
@@ -159,10 +143,10 @@ const MobileUpcomingEvents: React.FC<MobileUpcomingEventsProps> = memo(({ events
                     )}
                   </div>
                   <Badge 
-                    className={cn("text-xs ml-2 flex-shrink-0", getCategoryColor(event.category))}
+                    className="text-xs ml-2 flex-shrink-0"
                     variant="secondary"
                   >
-                    {event.category}
+                    Event
                   </Badge>
                 </div>
 
@@ -170,32 +154,34 @@ const MobileUpcomingEvents: React.FC<MobileUpcomingEventsProps> = memo(({ events
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4 flex-shrink-0" />
-                    <span>{event.date}</span>
+                    <span>{formatEventDate(event.start_time)}</span>
                     <Clock className="h-4 w-4 flex-shrink-0 ml-2" />
-                    <span>{event.time}</span>
+                    <span>{formatEventTime(event.start_time)}</span>
                   </div>
                   
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4 flex-shrink-0" />
-                    <span className="truncate">{event.location}</span>
-                  </div>
+                  {event.location && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4 flex-shrink-0" />
+                      <span className="truncate">{event.location}</span>
+                    </div>
+                  )}
                   
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Users className="h-4 w-4 flex-shrink-0" />
                     <span>
-                      {event.attendees} going
-                      {event.maxAttendees && ` • ${event.maxAttendees - event.attendees} spots left`}
+                      {event.current_capacity || 0} going
+                      {event.max_capacity && ` • ${event.max_capacity - (event.current_capacity || 0)} spots left`}
                     </span>
                   </div>
                 </div>
 
                 {/* Attendance Progress */}
-                {event.maxAttendees && (
+                {event.max_capacity && (
                   <div className="space-y-1">
                     <div className="w-full bg-muted rounded-full h-1.5">
                       <div 
                         className="bg-primary h-1.5 rounded-full transition-all duration-300"
-                        style={{ width: `${(event.attendees / event.maxAttendees) * 100}%` }}
+                        style={{ width: `${((event.current_capacity || 0) / event.max_capacity) * 100}%` }}
                       />
                     </div>
                   </div>

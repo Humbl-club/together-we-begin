@@ -1,6 +1,8 @@
 import React, { memo, Suspense, useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useDashboardData } from '@/hooks/useDashboardData';
+import { useUpcomingEvents } from '@/hooks/useUpcomingEvents';
+import { useCommunityFeed } from '@/hooks/useCommunityFeed';
 import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
@@ -25,7 +27,9 @@ import { RefreshCw, Search, QrCode, Bell, Plus, Calendar, Users, Zap, Menu } fro
 const MobileDashboard: React.FC = memo(() => {
   const { user } = useAuth();
   const { stats, profile, loading, refetch } = useDashboardData(user?.id);
-  const { isMobile, safeAreaInsets } = useMobileFirst();
+  const { events: upcomingEvents, loading: eventsLoading } = useUpcomingEvents();
+  const { posts: feedPosts, loading: postsLoading } = useCommunityFeed();
+  const { safeAreaInsets } = useMobileFirst();
   const { handleError } = useErrorHandler();
   const { toast } = useToast();
   const feedback = useHapticFeedback();
@@ -190,14 +194,14 @@ const MobileDashboard: React.FC = memo(() => {
             {/* Events Section */}
             <section>
               <Suspense fallback={<div className="h-32 bg-muted rounded-2xl animate-pulse" />}>
-                <LazyMobileUpcomingEvents />
+                <LazyMobileUpcomingEvents events={upcomingEvents as any} />
               </Suspense>
             </section>
 
             {/* Community Section */}
             <section>
               <Suspense fallback={<div className="h-64 bg-muted rounded-2xl animate-pulse" />}>
-                <LazyMobileCommunityFeed />
+                <LazyMobileCommunityFeed posts={feedPosts as any} />
               </Suspense>
             </section>
 

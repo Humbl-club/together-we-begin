@@ -513,6 +513,66 @@ export type Database = {
           },
         ]
       }
+      health_data: {
+        Row: {
+          active_minutes: number | null
+          calories_burned: number | null
+          created_at: string
+          date: string
+          distance_km: number | null
+          energy_level: number | null
+          heart_rate_avg: number | null
+          id: string
+          mood_score: number | null
+          notes: string | null
+          sleep_hours: number | null
+          steps: number | null
+          stress_level: number | null
+          updated_at: string
+          user_id: string
+          water_glasses: number | null
+          weight_kg: number | null
+        }
+        Insert: {
+          active_minutes?: number | null
+          calories_burned?: number | null
+          created_at?: string
+          date?: string
+          distance_km?: number | null
+          energy_level?: number | null
+          heart_rate_avg?: number | null
+          id?: string
+          mood_score?: number | null
+          notes?: string | null
+          sleep_hours?: number | null
+          steps?: number | null
+          stress_level?: number | null
+          updated_at?: string
+          user_id: string
+          water_glasses?: number | null
+          weight_kg?: number | null
+        }
+        Update: {
+          active_minutes?: number | null
+          calories_burned?: number | null
+          created_at?: string
+          date?: string
+          distance_km?: number | null
+          energy_level?: number | null
+          heart_rate_avg?: number | null
+          id?: string
+          mood_score?: number | null
+          notes?: string | null
+          sleep_hours?: number | null
+          steps?: number | null
+          stress_level?: number | null
+          updated_at?: string
+          user_id?: string
+          water_glasses?: number | null
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
       integration_settings: {
         Row: {
           calendar_sync: boolean | null
@@ -1278,6 +1338,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_name: string
+          achievement_type: string
+          badge_image_url: string | null
+          description: string | null
+          earned_at: string
+          id: string
+          is_milestone: boolean | null
+          metadata: Json | null
+          points_awarded: number | null
+          user_id: string
+        }
+        Insert: {
+          achievement_name: string
+          achievement_type: string
+          badge_image_url?: string | null
+          description?: string | null
+          earned_at?: string
+          id?: string
+          is_milestone?: boolean | null
+          metadata?: Json | null
+          points_awarded?: number | null
+          user_id: string
+        }
+        Update: {
+          achievement_name?: string
+          achievement_type?: string
+          badge_image_url?: string | null
+          description?: string | null
+          earned_at?: string
+          id?: string
+          is_milestone?: boolean | null
+          metadata?: Json | null
+          points_awarded?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_analytics: {
         Row: {
           challenges_completed: number | null
@@ -1369,6 +1468,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_goals: {
+        Row: {
+          created_at: string
+          current_value: number | null
+          end_date: string | null
+          goal_type: string
+          id: string
+          is_active: boolean
+          period: string
+          start_date: string
+          target_value: number
+          unit: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_value?: number | null
+          end_date?: string | null
+          goal_type: string
+          id?: string
+          is_active?: boolean
+          period?: string
+          start_date?: string
+          target_value: number
+          unit: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_value?: number | null
+          end_date?: string | null
+          goal_type?: string
+          id?: string
+          is_active?: boolean
+          period?: string
+          start_date?: string
+          target_value?: number
+          unit?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_notification_settings: {
         Row: {

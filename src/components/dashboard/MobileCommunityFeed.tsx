@@ -1,8 +1,9 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { MobileFirstCard, MobileFirstCardContent, MobileFirstCardHeader, MobileFirstCardTitle } from '@/components/ui/mobile-first-card';
 import { MobileNativeButton } from '@/components/ui/mobile-native-button';
 import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { useCommunityFeed } from '@/hooks/useCommunityFeed';
 import { Heart, MessageCircle, Share, MoreHorizontal, Camera, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,104 +11,64 @@ import { cn } from '@/lib/utils';
 
 interface Post {
   id: string;
-  author: {
-    name: string;
-    avatar?: string;
-    verified?: boolean;
-  };
+  user_id: string;
   content: string;
-  image?: string;
-  timestamp: string;
-  likes: number;
-  comments: number;
-  liked?: boolean;
-  category?: 'milestone' | 'motivation' | 'question' | 'celebration';
+  image_urls?: string[];
+  created_at: string;
+  likes_count: number;
+  comments_count: number;
+  is_story: boolean;
+  status: string;
+  profile_data: {
+    id: string;
+    full_name: string;
+    username?: string;
+    avatar_url?: string;
+  };
+  user_liked?: boolean;
 }
 
 interface MobileCommunityFeedProps {
   posts?: Post[];
 }
 
-const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts }) => {
+const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts: propPosts }) => {
   const { isMobile, safeAreaInsets } = useMobileFirst();
   const feedback = useHapticFeedback();
-  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
+  const { posts: feedPosts, loading, toggleLike } = useCommunityFeed();
 
-  const mockPosts: Post[] = [
-    {
-      id: '1',
-      author: {
-        name: 'Sarah Chen',
-        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face',
-        verified: true
-      },
-      content: 'Just completed my first 10K! 🏃‍♀️ The training was tough but so worth it. Thank you to everyone who cheered me on! 💪',
-      timestamp: '2h ago',
-      likes: 24,
-      comments: 8,
-      category: 'milestone'
-    },
-    {
-      id: '2',
-      author: {
-        name: 'Maya Rodriguez',
-        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face'
-      },
-      content: 'Anyone else struggling with work-life balance? Looking for tips on how to make time for self-care during busy weeks. 🤔',
-      timestamp: '4h ago',
-      likes: 15,
-      comments: 12,
-      category: 'question'
-    },
-    {
-      id: '3',
-      author: {
-        name: 'Emma Thompson',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face'
-      },
-      content: 'Morning meditation session in the park was absolutely magical today ✨ There\'s something so powerful about starting the day with intention.',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop',
-      timestamp: '6h ago',
-      likes: 31,
-      comments: 5,
-      category: 'motivation'
-    }
-  ];
+  const displayPosts = propPosts || feedPosts;
 
-  const displayPosts = posts || mockPosts;
-
-  const getCategoryEmoji = (category: Post['category']) => {
-    const emojis = {
-      milestone: '🎉',
-      motivation: '✨',
-      question: '🤔',
-      celebration: '🎊'
-    };
-    return category ? emojis[category] : '';
-  };
-
-  const handleLike = (postId: string) => {
+  const handleLike = async (postId: string) => {
     feedback.impact('light');
-    setLikedPosts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(postId)) {
-        newSet.delete(postId);
-      } else {
-        newSet.add(postId);
-        feedback.success();
-      }
-      return newSet;
-    });
+    try {
+      await toggleLike(postId);
+      feedback.success();
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
   };
 
   const handleComment = (postId: string) => {
     feedback.tap();
+    // TODO: Open comment modal
     console.log('Comment on post:', postId);
   };
 
   const handleShare = (postId: string) => {
     feedback.tap();
+    // TODO: Open share modal
     console.log('Share post:', postId);
+  };
+
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    return date.toLocaleDateString();
   };
 
   if (!isMobile) {
@@ -121,20 +82,20 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts })
           <div className="space-y-4">
             {displayPosts.slice(0, 2).map((post) => (
               <div key={post.id} className="p-3 rounded-lg border border-border">
-                <div className="flex items-start gap-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={post.author.avatar} />
-                    <AvatarFallback>{post.author.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm">{post.author.name}</h4>
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{post.content}</p>
-                    <div className="flex items-center gap-4 mt-2">
-                      <span className="text-xs text-muted-foreground">{post.likes} likes</span>
-                      <span className="text-xs text-muted-foreground">{post.comments} comments</span>
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={post.profile_data?.avatar_url} />
+                      <AvatarFallback>{post.profile_data?.full_name?.[0] || '?'}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-sm">{post.profile_data?.full_name || 'Anonymous'}</h4>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{post.content}</p>
+                      <div className="flex items-center gap-4 mt-2">
+                        <span className="text-xs text-muted-foreground">{post.likes_count} likes</span>
+                        <span className="text-xs text-muted-foreground">{post.comments_count} comments</span>
+                      </div>
                     </div>
                   </div>
-                </div>
               </div>
             ))}
           </div>
@@ -179,27 +140,17 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts })
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <Avatar className="h-10 w-10 flex-shrink-0">
-                      <AvatarImage src={post.author.avatar} />
-                      <AvatarFallback className="text-sm">{post.author.name[0]}</AvatarFallback>
+                      <AvatarImage src={post.profile_data?.avatar_url} />
+                      <AvatarFallback className="text-sm">{post.profile_data?.full_name?.[0] || '?'}</AvatarFallback>
                     </Avatar>
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="font-semibold text-sm text-foreground truncate">
-                          {post.author.name}
+                          {post.profile_data?.full_name || 'Anonymous'}
                         </h3>
-                        {post.author.verified && (
-                          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-                            ✓
-                          </Badge>
-                        )}
-                        {post.category && (
-                          <span className="text-sm" role="img" aria-label={post.category}>
-                            {getCategoryEmoji(post.category)}
-                          </span>
-                        )}
                       </div>
-                      <p className="text-xs text-muted-foreground">{post.timestamp}</p>
+                      <p className="text-xs text-muted-foreground">{formatTimestamp(post.created_at)}</p>
                     </div>
                   </div>
                   
@@ -219,10 +170,10 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts })
                     {post.content}
                   </p>
                   
-                  {post.image && (
+                  {post.image_urls && post.image_urls.length > 0 && (
                     <div className="rounded-xl overflow-hidden bg-muted">
                       <img 
-                        src={post.image} 
+                        src={post.image_urls[0]} 
                         alt="Post content"
                         className="w-full h-48 object-cover"
                         loading="lazy"
@@ -240,17 +191,17 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts })
                       onClick={() => handleLike(post.id)}
                       className={cn(
                         "flex items-center gap-2 h-8 px-2",
-                        likedPosts.has(post.id) && "text-red-500"
+                        post.user_liked && "text-red-500"
                       )}
                     >
                       <Heart 
                         className={cn(
                           "h-4 w-4 transition-colors",
-                          likedPosts.has(post.id) && "fill-current"
+                          post.user_liked && "fill-current"
                         )} 
                       />
                       <span className="text-xs font-medium">
-                        {post.likes + (likedPosts.has(post.id) ? 1 : 0)}
+                        {post.likes_count}
                       </span>
                     </MobileNativeButton>
                     
@@ -261,7 +212,7 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts })
                       className="flex items-center gap-2 h-8 px-2"
                     >
                       <MessageCircle className="h-4 w-4" />
-                      <span className="text-xs font-medium">{post.comments}</span>
+                      <span className="text-xs font-medium">{post.comments_count}</span>
                     </MobileNativeButton>
                   </div>
                   

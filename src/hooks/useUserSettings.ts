@@ -49,6 +49,7 @@ interface UserSettings {
 export const useUserSettings = () => {
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -158,7 +159,8 @@ export const useUserSettings = () => {
     if (!user || !settings) return;
 
     try {
-      const tableMap = {
+      setSaving(true);
+      const tableMap: Record<keyof UserSettings, string> = {
         appearance: 'user_appearance_settings',
         notifications: 'user_notification_settings',
         wellness: 'user_wellness_settings',
@@ -166,8 +168,10 @@ export const useUserSettings = () => {
         privacy: 'privacy_settings'
       };
 
+      const tableName = tableMap[category];
+      
       const { error } = await supabase
-        .from(tableMap[category])
+        .from(tableName as any)
         .update(updatedValues)
         .eq('user_id', user.id);
 
@@ -190,8 +194,15 @@ export const useUserSettings = () => {
         description: 'Failed to update settings',
         variant: 'destructive'
       });
+    } finally {
+      setSaving(false);
     }
   }, [user, settings, toast]);
+
+  // Single setting update for compatibility
+  const updateSetting = useCallback(async (category: keyof UserSettings, key: string, value: any) => {
+    await updateSettings(category, { [key]: value });
+  }, [updateSettings]);
 
   // Initialize settings on user login
   useEffect(() => {
@@ -205,7 +216,9 @@ export const useUserSettings = () => {
   return {
     settings,
     loading,
+    saving,
     updateSettings,
+    updateSetting,
     refetchSettings: fetchSettings
   };
 };

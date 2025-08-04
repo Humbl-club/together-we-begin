@@ -1,320 +1,211 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
 
-interface AppearanceSettings {
-  theme: 'light' | 'dark' | 'system';
-  glassmorphism_enabled: boolean;
-  font_size: 'small' | 'medium' | 'large';
-  high_contrast: boolean;
-  animations_enabled: boolean;
-}
-
-interface NotificationSettings {
-  push_enabled: boolean;
-  email_enabled: boolean;
-  sms_enabled: boolean;
-  event_reminders: boolean;
-  challenge_updates: boolean;
-  social_interactions: boolean;
-  marketing_emails: boolean;
-}
-
-interface WellnessSettings {
-  activity_reminders: boolean;
-  daily_goal_steps: number;
-  water_reminders: boolean;
-  mindfulness_reminders: boolean;
-  sleep_tracking: boolean;
-  health_data_sharing: boolean;
-}
-
-interface SocialSettings {
-  auto_follow_friends: boolean;
-  content_suggestions: boolean;
-  story_sharing: boolean;
-  activity_visibility: 'public' | 'friends' | 'private';
-  message_requests: boolean;
-  group_invitations: boolean;
-}
-
-export interface UserSettings {
-  appearance: AppearanceSettings;
-  notifications: NotificationSettings;
-  wellness: WellnessSettings;
-  social: SocialSettings;
-}
-
-const defaultSettings: UserSettings = {
+interface UserSettings {
   appearance: {
-    theme: 'system',
-    glassmorphism_enabled: true,
-    font_size: 'medium',
-    high_contrast: false,
-    animations_enabled: true
-  },
+    theme: string;
+    font_size: string;
+    glassmorphism_enabled: boolean;
+    high_contrast: boolean;
+    animations_enabled: boolean;
+  };
   notifications: {
-    push_enabled: true,
-    email_enabled: true,
-    sms_enabled: false,
-    event_reminders: true,
-    challenge_updates: true,
-    social_interactions: true,
-    marketing_emails: false
-  },
+    push_enabled: boolean;
+    email_enabled: boolean;
+    event_reminders: boolean;
+    challenge_updates: boolean;
+    social_interactions: boolean;
+    notification_frequency: string;
+    quiet_hours_start: string;
+    quiet_hours_end: string;
+  };
   wellness: {
-    activity_reminders: true,
-    daily_goal_steps: 8000,
-    water_reminders: true,
-    mindfulness_reminders: true,
-    sleep_tracking: false,
-    health_data_sharing: false
-  },
+    activity_reminders: boolean;
+    daily_goal_steps: number;
+    water_reminders: boolean;
+    mindfulness_reminders: boolean;
+    sleep_tracking: boolean;
+    health_data_sharing: boolean;
+  };
   social: {
-    auto_follow_friends: true,
-    content_suggestions: true,
-    story_sharing: true,
-    activity_visibility: 'friends',
-    message_requests: true,
-    group_invitations: true
-  }
-};
+    activity_visibility: string;
+    auto_follow_friends: boolean;
+    content_suggestions: boolean;
+    story_sharing: boolean;
+    message_requests: boolean;
+    group_invitations: boolean;
+  };
+  privacy: {
+    profile_visibility: string;
+    allow_messages: string;
+    show_activity_status: boolean;
+    allow_location_sharing: boolean;
+    allow_friend_requests: boolean;
+  };
+}
 
 export const useUserSettings = () => {
-  const [settings, setSettings] = useState<UserSettings>(defaultSettings);
+  const [settings, setSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const { user } = useAuth();
   const { toast } = useToast();
 
-  const loadSettings = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+  // Initialize default settings
+  const initializeUserSettings = useCallback(async () => {
+    if (!user) return;
 
-      // Load all settings tables
-      const [appearance, notifications, wellness, social] = await Promise.all([
+    try {
+      // Check if user already has settings, if not create them
+      const { data: existingSettings } = await supabase
+        .from('user_appearance_settings')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!existingSettings) {
+        // Create default settings for new user
+        await Promise.all([
+          supabase.from('user_appearance_settings').insert({ user_id: user.id }),
+          supabase.from('user_notification_settings').insert({ user_id: user.id }),
+          supabase.from('user_wellness_settings').insert({ user_id: user.id }),
+          supabase.from('user_social_settings').insert({ user_id: user.id }),
+          supabase.from('privacy_settings').insert({ user_id: user.id })
+        ]);
+      }
+    } catch (error) {
+      console.error('Error initializing user settings:', error);
+    }
+  }, [user]);
+
+  // Fetch all user settings
+  const fetchSettings = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      const [
+        { data: appearance },
+        { data: notifications },
+        { data: wellness },
+        { data: social },
+        { data: privacy }
+      ] = await Promise.all([
         supabase.from('user_appearance_settings').select('*').eq('user_id', user.id).single(),
         supabase.from('user_notification_settings').select('*').eq('user_id', user.id).single(),
         supabase.from('user_wellness_settings').select('*').eq('user_id', user.id).single(),
-        supabase.from('user_social_settings').select('*').eq('user_id', user.id).single()
+        supabase.from('user_social_settings').select('*').eq('user_id', user.id).single(),
+        supabase.from('privacy_settings').select('*').eq('user_id', user.id).single()
       ]);
 
-      const newSettings: UserSettings = {
+      setSettings({
         appearance: {
-          theme: (appearance.data?.theme as 'light' | 'dark' | 'system') || defaultSettings.appearance.theme,
-          glassmorphism_enabled: appearance.data?.glassmorphism_enabled ?? defaultSettings.appearance.glassmorphism_enabled,
-          font_size: (appearance.data?.font_size as 'small' | 'medium' | 'large') || defaultSettings.appearance.font_size,
-          high_contrast: appearance.data?.high_contrast ?? defaultSettings.appearance.high_contrast,
-          animations_enabled: appearance.data?.animations_enabled ?? defaultSettings.appearance.animations_enabled
+          theme: appearance?.theme || 'system',
+          font_size: appearance?.font_size || 'medium',
+          glassmorphism_enabled: appearance?.glassmorphism_enabled ?? true,
+          high_contrast: appearance?.high_contrast ?? false,
+          animations_enabled: appearance?.animations_enabled ?? true,
         },
         notifications: {
-          push_enabled: notifications.data?.push_enabled ?? defaultSettings.notifications.push_enabled,
-          email_enabled: notifications.data?.email_enabled ?? defaultSettings.notifications.email_enabled,
-          sms_enabled: notifications.data?.sms_enabled ?? defaultSettings.notifications.sms_enabled,
-          event_reminders: notifications.data?.event_reminders ?? defaultSettings.notifications.event_reminders,
-          challenge_updates: notifications.data?.challenge_updates ?? defaultSettings.notifications.challenge_updates,
-          social_interactions: notifications.data?.social_interactions ?? defaultSettings.notifications.social_interactions,
-          marketing_emails: notifications.data?.marketing_emails ?? defaultSettings.notifications.marketing_emails
+          push_enabled: notifications?.push_enabled ?? true,
+          email_enabled: notifications?.email_enabled ?? true,
+          event_reminders: notifications?.event_reminders ?? true,
+          challenge_updates: notifications?.challenge_updates ?? true,
+          social_interactions: notifications?.social_interactions ?? true,
+          notification_frequency: notifications?.notification_frequency || 'immediate',
+          quiet_hours_start: notifications?.quiet_hours_start || '22:00',
+          quiet_hours_end: notifications?.quiet_hours_end || '07:00',
         },
         wellness: {
-          activity_reminders: wellness.data?.activity_reminders ?? defaultSettings.wellness.activity_reminders,
-          daily_goal_steps: wellness.data?.daily_goal_steps || defaultSettings.wellness.daily_goal_steps,
-          water_reminders: wellness.data?.water_reminders ?? defaultSettings.wellness.water_reminders,
-          mindfulness_reminders: wellness.data?.mindfulness_reminders ?? defaultSettings.wellness.mindfulness_reminders,
-          sleep_tracking: wellness.data?.sleep_tracking ?? defaultSettings.wellness.sleep_tracking,
-          health_data_sharing: wellness.data?.health_data_sharing ?? defaultSettings.wellness.health_data_sharing
+          activity_reminders: wellness?.activity_reminders ?? true,
+          daily_goal_steps: wellness?.daily_goal_steps || 8000,
+          water_reminders: wellness?.water_reminders ?? true,
+          mindfulness_reminders: wellness?.mindfulness_reminders ?? true,
+          sleep_tracking: wellness?.sleep_tracking ?? false,
+          health_data_sharing: wellness?.health_data_sharing ?? false,
         },
         social: {
-          auto_follow_friends: social.data?.auto_follow_friends ?? defaultSettings.social.auto_follow_friends,
-          content_suggestions: social.data?.content_suggestions ?? defaultSettings.social.content_suggestions,
-          story_sharing: social.data?.story_sharing ?? defaultSettings.social.story_sharing,
-          activity_visibility: (social.data?.activity_visibility as 'public' | 'friends' | 'private') || defaultSettings.social.activity_visibility,
-          message_requests: social.data?.message_requests ?? defaultSettings.social.message_requests,
-          group_invitations: social.data?.group_invitations ?? defaultSettings.social.group_invitations
+          activity_visibility: social?.activity_visibility || 'friends',
+          auto_follow_friends: social?.auto_follow_friends ?? true,
+          content_suggestions: social?.content_suggestions ?? true,
+          story_sharing: social?.story_sharing ?? true,
+          message_requests: social?.message_requests ?? true,
+          group_invitations: social?.group_invitations ?? true,
+        },
+        privacy: {
+          profile_visibility: privacy?.profile_visibility || 'public',
+          allow_messages: privacy?.allow_messages || 'everyone',
+          show_activity_status: privacy?.show_activity_status ?? true,
+          allow_location_sharing: privacy?.allow_location_sharing ?? false,
+          allow_friend_requests: privacy?.allow_friend_requests ?? true,
         }
-      };
-
-      setSettings(newSettings);
-      
-      // Apply theme to document
-      applyTheme(newSettings.appearance.theme);
-      applyGlassmorphism(newSettings.appearance.glassmorphism_enabled);
-      applyFontSize(newSettings.appearance.font_size);
-      applyHighContrast(newSettings.appearance.high_contrast);
-      applyAnimations(newSettings.appearance.animations_enabled);
-      
+      });
     } catch (error) {
-      console.error('Error loading settings:', error);
+      console.error('Error fetching user settings:', error);
       toast({
-        title: "Error",
-        description: "Failed to load settings",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to load user settings',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, toast]);
 
-  const saveSettings = async (newSettings: Partial<UserSettings>) => {
-    setSaving(true);
+  // Update specific settings category
+  const updateSettings = useCallback(async (category: keyof UserSettings, updatedValues: any) => {
+    if (!user || !settings) return;
+
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const tableMap = {
+        appearance: 'user_appearance_settings',
+        notifications: 'user_notification_settings',
+        wellness: 'user_wellness_settings',
+        social: 'user_social_settings',
+        privacy: 'privacy_settings'
+      };
 
-      const updates = [];
+      const { error } = await supabase
+        .from(tableMap[category])
+        .update(updatedValues)
+        .eq('user_id', user.id);
 
-      if (newSettings.appearance) {
-        updates.push(
-          supabase.from('user_appearance_settings')
-            .upsert({ user_id: user.id, ...newSettings.appearance })
-        );
-      }
+      if (error) throw error;
 
-      if (newSettings.notifications) {
-        updates.push(
-          supabase.from('user_notification_settings')
-            .upsert({ user_id: user.id, ...newSettings.notifications })
-        );
-      }
-
-      if (newSettings.wellness) {
-        updates.push(
-          supabase.from('user_wellness_settings')
-            .upsert({ user_id: user.id, ...newSettings.wellness })
-        );
-      }
-
-      if (newSettings.social) {
-        updates.push(
-          supabase.from('user_social_settings')
-            .upsert({ user_id: user.id, ...newSettings.social })
-        );
-      }
-
-      await Promise.all(updates);
-
-      setSettings(prev => ({ ...prev, ...newSettings }));
-
-      // Apply theme changes immediately
-      if (newSettings.appearance?.theme) {
-        applyTheme(newSettings.appearance.theme);
-      }
-      
-      if (newSettings.appearance?.glassmorphism_enabled !== undefined) {
-        applyGlassmorphism(newSettings.appearance.glassmorphism_enabled);
-      }
+      // Update local state
+      setSettings(prev => ({
+        ...prev!,
+        [category]: { ...prev![category], ...updatedValues }
+      }));
 
       toast({
-        title: "Success",
-        description: "Settings saved successfully"
+        title: 'Success',
+        description: 'Settings updated successfully'
       });
-
     } catch (error) {
-      console.error('Error saving settings:', error);
+      console.error('Error updating settings:', error);
       toast({
-        title: "Error",
-        description: "Failed to save settings",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to update settings',
+        variant: 'destructive'
       });
-    } finally {
-      setSaving(false);
     }
-  };
+  }, [user, settings, toast]);
 
-  const applyTheme = (theme: 'light' | 'dark' | 'system') => {
-    const root = document.documentElement;
-    
-    // Remove existing theme classes
-    root.classList.remove('light', 'dark');
-    
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      root.classList.add(systemTheme);
-    } else {
-      root.classList.add(theme);
-    }
-    
-    // Also set data attribute for consistency
-    root.setAttribute('data-theme', theme);
-  };
-
-  const applyGlassmorphism = (enabled: boolean) => {
-    const root = document.documentElement;
-    if (enabled) {
-      root.classList.add('glassmorphism-enabled');
-      root.style.setProperty('--glass-effects', 'enabled');
-    } else {
-      root.classList.remove('glassmorphism-enabled');
-      root.style.setProperty('--glass-effects', 'disabled');
-    }
-  };
-
-  const applyFontSize = (size: 'small' | 'medium' | 'large') => {
-    const root = document.documentElement;
-    root.classList.remove('font-small', 'font-medium', 'font-large');
-    root.classList.add(`font-${size}`);
-  };
-
-  const applyHighContrast = (enabled: boolean) => {
-    const root = document.documentElement;
-    if (enabled) {
-      root.classList.add('high-contrast');
-    } else {
-      root.classList.remove('high-contrast');
-    }
-  };
-
-  const applyAnimations = (enabled: boolean) => {
-    const root = document.documentElement;
-    if (enabled) {
-      root.classList.remove('reduce-motion');
-    } else {
-      root.classList.add('reduce-motion');
-    }
-  };
-
-  const updateSetting = <T extends keyof UserSettings>(
-    section: T,
-    key: keyof UserSettings[T],
-    value: any
-  ) => {
-    const newSettings = {
-      ...settings,
-      [section]: {
-        ...settings[section],
-        [key]: value
-      }
-    };
-    
-    setSettings(newSettings);
-    
-    // Apply appearance changes immediately
-    if (section === 'appearance') {
-      if (key === 'theme') {
-        applyTheme(value);
-      } else if (key === 'glassmorphism_enabled') {
-        applyGlassmorphism(value);
-      } else if (key === 'font_size') {
-        applyFontSize(value);
-      } else if (key === 'high_contrast') {
-        applyHighContrast(value);
-      } else if (key === 'animations_enabled') {
-        applyAnimations(value);
-      }
-    }
-    
-    saveSettings({ [section]: newSettings[section] });
-  };
-
+  // Initialize settings on user login
   useEffect(() => {
-    loadSettings();
-  }, []);
+    if (user) {
+      initializeUserSettings().then(() => {
+        fetchSettings();
+      });
+    }
+  }, [user, initializeUserSettings, fetchSettings]);
 
   return {
     settings,
     loading,
-    saving,
-    updateSetting,
-    saveSettings
+    updateSettings,
+    refetchSettings: fetchSettings
   };
 };

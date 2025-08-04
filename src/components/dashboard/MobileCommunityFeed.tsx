@@ -231,24 +231,28 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts: p
         ))}
       </div>
 
-      {/* Community Stats */}
+      {/* Real Community Stats */}
       <div className="px-4">
         <MobileFirstCard variant="glass" padding="md">
           <MobileFirstCardContent>
             <div className="flex items-center justify-center gap-8 text-center">
               <div>
-                <p className="text-2xl font-bold text-primary">247</p>
-                <p className="text-xs text-muted-foreground">Active Members</p>
+                <p className="text-2xl font-bold text-primary">{displayPosts.length}</p>
+                <p className="text-xs text-muted-foreground">Recent Posts</p>
               </div>
               <div className="w-px h-8 bg-border"></div>
               <div>
-                <p className="text-2xl font-bold text-primary">89</p>
-                <p className="text-xs text-muted-foreground">Posts This Week</p>
+                <p className="text-2xl font-bold text-primary">
+                  {displayPosts.reduce((sum, post) => sum + (post.likes_count || 0), 0)}
+                </p>
+                <p className="text-xs text-muted-foreground">Total Likes</p>
               </div>
               <div className="w-px h-8 bg-border"></div>
               <div>
-                <p className="text-2xl font-bold text-primary">1.2k</p>
-                <p className="text-xs text-muted-foreground">Connections Made</p>
+                <p className="text-2xl font-bold text-primary">
+                  {displayPosts.reduce((sum, post) => sum + (post.comments_count || 0), 0)}
+                </p>
+                <p className="text-xs text-muted-foreground">Total Comments</p>
               </div>
             </div>
           </MobileFirstCardContent>

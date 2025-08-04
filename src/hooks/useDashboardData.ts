@@ -26,15 +26,12 @@ interface DashboardData {
 
 export const useDashboardData = (userId?: string) => {
   const [stats, setStats] = useState<DashboardStats>({
-    loyaltyPoints: 125,
-    upcomingEvents: 3,
-    activeChallenges: 2,
-    totalPosts: 8
+    loyaltyPoints: 0,
+    upcomingEvents: 0,
+    activeChallenges: 0,
+    totalPosts: 0
   });
-  const [profile, setProfile] = useState<Profile>({
-    full_name: 'Alexandra Chen',
-    avatar_url: undefined
-  });
+  const [profile, setProfile] = useState<Profile>({});
   const [loading, setLoading] = useState(true); // Start with loading true
   const { fetchWithCache } = useOptimizedData<any>('dashboard', 2 * 60 * 1000); // 2 minute cache
 
@@ -72,9 +69,9 @@ export const useDashboardData = (userId?: string) => {
 
         return {
           profile: profileResult.data,
-          eventsCount: eventsResult.data?.length || 3,
-          challengesCount: challengesResult.data?.length || 2,
-          postsCount: postsResult.data?.length || 8,
+          eventsCount: eventsResult.data?.length || 0,
+          challengesCount: challengesResult.data?.length || 0,
+          postsCount: postsResult.data?.length || 0,
           events: eventsResult.data || [],
         };
       });
@@ -82,7 +79,7 @@ export const useDashboardData = (userId?: string) => {
       if (dashboardData.profile) setProfile(dashboardData.profile);
 
       setStats({
-        loyaltyPoints: dashboardData.profile?.available_loyalty_points || 125,
+        loyaltyPoints: dashboardData.profile?.available_loyalty_points || 0,
         upcomingEvents: dashboardData.eventsCount,
         activeChallenges: dashboardData.challengesCount,
         totalPosts: dashboardData.postsCount

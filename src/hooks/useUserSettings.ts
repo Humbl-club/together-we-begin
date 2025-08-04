@@ -211,7 +211,7 @@ export const useUserSettings = () => {
         fetchSettings();
       });
     }
-  }, [user, initializeUserSettings, fetchSettings]);
+  }, [user]); // Remove the function dependencies to prevent infinite loops
 
   return {
     settings,

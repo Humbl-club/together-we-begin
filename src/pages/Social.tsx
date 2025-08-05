@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useRealtime } from '@/contexts/RealtimeContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -58,6 +59,7 @@ const Social: React.FC = () => {
   const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, isAdmin } = useAuth();
+  const { subscribeToTable } = useRealtime();
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { usePullToRefresh } = useProgressiveEnhancement();
@@ -94,48 +96,21 @@ const Social: React.FC = () => {
     initializeData();
     
     if (user) {
-      // Subscribe to posts channel
-      postsChannel = supabase
-        .channel('social-posts-changes')
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'social_posts'
-        }, () => {
-          // Debounced refetch for new posts only
-          setTimeout(() => {
-            fetchPosts();
-            fetchStories();
-          }, 1000);
-        })
-        .subscribe();
+      // Subscribe to posts using centralized manager
+      subscribeToTable('social_posts', () => {
+        setTimeout(() => {
+          fetchPosts();
+          fetchStories();
+        }, 1000);
+      });
       
-      // Subscribe to stories channel  
-      storiesChannel = supabase
-        .channel('stories-changes')
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'social_posts',
-          filter: 'is_story=eq.true'
-        }, () => {
-          // Debounced refetch for stories only
-          setTimeout(() => {
-            fetchStories();
-          }, 1000);
-        })
-        .subscribe();
+      // Subscribe to stories using centralized manager
+      subscribeToTable('social_posts', () => {
+        setTimeout(() => {
+          fetchStories();
+        }, 1000);
+      }, 'is_story=eq.true');
     }
-    
-    // Cleanup function
-    return () => {
-      if (postsChannel) {
-        supabase.removeChannel(postsChannel);
-      }
-      if (storiesChannel) {
-        supabase.removeChannel(storiesChannel);
-      }
-    };
   }, [user]);
 
   const fetchPosts = async () => {

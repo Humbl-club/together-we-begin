@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useRealtime } from '@/contexts/RealtimeContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -50,6 +51,7 @@ const Challenges: React.FC = () => {
     status: 'draft'
   });
   const { user, isAdmin } = useAuth();
+  const { subscribeToTable } = useRealtime();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -61,22 +63,12 @@ const Challenges: React.FC = () => {
   }, [user]);
 
   const subscribeToRealtime = () => {
-    // Optimized: Only listen to relevant events with debouncing
-    const channel = supabase
-      .channel('challenges-optimized')
-      .on('postgres_changes' as any, {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'challenges',
-        filter: 'status=eq.active'
-      }, () => {
-        setTimeout(() => fetchChallenges(), 1500);
-      })
-      .subscribe();
+    // Use centralized realtime manager
+    subscribeToTable('challenges', () => {
+      setTimeout(() => fetchChallenges(), 1500);
+    }, 'status=eq.active');
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => {};
   };
 
   const fetchUserProfile = async () => {

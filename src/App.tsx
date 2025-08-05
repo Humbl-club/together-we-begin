@@ -8,6 +8,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Layout } from '@/components/layout/Layout';
+import { RealtimeProvider } from '@/contexts/RealtimeContext';
 import NotificationService from '@/services/notificationService';
 
 // Create a page loader component
@@ -158,7 +159,8 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <LazyBoundary>
+            <RealtimeProvider>
+              <LazyBoundary>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   {/* Public routes */}
@@ -219,7 +221,8 @@ const App = () => {
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
-            </LazyBoundary>
+              </LazyBoundary>
+            </RealtimeProvider>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

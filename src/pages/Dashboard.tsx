@@ -14,7 +14,7 @@ import WellnessCard from '@/components/dashboard/WellnessCard';
 import UpcomingEvents from '@/components/dashboard/UpcomingEvents';
 import CommunityFeed from '@/components/dashboard/CommunityFeed';
 import WelcomeFlow from '@/components/onboarding/WelcomeFlow';
-import { DashboardLoadingSkeleton } from '@/components/ui/mobile-loading';
+import { DashboardLoadingSkeleton, MobileLoading } from '@/components/ui/mobile-loading';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { MobileContainer } from '@/components/ui/mobile-container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,25 +45,7 @@ const Dashboard: React.FC = memo(() => {
   console.log('Dashboard render:', { user, stats, profile, loading });
 
   if (loading) {
-    if (isMobile) {
-      return (
-        <div 
-          className="mobile-app-container"
-          style={{
-            paddingTop: `max(20px, ${safeAreaInsets.top}px)`,
-            paddingBottom: `max(100px, ${safeAreaInsets.bottom + 80}px)`
-          }}
-        >
-          <DashboardLoadingSkeleton />
-        </div>
-      );
-    }
-    
-    return (
-      <MobileContainer>
-        <DashboardLoadingSkeleton />
-      </MobileContainer>
-    );
+    return <MobileLoading variant="skeleton" size="lg" text="Loading dashboard..." />;
   }
 
   // Use dedicated mobile component for optimal mobile experience

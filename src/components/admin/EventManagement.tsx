@@ -124,6 +124,32 @@ const EventManagement: React.FC = () => {
 
   const createEvent = async () => {
     try {
+      // Validate date
+      const eventDate = new Date(createForm.start_time);
+      const now = new Date();
+      
+      if (eventDate < now) {
+        toast({
+          title: "Invalid Date",
+          description: "Event date must be in the future",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Validate end time is after start time
+      if (createForm.end_time) {
+        const endDate = new Date(createForm.end_time);
+        if (endDate <= eventDate) {
+          toast({
+            title: "Invalid Time",
+            description: "End time must be after start time",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
       const { data, error } = await supabase
         .from('events')
         .insert([{
@@ -192,6 +218,32 @@ const EventManagement: React.FC = () => {
     if (!selectedEvent) return;
     
     try {
+      // Validate date
+      const eventDate = new Date(editForm.start_time);
+      const now = new Date();
+      
+      if (eventDate < now) {
+        toast({
+          title: "Invalid Date",
+          description: "Event date must be in the future",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Validate end time is after start time
+      if (editForm.end_time) {
+        const endDate = new Date(editForm.end_time);
+        if (endDate <= eventDate) {
+          toast({
+            title: "Invalid Time",
+            description: "End time must be after start time",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
       const { error } = await supabase
         .from('events')
         .update({

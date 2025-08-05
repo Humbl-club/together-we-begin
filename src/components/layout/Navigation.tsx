@@ -96,20 +96,31 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
         {/* Simple floating message button */}
         <button
           onClick={() => setShowMessaging(true)}
-          className="fixed bottom-20 right-4 z-[9999] w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center"
+          className="fixed bottom-20 right-4 z-[9999] w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center"
         >
-          <MessageCircle className="w-6 h-6" />
+          <MessageCircle className="w-5 h-5" />
           {totalUnreadCount > 0 && (
-            <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+            <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
               {totalUnreadCount > 9 ? '9+' : totalUnreadCount}
             </span>
           )}
+        </button>
+        
+        {/* Floating Profile/Menu Button */}
+        <button
+          className="fixed bottom-20 left-4 z-[9999] w-12 h-12 bg-gray-800 text-white rounded-full shadow-lg flex items-center justify-center"
+          title="Profile & Settings"
+        >
+          <User className="w-5 h-5" />
         </button>
         
         <MessagingOverlay 
           isOpen={showMessaging} 
           onClose={() => setShowMessaging(false)} 
         />
+        
+        {/* Profile Dropdown */}
+        <ProfileDropdown profile={profile || user?.user_metadata || {}} />
       </>
     );
   }

@@ -1,8 +1,32 @@
 import { Layout } from '@/components/layout/Layout';
 import { DirectMessaging } from '@/components/messaging/DirectMessaging';
 import { MessageCircle } from 'lucide-react';
+import { MobileLoading } from '@/components/ui/mobile-loading';
+import { useState, useEffect } from 'react';
 
 export default function Messages() {
+  const [loading, setLoading] = useState(true);
+
+  // Simulate loading state
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="container mx-auto p-6">
+          <MobileLoading 
+            variant="skeleton"
+            size="lg"
+            text="Loading messages..."
+          />
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="container mx-auto p-6">

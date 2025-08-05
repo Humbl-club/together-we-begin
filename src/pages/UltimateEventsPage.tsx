@@ -16,6 +16,7 @@ import { eventBus } from '@/core/EventBus';
 import { PerformanceMonitorService } from '@/services/core/PerformanceMonitorService';
 import { Calendar, Plus, Grid3X3, List, LayoutGrid, Search, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MobileLoading } from '@/components/ui/mobile-loading';
 
 // Ultimate Events Page with enterprise architecture
 const UltimateEventsPage = memo(() => {
@@ -238,12 +239,14 @@ const UltimateEventsPage = memo(() => {
   // Adaptive loading strategy
   const loadingStrategy = getLoadingStrategy();
   
-  if (loading && loadingStrategy === 'minimal') {
+  if (loading) {
     return (
       <div className="container mx-auto p-4">
-        <div className="loading-skeleton h-8 w-48 mb-4" />
-        <div className="loading-skeleton h-32 mb-4" />
-        <div className="loading-skeleton h-32 mb-4" />
+        <MobileLoading 
+          variant="skeleton"
+          size="lg"
+          text="Loading events..."
+        />
       </div>
     );
   }

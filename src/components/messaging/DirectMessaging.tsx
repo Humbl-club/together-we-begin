@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Send, Search, MessageCircle, MessageSquare, Lock, Shield, Plus, ArrowLeft } from 'lucide-react';
+import { Send, Search, MessageCircle, MessageSquare, Lock, Shield, Plus, ArrowLeft, Loader2 } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -247,11 +247,8 @@ export const DirectMessaging = () => {
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                   {loadingMessages ? (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-                        <p className="text-sm text-muted-foreground">Loading messages...</p>
-                      </div>
+                    <div className="flex justify-center py-4">
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                     </div>
                   ) : messages.length === 0 ? (
                     <div className="flex items-center justify-center py-8">
@@ -307,7 +304,11 @@ export const DirectMessaging = () => {
                       disabled={!newMessage.trim() || sending} 
                       size={isMobile ? "sm" : "default"}
                     >
-                      <Send className="h-4 w-4" />
+                      {sending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">

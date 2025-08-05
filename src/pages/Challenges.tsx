@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChallengeWithParticipation, Profile, ChallengeInsert } from '@/types/database.types';
+import { MobileLoading } from '@/components/ui/mobile-loading';
 
 interface UserProfile {
   available_loyalty_points: number;
@@ -326,7 +327,11 @@ const Challenges: React.FC = () => {
   if (loading) {
     return (
       <div className="container max-w-6xl mx-auto p-4">
-        <div className="text-center">Loading challenges...</div>
+        <MobileLoading 
+          variant="skeleton"
+          size="lg"
+          text="Loading challenges..."
+        />
       </div>
     );
   }

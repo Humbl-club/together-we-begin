@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { ImagePlus, X } from 'lucide-react';
+import { ImagePlus, X, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface CreatePostFormProps {
@@ -147,6 +147,7 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
           </div>
 
           <Button type="submit" disabled={isSubmitting || (!content.trim() && selectedImages.length === 0)}>
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isSubmitting ? 'Posting...' : 'Post'}
           </Button>
         </div>

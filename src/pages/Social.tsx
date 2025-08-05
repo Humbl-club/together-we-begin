@@ -447,7 +447,7 @@ const Social: React.FC = () => {
 
   // handleImageSelect is now handled within CreatePostForm
 
-  if (loading && posts.length === 0) {
+  if (loading) {
     return (
       <div className={`container mx-auto ${isMobile ? 'px-2 py-2' : 'max-w-2xl px-4 py-4'}`}>
         <MobileLoading 

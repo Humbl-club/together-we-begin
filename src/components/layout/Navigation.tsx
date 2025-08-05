@@ -39,19 +39,9 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
   const [showMessaging, setShowMessaging] = useState(false);
   const { totalUnreadCount } = useMessaging();
 
-  // Force re-render debug and ensure navigation is always visible
-  const [debugInfo, setDebugInfo] = useState('');
-  
+  // Force re-render and ensure navigation is always visible
   React.useEffect(() => {
-    const updateDebug = () => {
-      const info = `W:${window.innerWidth} Mobile:${isMobile} Tablet:${isTablet} Desktop:${isDesktop}`;
-      setDebugInfo(info);
-      console.log('Navigation render state:', { isMobile, isTablet, isDesktop, width: window.innerWidth });
-    };
-    
-    updateDebug();
-    window.addEventListener('resize', updateDebug);
-    return () => window.removeEventListener('resize', updateDebug);
+    console.log('Navigation render state:', { isMobile, isTablet, isDesktop, width: window.innerWidth });
   }, [isMobile, isTablet, isDesktop]);
 
   const navItems = [
@@ -80,11 +70,6 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
   if (shouldRenderMobile) {
     return (
       <>
-        {/* Debug Info */}
-        <div className="fixed top-0 left-0 z-[9999] bg-black text-white text-xs p-1">
-          {debugInfo}
-        </div>
-        
         {/* Enhanced Mobile Bottom Navigation with Glass Effect */}
         <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom,0px)] px-2">
           <div className="nav-glass-floating mx-auto mb-2 max-w-sm">

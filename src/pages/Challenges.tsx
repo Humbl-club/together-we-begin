@@ -14,40 +14,31 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ChallengeWithParticipation, Profile, ChallengeInsert } from '@/types/database.types';
 
-interface Challenge {
-  id: string;
-  title: string;
-  description: string | null;
-  instructions: string | null;
-  start_date: string | null;
-  end_date: string | null;
-  points_reward: number | null;
-  badge_name: string | null;
-  badge_image_url: string | null;
-  status: string;
-  created_at: string;
-  user_participation?: {
-    id: string;
-    completed: boolean;
-    completion_date: string | null;
-    progress_data: any;
-    joined_at: string;
-  };
-}
-
-interface Profile {
+interface UserProfile {
   available_loyalty_points: number;
   total_loyalty_points: number;
 }
 
+interface NewChallengeForm {
+  title: string;
+  description: string;
+  instructions: string;
+  start_date: string;
+  end_date: string;
+  points_reward: number;
+  badge_name: string;
+  status: 'draft' | 'active' | 'completed';
+}
+
 const Challenges: React.FC = () => {
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [userProfile, setUserProfile] = useState<Profile | null>(null);
+  const [challenges, setChallenges] = useState<ChallengeWithParticipation[]>([]);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
-  const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
-  const [newChallenge, setNewChallenge] = useState({
+  const [selectedChallenge, setSelectedChallenge] = useState<ChallengeWithParticipation | null>(null);
+  const [newChallenge, setNewChallenge] = useState<NewChallengeForm>({
     title: '',
     description: '',
     instructions: '',
@@ -202,7 +193,7 @@ const Challenges: React.FC = () => {
     }
   };
 
-  const joinChallenge = async (challenge: Challenge) => {
+  const joinChallenge = async (challenge: ChallengeWithParticipation) => {
     try {
       const participationData = {
         challenge_id: challenge.id,
@@ -232,11 +223,11 @@ const Challenges: React.FC = () => {
     }
   };
 
-  const updateProgress = async (challenge: Challenge, progressUpdate: any) => {
+  const updateProgress = async (challenge: ChallengeWithParticipation, progressUpdate: any) => {
     if (!challenge.user_participation) return;
 
     try {
-      const currentProgress = challenge.user_participation.progress_data || { steps: 0, milestones: [] };
+      const currentProgress = (challenge.user_participation.progress_data as any) || { steps: 0, milestones: [] };
       const newProgress = { ...currentProgress, ...progressUpdate };
 
       const { error } = await supabase
@@ -262,7 +253,7 @@ const Challenges: React.FC = () => {
     }
   };
 
-  const completeChallenge = async (challenge: Challenge) => {
+  const completeChallenge = async (challenge: ChallengeWithParticipation) => {
     if (!challenge.user_participation) return;
 
     try {
@@ -310,7 +301,7 @@ const Challenges: React.FC = () => {
     }
   };
 
-  const getChallengeStatusBadge = (challenge: Challenge) => {
+  const getChallengeStatusBadge = (challenge: ChallengeWithParticipation) => {
     if (challenge.user_participation?.completed) {
       return <Badge className="bg-green-500">Completed</Badge>;
     } else if (challenge.user_participation) {
@@ -320,7 +311,7 @@ const Challenges: React.FC = () => {
     }
   };
 
-  const getProgressPercentage = (challenge: Challenge) => {
+  const getProgressPercentage = (challenge: ChallengeWithParticipation) => {
     if (!challenge.user_participation) return 0;
     if (challenge.user_participation.completed) return 100;
     
@@ -328,7 +319,7 @@ const Challenges: React.FC = () => {
     if (!progress) return 0;
     
     // Simple progress calculation - can be customized per challenge type
-    const steps = progress.steps || 0;
+    const steps = (progress as any)?.steps || 0;
     return Math.min(steps, 100); // Assuming 100 steps = 100%
   };
 
@@ -445,7 +436,7 @@ const Challenges: React.FC = () => {
                   <Label htmlFor="status">Status</Label>
                   <Select
                     value={newChallenge.status}
-                    onValueChange={(value) => setNewChallenge(prev => ({ ...prev, status: value }))}
+                    onValueChange={(value: 'draft' | 'active' | 'completed') => setNewChallenge(prev => ({ ...prev, status: value }))}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -632,7 +623,7 @@ const Challenges: React.FC = () => {
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => updateProgress(challenge, { steps: (challenge.user_participation?.progress_data?.steps || 0) + 10 })}
+                      onClick={() => updateProgress(challenge, { steps: ((challenge.user_participation?.progress_data as any)?.steps || 0) + 10 })}
                     >
                       <TrendingUp className="w-4 h-4 mr-2" />
                       Update Progress

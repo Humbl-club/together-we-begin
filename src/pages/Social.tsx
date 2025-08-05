@@ -10,6 +10,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useProgressiveEnhancement } from '@/hooks/useProgressiveEnhancement';
 import { dbPerformance } from '@/services/core/DatabasePerformanceService';
 import { MobileLoading } from '@/components/ui/mobile-loading';
+import { PostWithProfile, Profile, CommentWithProfile } from '@/types/database.types';
 
 // Import new components
 import { CreatePostForm } from '@/components/social/CreatePostForm';
@@ -46,11 +47,11 @@ interface Comment {
 }
 
 const Social: React.FC = () => {
-  const [posts, setPosts] = useState<any[]>([]);
-  const [stories, setStories] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<PostWithProfile[]>([]);
+  const [stories, setStories] = useState<PostWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreatePost, setShowCreatePost] = useState(false);
-  const [profiles, setProfiles] = useState<Record<string, any>>({});
+  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
   const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});

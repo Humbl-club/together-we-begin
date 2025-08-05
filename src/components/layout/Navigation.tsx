@@ -56,21 +56,13 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Debug logging
-  console.log('Navigation Debug:', { isMobile, isTablet, isDesktop, viewport: { width: window.innerWidth, height: window.innerHeight } });
-
   // Mobile Navigation - Enhanced glass design
   if (isMobile) {
     return (
       <>
-        {/* Debug Test Navigation - Always Visible */}
-        <div className="fixed bottom-0 left-0 right-0 z-[9999] bg-red-500 text-white p-4">
-          <div className="text-center">Mobile Nav Test - Debug Mode</div>
-        </div>
-        
         {/* Enhanced Mobile Bottom Navigation with Glass Effect */}
-        <nav className="fixed bottom-12 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom,0px)] px-2">
-          <div className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-lg rounded-2xl mx-auto mb-2 max-w-sm">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom,0px)] px-2">
+          <div className="nav-glass-floating mx-auto mb-2 max-w-sm">
             <div className="grid grid-cols-4 gap-1 p-3">
               {navItems.map(({ href, icon: Icon, label }) => (
                 <Link
@@ -82,8 +74,8 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
                     "touch-feedback transition-all duration-200 min-h-[50px]",
                     "relative overflow-hidden group",
                     isActive(href)
-                      ? 'text-blue-600 bg-blue-100' 
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      ? 'text-primary bg-primary/10 backdrop-blur-sm' 
+                      : 'text-muted-foreground hover:text-foreground hover:bg-background/30'
                   )}
                 >
                   <Icon className="w-5 h-5 mb-1 transition-transform group-active:scale-95" strokeWidth={isActive(href) ? 2.5 : 2} />
@@ -91,7 +83,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
                     {label}
                   </span>
                   {isActive(href) && (
-                    <div className="absolute bottom-1 w-1 h-1 bg-blue-600 rounded-full animate-pulse" />
+                    <div className="absolute bottom-1 w-1 h-1 bg-primary rounded-full animate-pulse" />
                   )}
                 </Link>
               ))}
@@ -102,7 +94,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
         {/* Floating Message Button */}
         <button
           onClick={() => setShowMessaging(true)}
-          className="fixed bottom-32 right-4 z-40 w-12 h-12 bg-white/90 backdrop-blur-md border border-gray-200 shadow-lg rounded-full flex items-center justify-center text-blue-600 hover:scale-105 transition-all duration-200"
+          className="fixed bottom-20 right-4 z-40 w-12 h-12 nav-glass-floating rounded-full flex items-center justify-center text-primary hover:scale-105 transition-all duration-200 shadow-lg"
         >
           <MessageCircle className="w-5 h-5" />
           {totalUnreadCount > 0 && (

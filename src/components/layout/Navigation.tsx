@@ -66,49 +66,41 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
   const shouldRenderTablet = !shouldRenderMobile && (isTablet || (window.innerWidth >= 768 && window.innerWidth < 1024));
   const shouldRenderDesktop = !shouldRenderMobile && !shouldRenderTablet;
 
-  // Mobile Navigation - Always render if mobile or small screen
+  // Mobile Navigation - Simple and highly visible
   if (shouldRenderMobile) {
     return (
       <>
-        {/* Enhanced Mobile Bottom Navigation with Glass Effect */}
-        <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom,0px)] px-2">
-          <div className="nav-glass-floating mx-auto mb-2 max-w-sm">
-            <div className="grid grid-cols-4 gap-1 p-3">
-              {navItems.map(({ href, icon: Icon, label }) => (
-                <Link
-                  key={href}
-                  to={href}
-                  onClick={() => haptics.tap()}
-                  className={cn(
-                    "flex flex-col items-center justify-center p-3 rounded-xl",
-                    "touch-feedback transition-all duration-200 min-h-[50px]",
-                    "relative overflow-hidden group",
-                    isActive(href)
-                      ? 'text-primary bg-primary/10 backdrop-blur-sm' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-background/30'
-                  )}
-                >
-                  <Icon className="w-5 h-5 mb-1 transition-transform group-active:scale-95" strokeWidth={isActive(href) ? 2.5 : 2} />
-                  <span className="text-[10px] font-medium tracking-tight leading-none">
-                    {label}
-                  </span>
-                  {isActive(href) && (
-                    <div className="absolute bottom-1 w-1 h-1 bg-primary rounded-full animate-pulse" />
-                  )}
-                </Link>
-              ))}
-            </div>
+        {/* Simple, highly visible mobile navigation */}
+        <nav className="fixed bottom-0 left-0 right-0 z-[9999] bg-white border-t border-gray-300 shadow-lg">
+          <div className="grid grid-cols-4 gap-0 px-2 py-3">
+            {navItems.map(({ href, icon: Icon, label }) => (
+              <Link
+                key={href}
+                to={href}
+                className={cn(
+                  "flex flex-col items-center justify-center p-2 rounded-lg transition-colors",
+                  isActive(href)
+                    ? 'text-blue-600 bg-blue-50' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                )}
+              >
+                <Icon className="w-6 h-6 mb-1" strokeWidth={isActive(href) ? 2.5 : 2} />
+                <span className="text-xs font-medium">
+                  {label}
+                </span>
+              </Link>
+            ))}
           </div>
         </nav>
         
-        {/* Floating Message Button */}
+        {/* Simple floating message button */}
         <button
           onClick={() => setShowMessaging(true)}
-          className="fixed bottom-20 right-4 z-40 w-12 h-12 nav-glass-floating rounded-full flex items-center justify-center text-primary hover:scale-105 transition-all duration-200 shadow-lg"
+          className="fixed bottom-20 right-4 z-[9999] w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center"
         >
-          <MessageCircle className="w-5 h-5" />
+          <MessageCircle className="w-6 h-6" />
           {totalUnreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+            <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
               {totalUnreadCount > 9 ? '9+' : totalUnreadCount}
             </span>
           )}
@@ -118,9 +110,6 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
           isOpen={showMessaging} 
           onClose={() => setShowMessaging(false)} 
         />
-        
-        {/* Profile Dropdown */}
-        <ProfileDropdown profile={profile || user?.user_metadata || {}} />
       </>
     );
   }

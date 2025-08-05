@@ -5,7 +5,6 @@ import { useDashboardData } from '@/hooks/useDashboardData';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { useToast } from '@/hooks/use-toast';
 import { useProgressiveEnhancement } from '@/hooks/useProgressiveEnhancement';
-import { MobileFirstNavigation } from '@/components/layout/MobileFirstNavigation';
 import MobileDashboard from './MobileDashboard';
 
 // Desktop imports
@@ -72,7 +71,6 @@ const Dashboard: React.FC = memo(() => {
     return (
       <div className="mobile-app-container" data-pull-refresh>
         <MobileDashboard />
-        <MobileFirstNavigation profile={profile} />
       </div>
     );
   }

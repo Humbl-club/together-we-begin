@@ -74,10 +74,12 @@ const MobileFirstNavigation = forwardRef<HTMLElement, MobileFirstNavigationProps
               </Link>
             ))}
             
-            {/* Profile Dropdown in Navigation */}
-            <div className="flex flex-col items-center justify-center p-3 rounded-xl min-h-[60px] min-w-[60px]">
-              <ProfileDropdown profile={profile} />
-              <span className="text-xs font-medium text-muted-foreground mt-1">
+            {/* Profile Dropdown replaces wellness section */}
+            <div className="flex flex-col items-center justify-center p-3 rounded-xl min-h-[60px] min-w-[60px] relative">
+              <div className="mb-1">
+                <ProfileDropdown profile={profile} />
+              </div>
+              <span className="text-xs font-medium text-muted-foreground">
                 Profile
               </span>
             </div>

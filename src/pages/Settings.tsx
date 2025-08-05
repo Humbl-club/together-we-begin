@@ -8,6 +8,50 @@ import { Label } from '@/components/ui/label';
 import { MobileToggle } from '@/components/ui/mobile-toggle';
 import { Bell, Shield, Heart, Users, Palette, Save, MessageCircle, Lock, Search, ChevronRight, ArrowLeft, User } from 'lucide-react';
 import { useUserSettings } from '@/hooks/useUserSettings';
+
+// Define the UserSettings type locally to match the hook
+interface UserSettings {
+  appearance: {
+    theme: string;
+    font_size: string;
+    glassmorphism_enabled: boolean;
+    high_contrast: boolean;
+    animations_enabled: boolean;
+  };
+  notifications: {
+    push_enabled: boolean;
+    email_enabled: boolean;
+    event_reminders: boolean;
+    challenge_updates: boolean;
+    social_interactions: boolean;
+    notification_frequency: string;
+    quiet_hours_start: string;
+    quiet_hours_end: string;
+  };
+  wellness: {
+    activity_reminders: boolean;
+    daily_goal_steps: number;
+    water_reminders: boolean;
+    mindfulness_reminders: boolean;
+    sleep_tracking: boolean;
+    health_data_sharing: boolean;
+  };
+  social: {
+    activity_visibility: string;
+    auto_follow_friends: boolean;
+    content_suggestions: boolean;
+    story_sharing: boolean;
+    message_requests: boolean;
+    group_invitations: boolean;
+  };
+  privacy: {
+    profile_visibility: string;
+    allow_messages: string;
+    show_activity_status: boolean;
+    allow_location_sharing: boolean;
+    allow_friend_requests: boolean;
+  };
+}
 import { useViewport } from '@/hooks/use-mobile';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { MobileActionSheet } from '@/components/ui/mobile-action-sheet';
@@ -39,7 +83,7 @@ const Settings: React.FC = () => {
   }
 
   // Enhanced toggle handler with haptic feedback
-  const handleToggleChange = (section: any, key: any, value: boolean) => {
+  const handleToggleChange = (section: keyof UserSettings, key: string, value: boolean) => {
     feedback.tap();
     updateSetting(section, key, value);
   };

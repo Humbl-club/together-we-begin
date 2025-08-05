@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Camera, MapPin, Instagram, Edit3, Save, X, CheckCircle, Star, Trophy, Lock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PrivacyControls } from '@/components/profile/PrivacyControls';
+import type { Profile } from '@/types/database.types';
 
 
 import { AnimatedStats } from '@/components/profile/AnimatedStats';
@@ -25,7 +26,7 @@ import { LoyaltyTimeline } from '@/components/profile/LoyaltyTimeline';
 
 const Profile: React.FC = () => {
   const [editing, setEditing] = useState(false);
-  const [editedProfile, setEditedProfile] = useState<any>({});
+  const [editedProfile, setEditedProfile] = useState<Partial<Profile>>({});
   const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();

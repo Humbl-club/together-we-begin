@@ -76,7 +76,7 @@ export const AttendanceMarkingWidget: React.FC<AttendanceMarkingWidgetProps> = (
     fetchRecentAttendance();
   }, [user]);
 
-  const handleScanSuccess = async (result: any) => {
+  const handleScanSuccess = async (result: string) => {
     setLastScanResult(result);
     setScanning(false);
     
@@ -86,7 +86,7 @@ export const AttendanceMarkingWidget: React.FC<AttendanceMarkingWidgetProps> = (
     // Show success notification with animation
     toast({
       title: '🎉 Attendance Recorded!',
-      description: `Welcome to "${result.event_title}"! You've earned ${result.points_awarded} points.`,
+      description: `QR code scanned successfully!`,
     });
   };
 

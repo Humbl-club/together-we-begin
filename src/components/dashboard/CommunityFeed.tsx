@@ -46,7 +46,7 @@ const CommunityFeed: React.FC = () => {
       if (error) throw error;
       
       // Add user_liked information
-      const postsWithLikes = await Promise.all((data || []).map(async (post: any) => {
+      const postsWithLikes = await Promise.all((data || []).map(async (post) => {
         if (!user) return { ...post, user_liked: false };
         
         const { data: likeData } = await supabase

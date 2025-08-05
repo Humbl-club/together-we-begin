@@ -39,6 +39,21 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
   const [showMessaging, setShowMessaging] = useState(false);
   const { totalUnreadCount } = useMessaging();
 
+  // Force re-render debug and ensure navigation is always visible
+  const [debugInfo, setDebugInfo] = useState('');
+  
+  React.useEffect(() => {
+    const updateDebug = () => {
+      const info = `W:${window.innerWidth} Mobile:${isMobile} Tablet:${isTablet} Desktop:${isDesktop}`;
+      setDebugInfo(info);
+      console.log('Navigation render state:', { isMobile, isTablet, isDesktop, width: window.innerWidth });
+    };
+    
+    updateDebug();
+    window.addEventListener('resize', updateDebug);
+    return () => window.removeEventListener('resize', updateDebug);
+  }, [isMobile, isTablet, isDesktop]);
+
   const navItems = [
     { href: '/dashboard', icon: Home, label: 'Home' },
     { href: '/social', icon: Users, label: 'Community' },
@@ -56,10 +71,20 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Mobile Navigation - Enhanced glass design
-  if (isMobile) {
+  // Always render navigation - fallback to mobile if detection fails
+  const shouldRenderMobile = isMobile || window.innerWidth < 768;
+  const shouldRenderTablet = !shouldRenderMobile && (isTablet || (window.innerWidth >= 768 && window.innerWidth < 1024));
+  const shouldRenderDesktop = !shouldRenderMobile && !shouldRenderTablet;
+
+  // Mobile Navigation - Always render if mobile or small screen
+  if (shouldRenderMobile) {
     return (
       <>
+        {/* Debug Info */}
+        <div className="fixed top-0 left-0 z-[9999] bg-black text-white text-xs p-1">
+          {debugInfo}
+        </div>
+        
         {/* Enhanced Mobile Bottom Navigation with Glass Effect */}
         <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom,0px)] px-2">
           <div className="nav-glass-floating mx-auto mb-2 max-w-sm">
@@ -116,7 +141,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
   }
 
   // Tablet Navigation (Enhanced Glass Sidebar)
-  if (isTablet) {
+  if (shouldRenderTablet) {
     return (
       <nav className="fixed top-0 left-0 w-16 h-full z-50">
         <div className="glass-nav h-full border-r border-border/20 flex flex-col">
@@ -174,7 +199,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
     );
   }
 
-  // Desktop Navigation (Full Glass Experience)
+  // Desktop Navigation (Full Glass Experience) - Default fallback
   return (
     <nav className="fixed top-0 left-0 w-20 h-full z-50">
       <div className="glass-nav h-full border-r border-border/20 flex flex-col">

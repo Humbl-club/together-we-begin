@@ -1,5 +1,5 @@
 import React, { memo, useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useViewport } from '@/hooks/use-mobile';
 import { Navigation } from './Navigation';
@@ -15,7 +15,11 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   const { user, loading } = useAuth();
   const { isMobile, isTablet } = useViewport();
+  const location = useLocation();
   const [profile, setProfile] = useState<any>(null);
+  
+  // Show header only on dashboard/home routes
+  const showHeader = location.pathname === '/' || location.pathname === '/dashboard';
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -51,7 +55,7 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
 
   // Calculate layout padding based on viewport
   const getLayoutPadding = () => {
-    if (isMobile) return 'pb-24 pt-28'; // Space for glass navigation + seamless header
+    if (isMobile) return `pb-24 ${showHeader ? 'pt-32' : 'pt-4'}`; // Space for header only on dashboard
     if (isTablet) return 'pl-16 pt-4'; // Space for side nav
     return 'pl-20 pt-4'; // Desktop side nav
   };
@@ -69,8 +73,8 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
       "pt-[env(safe-area-inset-top,0px)]",
       getLayoutPadding()
     )}>
-      {/* Mobile Girls Club Header */}
-      {isMobile && <MobileGirlsClubHeader />}
+      {/* Mobile Girls Club Header - only on dashboard */}
+      {isMobile && showHeader && <MobileGirlsClubHeader />}
       
       <Navigation profile={profile} />
       <main className={cn(

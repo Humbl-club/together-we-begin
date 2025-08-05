@@ -12,52 +12,64 @@ export const MobileGirlsClubHeader: React.FC<MobileGirlsClubHeaderProps> = ({ cl
       "pt-[env(safe-area-inset-top,0px)]",
       className
     )}>
-      {/* Premium Apple-style glassmorphism header */}
+      {/* Artistic glassmorphism banner with premium aesthetics */}
       <div className="relative h-32 overflow-hidden">
-        {/* Apple-quality glass foundation */}
-        <div className="absolute inset-0 bg-background/85 backdrop-blur-[20px] backdrop-saturate-150" />
+        {/* Primary glass foundation */}
+        <div className="absolute inset-0 bg-white/25 backdrop-blur-3xl" />
         
-        {/* Refined depth layers */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/75 to-background/85" />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-accent/2" />
+        {/* Layered gradient system for depth */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/8 via-transparent to-accent/6" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-foreground/2 to-transparent" />
         
-        {/* Subtle ambient lighting */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-16 bg-primary/8 blur-3xl rounded-full" />
-        <div className="absolute bottom-0 right-1/4 w-24 h-12 bg-accent/6 blur-2xl rounded-full" />
+        {/* Artistic light rays */}
+        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-primary/20 via-primary/5 to-transparent rotate-12 transform origin-top" />
+        <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-accent/15 via-accent/3 to-transparent -rotate-6 transform origin-top" />
         
-        {/* Minimal elegant accents */}
-        <div className="absolute top-6 right-8 w-1 h-1 rounded-full bg-primary/30 animate-pulse" style={{animationDuration: '3s'}} />
-        <div className="absolute bottom-8 left-12 w-0.5 h-0.5 rounded-full bg-accent/25 animate-pulse" style={{animationDelay: '1.5s', animationDuration: '4s'}} />
+        {/* Floating artistic elements */}
+        <div className="absolute top-6 left-12 w-4 h-4 rounded-full bg-primary/15 blur-md animate-pulse" style={{animationDuration: '3s'}} />
+        <div className="absolute top-8 right-16 w-3 h-3 rounded-full bg-accent/20 blur-sm animate-pulse" style={{animationDelay: '1.5s', animationDuration: '4s'}} />
+        <div className="absolute bottom-8 left-1/4 w-2 h-2 rounded-full bg-foreground/10 blur-sm animate-pulse" style={{animationDelay: '2.5s', animationDuration: '5s'}} />
+        <div className="absolute top-12 left-2/3 w-1.5 h-1.5 rounded-full bg-primary/25 blur-xs animate-pulse" style={{animationDelay: '0.5s', animationDuration: '3.5s'}} />
         
-        {/* Clean, centered content */}
-        <div className="relative h-full flex items-center justify-center">
-          <div className="text-center space-y-3">
-            {/* Premium typography */}
-            <div className="relative">
-              <h1 className="text-3xl font-bold text-foreground tracking-[-0.02em] leading-none">
+        {/* Elegant content composition */}
+        <div className="relative h-full flex items-center justify-center px-8">
+          <div className="text-center relative">
+            {/* Sophisticated typography with artistic flair */}
+            <div className="relative mb-2">
+              {/* Background glow effect */}
+              <h1 className="absolute inset-0 text-4xl font-bold text-primary/15 blur-md tracking-tight">
+                HUMBL
+              </h1>
+              {/* Main text with elegant styling */}
+              <h1 className="relative text-4xl font-bold text-foreground tracking-tight bg-gradient-to-r from-foreground via-foreground to-foreground/90 bg-clip-text">
                 HUMBL
               </h1>
             </div>
             
-            {/* Refined subtitle */}
-            <p className="text-sm font-medium text-muted-foreground/80 tracking-[0.2em] uppercase">
-              girls club
-            </p>
-            
-            {/* Minimalist accent */}
-            <div className="flex items-center justify-center">
-              <div className="w-8 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+            {/* Artistic subtitle with enhanced spacing */}
+            <div className="relative">
+              <p className="text-sm font-medium text-muted-foreground/85 tracking-[0.2em] uppercase">
+                girls club
+              </p>
+              
+              {/* Elegant decorative elements */}
+              <div className="flex items-center justify-center mt-4 space-x-3">
+                <div className="w-8 h-px bg-gradient-to-r from-transparent to-primary/40" />
+                <div className="w-1.5 h-1.5 rounded-full bg-primary/30" />
+                <div className="w-8 h-px bg-gradient-to-l from-transparent to-primary/40" />
+              </div>
             </div>
           </div>
         </div>
         
-        {/* Apple-style borders */}
-        <div className="absolute inset-0 ring-1 ring-inset ring-white/10" />
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
+        {/* Sophisticated border system */}
+        <div className="absolute inset-0 ring-1 ring-inset ring-white/15" />
+        <div className="absolute inset-0 ring-1 ring-inset ring-primary/10" style={{transform: 'scale(0.98)'}} />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         
-        {/* Seamless content transition */}
-        <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-background/60" />
-        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-b from-transparent to-background" />
+        {/* Subtle artistic overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/5" />
       </div>
     </header>
   );

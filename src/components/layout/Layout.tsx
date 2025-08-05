@@ -55,7 +55,7 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
 
   // Calculate layout padding based on viewport
   const getLayoutPadding = () => {
-    if (isMobile) return `pb-24 ${showHeader ? 'pt-36' : 'pt-4'}`; // Space for artistic header
+    if (isMobile) return `pb-24 ${showHeader ? 'pt-36' : 'pt-4'}`; // Space for larger artistic header
     if (isTablet) return 'pl-16 pt-4'; // Space for side nav
     return 'pl-20 pt-4'; // Desktop side nav
   };

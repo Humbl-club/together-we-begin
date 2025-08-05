@@ -341,3 +341,39 @@ select {
   border-radius: 50%;
   animation: pullRefreshSpin 1s linear infinite;
 }
+
+/* iOS Input Zoom Fix */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="search"],
+input[type="time"],
+input[type="url"],
+input[type="week"],
+textarea,
+select {
+  font-size: 16px !important;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Ensure touch targets are at least 44px */
+.btn-mobile,
+button,
+a,
+input,
+textarea,
+select {
+  min-height: 44px;
+}
+
+/* Fix for date inputs on iOS */
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}

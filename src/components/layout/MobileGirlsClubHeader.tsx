@@ -12,40 +12,27 @@ export const MobileGirlsClubHeader: React.FC<MobileGirlsClubHeaderProps> = ({ cl
       "pt-[env(safe-area-inset-top,0px)]",
       className
     )}>
-      {/* Enhanced Glassmorphism Banner */}
-      <div className="relative h-28 glass-nav border-0 border-b border-border/30">
-        {/* Additional glass layers for depth */}
-        <div className="absolute inset-0 bg-background/60 backdrop-blur-3xl" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 to-background/20" />
+      {/* Seamless glassmorphism banner matching app design */}
+      <div className="relative h-24 glass-nav border-0 border-b border-border/20">
+        {/* Enhanced glass background layers */}
+        <div className="absolute inset-0 bg-background/70 backdrop-blur-xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-card/30 to-background/10" />
         
-        {/* Subtle magazine-style pattern overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-muted/10 via-transparent to-accent/5" />
-        
-        {/* Content with magazine elegance */}
-        <div className="relative h-full flex flex-col items-center justify-center px-8">
-          <div className="text-center space-y-2">
-            {/* Editorial-style brand name */}
-            <h1 className="text-3xl font-light tracking-[0.15em] text-foreground/90 uppercase">
+        {/* Content matching existing typography */}
+        <div className="relative h-full flex items-center justify-center px-6">
+          <div className="text-center">
+            {/* Match the exact typography from MobileDashboard */}
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">
               HUMBL
             </h1>
-            
-            {/* Sophisticated subtitle */}
-            <div className="relative">
-              <p className="text-sm font-light text-muted-foreground tracking-[0.3em] uppercase">
-                girls club
-              </p>
-              
-              {/* Elegant divider line */}
-              <div className="mx-auto mt-3 w-32 h-px bg-gradient-to-r from-transparent via-border to-transparent opacity-60" />
-            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              girls club
+            </p>
           </div>
         </div>
         
-        {/* Sophisticated bottom border */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
-        
-        {/* Additional glass enhancement */}
-        <div className="absolute inset-0 ring-1 ring-inset ring-border/20" />
+        {/* Subtle glass border effect */}
+        <div className="absolute inset-0 ring-1 ring-inset ring-border/10" />
       </div>
     </header>
   );

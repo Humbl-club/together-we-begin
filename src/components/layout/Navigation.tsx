@@ -106,14 +106,6 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
           )}
         </button>
         
-        {/* Floating Profile/Menu Button */}
-        <button
-          className="fixed bottom-20 left-4 z-[9999] w-12 h-12 bg-gray-800 text-white rounded-full shadow-lg flex items-center justify-center"
-          title="Profile & Settings"
-        >
-          <User className="w-5 h-5" />
-        </button>
-        
         <MessagingOverlay 
           isOpen={showMessaging} 
           onClose={() => setShowMessaging(false)} 

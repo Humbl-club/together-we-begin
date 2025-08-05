@@ -82,34 +82,60 @@ const Social: React.FC = () => {
   });
 
   useEffect(() => {
-    // Temporarily load data even without user for testing
-    fetchPosts();
-    fetchStories();
+    let postsChannel;
+    let storiesChannel;
+    
+    const initializeData = async () => {
+      await fetchPosts();
+      await fetchStories();
+    };
+    
+    initializeData();
+    
     if (user) {
-      subscribeToRealtime();
+      // Subscribe to posts channel
+      postsChannel = supabase
+        .channel('social-posts-changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'social_posts'
+        }, () => {
+          // Debounced refetch for new posts only
+          setTimeout(() => {
+            fetchPosts();
+            fetchStories();
+          }, 1000);
+        })
+        .subscribe();
+      
+      // Subscribe to stories channel  
+      storiesChannel = supabase
+        .channel('stories-changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'social_posts',
+          filter: 'is_story=eq.true'
+        }, () => {
+          // Debounced refetch for stories only
+          setTimeout(() => {
+            fetchStories();
+          }, 1000);
+        })
+        .subscribe();
     }
+    
+    // Cleanup function
+    return () => {
+      if (postsChannel) {
+        supabase.removeChannel(postsChannel);
+      }
+      if (storiesChannel) {
+        supabase.removeChannel(storiesChannel);
+      }
+    };
   }, [user]);
-
-  const subscribeToRealtime = () => {
-    // Optimized: Reduced frequency and specific event listening
-    const channel = supabase
-      .channel('social-optimized')
-      .on('postgres_changes' as any, {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'social_posts',
-        filter: 'status=eq.active'
-      }, () => {
-        // Debounced refetch for new posts only
-        setTimeout(() => {
-          fetchPosts();
-          fetchStories();
-        }, 1000);
-      })
-      .subscribe();
-
-    return () => supabase.removeChannel(channel);
-  };
 
   const fetchPosts = async () => {
     try {

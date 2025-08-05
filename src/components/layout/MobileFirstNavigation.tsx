@@ -34,17 +34,6 @@ const MobileFirstNavigation = forwardRef<HTMLElement, MobileFirstNavigationProps
       { id: 'messages', icon: MessageCircle, label: 'Messages', href: '/messages' },
     ];
 
-    const renderProfileButton = () => (
-      <div className="flex flex-col items-center justify-center p-3 rounded-xl min-h-[60px] min-w-[60px] relative">
-        <div className="mb-1">
-          <ProfileDropdown profile={profile} />
-        </div>
-        <span className="text-xs font-medium text-muted-foreground">
-          Profile
-        </span>
-      </div>
-    );
-
     const isActive = (path: string) => location.pathname === path;
 
     return (
@@ -54,42 +43,131 @@ const MobileFirstNavigation = forwardRef<HTMLElement, MobileFirstNavigationProps
       >
         <div className="nav-glass-floating mx-auto mb-2 max-w-sm">
           <div className="flex items-center justify-around px-2 py-3">
-            {navItems.map((item, index) => {
-              const isAfterEvents = item.id === 'events';
-              return (
-                <React.Fragment key={`nav-${item.id}`}>
-                  <Link
-                    to={item.href}
-                    onClick={() => feedback.tap()}
-                    className={cn(
-                      "flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200",
-                      "min-h-[60px] min-w-[60px]", // Touch target
-                      "transform-gpu touch-manipulation relative overflow-hidden group",
-                      "active:scale-95 active:bg-primary/10",
-                      isActive(item.href)
-                        ? "text-primary bg-primary/10 backdrop-blur-sm" 
-                        : "text-muted-foreground hover:text-foreground hover:bg-background/30"
-                    )}
-                  >
-                    <item.icon className={cn(
-                      "h-5 w-5 mb-1 transition-all duration-200 group-active:scale-95",
-                      isActive(item.href) && "text-primary"
-                    )} />
-                    <span className={cn(
-                      "text-xs font-medium",
-                      isActive(item.href) ? "text-primary" : "text-muted-foreground"
-                    )}>
-                      {item.label}
-                    </span>
-                    {isActive(item.href) && (
-                      <div className="absolute bottom-1 w-1 h-1 bg-primary rounded-full animate-pulse" />
-                    )}
-                  </Link>
-                  {/* Insert profile dropdown right after events section */}
-                  {isAfterEvents && renderProfileButton()}
-                </React.Fragment>
-              );
-            })}
+            {/* Home */}
+            <Link
+              to="/dashboard"
+              onClick={() => feedback.tap()}
+              className={cn(
+                "flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200",
+                "min-h-[60px] min-w-[60px]", // Touch target
+                "transform-gpu touch-manipulation relative overflow-hidden group",
+                "active:scale-95 active:bg-primary/10",
+                isActive('/dashboard')
+                  ? "text-primary bg-primary/10 backdrop-blur-sm" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-background/30"
+              )}
+            >
+              <Home className={cn(
+                "h-5 w-5 mb-1 transition-all duration-200 group-active:scale-95",
+                isActive('/dashboard') && "text-primary"
+              )} />
+              <span className={cn(
+                "text-xs font-medium",
+                isActive('/dashboard') ? "text-primary" : "text-muted-foreground"
+              )}>
+                Home
+              </span>
+              {isActive('/dashboard') && (
+                <div className="absolute bottom-1 w-1 h-1 bg-primary rounded-full animate-pulse" />
+              )}
+            </Link>
+
+            {/* Events */}
+            <Link
+              to="/events"
+              onClick={() => feedback.tap()}
+              className={cn(
+                "flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200",
+                "min-h-[60px] min-w-[60px]", // Touch target
+                "transform-gpu touch-manipulation relative overflow-hidden group",
+                "active:scale-95 active:bg-primary/10",
+                isActive('/events')
+                  ? "text-primary bg-primary/10 backdrop-blur-sm" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-background/30"
+              )}
+            >
+              <Calendar className={cn(
+                "h-5 w-5 mb-1 transition-all duration-200 group-active:scale-95",
+                isActive('/events') && "text-primary"
+              )} />
+              <span className={cn(
+                "text-xs font-medium",
+                isActive('/events') ? "text-primary" : "text-muted-foreground"
+              )}>
+                Events
+              </span>
+              {isActive('/events') && (
+                <div className="absolute bottom-1 w-1 h-1 bg-primary rounded-full animate-pulse" />
+              )}
+            </Link>
+
+            {/* Profile Dropdown - replaces wellness */}
+            <div className="flex flex-col items-center justify-center p-3 rounded-xl min-h-[60px] min-w-[60px] relative">
+              <div className="mb-1">
+                <ProfileDropdown profile={profile} />
+              </div>
+              <span className="text-xs font-medium text-muted-foreground">
+                Profile
+              </span>
+            </div>
+
+            {/* Social */}
+            <Link
+              to="/social"
+              onClick={() => feedback.tap()}
+              className={cn(
+                "flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200",
+                "min-h-[60px] min-w-[60px]", // Touch target
+                "transform-gpu touch-manipulation relative overflow-hidden group",
+                "active:scale-95 active:bg-primary/10",
+                isActive('/social')
+                  ? "text-primary bg-primary/10 backdrop-blur-sm" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-background/30"
+              )}
+            >
+              <Heart className={cn(
+                "h-5 w-5 mb-1 transition-all duration-200 group-active:scale-95",
+                isActive('/social') && "text-primary"
+              )} />
+              <span className={cn(
+                "text-xs font-medium",
+                isActive('/social') ? "text-primary" : "text-muted-foreground"
+              )}>
+                Social
+              </span>
+              {isActive('/social') && (
+                <div className="absolute bottom-1 w-1 h-1 bg-primary rounded-full animate-pulse" />
+              )}
+            </Link>
+
+            {/* Messages */}
+            <Link
+              to="/messages"
+              onClick={() => feedback.tap()}
+              className={cn(
+                "flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200",
+                "min-h-[60px] min-w-[60px]", // Touch target
+                "transform-gpu touch-manipulation relative overflow-hidden group",
+                "active:scale-95 active:bg-primary/10",
+                isActive('/messages')
+                  ? "text-primary bg-primary/10 backdrop-blur-sm" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-background/30"
+              )}
+            >
+              <MessageCircle className={cn(
+                "h-5 w-5 mb-1 transition-all duration-200 group-active:scale-95",
+                isActive('/messages') && "text-primary"
+              )} />
+              <span className={cn(
+                "text-xs font-medium",
+                isActive('/messages') ? "text-primary" : "text-muted-foreground"
+              )}>
+                Messages
+              </span>
+              {isActive('/messages') && (
+                <div className="absolute bottom-1 w-1 h-1 bg-primary rounded-full animate-pulse" />
+              )}
+            </Link>
           </div>
         </div>
       </nav>

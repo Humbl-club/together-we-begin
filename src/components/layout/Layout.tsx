@@ -50,7 +50,7 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
 
   // Calculate layout padding based on viewport
   const getLayoutPadding = () => {
-    if (isMobile) return 'pb-24 pt-4'; // Space for bottom nav
+    if (isMobile) return 'pb-24 pt-20'; // Space for glass navigation + glass header
     if (isTablet) return 'pl-16 pt-4'; // Space for side nav
     return 'pl-20 pt-4'; // Desktop side nav
   };
@@ -61,11 +61,12 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
     return 'px-8 py-8';
   };
 
-  // Use the new unified mobile-first layout system
+  // Use the new unified mobile-first layout system with glass effects
   return (
     <div className={cn(
       "min-h-screen bg-background text-foreground",
-      "pt-[env(safe-area-inset-top,0px)]"
+      "pt-[env(safe-area-inset-top,0px)]",
+      getLayoutPadding()
     )}>
       <Navigation profile={profile} />
       <main className={cn(

@@ -56,43 +56,53 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Mobile Navigation - optimized design system
+  // Mobile Navigation - Enhanced glass design
   if (isMobile) {
     return (
       <>
-        {/* Clean Mobile Bottom Navigation */}
-        <nav className={cn(
-          "fixed bottom-0 left-0 right-0 z-50 mobile-nav-safe",
-          "pb-[env(safe-area-inset-bottom,0px)]"
-        )}>
-          <div className="nav-glass mx-2 mb-safe rounded-2xl shadow-xl border border-border/30">
+        {/* Enhanced Mobile Bottom Navigation with Glass Effect */}
+        <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom,0px)] px-2">
+          <div className="nav-glass-floating mx-auto mb-2 max-w-sm">
             <div className="grid grid-cols-4 gap-1 p-3">
               {navItems.map(({ href, icon: Icon, label }) => (
                 <Link
                   key={href}
                   to={href}
                   onClick={() => haptics.tap()}
-                  className={`
-                    flex flex-col items-center justify-center p-3 rounded-xl
-                    touch-feedback transition-all duration-200 min-h-[50px]
-                    ${isActive(href)
-                      ? 'card-accent text-primary' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/20'
-                    }
-                  `}
+                  className={cn(
+                    "flex flex-col items-center justify-center p-3 rounded-xl",
+                    "touch-feedback transition-all duration-200 min-h-[50px]",
+                    "relative overflow-hidden group",
+                    isActive(href)
+                      ? 'text-primary bg-primary/10 backdrop-blur-sm' 
+                      : 'text-muted-foreground hover:text-foreground hover:bg-background/30'
+                  )}
                 >
-                  <Icon className="w-5 h-5 mb-1" strokeWidth={isActive(href) ? 2.5 : 2} />
+                  <Icon className="w-5 h-5 mb-1 transition-transform group-active:scale-95" strokeWidth={isActive(href) ? 2.5 : 2} />
                   <span className="text-[10px] font-medium tracking-tight leading-none">
                     {label}
                   </span>
                   {isActive(href) && (
-                    <div className="absolute bottom-1 w-1 h-1 bg-primary rounded-full" />
+                    <div className="absolute bottom-1 w-1 h-1 bg-primary rounded-full animate-pulse" />
                   )}
                 </Link>
               ))}
             </div>
           </div>
         </nav>
+        
+        {/* Floating Message Button */}
+        <button
+          onClick={() => setShowMessaging(true)}
+          className="fixed bottom-20 right-4 z-40 w-12 h-12 nav-glass-floating rounded-full flex items-center justify-center text-primary hover:scale-105 transition-all duration-200 shadow-lg"
+        >
+          <MessageCircle className="w-5 h-5" />
+          {totalUnreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+              {totalUnreadCount > 9 ? '9+' : totalUnreadCount}
+            </span>
+          )}
+        </button>
         
         <MessagingOverlay 
           isOpen={showMessaging} 
@@ -105,42 +115,46 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
     );
   }
 
-  // Tablet Navigation (Simplified Desktop)
+  // Tablet Navigation (Enhanced Glass Sidebar)
   if (isTablet) {
     return (
       <nav className="fixed top-0 left-0 w-16 h-full z-50">
-        <div className="glass-nav h-full border-r border-border/20 flex flex-col rounded-none">
-          {/* Tablet Logo */}
+        <div className="glass-nav h-full border-r border-border/20 flex flex-col">
+          {/* Tablet Logo with Glass Effect */}
           <div className="p-3 border-b border-border/20">
-            <div className="w-10 h-10 bg-editorial-charcoal rounded-lg flex items-center justify-center shadow-md">
-              <span className="text-white font-medium text-lg tracking-tight">H</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-editorial-charcoal to-editorial-navy rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg tracking-tight">H</span>
             </div>
           </div>
 
-          {/* Navigation Items */}
+          {/* Navigation Items with Enhanced Glass */}
           <div className="flex-1 flex flex-col space-y-2 p-2 mt-4">
             {[...navItems, ...secondaryNavItems].map(({ href, icon: Icon, label }) => (
               <Link
                 key={href}
                 to={href}
                 title={label}
-                className={`flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 group ${
+                className={cn(
+                  "flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 group relative",
                   isActive(href)
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
-                }`}
+                    ? 'bg-primary/20 text-primary backdrop-blur-sm shadow-sm border border-primary/20'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-background/50 hover:backdrop-blur-sm'
+                )}
               >
                 <Icon className="w-5 h-5" strokeWidth={isActive(href) ? 2.5 : 2} />
+                {isActive(href) && (
+                  <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-primary rounded-full" />
+                )}
               </Link>
             ))}
           </div>
 
-          {/* Tablet Actions */}
+          {/* Tablet Actions with Glass Effects */}
           <div className="p-2 border-t border-border/20 space-y-2">
             <Link
               to="/settings"
               title="Settings"
-              className="flex items-center justify-center w-12 h-12 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all duration-200"
+              className="flex items-center justify-center w-12 h-12 rounded-xl text-muted-foreground hover:text-foreground hover:bg-background/50 hover:backdrop-blur-sm transition-all duration-200"
             >
               <Settings className="w-5 h-5" />
             </Link>
@@ -150,7 +164,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
               size="sm"
               title="Logout"
               onClick={() => signOut()}
-              className="flex items-center justify-center w-12 h-12 p-0 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
+              className="flex items-center justify-center w-12 h-12 p-0 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:backdrop-blur-sm transition-all duration-200"
             >
               <LogOut className="w-5 h-5" />
             </Button>
@@ -160,44 +174,52 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
     );
   }
 
-  // Desktop Navigation (Full)
+  // Desktop Navigation (Full Glass Experience)
   return (
     <nav className="fixed top-0 left-0 w-20 h-full z-50">
-      <div className="glass-nav h-full border-r border-border/20 flex flex-col rounded-none">
-        {/* Desktop Logo */}
+      <div className="glass-nav h-full border-r border-border/20 flex flex-col">
+        {/* Desktop Logo with Enhanced Glass */}
         <div className="p-4 border-b border-border/20">
-          <div className="w-12 h-12 mx-auto bg-editorial-charcoal rounded-lg flex items-center justify-center shadow-md">
-            <span className="text-white font-medium text-xl tracking-tight">H</span>
+          <div className="w-12 h-12 mx-auto bg-gradient-to-br from-editorial-charcoal via-editorial-navy to-editorial-charcoal rounded-xl flex items-center justify-center shadow-xl relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+            <span className="text-white font-bold text-xl tracking-tight relative z-10">H</span>
           </div>
         </div>
 
-        {/* Navigation Items */}
+        {/* Navigation Items with Premium Glass Effect */}
         <div className="flex-1 flex flex-col space-y-3 p-3 mt-6">
           {[...navItems, ...secondaryNavItems].map(({ href, icon: Icon, label }) => (
             <Link
               key={href}
               to={href}
-              className={`flex flex-col items-center space-y-2 p-3 rounded-xl transition-all duration-200 group ${
+              className={cn(
+                "flex flex-col items-center space-y-2 p-3 rounded-xl transition-all duration-200 group relative overflow-hidden",
                 isActive(href)
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
-              }`}
+                  ? 'bg-primary/20 text-primary backdrop-blur-md shadow-lg border border-primary/30'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-background/50 hover:backdrop-blur-sm hover:shadow-md'
+              )}
             >
-              <Icon className="w-5 h-5" strokeWidth={isActive(href) ? 2.5 : 2} />
-              <span className="text-xs font-medium tracking-wide text-center leading-none">
+              {isActive(href) && (
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl" />
+              )}
+              <Icon className="w-5 h-5 relative z-10 transition-transform group-hover:scale-110" strokeWidth={isActive(href) ? 2.5 : 2} />
+              <span className="text-xs font-medium tracking-wide text-center leading-none relative z-10">
                 {label}
               </span>
+              {isActive(href) && (
+                <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-primary rounded-full shadow-md" />
+              )}
             </Link>
           ))}
         </div>
 
-        {/* Desktop Actions */}
+        {/* Desktop Actions with Glass Effects */}
         <div className="p-3 border-t border-border/20 space-y-2">
           <Link
             to="/settings"
-            className="flex flex-col items-center space-y-1 p-3 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all duration-200"
+            className="flex flex-col items-center space-y-1 p-3 rounded-xl text-muted-foreground hover:text-foreground hover:bg-background/50 hover:backdrop-blur-sm transition-all duration-200 group"
           >
-            <Settings className="w-5 h-5" />
+            <Settings className="w-5 h-5 transition-transform group-hover:rotate-90" />
             <span className="text-xs font-medium tracking-wide">Settings</span>
           </Link>
           
@@ -205,9 +227,9 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
             variant="ghost"
             size="sm"
             onClick={() => signOut()}
-            className="flex flex-col items-center space-y-1 p-3 w-full rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
+            className="flex flex-col items-center space-y-1 p-3 w-full rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:backdrop-blur-sm transition-all duration-200 group"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             <span className="text-xs font-medium tracking-wide">Logout</span>
           </Button>
         </div>

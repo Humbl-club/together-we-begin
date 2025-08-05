@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { validateMultipleImageFiles } from "@/utils/fileValidation";
 
 interface ImageUploadProps {
   onUploadComplete: (urls: string[]) => void;
@@ -77,20 +78,27 @@ export function ImageUpload({
     }
 
     setUploading(true);
+    
+    // Validate all files before processing
+    const { validFiles, errors } = await validateMultipleImageFiles(acceptedFiles, maxSize);
+    
+    if (errors.length > 0) {
+      toast({
+        title: "Invalid files",
+        description: errors.join(", "),
+        variant: "destructive",
+      });
+    }
+
+    if (validFiles.length === 0) {
+      setUploading(false);
+      return;
+    }
+
     const newUrls: string[] = [];
 
     try {
-      for (const file of acceptedFiles) {
-        // Check file size
-        if (file.size > maxSize * 1024 * 1024) {
-          toast({
-            title: "File too large",
-            description: `${file.name} exceeds ${maxSize}MB limit`,
-            variant: "destructive",
-          });
-          continue;
-        }
-
+      for (const file of validFiles) {
         // Compress image
         const compressedFile = await compressImage(file);
         
@@ -100,7 +108,7 @@ export function ImageUpload({
       }
 
       const allUrls = [...uploadedUrls, ...newUrls];
-      setUploadedFiles(prev => [...prev, ...acceptedFiles]);
+      setUploadedFiles(prev => [...prev, ...validFiles]);
       setUploadedUrls(allUrls);
       onUploadComplete(allUrls);
 

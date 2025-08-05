@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { ImagePlus, X, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { validateImageFile } from '@/utils/fileValidation';
 
 interface CreatePostFormProps {
   onSubmit: (content: string, images: File[], isStory: boolean) => Promise<void>;
@@ -24,7 +25,7 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
   const [isStory, setIsStory] = useState(false);
   const { toast } = useToast();
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length + selectedImages.length > 4) {
       toast({
@@ -35,11 +36,31 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
       return;
     }
 
-    const newFiles = files.slice(0, 4 - selectedImages.length);
-    const newUrls = newFiles.map(file => URL.createObjectURL(file));
-    
-    setSelectedImages([...selectedImages, ...newFiles]);
-    setPreviewUrls([...previewUrls, ...newUrls]);
+    const validFiles: File[] = [];
+    const newUrls: string[] = [];
+
+    for (const file of files) {
+      if (validFiles.length >= 4 - selectedImages.length) break;
+      
+      const validation = await validateImageFile(file);
+      
+      if (!validation.valid) {
+        toast({
+          title: "Invalid Image",
+          description: validation.error,
+          variant: "destructive"
+        });
+        continue;
+      }
+
+      validFiles.push(file);
+      newUrls.push(URL.createObjectURL(file));
+    }
+
+    if (validFiles.length > 0) {
+      setSelectedImages([...selectedImages, ...validFiles]);
+      setPreviewUrls([...previewUrls, ...newUrls]);
+    }
   };
 
   const removeImage = (index: number) => {

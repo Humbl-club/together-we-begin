@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import { validateImageFile } from '@/utils/fileValidation';
 import { Camera, MapPin, Instagram, Edit3, Save, X, CheckCircle, Star, Trophy, Lock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PrivacyControls } from '@/components/profile/PrivacyControls';
@@ -100,9 +101,20 @@ const Profile: React.FC = () => {
     }
   };
 
-  const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const validation = await validateImageFile(file, 2); // 2MB limit for avatars
+      
+      if (!validation.valid) {
+        toast({
+          title: "Invalid Image",
+          description: validation.error,
+          variant: "destructive"
+        });
+        return;
+      }
+      
       setSelectedAvatar(file);
     }
   };

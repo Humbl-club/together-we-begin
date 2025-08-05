@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useViewport } from '@/hooks/use-mobile';
 import { Navigation } from './Navigation';
+import { MobileGirlsClubHeader } from './MobileGirlsClubHeader';
 import { MobileLoading } from '@/components/ui/mobile-loading';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
@@ -50,7 +51,7 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
 
   // Calculate layout padding based on viewport
   const getLayoutPadding = () => {
-    if (isMobile) return 'pb-24 pt-20'; // Space for glass navigation + glass header
+    if (isMobile) return 'pb-24 pt-32'; // Space for glass navigation + girls club header
     if (isTablet) return 'pl-16 pt-4'; // Space for side nav
     return 'pl-20 pt-4'; // Desktop side nav
   };
@@ -68,6 +69,9 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
       "pt-[env(safe-area-inset-top,0px)]",
       getLayoutPadding()
     )}>
+      {/* Mobile Girls Club Header */}
+      {isMobile && <MobileGirlsClubHeader />}
+      
       <Navigation profile={profile} />
       <main className={cn(
         `responsive-container max-w-7xl mx-auto ${getMainPadding()}`,

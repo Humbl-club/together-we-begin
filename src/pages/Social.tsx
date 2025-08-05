@@ -139,61 +139,51 @@ const Social: React.FC = () => {
 
   const fetchPosts = async () => {
     try {
-      // Fetch posts and profiles separately
-      const { data: postsData, error: postsError } = await supabase
+      const { data, error } = await supabase
         .from('social_posts')
-        .select('*')
+        .select(`
+          *,
+          profiles!user_id (
+            full_name,
+            username,
+            avatar_url
+          )
+        `)
         .eq('is_story', false)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
 
-      if (postsError) throw postsError;
-
-      // Fetch profiles for these posts
-      const userIds = [...new Set(postsData?.map(post => post.user_id) || [])];
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, full_name, username, avatar_url')
-        .in('id', userIds);
-
-      if (profilesError) throw profilesError;
-
-      // Fetch likes for these posts
-      const postIds = postsData?.map(post => post.id) || [];
-      const { data: likesData, error: likesError } = await supabase
-        .from('post_likes')
-        .select('post_id, user_id')
-        .in('post_id', postIds);
-
-      if (likesError) throw likesError;
-
-      // Store profiles and create lookup maps
-      const profilesMap = profilesData?.reduce((acc, profile) => {
-        acc[profile.id] = profile;
-        return acc;
-      }, {} as Record<string, any>) || {};
-
-      const likesMap = likesData?.reduce((acc, like) => {
-        if (!acc[like.post_id]) acc[like.post_id] = 0;
-        acc[like.post_id]++;
-        return acc;
-      }, {} as Record<string, number>) || {};
-
-      const userLikedSet = new Set(
-        likesData?.filter(like => like.user_id === user?.id).map(like => like.post_id) || []
-      );
-
-      setProfiles(profilesMap);
-      setLikeCounts(likesMap);
-      setLikedPosts(userLikedSet);
-      setPosts(postsData || []);
+      if (error) throw error;
+      
+      // Process likes data
+      if (user && data) {
+        const postsWithLikes = await Promise.all(
+          data.map(async (post) => {
+            const { data: likeData } = await supabase
+              .from('post_likes')
+              .select('id')
+              .eq('post_id', post.id)
+              .eq('user_id', user.id)
+              .maybeSingle();
+            
+            return {
+              ...post,
+              user_liked: !!likeData
+            };
+          })
+        );
+        setPosts(postsWithLikes);
+      } else {
+        setPosts(data || []);
+      }
     } catch (error) {
       console.error('Error fetching posts:', error);
       toast({
-        title: "Error",
-        description: "Failed to load posts",
+        title: "Error loading posts",
+        description: "Please try refreshing the page",
         variant: "destructive"
       });
+      setPosts([]);
     } finally {
       setLoading(false);
     }
@@ -201,43 +191,32 @@ const Social: React.FC = () => {
 
   const fetchStories = async () => {
     try {
-      // Fetch stories and profiles separately
-      const { data: storiesData, error: storiesError } = await supabase
+      const { data, error } = await supabase
         .from('social_posts')
-        .select('*')
+        .select(`
+          *,
+          profiles!user_id (
+            full_name,
+            username,
+            avatar_url
+          )
+        `)
         .eq('is_story', true)
         .eq('status', 'active')
         .gt('expires_at', new Date().toISOString())
         .order('created_at', { ascending: false });
 
-      if (storiesError) throw storiesError;
+      if (error) throw error;
 
-      // Fetch profiles for these stories
-      const userIds = [...new Set(storiesData?.map(story => story.user_id) || [])];
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, full_name, username, avatar_url')
-        .in('id', userIds);
-
-      if (profilesError) throw profilesError;
-
-      // Combine the data
-      const storiesWithProfiles = storiesData?.map(story => {
-        const profile = profilesData?.find(p => p.id === story.user_id) || {
-          full_name: 'Unknown User',
-          username: 'unknown',
-          avatar_url: null
-        };
-        
-        return {
-          ...story,
-          profiles: profile
-        };
-      }) || [];
-
-      setStories(storiesWithProfiles);
+      setStories(data || []);
     } catch (error) {
       console.error('Error fetching stories:', error);
+      toast({
+        title: "Error loading stories",
+        description: "Please try refreshing the page",
+        variant: "destructive"
+      });
+      setStories([]);
     }
   };
 

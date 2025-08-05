@@ -93,12 +93,18 @@ const Challenges: React.FC = () => {
         .from('profiles')
         .select('available_loyalty_points, total_loyalty_points')
         .eq('id', user!.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       setUserProfile(data);
     } catch (error) {
       console.error('Error fetching user profile:', error);
+      toast({
+        title: "Error loading profile",
+        description: "Please try refreshing the page",
+        variant: "destructive"
+      });
+      setUserProfile(null);
     }
   };
 
@@ -136,10 +142,11 @@ const Challenges: React.FC = () => {
     } catch (error) {
       console.error('Error fetching challenges:', error);
       toast({
-        title: "Error",
-        description: "Failed to load challenges",
+        title: "Error loading challenges",
+        description: "Please try refreshing the page",
         variant: "destructive"
       });
+      setChallenges([]);
     } finally {
       setLoading(false);
     }

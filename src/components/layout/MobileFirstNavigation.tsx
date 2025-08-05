@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { Navigation as DesktopNavigation } from './Navigation';
+import { ProfileDropdown } from './ProfileDropdown';
 
 // Mobile Navigation Icons
 import { Home, Calendar, MessageCircle, User, Heart, Search, Settings } from 'lucide-react';
@@ -31,7 +32,6 @@ const MobileFirstNavigation = forwardRef<HTMLElement, MobileFirstNavigationProps
       { id: 'events', icon: Calendar, label: 'Events', href: '/events' },
       { id: 'social', icon: Heart, label: 'Social', href: '/social' },
       { id: 'messages', icon: MessageCircle, label: 'Messages', href: '/messages' },
-      { id: 'profile', icon: User, label: 'Profile', href: '/profile' },
     ];
 
     const isActive = (path: string) => location.pathname === path;
@@ -73,6 +73,14 @@ const MobileFirstNavigation = forwardRef<HTMLElement, MobileFirstNavigationProps
                 )}
               </Link>
             ))}
+            
+            {/* Profile Dropdown in Navigation */}
+            <div className="flex flex-col items-center justify-center p-3 rounded-xl min-h-[60px] min-w-[60px]">
+              <ProfileDropdown profile={profile} />
+              <span className="text-xs font-medium text-muted-foreground mt-1">
+                Profile
+              </span>
+            </div>
           </div>
         </div>
       </nav>

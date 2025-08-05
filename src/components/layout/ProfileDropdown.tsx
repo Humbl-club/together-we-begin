@@ -21,6 +21,11 @@ import {
   QrCode,
   MessageCircle,
   Crown,
+  Activity,
+  Heart,
+  Trophy,
+  Target,
+  TrendingUp,
   type LucideIcon
 } from 'lucide-react';
 
@@ -36,8 +41,13 @@ interface MenuItem {
   icon: LucideIcon;
   label: string;
   description: string;
-  group: 'main' | 'admin' | 'tools';
+  group: 'main' | 'admin' | 'tools' | 'wellness';
   badge?: string;
+  stats?: {
+    value: string | number;
+    label: string;
+    color?: string;
+  };
 }
 
 export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ profile }) => {
@@ -73,6 +83,42 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ profile }) => 
       description: 'Chat with community members',
       group: 'main',
       badge: '2' // Example unread count
+    },
+  ];
+
+  // Wellness section
+  const wellnessItems: MenuItem[] = [
+    { 
+      href: '/wellness', 
+      icon: Activity, 
+      label: 'Today\'s Steps', 
+      description: '8,450 / 10,000 steps completed',
+      group: 'wellness',
+      stats: { value: '8,450', label: 'steps', color: 'text-blue-500' }
+    },
+    { 
+      href: '/challenges', 
+      icon: Trophy, 
+      label: 'Active Challenge', 
+      description: 'Summer Walking Challenge - Rank #12',
+      group: 'wellness',
+      badge: '#12'
+    },
+    { 
+      href: '/wellness', 
+      icon: Heart, 
+      label: 'Wellness Score', 
+      description: 'Great progress this week!',
+      group: 'wellness',
+      stats: { value: '85%', label: 'score', color: 'text-green-500' }
+    },
+    { 
+      href: '/challenges', 
+      icon: Target, 
+      label: 'Weekly Goal', 
+      description: '4 of 5 days completed',
+      group: 'wellness',
+      stats: { value: '80%', label: 'complete', color: 'text-amber-500' }
     },
   ];
 
@@ -182,12 +228,24 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ profile }) => 
             <IconComponent className="w-6 h-6" strokeWidth={isActive(item.href) ? 2.5 : 2} />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-sm truncate">{item.label}</span>
-              {item.badge && (
-                <Badge variant="secondary" className="text-xs bg-red-500 text-white px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center">
-                  {item.badge}
-                </Badge>
+            <div className="flex items-center gap-2 justify-between">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-sm truncate">{item.label}</span>
+                {item.badge && (
+                  <Badge variant="secondary" className="text-xs bg-red-500 text-white px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center">
+                    {item.badge}
+                  </Badge>
+                )}
+              </div>
+              {item.stats && (
+                <div className="text-right">
+                  <div className={`text-lg font-bold ${item.stats.color || 'text-primary'}`}>
+                    {item.stats.value}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {item.stats.label}
+                  </div>
+                </div>
               )}
             </div>
             <p className="text-xs text-muted-foreground truncate mt-0.5">{item.description}</p>
@@ -202,27 +260,25 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ profile }) => 
       <DropdownMenuTrigger asChild>
         <button 
           className={`
-            fixed z-50 glass-button-enhanced rounded-full flex items-center justify-center 
-            shadow-2xl border-2 transition-all duration-500 group
-            bg-background/95 hover:bg-primary/15 hover:scale-110 active:scale-95 
-            ring-2 ring-primary/20 hover:ring-primary/40 backdrop-blur-3xl
+            glass-button-enhanced rounded-full flex items-center justify-center 
+            shadow-lg border-2 transition-all duration-300 group
+            bg-background/95 hover:bg-primary/15 hover:scale-105 active:scale-95 
+            ring-2 ring-primary/20 hover:ring-primary/40 backdrop-blur-xl
             focus:outline-none focus:ring-4 focus:ring-primary/30
-            ${isMobile ? 'bottom-28 left-5 w-16 h-16' : isTablet ? 'bottom-6 left-6 w-14 h-14' : 'bottom-8 left-8 w-16 h-16'}
-            ${isOpen ? 'scale-110 ring-primary/50 shadow-3xl' : ''}
+            ${isMobile ? 'w-10 h-10' : isTablet ? 'w-11 h-11' : 'w-12 h-12'}
+            ${isOpen ? 'scale-105 ring-primary/50 shadow-xl' : ''}
           `}
           aria-label="Open profile menu"
           aria-expanded={isOpen}
         >
-          <Avatar className={`ring-2 ring-primary/30 shadow-lg transition-all duration-300 group-hover:ring-primary/50 ${isMobile ? 'w-14 h-14' : isTablet ? 'w-12 h-12' : 'w-14 h-14'}`}>
+          <Avatar className={`ring-2 ring-primary/30 shadow-sm transition-all duration-300 group-hover:ring-primary/50 ${isMobile ? 'w-8 h-8' : isTablet ? 'w-9 h-9' : 'w-10 h-10'}`}>
             <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
-            <AvatarFallback className="bg-gradient-to-br from-primary/40 to-secondary/40 text-sm font-bold">
+            <AvatarFallback className="bg-gradient-to-br from-primary/40 to-secondary/40 text-xs font-bold">
               {getInitials(profile?.full_name)}
             </AvatarFallback>
           </Avatar>
           {/* Online status indicator */}
-          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background shadow-sm animate-pulse"></div>
-          {/* Subtle glow effect when hovered */}
-          <div className="absolute inset-0 rounded-full bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-background shadow-sm"></div>
         </button>
       </DropdownMenuTrigger>
       
@@ -276,6 +332,16 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ profile }) => 
         {/* Main Menu Items */}
         <div className="space-y-1">
           {menuItems.map(renderMenuItem)}
+        </div>
+        
+        {/* Wellness Section */}
+        <DropdownMenuSeparator className="my-3 bg-border/60" />
+        <DropdownMenuLabel className="text-xs font-medium text-muted-foreground px-2 py-1 flex items-center gap-2">
+          <TrendingUp className="w-3 h-3" />
+          Wellness Overview
+        </DropdownMenuLabel>
+        <div className="space-y-1">
+          {wellnessItems.map(renderMenuItem)}
         </div>
         
         {secondaryItems.length > 0 && (

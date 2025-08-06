@@ -4,6 +4,7 @@ import { useAdvancedMobileOptimization } from '@/hooks/useAdvancedMobileOptimiza
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { generateStableKey } from '@/utils/keyGenerators';
 
 interface IOSModalProps {
   children: React.ReactNode;
@@ -144,7 +145,7 @@ export const IOSActionSheet = memo(({
         <div className="space-y-2">
           {actions.map((action, index) => (
             <button
-              key={index}
+              key={generateStableKey(action, index)}
               onClick={() => handleActionClick(action)}
               className={cn(
                 'w-full flex items-center justify-center gap-3 p-4 rounded-xl',

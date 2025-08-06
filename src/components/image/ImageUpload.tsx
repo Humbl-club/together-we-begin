@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { validateMultipleImageFiles } from "@/utils/fileValidation";
+import { generateStableKey } from '@/utils/keyGenerators';
 
 interface ImageUploadProps {
   onUploadComplete: (urls: string[]) => void;
@@ -187,7 +188,7 @@ export function ImageUpload({
           
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {uploadedFiles.map((file, index) => (
-              <div key={index} className="relative group">
+              <div key={generateStableKey(file, index)} className="relative group">
                 <div className="aspect-square bg-muted rounded-lg overflow-hidden">
                   <img
                     src={URL.createObjectURL(file)}

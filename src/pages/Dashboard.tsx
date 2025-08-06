@@ -16,6 +16,7 @@ import CommunityFeed from '@/components/dashboard/CommunityFeed';
 import WelcomeFlow from '@/components/onboarding/WelcomeFlow';
 import { DashboardLoadingSkeleton, MobileLoading } from '@/components/ui/mobile-loading';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { EnhancedErrorBoundary } from '@/hooks/useEnhancedErrorBoundary';
 import { MobileContainer } from '@/components/ui/mobile-container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -60,7 +61,10 @@ const Dashboard: React.FC = memo(() => {
   // Desktop experience
   return (
     <div className="desktop-layout min-h-screen bg-background" data-pull-refresh>
-      <ErrorBoundary>
+      <EnhancedErrorBoundary
+        showErrorDetails={process.env.NODE_ENV === 'development'}
+        allowRetry={true}
+      >
         <div className="desktop-dashboard-container p-6 space-y-6 ml-20">
           <DashboardHeader profile={profile} />
           <StatsGrid stats={stats} />
@@ -103,7 +107,7 @@ const Dashboard: React.FC = memo(() => {
             </div>
           </div>
         </div>
-      </ErrorBoundary>
+      </EnhancedErrorBoundary>
     </div>
   );
 });

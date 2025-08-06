@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Heart, Sparkles, Users, Trophy } from 'lucide-react';
+import { generateStableKey } from '@/utils/keyGenerators';
 
 interface WelcomeFlowProps {
   onComplete: () => void;
@@ -200,12 +201,12 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
           
           <div className="flex justify-between items-center pt-4">
             <div className="flex space-x-2">
-              {steps.map((_, index) => (
+              {steps.map((stepItem, index) => (
                 <div
-                  key={index}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    index + 1 <= step ? 'bg-primary' : 'bg-muted'
-                  }`}
+                  key={generateStableKey(stepItem, index)}
+                    className={`w-3 h-3 rounded-full transition-colors ${
+                     index + 1 <= step ? 'bg-primary' : 'bg-muted'
+                    }`}
                 />
               ))}
             </div>

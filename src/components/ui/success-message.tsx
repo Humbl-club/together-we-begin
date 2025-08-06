@@ -2,6 +2,7 @@ import React from 'react';
 import { CheckCircle, Sparkles, Zap, Shield } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { generateStableKey } from '@/utils/keyGenerators';
 
 interface SuccessMessageProps {
   title: string;
@@ -28,7 +29,7 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({
       <CardContent className="space-y-4">
         <div className="grid gap-2">
           {improvements.map((improvement, index) => (
-            <div key={index} className="flex items-center gap-2">
+            <div key={generateStableKey(improvement, index)} className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full" />
               <span className="text-sm">{improvement}</span>
             </div>

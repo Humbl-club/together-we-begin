@@ -1,5 +1,6 @@
 import React, { memo, useMemo, useCallback, useRef, useEffect, useState } from 'react';
 import { useViewport } from '@/hooks/use-mobile';
+import { generateStableKey } from '@/utils/keyGenerators';
 
 interface VirtualizedListProps<T> {
   items: T[];
@@ -81,7 +82,7 @@ export const VirtualizedList = memo(<T,>({
         >
           {visibleItems.map((item, index) => (
             <div
-              key={visibleRange.start + index}
+              key={generateStableKey(item, visibleRange.start + index)}
               style={{ height: itemHeight }}
             >
               {renderItem(item, visibleRange.start + index)}

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { ImagePlus, X, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { validateImageFile } from '@/utils/fileValidation';
+import { generateStableKey, generateMediaKey } from '@/utils/keyGenerators';
 
 interface CreatePostFormProps {
   onSubmit: (content: string, images: File[], isStory: boolean) => Promise<void>;
@@ -116,7 +117,7 @@ export const CreatePostForm: React.FC<CreatePostFormProps> = ({
         {previewUrls.length > 0 && (
           <div className="grid grid-cols-2 gap-2">
             {previewUrls.map((url, index) => (
-              <div key={index} className="relative">
+              <div key={generateMediaKey(url, index)} className="relative">
                 <img
                   src={url}
                   alt={`Preview ${index + 1}`}

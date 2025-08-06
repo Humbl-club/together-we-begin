@@ -3,6 +3,7 @@ import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { MobileFirstCard, MobileFirstCardContent, MobileFirstCardHeader, MobileFirstCardTitle } from '@/components/ui/mobile-first-card';
+import { generateStableKey } from '@/utils/keyGenerators';
 import { MobileNativeButton } from '@/components/ui/mobile-native-button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -265,7 +266,7 @@ const MobileProfilePage: React.FC = memo(() => {
                         { action: 'Joined book club event', time: '1d ago', icon: '📚' },
                         { action: 'Earned Early Bird badge', time: '2d ago', icon: '🏆' }
                       ].map((activity, index) => (
-                        <div key={index} className="flex items-center gap-3">
+                        <div key={generateStableKey(activity, index)} className="flex items-center gap-3">
                           <span className="text-lg">{activity.icon}</span>
                           <div className="flex-1">
                             <p className="text-sm font-medium">{activity.action}</p>

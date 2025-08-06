@@ -1,5 +1,6 @@
 import { Layout } from '@/components/layout/Layout';
 import { DirectMessaging } from '@/components/messaging/DirectMessaging';
+import { MessageErrorBoundary } from '@/components/messaging/MessageErrorBoundary';
 import { MessageCircle } from 'lucide-react';
 import { MobileLoading } from '@/components/ui/mobile-loading';
 import { useState, useEffect } from 'react';
@@ -39,7 +40,9 @@ export default function Messages() {
             </div>
           </div>
 
-          <DirectMessaging />
+          <MessageErrorBoundary>
+            <DirectMessaging />
+          </MessageErrorBoundary>
         </div>
       </div>
     </Layout>

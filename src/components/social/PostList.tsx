@@ -1,4 +1,5 @@
 import React from 'react';
+import { generateStableKey, generateMediaKey } from '@/utils/keyGenerators';
 import { Card } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -86,7 +87,7 @@ export const PostList: React.FC<PostListProps> = ({
               <div className="grid grid-cols-2 gap-2">
                 {post.image_urls.map((url, index) => (
                   <img
-                    key={index}
+                    key={generateMediaKey(url, index)}
                     src={url}
                     alt={`Post image ${index + 1}`}
                     className="rounded-lg w-full h-48 object-cover"

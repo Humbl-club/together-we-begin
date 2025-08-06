@@ -1775,6 +1775,10 @@ export type Database = {
         }
         Returns: Json
       }
+      cleanup_expired_points_regularly: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       create_invite_code: {
         Args: {
           _created_by: string

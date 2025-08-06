@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useOptimizedData } from './useOptimizedData';
+import { Event, Post } from '@/types/api';
 
 interface DashboardStats {
   loyaltyPoints: number;
@@ -15,13 +16,20 @@ interface Profile {
   available_loyalty_points?: number;
 }
 
+interface SimpleEvent {
+  id: string;
+  title: string;
+  start_time: string;
+  location: string | null;
+}
+
 interface DashboardData {
   profile: Profile | null;
   eventsCount: number;
   challengesCount: number;
   postsCount: number;
-  events?: any[];
-  feedPosts?: any[];
+  events?: SimpleEvent[];
+  feedPosts?: Post[];
 }
 
 export const useDashboardData = (userId?: string) => {
@@ -72,7 +80,7 @@ export const useDashboardData = (userId?: string) => {
           eventsCount: eventsResult.data?.length || 0,
           challengesCount: challengesResult.data?.length || 0,
           postsCount: postsResult.data?.length || 0,
-          events: eventsResult.data || [],
+          events: (eventsResult.data || []) as SimpleEvent[],
         };
       });
 

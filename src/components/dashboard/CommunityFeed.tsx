@@ -12,14 +12,16 @@ import { useToast } from '@/hooks/use-toast';
 import { ImageUpload } from '@/components/image/ImageUpload';
 import { useImageCompression } from '@/hooks/useImageCompression';
 import { ShareButton } from '@/components/social/ShareButton';
+import { PostWithProfile, CommentWithProfile } from '@/types/api';
+import { generateStableKey, generateMediaKey } from '@/utils/keyGenerators';
 
 const CommunityFeed: React.FC = () => {
   const [newPost, setNewPost] = useState('');
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<PostWithProfile[]>([]);
   const [showComments, setShowComments] = useState<string | null>(null);
-  const [comments, setComments] = useState<any[]>([]);
+  const [comments, setComments] = useState<CommentWithProfile[]>([]);
   const [newComment, setNewComment] = useState('');
   const [showStorageInfo, setShowStorageInfo] = useState(false);
   const { user } = useAuth();
@@ -59,7 +61,7 @@ const CommunityFeed: React.FC = () => {
         return { ...post, user_liked: !!likeData };
       }));
       
-      setPosts(postsWithLikes);
+      setPosts(postsWithLikes as PostWithProfile[]);
     } catch (error) {
       console.error('Error loading posts:', error);
     }
@@ -115,24 +117,52 @@ const CommunityFeed: React.FC = () => {
 
   const fetchComments = async (postId: string) => {
     try {
-      const { data, error } = await supabase
+      // First get comments
+      const { data: commentsData, error: commentsError } = await supabase
         .from('post_comments')
         .select(`
           id,
+          post_id,
           content,
           created_at,
-          user_id,
-          profiles!inner(
-            full_name,
-            username,
-            avatar_url
-          )
+          updated_at,
+          user_id
         `)
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
-      setComments(data || []);
+      if (commentsError) throw commentsError;
+
+      if (!commentsData || commentsData.length === 0) {
+        setComments([]);
+        return;
+      }
+
+      // Get unique user IDs
+      const userIds = [...new Set(commentsData.map(c => c.user_id))];
+
+      // Fetch profiles for all users
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, username, avatar_url')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create profile lookup map
+      const profileMap = new Map(profilesData.map(p => [p.id, p]));
+
+      // Combine comments with profiles
+      const commentsWithProfiles: CommentWithProfile[] = commentsData.map(comment => ({
+        ...comment,
+        profiles: profileMap.get(comment.user_id!) || {
+          full_name: null,
+          username: null,
+          avatar_url: null
+        }
+      }));
+
+      setComments(commentsWithProfiles);
     } catch (error) {
       console.error('Error fetching comments:', error);
     }
@@ -370,7 +400,7 @@ const CommunityFeed: React.FC = () => {
             {selectedImages.length > 0 && (
               <div className="flex gap-2 flex-wrap">
                 {selectedImages.map((file, index) => (
-                  <div key={index} className="relative">
+                  <div key={generateStableKey(file, index)} className="relative">
                     <img
                       src={URL.createObjectURL(file)}
                       alt={`Selected ${index + 1}`}
@@ -418,7 +448,7 @@ const CommunityFeed: React.FC = () => {
                   {post.image_urls && post.image_urls.length > 0 && (
                     <div className="mt-3 grid grid-cols-1 gap-2">
                       {post.image_urls.map((url: string, index: number) => (
-                        <div key={index} className="relative group">
+                        <div key={generateMediaKey(url, index)} className="relative group">
                           <img
                             src={url}
                             alt={`Post image ${index + 1}`}

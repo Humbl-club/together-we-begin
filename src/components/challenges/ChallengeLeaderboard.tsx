@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { generateLeaderboardKey } from '@/utils/keyGenerators';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -236,7 +237,7 @@ export const ChallengeLeaderboard: React.FC<ChallengeLeaderboardProps> = ({
               
               return (
                 <div
-                  key={entry.user_id}
+                  key={generateLeaderboardKey(entry, rank)}
                   className={`p-4 rounded-lg border transition-colors ${
                     isUser 
                       ? 'bg-primary/5 border-primary/20 ring-1 ring-primary/30' 

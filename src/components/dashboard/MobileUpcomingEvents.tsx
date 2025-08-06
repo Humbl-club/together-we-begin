@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import { generateStableKey } from '@/utils/keyGenerators';
 import { MobileFirstCard, MobileFirstCardContent, MobileFirstCardHeader, MobileFirstCardTitle } from '@/components/ui/mobile-first-card';
 import { MobileNativeButton } from '@/components/ui/mobile-native-button';
 import { useMobileFirst } from '@/hooks/useMobileFirst';
@@ -117,7 +118,7 @@ const MobileUpcomingEvents: React.FC<MobileUpcomingEventsProps> = memo(({ events
       <div className="space-y-3 px-4">
         {displayEvents.map((event, index) => (
           <MobileFirstCard
-            key={event.id}
+            key={generateStableKey(event, index)}
             variant={event.featured ? "premium" : "elevated"}
             interactive
             padding="md"

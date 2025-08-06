@@ -89,8 +89,8 @@ const StatsGrid: React.FC<StatsGridProps> = memo(({ stats }) => {
       color: 'text-amber-600',
       bgColor: 'bg-amber-500/20',
       progress: Math.min((stats.loyaltyPoints / 500) * 100, 100),
-      change: '+12',
-      trend: 'up' as const
+      change: stats.loyaltyPoints > 0 ? `+${Math.round(stats.loyaltyPoints * 0.1)}` : '0',
+      trend: stats.loyaltyPoints > 0 ? 'up' as const : 'stable' as const
     },
     {
       title: 'Events This Month',
@@ -99,8 +99,8 @@ const StatsGrid: React.FC<StatsGridProps> = memo(({ stats }) => {
       color: 'text-blue-600',
       bgColor: 'bg-blue-500/20',
       progress: Math.min((stats.upcomingEvents / 10) * 100, 100),
-      change: '+1',
-      trend: 'up' as const
+      change: stats.upcomingEvents > 0 ? `${stats.upcomingEvents}` : '0',
+      trend: stats.upcomingEvents > 0 ? 'up' as const : 'stable' as const
     },
     {
       title: 'Active Challenges',
@@ -109,8 +109,8 @@ const StatsGrid: React.FC<StatsGridProps> = memo(({ stats }) => {
       color: 'text-purple-600',
       bgColor: 'bg-purple-500/20',
       progress: Math.min((stats.activeChallenges / 5) * 100, 100),
-      change: 'New',
-      trend: 'stable' as const
+      change: stats.activeChallenges > 0 ? `${stats.activeChallenges}` : '0',
+      trend: stats.activeChallenges > 0 ? 'up' as const : 'stable' as const
     },
     {
       title: 'Community Posts',
@@ -119,8 +119,8 @@ const StatsGrid: React.FC<StatsGridProps> = memo(({ stats }) => {
       color: 'text-green-600',
       bgColor: 'bg-green-500/20',
       progress: Math.min((stats.totalPosts / 20) * 100, 100),
-      change: '+3',
-      trend: 'up' as const
+      change: stats.totalPosts > 0 ? `${stats.totalPosts}` : '0',
+      trend: stats.totalPosts > 0 ? 'up' as const : 'stable' as const
     }
   ], [stats]);
 

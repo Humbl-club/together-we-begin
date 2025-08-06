@@ -17,7 +17,7 @@ import { PullToRefresh } from '@/components/ui/pull-to-refresh';
 
 // Lazy-loaded mobile-optimized components
 const LazyStatsGrid = React.lazy(() => import('@/components/dashboard/StatsGrid'));
-const LazyWellnessCard = React.lazy(() => import('@/components/dashboard/WellnessCard'));
+import WellnessWidget from '@/components/wellness/WellnessWidget';
 const LazyMobileUpcomingEvents = React.lazy(() => import('@/components/dashboard/MobileUpcomingEvents'));
 const LazyMobileCommunityFeed = React.lazy(() => import('@/components/dashboard/MobileCommunityFeed'));
 
@@ -180,14 +180,7 @@ const MobileDashboard: React.FC = memo(() => {
                 Your Wellness Journey
               </h2>
               <Suspense fallback={<div className="h-48 bg-muted rounded-2xl animate-pulse" />}>
-                <LazyWellnessCard
-                  steps={8420}
-                  goalSteps={10000}
-                  leaderboardPosition={12}
-                  totalParticipants={247}
-                  challengeName="Spring Steps"
-                  weeklyProgress={15}
-                />
+                <WellnessWidget onChallengeSync={(challengeId) => console.log('Sync challenge:', challengeId)} />
               </Suspense>
             </section>
 

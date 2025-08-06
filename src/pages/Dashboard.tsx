@@ -10,7 +10,7 @@ import MobileDashboard from './MobileDashboard';
 // Desktop imports
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import StatsGrid from '@/components/dashboard/StatsGrid';
-import WellnessCard from '@/components/dashboard/WellnessCard';
+import WellnessWidget from '@/components/wellness/WellnessWidget';
 import UpcomingEvents from '@/components/dashboard/UpcomingEvents';
 import CommunityFeed from '@/components/dashboard/CommunityFeed';
 import WelcomeFlow from '@/components/onboarding/WelcomeFlow';
@@ -76,14 +76,7 @@ const Dashboard: React.FC = memo(() => {
             </div>
 
             <div className="space-y-6">
-              <WellnessCard
-                steps={8420}
-                goalSteps={10000}
-                leaderboardPosition={12}
-                totalParticipants={247}
-                challengeName="Spring Steps"
-                weeklyProgress={15}
-              />
+              <WellnessWidget onChallengeSync={(challengeId) => console.log('Sync challenge:', challengeId)} />
 
               <Card className="card-secondary">
                 <CardHeader>

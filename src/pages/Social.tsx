@@ -437,7 +437,7 @@ const Social: React.FC = () => {
   }
 
   return (
-    <div className={`container mx-auto ${isMobile ? 'p-mobile' : 'max-w-2xl p-mobile'} space-mobile`} data-pull-refresh>
+    <div className={`container mx-auto ${isMobile ? 'p-mobile' : 'max-w-2xl p-mobile'} space-mobile pb-[env(safe-area-inset-bottom,0px)]`} data-pull-refresh>
       <SEO title="Social Feed" description="Share stories, posts, and connect with your community." canonical="/social" />
       {/* Pull to refresh indicator - only visible on mobile */}
       {isMobile && (

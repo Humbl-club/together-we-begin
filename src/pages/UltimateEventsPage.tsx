@@ -18,6 +18,13 @@ import { Calendar, Plus, Grid3X3, List, LayoutGrid, Search, Filter } from 'lucid
 import { cn } from '@/lib/utils';
 import { MobileLoading } from '@/components/ui/mobile-loading';
 import { SEO } from '@/components/seo/SEO';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as DayPicker } from '@/components/ui/calendar';
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext';
 
 // Ultimate Events Page with enterprise architecture
 const UltimateEventsPage = memo(() => {
@@ -49,6 +56,22 @@ const UltimateEventsPage = memo(() => {
 
   // Performance monitoring
   const performanceMonitor = PerformanceMonitorService.getInstance();
+
+  // Feature flags and admin check
+  const { flags } = useFeatureFlags();
+  const { isAdmin } = useAuth();
+
+  // Create Event modal state
+  const [createOpen, setCreateOpen] = useState(false);
+  const [titleInput, setTitleInput] = useState('');
+  const [descriptionInput, setDescriptionInput] = useState('');
+  const [locationInput, setLocationInput] = useState('');
+  const [dateInput, setDateInput] = useState<Date | undefined>();
+  const [startTimeInput, setStartTimeInput] = useState('18:00');
+  const [endTimeInput, setEndTimeInput] = useState('19:00');
+  const [priceInput, setPriceInput] = useState('');
+  const [capacityInput, setCapacityInput] = useState<number | ''>('');
+  const [submitting, setSubmitting] = useState(false);
 
   // Load events with enhanced caching and monitoring
   const loadEvents = useCallback(async (status = 'upcoming') => {
@@ -141,6 +164,62 @@ const UltimateEventsPage = memo(() => {
     // Analytics tracking could be added here
     console.log('Event shared:', eventId);
   }, []);
+
+  // Create Event submit handler
+  const handleCreateEventSubmit = useCallback(async () => {
+    if (!user) {
+      toast({ title: 'Sign in required', description: 'Please sign in to create events', variant: 'destructive' });
+      return;
+    }
+    if (!titleInput.trim()) {
+      toast({ title: 'Title required', description: 'Please enter an event title', variant: 'destructive' });
+      return;
+    }
+    if (!dateInput) {
+      toast({ title: 'Date required', description: 'Please select a date', variant: 'destructive' });
+      return;
+    }
+    const combineDateTime = (date: Date, time: string) => {
+      const [h, m] = time.split(':').map(Number);
+      const d = new Date(date);
+      d.setHours(h || 0, m || 0, 0, 0);
+      return d.toISOString();
+    };
+
+    try {
+      setSubmitting(true);
+      const startIso = combineDateTime(dateInput, startTimeInput);
+      const endIso = endTimeInput ? combineDateTime(dateInput, endTimeInput) : undefined;
+
+      const payload: any = {
+        title: titleInput.trim(),
+        description: descriptionInput?.trim() || null,
+        location: locationInput?.trim() || null,
+        start_time: startIso,
+        ...(endIso ? { end_time: endIso } : {}),
+        price_cents: priceInput ? Math.round(parseFloat(priceInput) * 100) : null,
+        max_capacity: typeof capacityInput === 'number' ? capacityInput : null,
+      };
+
+      await createEvent(payload, user.id);
+      toast({ title: 'Event created', description: 'Your event has been created.' });
+      setCreateOpen(false);
+      setTitleInput('');
+      setDescriptionInput('');
+      setLocationInput('');
+      setDateInput(undefined);
+      setStartTimeInput('18:00');
+      setEndTimeInput('19:00');
+      setPriceInput('');
+      setCapacityInput('');
+      await loadEvents(activeTab);
+    } catch (err: any) {
+      console.error('Create event failed:', err);
+      toast({ title: 'Failed to create event', description: err?.message || 'Please try again', variant: 'destructive' });
+    } finally {
+      setSubmitting(false);
+    }
+  }, [user, titleInput, dateInput, startTimeInput, endTimeInput, descriptionInput, locationInput, priceInput, capacityInput, createEvent, loadEvents, activeTab]);
 
   // Filtered and sorted events
   const filteredEvents = useMemo(() => {
@@ -290,11 +369,80 @@ const UltimateEventsPage = memo(() => {
               </p>
             </div>
             
-            {/* Create Event Button - Admin/Organizer only */}
-            <Button className="glass-button mobile:w-full lg:w-auto mobile:h-10 sm:h-11 lg:h-12 mobile:px-4 sm:px-6">
-              <Plus className="mobile:w-4 mobile:h-4 sm:w-5 sm:h-5 mr-2" />
-              <span className="mobile:text-sm sm:text-base">Create Event</span>
-            </Button>
+            {(isAdmin || flags.enableCreateEventButton) && (
+              <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+                <DialogTrigger asChild>
+                  <Button className="glass-button mobile:w-full lg:w-auto mobile:h-10 sm:h-11 lg:h-12 mobile:px-4 sm:px-6">
+                    <Plus className="mobile:w-4 mobile:h-4 sm:w-5 sm:h-5 mr-2" />
+                    <span className="mobile:text-sm sm:text-base">Create Event</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="glass-card max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>Create Event</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-3">
+                    <div className="grid gap-2">
+                      <Label htmlFor="evt-title">Title</Label>
+                      <Input id="evt-title" value={titleInput} onChange={(e) => setTitleInput(e.target.value)} placeholder="e.g., Weekend Walk & Talk" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="evt-desc">Description</Label>
+                      <Textarea id="evt-desc" rows={3} value={descriptionInput} onChange={(e) => setDescriptionInput(e.target.value)} />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Date</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="justify-start">
+                            {dateInput ? dateInput.toLocaleDateString() : 'Pick a date'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <DayPicker
+                            mode="single"
+                            selected={dateInput}
+                            onSelect={setDateInput}
+                            initialFocus
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="grid gap-2">
+                        <Label htmlFor="evt-start">Start time</Label>
+                        <Input id="evt-start" type="time" value={startTimeInput} onChange={(e) => setStartTimeInput(e.target.value)} />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="evt-end">End time</Label>
+                        <Input id="evt-end" type="time" value={endTimeInput} onChange={(e) => setEndTimeInput(e.target.value)} />
+                      </div>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="evt-location">Location</Label>
+                      <Input id="evt-location" value={locationInput} onChange={(e) => setLocationInput(e.target.value)} placeholder="City park, main gate" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="grid gap-2">
+                        <Label htmlFor="evt-price">Price (USD)</Label>
+                        <Input id="evt-price" type="number" min="0" step="0.01" value={priceInput} onChange={(e) => setPriceInput(e.target.value)} />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="evt-capacity">Capacity</Label>
+                        <Input id="evt-capacity" type="number" min="0" value={capacityInput as any} onChange={(e) => setCapacityInput(e.target.value === '' ? '' : Number(e.target.value))} />
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-2 pt-2">
+                      <Button variant="outline" onClick={() => setCreateOpen(false)} disabled={submitting}>Cancel</Button>
+                      <Button onClick={handleCreateEventSubmit} disabled={submitting}>
+                        {submitting ? 'Creating…' : 'Create'}
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         </div>
 

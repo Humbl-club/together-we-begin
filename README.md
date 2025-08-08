@@ -1,103 +1,72 @@
 # Welcome to your Lovable project
 
-## Project info
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-**URL**: https://lovable.dev/projects/945e8026-291f-4434-93b5-949dcf1fab6b
+## Getting Started
 
-## How can I edit this code?
+First, run the development server:
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/945e8026-291f-4434-93b5-949dcf1fab6b) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-**Edit a file directly in GitHub**
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-**Use GitHub Codespaces**
+This project uses [`next/font`](https://nextjs.org/docs/font) to optimize and load Inter, a custom Google Font.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Learn More
 
-## What technologies are used for this project?
+To learn more about Next.js, take a look at the following resources:
 
-This project is built with:
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## How can I deploy this project?
+## Deploy on Vercel
 
-Simply open [Lovable](https://lovable.dev/projects/945e8026-291f-4434-93b5-949dcf1fab6b) and click on Share -> Publish.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app) from the creators of Next.js.
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
 ---
 
-## Mobile Health Integrations (Apple Health / Android Health Connect)
+## Modular branding, feature flags, and tenants
 
-This app can optionally read today’s steps natively to power wellness challenges.
+This app is prepared for multi‑brand, multi‑tenant deployments.
 
-- Android: Health Connect via `@pianissimoproject/capacitor-health-connect`
-- iOS: Apple HealthKit via `@perfood/capacitor-healthkit`
+- BrandProvider
+  - Switch brand at runtime via URL: ?brand=together or ?brand=aurora
+  - Or set in localStorage: localStorage.setItem('brand', 'aurora')
+  - Applies CSS variables (e.g., --brand-accent) and sets data-brand on <html>
 
-### Enable on your device
-1. Export your project and clone locally
-2. `npm install`
-3. Add platforms: `npx cap add ios` and/or `npx cap add android`
-4. `npx cap sync`
-5. `npm run build`
-6. Run on device: `npx cap run ios` or `npx cap run android`
+- FeatureFlagsProvider
+  - Persisted flags in localStorage key "featureFlags"
+  - Example in Console:
+    - const flags = JSON.parse(localStorage.getItem('featureFlags')||'{}');
+    - localStorage.setItem('featureFlags', JSON.stringify({ ...flags, enableCreateEventButton: true }))
 
-### iOS setup
-- In Xcode, enable the HealthKit capability for the iOS target
-- Add Info.plist usage description:
-  - `NSHealthShareUsageDescription` with a message like: “We use your step count to track challenge progress.”
-- Ensure the app requests read permission for steps (handled in-code)
+- TenantProvider (stub)
+  - Holds tenantId for future org scoping
+  - Set with: localStorage.setItem('tenantId', 'org_123')
 
-### Android setup
-- Ensure Google Health Connect is installed on the device
-- The app will request read permission for “Steps” at runtime (handled in-code)
+## SEO usage
+Per‑page SEO is handled by <SEO title="..." description="..." canonical="/path" />
+Already added on Messages, Social, Events pages.
 
-Once permissions are granted, the Dashboard will show a “Sync your steps” prompt to connect, then pull today’s steps.
+## Create Event (admin)
+- Admins (or when enableCreateEventButton flag is true) can create events from Events page.
+- Uses shadcn Calendar with pointer-events-auto to ensure interactivity in dialogs.
 
+## E2E smoke tests
+Playwright specs are under e2e/*.spec.ts and currently skipped (auth‑dependent):
+- messages.spec.ts, events.spec.ts, social.spec.ts
+Enable by removing test.skip when you have test users.

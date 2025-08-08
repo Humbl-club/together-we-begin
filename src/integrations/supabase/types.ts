@@ -1964,6 +1964,15 @@ export type Database = {
         Args: { reward_id_param: string; user_id_param: string }
         Returns: Json
       }
+      register_for_event: {
+        Args: {
+          event_id_param: string
+          user_id_param: string
+          payment_method_param?: string
+          loyalty_points_used_param?: number
+        }
+        Returns: Json
+      }
       remove_user_role: {
         Args: {
           _user_id: string

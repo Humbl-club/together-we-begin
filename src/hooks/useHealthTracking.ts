@@ -3,6 +3,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { pedometerService, StepData, DailyStepData } from '@/services/PedometerService';
+import { HealthIntegrationService } from '@/services/native/HealthIntegrationService';
 
 interface HealthData {
   steps: number;
@@ -63,6 +64,27 @@ export const useHealthTracking = () => {
   const initializePedometer = useCallback(async () => {
     try {
       setLoading(true);
+      
+      // Try native health integrations first (Apple Health / Health Connect)
+      try {
+        const available = await HealthIntegrationService.isAvailable();
+        if (available) {
+          await HealthIntegrationService.requestPermissions();
+          const today = await HealthIntegrationService.getTodaySteps();
+          if (today != null) {
+            setHealthData(prev => ({
+              ...prev,
+              steps: today,
+              calories: Math.floor(today * 0.04),
+              distance: today * 0.0008,
+              activeMinutes: Math.floor(today / 100),
+              lastUpdated: new Date()
+            }));
+          }
+        }
+      } catch (e) {
+        console.warn('Health integration not available', e);
+      }
       
       // Start native pedometer tracking
       const trackingStarted = await pedometerService.startTracking();

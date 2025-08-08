@@ -35,7 +35,7 @@ export class OptimizedMessagingService {
 
   private initializeWorker() {
     try {
-      this.encryptionWorker = new Worker('/src/workers/encryptionWorker.ts', { type: 'module' });
+      this.encryptionWorker = new Worker(new URL('../../workers/encryptionWorker.ts', import.meta.url), { type: 'module' });
     } catch (error) {
       console.warn('Web Worker not available, falling back to main thread encryption:', error);
     }

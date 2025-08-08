@@ -69,37 +69,25 @@ export class EventRepository {
     return data;
   }
 
-  // Register for event with transaction safety
+  // Register for event via atomic RPC to avoid race conditions
   async registerForEvent(eventId: string, userId: string, registrationData: {
     payment_method?: string;
     loyalty_points_used?: number;
   } = {}) {
     const { data, error } = await supabase
-      .from('event_registrations')
-      .insert({
-        event_id: eventId,
-        user_id: userId,
-        ...registrationData
-      })
-      .select()
-      .single();
+      .rpc('register_for_event', {
+        event_id_param: eventId,
+        user_id_param: userId,
+        payment_method_param: registrationData.payment_method || null,
+        loyalty_points_used_param: registrationData.loyalty_points_used || 0,
+      });
+    const result = (data as unknown) as { success?: boolean; error?: string; registration_id?: string };
 
-    if (error) throw error;
+    if (!result?.success) {
+      throw new Error(result?.error || 'Registration failed');
+    }
 
-    // First get the current event data to access current_capacity
-    const { data: currentEvent } = await supabase
-      .from('events')
-      .select('current_capacity')
-      .eq('id', eventId)
-      .single();
-
-    // Update event capacity (simplified version)
-    await supabase
-      .from('events')
-      .update({ current_capacity: (currentEvent?.current_capacity || 0) + 1 })
-      .eq('id', eventId);
-    
-    return data;
+    return { id: result.registration_id, event_id: eventId, user_id: userId, ...registrationData } as any;
   }
 
   // Get user's registered events

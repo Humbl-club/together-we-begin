@@ -4,6 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Send, Lock, Smile } from 'lucide-react';
 import { useViewport } from '@/hooks/use-mobile';
 import { toast } from '@/hooks/use-toast';
+import { useKeyboardInsets } from '@/hooks/useKeyboardInsets';
 
 interface MessageInputProps {
   onSendMessage: (content: string) => Promise<void>;
@@ -20,6 +21,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const [sending, setSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { isMobile } = useViewport();
+  const keyboardPadding = useKeyboardInsets();
 
   const handleSend = async () => {
     if (!message.trim() || sending || disabled) return;
@@ -68,7 +70,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   return (
-    <div className="sticky bottom-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 p-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]">
+    <div className="sticky bottom-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 p-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]" style={{ bottom: keyboardPadding }}>
       <div className="flex gap-2 items-end">
         <div className="flex-1 relative">
           <Textarea

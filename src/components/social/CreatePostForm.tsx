@@ -13,17 +13,19 @@ interface CreatePostFormProps {
   onSubmit: (content: string, images: File[], isStory: boolean) => Promise<void>;
   isSubmitting: boolean;
   onClose: () => void;
+  defaultIsStory?: boolean;
 }
 
 export const CreatePostForm: React.FC<CreatePostFormProps> = ({
   onSubmit,
   isSubmitting,
   onClose,
+  defaultIsStory = false,
 }) => {
   const [content, setContent] = useState('');
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [isStory, setIsStory] = useState(false);
+  const [isStory, setIsStory] = useState(defaultIsStory ?? false);
   const { toast } = useToast();
 
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {

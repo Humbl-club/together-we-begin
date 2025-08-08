@@ -53,6 +53,7 @@ const Social: React.FC = () => {
   const [stories, setStories] = useState<PostWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreatePost, setShowCreatePost] = useState(false);
+  const [defaultIsStory, setDefaultIsStory] = useState(false);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
   const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
@@ -446,13 +447,13 @@ const Social: React.FC = () => {
         </div>
       )}
       {/* Stories Section */}
-      <StoriesBar stories={stories} isMobile={isMobile} />
+      <StoriesBar stories={stories} isMobile={isMobile} onAddStory={() => { setDefaultIsStory(true); setShowCreatePost(true); }} />
 
       {/* Create Post Button */}
       {!showCreatePost && (
         <Card className="glass-card p-4 mb-4">
           <button
-            onClick={() => setShowCreatePost(true)}
+            onClick={() => { setDefaultIsStory(false); setShowCreatePost(true); }}
             className="w-full text-left p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
           >
             What's on your mind?
@@ -466,6 +467,7 @@ const Social: React.FC = () => {
           onSubmit={handleCreatePost}
           isSubmitting={isSubmitting}
           onClose={() => setShowCreatePost(false)}
+          defaultIsStory={defaultIsStory}
         />
       )}
 

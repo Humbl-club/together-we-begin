@@ -24,9 +24,10 @@ interface Post {
 interface StoriesBarProps {
   stories: Post[];
   isMobile: boolean;
+  onAddStory?: () => void;
 }
 
-export const StoriesBar: React.FC<StoriesBarProps> = ({ stories, isMobile }) => {
+export const StoriesBar: React.FC<StoriesBarProps> = ({ stories, isMobile, onAddStory }) => {
   if (stories.length === 0) return null;
 
   return (
@@ -38,7 +39,14 @@ export const StoriesBar: React.FC<StoriesBarProps> = ({ stories, isMobile }) => 
         <div className={`flex ${isMobile ? 'gap-5' : 'gap-6'} overflow-x-auto pb-3 scrollbar-hide ios-scroll`}>
           {/* Add Story Button */}
           <div className="flex-shrink-0 text-center touch-target-large">
-            <div className={`${isMobile ? 'w-20 h-20' : 'w-24 h-24'} rounded-full bg-gradient-to-br from-primary/25 to-primary/15 border-3 border-dashed border-primary/40 flex items-center justify-center hover:border-primary/60 transition-all duration-500 cursor-pointer shadow-lg hover:shadow-xl hover:scale-105 active:scale-95`}>
+            <div
+              className={`${isMobile ? 'w-20 h-20' : 'w-24 h-24'} rounded-full bg-gradient-to-br from-primary/25 to-primary/15 border-3 border-dashed border-primary/40 flex items-center justify-center hover:border-primary/60 transition-all duration-500 cursor-pointer shadow-lg hover:shadow-xl hover:scale-105 active:scale-95`}
+              role="button"
+              tabIndex={0}
+              aria-label="Add Story"
+              onClick={onAddStory}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onAddStory?.(); }}
+            >
               <Plus className={`${isMobile ? 'w-8 h-8' : 'w-10 h-10'} text-primary`} strokeWidth={2.5} />
             </div>
             <p className={`text-xs mt-2 truncate ${isMobile ? 'w-20' : 'w-24'} font-bold text-primary`}>

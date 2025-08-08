@@ -278,6 +278,18 @@ const UltimateEventsPage = memo(() => {
     }));
   }, [events, searchQuery, activeFilters, sortBy, savedEvents]);
 
+  // Featured event (only on Upcoming, when no search/filters)
+  const featuredEvent = useMemo(() => {
+    if (activeTab !== 'upcoming' || searchQuery || activeFilters.length > 0) return null;
+    return filteredEvents[0] || null;
+  }, [activeTab, searchQuery, activeFilters, filteredEvents]);
+
+  // Exclude featured from listings below
+  const displayedEvents = useMemo(() => {
+    if (!featuredEvent) return filteredEvents;
+    return filteredEvents.filter((e) => e.id !== featuredEvent.id);
+  }, [filteredEvents, featuredEvent]);
+
   // Real-time event updates
   useEffect(() => {
     const unsubscribeCreated = eventBus.on('event:created', () => {
@@ -480,6 +492,20 @@ const UltimateEventsPage = memo(() => {
           </div>
         </div>
 
+        {/* Featured Event */}
+        {featuredEvent && (
+          <div className="glass-card-enhanced p-0">
+            <EnhancedEventCard
+              event={featuredEvent}
+              onRegister={handleRegister}
+              onViewDetails={(id) => console.log('View details:', id)}
+              onSave={handleSaveEvent}
+              onShare={handleShareEvent}
+              variant="featured"
+            />
+          </div>
+        )}
+
         {/* Search & Filters */}
         <div className="glass-card-enhanced mobile:p-3 sm:p-4 lg:p-6">
           <EventSearch
@@ -547,7 +573,7 @@ const UltimateEventsPage = memo(() => {
                     <div key={i} className="glass-card mobile:h-32 sm:h-40 rounded-xl animate-pulse" />
                   ))}
                 </div>
-              ) : filteredEvents.length === 0 ? (
+               ) : displayedEvents.length === 0 ? (
                 <EmptyState
                   icon={searchQuery || activeFilters.length > 0 ? <Search className="w-full h-full" /> : <Calendar className="w-full h-full" />}
                   title={searchQuery || activeFilters.length > 0 
@@ -574,13 +600,13 @@ const UltimateEventsPage = memo(() => {
                   {/* Mobile-first event list */}
                   {isMobileOptimized ? (
                     <div className="space-y-3">
-                      {filteredEvents.slice(0, 10).map((event, index) => renderEventCard(event, index))}
+                      {displayedEvents.slice(0, 10).map((event, index) => renderEventCard(event, index))}
                       
-                      {filteredEvents.length > 10 && (
+                      {displayedEvents.length > 10 && (
                         <div className="text-center pt-4">
                           <Button variant="outline" className="w-full">
                             <Plus className="w-4 h-4 mr-2" />
-                            Load More Events ({filteredEvents.length - 10} remaining)
+                            Load More Events ({displayedEvents.length - 10} remaining)
                           </Button>
                         </div>
                       )}
@@ -590,13 +616,13 @@ const UltimateEventsPage = memo(() => {
                       'grid gap-4',
                       viewMode === 'grid' ? 'sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
                     )}>
-                      {filteredEvents.slice(0, 12).map((event, index) => renderEventCard(event, index))}
+                      {displayedEvents.slice(0, 12).map((event, index) => renderEventCard(event, index))}
                       
-                      {filteredEvents.length > 12 && (
+                      {displayedEvents.length > 12 && (
                         <div className="col-span-full text-center pt-4">
                           <Button variant="outline">
                             <Plus className="w-4 h-4 mr-2" />
-                            Load More Events ({filteredEvents.length - 12} remaining)
+                            Load More Events ({displayedEvents.length - 12} remaining)
                           </Button>
                         </div>
                       )}

@@ -93,9 +93,9 @@ export const EnhancedEventCard = memo(({
   ), [variant, className]);
 
   const statusBadge = useMemo(() => {
-    if (event.isToday) return { text: 'Today', className: 'bg-red-500 text-white' };
-    if (event.isUpcoming) return { text: 'Upcoming', className: 'bg-blue-500 text-white' };
-    return { text: 'Past', className: 'bg-gray-500 text-white' };
+    if (event.isToday) return { text: 'Today', className: 'bg-destructive text-destructive-foreground' };
+    if (event.isUpcoming) return { text: 'Upcoming', className: 'bg-primary text-primary-foreground' };
+    return { text: 'Past', className: 'bg-muted text-muted-foreground' };
   }, [event.isToday, event.isUpcoming]);
 
   const priceDisplay = useMemo(() => {
@@ -107,6 +107,21 @@ export const EnhancedEventCard = memo(({
     }
     return 'Free';
   }, [event.loyalty_points_price, event.price_cents]);
+
+  const capacityPct = useMemo(() => {
+    if (typeof event.capacityPercentage === 'number') return event.capacityPercentage;
+    if (event.max_capacity && typeof event.current_capacity === 'number') {
+      return Math.round((Math.min(event.current_capacity, event.max_capacity) / event.max_capacity) * 100);
+    }
+    return 0;
+  }, [event.capacityPercentage, event.max_capacity, event.current_capacity]);
+
+  const capacityBadge = useMemo(() => {
+    if (!event.max_capacity) return null as null | { text: string; cls: string };
+    if (capacityPct >= 90) return { text: 'Almost full', cls: 'bg-destructive text-destructive-foreground' };
+    if (capacityPct >= 60) return { text: 'Filling fast', cls: 'bg-accent text-accent-foreground' };
+    return { text: 'Spots available', cls: 'bg-primary/10 text-primary' };
+  }, [capacityPct, event.max_capacity]);
 
   const handleSave = useCallback(async () => {
     if (isSaving) return;
@@ -335,21 +350,27 @@ export const EnhancedEventCard = memo(({
           <div className="space-y-2 mt-3">
             {event.max_capacity && (
               <div className="space-y-1">
-                <div className="flex justify-between text-xs text-muted-foreground">
+                <div className="flex justify-between items-center text-xs text-muted-foreground">
                   <span>Capacity</span>
-                  <span>{event.current_capacity}/{event.max_capacity}</span>
+                  <div className="flex items-center gap-2">
+                    {capacityBadge && (
+                      <Badge className={cn('text-[10px] px-1.5 py-0.5', capacityBadge.cls)}>
+                        {capacityBadge.text}
+                      </Badge>
+                    )}
+                    <span>{event.current_capacity}/{event.max_capacity}</span>
+                  </div>
                 </div>
                 <div className="w-full bg-muted rounded-full h-1.5">
                   <div
                     className={cn(
-                      'h-1.5 rounded-full transition-all duration-300',
-                      event.capacityPercentage && event.capacityPercentage > 80 
-                        ? 'bg-red-500' 
-                        : event.capacityPercentage && event.capacityPercentage > 60 
-                        ? 'bg-yellow-500' 
-                        : 'bg-green-500'
+                      capacityPct > 80 
+                        ? 'bg-destructive' 
+                        : capacityPct > 60 
+                        ? 'bg-accent' 
+                        : 'bg-primary'
                     )}
-                    style={{ width: `${event.capacityPercentage || 0}%` }}
+                    style={{ width: `${capacityPct}%` }}
                   />
                 </div>
               </div>

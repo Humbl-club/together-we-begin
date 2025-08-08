@@ -10,6 +10,9 @@ import { Activity, Heart, Target, TrendingUp, Calendar, Plus, Award } from 'luci
 import { Layout } from '@/components/layout/Layout';
 import WellnessWidget from '@/components/wellness/WellnessWidget';
 import { useToast } from '@/hooks/use-toast';
+import { SEO } from '@/components/seo/SEO';
+import { PageSection } from '@/components/sections/PageSection';
+import { SectionHeader } from '@/components/sections/SectionHeader';
 
 export default function Wellness() {
   const [weeklyGoals, setWeeklyGoals] = useState({
@@ -59,15 +62,12 @@ export default function Wellness() {
 
   return (
     <Layout>
+      <SEO title="Wellness" description="Track your health and wellness journey." canonical="/wellness" />
       <div className="container mx-auto p-6">
         <div className="space-y-6">
-          <div className="flex items-center gap-3">
-            <Activity className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-3xl font-bold">Wellness Dashboard</h1>
-              <p className="text-muted-foreground">Track your health and wellness journey</p>
-            </div>
-          </div>
+          <PageSection surface="accent" className="mb-2">
+            <SectionHeader title="Wellness" subtitle="Track your health and wellness journey" />
+          </PageSection>
 
           <Tabs defaultValue="today" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
@@ -86,7 +86,7 @@ export default function Wellness() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Heart className="h-5 w-5 text-red-500" />
+                      <Heart className="h-5 w-5 text-primary" />
                       Quick Actions
                     </CardTitle>
                   </CardHeader>
@@ -109,7 +109,7 @@ export default function Wellness() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Calendar className="h-5 w-5 text-blue-500" />
+                      <Calendar className="h-5 w-5 text-accent" />
                       This Week
                     </CardTitle>
                   </CardHeader>
@@ -182,21 +182,21 @@ export default function Wellness() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                      <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                         <div>
-                          <p className="font-semibold text-green-800">Great Progress!</p>
-                          <p className="text-sm text-green-600">You're 65% towards your weekly goals</p>
+                          <p className="font-semibold text-foreground">Great Progress!</p>
+                          <p className="text-sm text-muted-foreground">You're 65% towards your weekly goals</p>
                         </div>
-                        <TrendingUp className="h-8 w-8 text-green-500" />
+                        <TrendingUp className="h-8 w-8 text-primary" />
                       </div>
                       
                       <div className="grid grid-cols-2 gap-3 text-center">
                         <div className="p-3 border rounded-lg">
-                          <div className="text-2xl font-bold text-blue-500">3</div>
+                          <div className="text-2xl font-bold text-primary">3</div>
                           <div className="text-xs text-muted-foreground">Days Active</div>
                         </div>
                         <div className="p-3 border rounded-lg">
-                          <div className="text-2xl font-bold text-green-500">2</div>
+                          <div className="text-2xl font-bold text-accent">2</div>
                           <div className="text-xs text-muted-foreground">Goals Met</div>
                         </div>
                       </div>
@@ -247,16 +247,16 @@ export default function Wellness() {
                       <div className="p-4 border rounded-lg">
                         <h4 className="font-semibold mb-2">Weight Trend</h4>
                         <div className="flex items-center gap-2">
-                          <TrendingUp className="h-4 w-4 text-green-500" />
-                          <span className="text-sm text-green-600">Stable over the last 30 days</span>
+                          <TrendingUp className="h-4 w-4 text-primary" />
+                          <span className="text-sm text-muted-foreground">Stable over the last 30 days</span>
                         </div>
                       </div>
                       
                       <div className="p-4 border rounded-lg">
                         <h4 className="font-semibold mb-2">Heart Rate</h4>
                         <div className="flex items-center gap-2">
-                          <Heart className="h-4 w-4 text-red-500" />
-                          <span className="text-sm text-gray-600">Average: 72 bpm (Excellent)</span>
+                          <Heart className="h-4 w-4 text-primary" />
+                          <span className="text-sm text-muted-foreground">Average: 72 bpm (Excellent)</span>
                         </div>
                       </div>
                     </div>
@@ -269,7 +269,7 @@ export default function Wellness() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Award className="h-5 w-5 text-yellow-500" />
+                    <Award className="h-5 w-5 text-accent" />
                     Your Achievements
                   </CardTitle>
                 </CardHeader>
@@ -279,7 +279,7 @@ export default function Wellness() {
                       <div
                         key={achievement.id}
                         className={`p-4 border rounded-lg flex items-center gap-3 ${
-                          achievement.earned ? 'bg-yellow-50 border-yellow-200' : 'opacity-50'
+                          achievement.earned ? 'bg-accent/10 border-accent/30' : 'opacity-50'
                         }`}
                       >
                         <div className="text-2xl">{achievement.icon}</div>
@@ -288,7 +288,7 @@ export default function Wellness() {
                           <p className="text-sm text-muted-foreground">{achievement.description}</p>
                         </div>
                         {achievement.earned && (
-                          <Badge className="bg-yellow-500">Earned!</Badge>
+                          <Badge variant="secondary">Earned!</Badge>
                         )}
                       </div>
                     ))}

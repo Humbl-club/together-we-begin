@@ -68,6 +68,31 @@ const Dashboard: React.FC = memo(() => {
       >
         <div className="desktop-dashboard-container p-6 space-y-6 ml-20">
           <DashboardHeader profile={profile} />
+
+          {/* Hero Strip */}
+          <section className="relative overflow-hidden rounded-2xl bg-editorial-hero">
+            <div className="glass-card p-6 flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-semibold font-display tracking-tight text-foreground">
+                  Welcome back, {profile?.full_name?.split(' ')[0] || 'Friend'} ✨
+                </h1>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Let’s make today empowering and fun.
+                </p>
+              </div>
+              <div className="hidden md:flex gap-2">
+                <Button variant="secondary" size="sm" className="touch-target">
+                  <Zap className="w-4 h-4 mr-2" />
+                  Start Challenge
+                </Button>
+                <Button variant="outline" size="sm" className="touch-target">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Create Event
+                </Button>
+              </div>
+            </div>
+          </section>
+
           <StatsGrid stats={stats} />
           
           <div className="responsive-grid lg:grid-cols-3">

@@ -10,6 +10,9 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Layout } from '@/components/layout/Layout';
 import { RealtimeProvider } from '@/contexts/RealtimeContext';
 import NotificationService from '@/services/notificationService';
+import { BrandProvider } from '@/contexts/BrandContext';
+import { TenantProvider } from '@/contexts/TenantContext';
+import { FeatureFlagsProvider } from '@/contexts/FeatureFlagsContext';
 
 // Create a page loader component
 const PageLoader = () => (
@@ -157,74 +160,80 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            <RealtimeProvider>
-              <LazyBoundary>
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
-                  {/* Public routes */}
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<Auth />} />
-                  
-                  {/* Protected routes */}
-                  <Route path="/dashboard" element={
-                    <ProtectedRoute>
-                      <Layout><Dashboard /></Layout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/social" element={
-                    <ProtectedRoute>
-                      <Layout><Social /></Layout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/events" element={
-                    <ProtectedRoute>
-                      <Layout><Events /></Layout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/challenges" element={
-                    <ProtectedRoute>
-                      <Layout><Challenges /></Layout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/profile" element={
-                    <ProtectedRoute>
-                      <Layout><Profile /></Layout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/messages" element={
-                    <ProtectedRoute>
-                      <Layout><Messages /></Layout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/admin" element={
-                    <ProtectedRoute requireAdmin>
-                      <Layout><Admin /></Layout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/admin/performance" element={
-                    <ProtectedRoute requireAdmin>
-                      <Layout><PerformanceMonitor /></Layout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/settings" element={
-                    <ProtectedRoute>
-                      <Layout><Settings /></Layout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/qr-scanner" element={
-                    <ProtectedRoute>
-                      <Layout><QRScanner /></Layout>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-              </LazyBoundary>
-            </RealtimeProvider>
-          </AuthProvider>
-        </BrowserRouter>
+        <BrandProvider>
+          <FeatureFlagsProvider>
+            <TenantProvider>
+              <BrowserRouter>
+                <AuthProvider>
+                  <RealtimeProvider>
+                    <LazyBoundary>
+                    <Suspense fallback={<PageLoader />}>
+                      <Routes>
+                        {/* Public routes */}
+                        <Route path="/" element={<Index />} />
+                        <Route path="/auth" element={<Auth />} />
+                        
+                        {/* Protected routes */}
+                        <Route path="/dashboard" element={
+                          <ProtectedRoute>
+                            <Layout><Dashboard /></Layout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/social" element={
+                          <ProtectedRoute>
+                            <Layout><Social /></Layout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/events" element={
+                          <ProtectedRoute>
+                            <Layout><Events /></Layout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/challenges" element={
+                          <ProtectedRoute>
+                            <Layout><Challenges /></Layout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/profile" element={
+                          <ProtectedRoute>
+                            <Layout><Profile /></Layout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/messages" element={
+                          <ProtectedRoute>
+                            <Layout><Messages /></Layout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/admin" element={
+                          <ProtectedRoute requireAdmin>
+                            <Layout><Admin /></Layout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/admin/performance" element={
+                          <ProtectedRoute requireAdmin>
+                            <Layout><PerformanceMonitor /></Layout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/settings" element={
+                          <ProtectedRoute>
+                            <Layout><Settings /></Layout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/qr-scanner" element={
+                          <ProtectedRoute>
+                            <Layout><QRScanner /></Layout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </Suspense>
+                    </LazyBoundary>
+                  </RealtimeProvider>
+                </AuthProvider>
+              </BrowserRouter>
+            </TenantProvider>
+          </FeatureFlagsProvider>
+        </BrandProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

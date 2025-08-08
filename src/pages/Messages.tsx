@@ -4,11 +4,13 @@ import { MessageErrorBoundary } from '@/components/messaging/MessageErrorBoundar
 import { MessageCircle } from 'lucide-react';
 import { MobileLoading } from '@/components/ui/mobile-loading';
 import { useState, useEffect } from 'react';
+import { SEO } from '@/components/seo/SEO';
 
 export default function Messages() {
 
   return (
     <Layout>
+      <SEO title="Private Messages" description="Secure, end-to-end encrypted messages with your community." canonical="/messages" />
       <div className="container mx-auto p-6">
         <div className="space-y-6">
           <div className="flex items-center gap-3">

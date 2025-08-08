@@ -8,6 +8,7 @@ import { ArrowLeft, MessageCircle, Lock, MoreVertical, Phone, Video } from 'luci
 import { useViewport } from '@/hooks/use-mobile';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { formatDistanceToNow } from 'date-fns';
+import { useKeyboardInsets } from '@/hooks/useKeyboardInsets';
 
 interface MessageViewProps {
   thread: MessageThread | null;
@@ -29,6 +30,7 @@ export const MessageView: React.FC<MessageViewProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { isMobile } = useViewport();
   const { user } = useAuth();
+  const keyboardPadding = useKeyboardInsets();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -143,7 +145,7 @@ export const MessageView: React.FC<MessageViewProps> = ({
       
       {/* Messages */}
       <CardContent className="flex-1 p-0 flex flex-col min-h-0">
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ paddingBottom: keyboardPadding }}>
           {loading ? (
             <div className="flex justify-center py-8">
               <div className="animate-pulse text-muted-foreground">Loading messages...</div>

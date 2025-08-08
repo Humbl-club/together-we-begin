@@ -17,6 +17,7 @@ import { PerformanceMonitorService } from '@/services/core/PerformanceMonitorSer
 import { Calendar, Plus, Grid3X3, List, LayoutGrid, Search, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MobileLoading } from '@/components/ui/mobile-loading';
+import { SEO } from '@/components/seo/SEO';
 
 // Ultimate Events Page with enterprise architecture
 const UltimateEventsPage = memo(() => {
@@ -270,7 +271,7 @@ const UltimateEventsPage = memo(() => {
 
   return (
     <div className="min-h-screen bg-background mobile:p-2 sm:p-4 lg:p-6 safe-area-top" data-pull-refresh>
-      {/* Pull to refresh indicator - only visible on mobile */}
+      <SEO title="Events" description="Discover and join girls-only meetups, workshops, and activities." canonical="/events" />
       {isMobileOptimized && (
         <div className="pull-refresh-indicator">
           <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>

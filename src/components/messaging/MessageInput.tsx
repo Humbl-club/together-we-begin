@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send, Lock, Smile } from 'lucide-react';
 import { useViewport } from '@/hooks/use-mobile';
+import { toast } from '@/hooks/use-toast';
 
 interface MessageInputProps {
   onSendMessage: (content: string) => Promise<void>;
@@ -39,7 +40,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       const errorMessage = error?.message || 'Failed to send message';
       
       // You can add a toast notification here if you have access to toast
-      // For now, we'll just log it and let the parent component handle it
+      toast({ title: 'Message not sent', description: errorMessage, variant: 'destructive' });
       if (errorMessage.includes('Rate limit')) {
         console.warn('Rate limit reached - please wait before sending another message');
       }
@@ -67,7 +68,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   return (
-    <div className="border-t bg-background p-4">
+    <div className="sticky bottom-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 p-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]">
       <div className="flex gap-2 items-end">
         <div className="flex-1 relative">
           <Textarea
@@ -83,6 +84,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             disabled={disabled || sending}
             rows={1}
             autoComplete="off"
+            inputMode="text"
+            autoCapitalize="sentences"
+            autoCorrect="on"
           />
           <div className="absolute right-3 bottom-3 flex items-center gap-1">
             <button

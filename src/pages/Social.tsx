@@ -17,6 +17,7 @@ import { PostWithProfile, Profile, CommentWithProfile } from '@/types/database.t
 import { CreatePostForm } from '@/components/social/CreatePostForm';
 import { PostList } from '@/components/social/PostList';
 import { StoriesBar } from '@/components/social/StoriesBar';
+import { SEO } from '@/components/seo/SEO';
 
 interface Post {
   id: string;
@@ -437,6 +438,7 @@ const Social: React.FC = () => {
 
   return (
     <div className={`container mx-auto ${isMobile ? 'p-mobile' : 'max-w-2xl p-mobile'} space-mobile`} data-pull-refresh>
+      <SEO title="Social Feed" description="Share stories, posts, and connect with your community." canonical="/social" />
       {/* Pull to refresh indicator - only visible on mobile */}
       {isMobile && (
         <div className="pull-refresh-indicator">

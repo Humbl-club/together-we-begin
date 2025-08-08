@@ -11,11 +11,13 @@ export const HealthIntegrationService: HealthIntegrationAPI = {
     try {
       if (!Capacitor.isNativePlatform()) return false;
       if (Capacitor.getPlatform() === 'android') {
-        // Dynamically import Health Connect on Android only
         const mod = await import(/* @vite-ignore */ '@pianissimoproject/capacitor-health-connect').catch(() => null as any);
         return Boolean(mod?.HealthConnect);
       }
-      // iOS HealthKit: to be added once a plugin is selected
+      if (Capacitor.getPlatform() === 'ios') {
+        const hk = await import(/* @vite-ignore */ '@perfood/capacitor-healthkit').catch(() => null as any);
+        return Boolean(hk?.HealthKit);
+      }
       return false;
     } catch {
       return false;
@@ -33,6 +35,25 @@ export const HealthIntegrationService: HealthIntegrationAPI = {
             read: [{ dataType: 'Steps' }],
           } as any);
           return true;
+        }
+      }
+      if (Capacitor.getPlatform() === 'ios') {
+        const hk = await import(/* @vite-ignore */ '@perfood/capacitor-healthkit').catch(() => null as any);
+        if (hk?.HealthKit) {
+          try {
+            // Prefer requestPermissions if available
+            if (typeof hk.HealthKit.requestPermissions === 'function') {
+              const res = await hk.HealthKit.requestPermissions({
+                read: ['steps'] as any,
+              } as any);
+              return !!res;
+            }
+            // Fallback: requestAuthorization
+            if (typeof hk.HealthKit.requestAuthorization === 'function') {
+              await hk.HealthKit.requestAuthorization({ read: ['steps'] } as any);
+              return true;
+            }
+          } catch {}
         }
       }
       return false;
@@ -56,6 +77,37 @@ export const HealthIntegrationService: HealthIntegrationAPI = {
           } as any);
           const total = ((res as any)?.records || []).reduce((sum: number, r: any) => sum + (r.count || r.value || 0), 0);
           return Number.isFinite(total) ? total : null;
+        }
+      }
+      if (Capacitor.getPlatform() === 'ios') {
+        const hk = await import(/* @vite-ignore */ '@perfood/capacitor-healthkit').catch(() => null as any);
+        if (hk?.HealthKit) {
+          const end = new Date();
+          const start = new Date();
+          start.setHours(0, 0, 0, 0);
+          try {
+            // Try common sum API names
+            if (typeof hk.HealthKit.queryQuantitySum === 'function') {
+              const res = await hk.HealthKit.queryQuantitySum({
+                sampleType: 'steps',
+                unit: 'count',
+                startDate: start.toISOString(),
+                endDate: end.toISOString(),
+              } as any);
+              const value = (res as any)?.value ?? null;
+              return typeof value === 'number' ? value : null;
+            }
+            if (typeof hk.HealthKit.sumQuantitySamples === 'function') {
+              const res = await hk.HealthKit.sumQuantitySamples({
+                sampleType: 'steps',
+                unit: 'count',
+                startDate: start.toISOString(),
+                endDate: end.toISOString(),
+              } as any);
+              const value = (res as any)?.value ?? null;
+              return typeof value === 'number' ? value : null;
+            }
+          } catch {}
         }
       }
       return null;

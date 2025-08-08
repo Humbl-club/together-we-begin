@@ -11,6 +11,7 @@ import MobileDashboard from './MobileDashboard';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import StatsGrid from '@/components/dashboard/StatsGrid';
 import WellnessWidget from '@/components/wellness/WellnessWidget';
+import HealthPermissionPrompt from '@/components/wellness/HealthPermissionPrompt';
 import UpcomingEvents from '@/components/dashboard/UpcomingEvents';
 import CommunityFeed from '@/components/dashboard/CommunityFeed';
 import WelcomeFlow from '@/components/onboarding/WelcomeFlow';
@@ -76,6 +77,7 @@ const Dashboard: React.FC = memo(() => {
             </div>
 
             <div className="space-y-6">
+              <HealthPermissionPrompt onConnected={() => refetch()} />
               <WellnessWidget onChallengeSync={(challengeId) => console.log('Sync challenge:', challengeId)} />
 
               <Card className="card-secondary">

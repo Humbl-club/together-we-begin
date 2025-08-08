@@ -71,3 +71,33 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+---
+
+## Mobile Health Integrations (Apple Health / Android Health Connect)
+
+This app can optionally read today’s steps natively to power wellness challenges.
+
+- Android: Health Connect via `@pianissimoproject/capacitor-health-connect`
+- iOS: Apple HealthKit via `@perfood/capacitor-healthkit`
+
+### Enable on your device
+1. Export your project and clone locally
+2. `npm install`
+3. Add platforms: `npx cap add ios` and/or `npx cap add android`
+4. `npx cap sync`
+5. `npm run build`
+6. Run on device: `npx cap run ios` or `npx cap run android`
+
+### iOS setup
+- In Xcode, enable the HealthKit capability for the iOS target
+- Add Info.plist usage description:
+  - `NSHealthShareUsageDescription` with a message like: “We use your step count to track challenge progress.”
+- Ensure the app requests read permission for steps (handled in-code)
+
+### Android setup
+- Ensure Google Health Connect is installed on the device
+- The app will request read permission for “Steps” at runtime (handled in-code)
+
+Once permissions are granted, the Dashboard will show a “Sync your steps” prompt to connect, then pull today’s steps.
+

@@ -19,6 +19,7 @@
     "@faker-js/faker": "^9.9.0",
     "@hookform/resolvers": "^3.9.0",
     "@mswjs/data": "^0.16.2",
+    "@pianissimoproject/capacitor-health-connect": "^0.7.1",
     "@playwright/test": "^1.54.1",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",

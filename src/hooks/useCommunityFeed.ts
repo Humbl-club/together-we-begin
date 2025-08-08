@@ -79,19 +79,60 @@ export const useCommunityFeed = (userId?: string) => {
   };
 
   const toggleLike = async (postId: string) => {
-    // For demo purposes, just increment the like count
-    setPosts(prev => prev.map(post => 
-      post.id === postId 
-        ? { ...post, likes_count: post.likes_count + 1 }
-        : post
-    ));
+    if (!userId) {
+      console.warn('toggleLike called without userId');
+      return;
+    }
+
+    try {
+      // Check if user already liked the post
+      const { data: existingLike, error: likeCheckError } = await supabase
+        .from('post_likes')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (likeCheckError) throw likeCheckError;
+
+      if (existingLike) {
+        // Unlike
+        const { error: deleteError } = await supabase
+          .from('post_likes')
+          .delete()
+          .eq('id', existingLike.id);
+        if (deleteError) throw deleteError;
+
+        // Optimistic UI
+        setPosts(prev => prev.map(post =>
+          post.id === postId
+            ? { ...post, likes_count: Math.max(0, post.likes_count - 1) }
+            : post
+        ));
+      } else {
+        // Like
+        const { error: insertError } = await supabase
+          .from('post_likes')
+          .insert([{ post_id: postId, user_id: userId }]);
+        if (insertError) throw insertError;
+
+        // Optimistic UI
+        setPosts(prev => prev.map(post =>
+          post.id === postId
+            ? { ...post, likes_count: post.likes_count + 1 }
+            : post
+        ));
+      }
+    } catch (err) {
+      console.error('Error toggling like:', err);
+    }
   };
 
   // Optimized real-time subscription
   useOptimizedRealtime(userId, [
     {
       table: 'social_posts',
-      events: ['INSERT'],
+      events: ['INSERT', 'UPDATE'],
       filter: 'status=eq.active',
       onUpdate: () => fetchPosts(),
       debounceMs: 1000

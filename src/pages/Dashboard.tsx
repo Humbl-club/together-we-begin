@@ -21,6 +21,7 @@ import { EnhancedErrorBoundary } from '@/hooks/useEnhancedErrorBoundary';
 import { MobileContainer } from '@/components/ui/mobile-container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { SEO } from '@/components/seo/SEO';
 import { Calendar, Users, Zap } from 'lucide-react';
 
 const Dashboard: React.FC = memo(() => {
@@ -54,6 +55,7 @@ const Dashboard: React.FC = memo(() => {
   if (isMobile) {
     return (
       <div className="mobile-app-container" data-pull-refresh>
+        <SEO title="Dashboard" description="Your community, events, and wellness at a glance." canonical="/dashboard" />
         <MobileDashboard />
       </div>
     );
@@ -67,6 +69,7 @@ const Dashboard: React.FC = memo(() => {
         allowRetry={true}
       >
         <div className="desktop-dashboard-container p-6 space-y-6 ml-20">
+          <SEO title="Dashboard" description="Your community, events, and wellness at a glance." canonical="/dashboard" />
           <DashboardHeader profile={profile} />
 
           {/* Hero Strip */}

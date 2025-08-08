@@ -8,6 +8,8 @@ import { Heart, MessageCircle, Sparkles } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Tables } from '@/integrations/supabase/types';
 import { PostComments } from './PostComments';
+import { MobileTypography } from '@/components/ui/mobile-typography';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 
 interface PostListProps {
   posts: Tables<'social_posts'>[];
@@ -61,9 +63,9 @@ export const PostList: React.FC<PostListProps> = ({
         const showComments = expandedComments.has(post.id);
 
         return (
-          <Card key={post.id} className="glass-card p-4 space-y-4">
+          <Card key={post.id} className="card-secondary glass-card hover:shadow-lg transition-shadow p-4 space-y-4">
             {/* Post Header */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-3">
               <Avatar>
                 <img
                   src={profile?.avatar_url || `https://ui-avatars.com/api/?name=${profile?.full_name || 'User'}`}
@@ -72,25 +74,32 @@ export const PostList: React.FC<PostListProps> = ({
                 />
               </Avatar>
               <div className="flex-1">
-                <p className="font-semibold">{profile?.full_name || 'Anonymous'}</p>
-                <p className="text-sm text-muted-foreground">
+                <MobileTypography variant="body" weight="semibold">
+                  {profile?.full_name || 'Anonymous'}
+                </MobileTypography>
+                <MobileTypography variant="caption" className="text-muted-foreground">
                   {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
-                </p>
+                </MobileTypography>
               </div>
             </div>
 
             {/* Post Content */}
-            <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
+            {post.content && (
+              <MobileTypography variant="body" className="whitespace-pre-wrap">
+                {post.content}
+              </MobileTypography>
+            )}
 
             {/* Post Images */}
             {post.image_urls && post.image_urls.length > 0 && (
               <div className="grid grid-cols-2 gap-2">
                 {post.image_urls.map((url, index) => (
-                  <img
+                  <OptimizedImage
                     key={generateMediaKey(url, index)}
                     src={url}
                     alt={`Post image ${index + 1}`}
-                    className="rounded-lg w-full h-48 object-cover"
+                    className="rounded-lg h-48"
+                    aspectRatio="auto"
                   />
                 ))}
               </div>
@@ -102,7 +111,9 @@ export const PostList: React.FC<PostListProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => onLike(post.id)}
-                className={isLiked ? 'text-red-500' : ''}
+                className={isLiked ? 'text-primary' : ''}
+                aria-pressed={isLiked}
+                aria-label={isLiked ? 'Unlike' : 'Like'}
               >
                 <Heart className={`w-4 h-4 mr-1 ${isLiked ? 'fill-current' : ''}`} />
                 {likeCount}

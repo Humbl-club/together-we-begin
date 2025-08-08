@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useRealtime } from '@/contexts/RealtimeContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,6 +18,10 @@ import { CreatePostForm } from '@/components/social/CreatePostForm';
 import { PostList } from '@/components/social/PostList';
 import { StoriesBar } from '@/components/social/StoriesBar';
 import { SEO } from '@/components/seo/SEO';
+import { PageSection } from '@/components/sections/PageSection';
+import { SectionHeader } from '@/components/sections/SectionHeader';
+import { FilterChips } from '@/components/sections/FilterChips';
+import { AnnouncementBanner } from '@/components/sections/AnnouncementBanner';
 
 interface Post {
   id: string;
@@ -65,6 +69,20 @@ const Social: React.FC = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { usePullToRefresh } = useProgressiveEnhancement();
+
+  // Filters UI state (client-side only, no business logic changes)
+  const [filter, setFilter] = useState<'all' | 'media' | 'trending' | 'latest'>('all');
+  const displayedPosts = useMemo(() => {
+    let list = [...posts];
+    if (filter === 'media') {
+      list = list.filter((p) => Array.isArray(p.image_urls) && p.image_urls.length > 0);
+    }
+    if (filter === 'latest') {
+      list = list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+    // Trending falls back to latest for now (no server changes)
+    return list;
+  }, [posts, filter]);
 
   // Add pull to refresh functionality
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -440,16 +458,27 @@ const Social: React.FC = () => {
   return (
     <div className={`container mx-auto ${isMobile ? 'p-mobile' : 'max-w-2xl p-mobile'} space-mobile pb-[env(safe-area-inset-bottom,0px)]`} data-pull-refresh>
       <SEO title="Social Feed" description="Share stories, posts, and connect with your community." canonical="/social" />
-      {/* Pull to refresh indicator - only visible on mobile */}
-      {isMobile && (
-        <div className="pull-refresh-indicator">
-          <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
-        </div>
-      )}
-      {/* Stories Section */}
-      <StoriesBar stories={stories} isMobile={isMobile} onAddStory={() => { setDefaultIsStory(true); setShowCreatePost(true); }} />
 
-      {/* Create Post Button */}
+      <PageSection surface="accent" className="mb-4">
+        <AnnouncementBanner
+          id="community-guidelines"
+          title="Community Guidelines"
+          message={
+            <span>
+              Be kind, supportive, and respectful. This is a women-only space—report anything that doesn’t feel right.
+            </span>
+          }
+          variant="info"
+        />
+      </PageSection>
+
+      {/* Stories Section */}
+      <PageSection className="mb-3">
+        <SectionHeader title="Stories" subtitle="Highlights from your community" />
+        <StoriesBar stories={stories} isMobile={isMobile} onAddStory={() => { setDefaultIsStory(true); setShowCreatePost(true); }} />
+      </PageSection>
+
+      {/* Composer */}
       {!showCreatePost && (
         <Card className="glass-card p-4 mb-4">
           <button
@@ -461,7 +490,6 @@ const Social: React.FC = () => {
         </Card>
       )}
 
-      {/* Create Post Section */}
       {showCreatePost && (
         <CreatePostForm
           onSubmit={handleCreatePost}
@@ -471,9 +499,25 @@ const Social: React.FC = () => {
         />
       )}
 
+      {/* Feed header + filters */}
+      <PageSection className="mb-3">
+        <SectionHeader title="Community" subtitle="Latest from women near you" />
+        <FilterChips
+          options={[
+            { value: 'all', label: 'All' },
+            { value: 'media', label: 'Media' },
+            { value: 'trending', label: 'Trending' },
+            { value: 'latest', label: 'Latest' },
+          ]}
+          value={filter}
+          onValueChange={(v) => setFilter(v as any)}
+          className="mt-1"
+        />
+      </PageSection>
+
       {/* Posts Feed */}
       <PostList
-        posts={posts}
+        posts={displayedPosts}
         profiles={profiles}
         currentUserId={user?.id}
         onLike={handleLike}

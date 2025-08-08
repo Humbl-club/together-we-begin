@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, userEvent } from '@/test/test-utils';
-import { screen } from '@testing-library/react';
+
 import { EnhancedEventCard } from './EnhancedEventCard';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
@@ -28,25 +28,25 @@ describe('EnhancedEventCard - mobile sticky CTA', () => {
   it('renders sticky mobile CTA and triggers register', async () => {
     const onRegister = vi.fn();
 
-    render(
+    const { findByTestId, getByTestId } = render(
       <EnhancedEventCard event={baseEvent} onRegister={onRegister} />
     );
 
-    const cta = await screen.findByTestId('mobile-sticky-cta');
+    const cta = await findByTestId('mobile-sticky-cta');
     expect(cta).toBeInTheDocument();
 
-    await userEvent.click(screen.getByTestId('mobile-register-button'));
+    await userEvent.click(getByTestId('mobile-register-button'));
     expect(onRegister).toHaveBeenCalledWith('evt_1');
   });
 
   it('opens details dialog when no onViewDetails is provided and shows footer CTA', async () => {
-    render(<EnhancedEventCard event={baseEvent} />);
+    const utils = render(<EnhancedEventCard event={baseEvent} />);
 
     // Click the Details button
-    await userEvent.click(screen.getByRole('button', { name: /details/i }));
+    await userEvent.click(utils.getByRole('button', { name: /details/i }));
 
     // Footer CTA should be present in dialog
-    const dialogCta = await screen.findByTestId('details-register-button');
+    const dialogCta = await utils.findByTestId('details-register-button');
     expect(dialogCta).toBeInTheDocument();
   });
 });

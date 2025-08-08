@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, userEvent } from '@/test/test-utils';
-import { screen } from '@testing-library/react';
+
 import { EventCardPresentation } from './EventCardPresentation';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 function setMobileViewport() {
   Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 375 });
@@ -28,14 +28,14 @@ describe('EventCardPresentation - mobile sticky CTA', () => {
   it('renders sticky CTA and calls onRegister', async () => {
     const onRegister = vi.fn();
 
-    render(
+    const { findByTestId, getByTestId } = render(
       <EventCardPresentation event={baseEvent} onRegister={onRegister} />
     );
 
-    const cta = await screen.findByTestId('mobile-sticky-cta');
+    const cta = await findByTestId('mobile-sticky-cta');
     expect(cta).toBeInTheDocument();
 
-    await userEvent.click(screen.getByTestId('mobile-register-button'));
+    await userEvent.click(getByTestId('mobile-register-button'));
     expect(onRegister).toHaveBeenCalledWith('evt_2');
   });
 });

@@ -20,6 +20,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/useMobileFirst';
+import { SafeAreaBottom } from '@/components/ui/safe-area-layout';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface EnhancedEventCardProps {
   event: {
@@ -74,6 +77,8 @@ export const EnhancedEventCard = memo(({
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
 
   const cardClasses = useMemo(() => cn(
     'glass-card-enhanced overflow-hidden transition-all duration-300 group',
@@ -177,7 +182,7 @@ export const EnhancedEventCard = memo(({
   }, [event.attendees]);
 
   return (
-    <div className={cardClasses} onClick={() => onViewDetails?.(event.id)}>
+    <div className={cardClasses} onClick={() => { if (onViewDetails) onViewDetails(event.id); else setOpen(true); }}>
       {/* Image Section */}
       <div className={cn(
         'relative overflow-hidden',
@@ -369,7 +374,7 @@ export const EnhancedEventCard = memo(({
             variant="outline"
             onClick={(e) => {
               e.stopPropagation();
-              onViewDetails?.(event.id);
+              if (onViewDetails) onViewDetails(event.id); else setOpen(true);
             }}
             className={cn(
               'flex-1 glass-button text-xs h-8'
@@ -426,6 +431,65 @@ export const EnhancedEventCard = memo(({
           )}
         </div>
       </div>
+
+      {isMobile && !event.is_registered && event.isUpcoming && (
+        <div data-testid="mobile-sticky-cta" className="sticky bottom-0 inset-x-0 z-10">
+          <SafeAreaBottom className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70 border-t border-border px-3 py-2">
+            <Button
+              size="lg"
+              className="w-full"
+              onClick={(e) => { e.stopPropagation(); onRegister?.(event.id); }}
+              data-testid="mobile-register-button"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Register
+            </Button>
+          </SafeAreaBottom>
+        </div>
+      )}
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="p-0 overflow-hidden">
+          <DialogHeader className="p-4">
+            <DialogTitle>{event.title}</DialogTitle>
+            {event.description && (
+              <DialogDescription className="line-clamp-3">
+                {event.description}
+              </DialogDescription>
+            )}
+          </DialogHeader>
+
+          <div className="p-4 space-y-3 text-sm">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-muted-foreground" />
+              <span>{new Date(event.start_time).toLocaleString()}</span>
+            </div>
+            {event.location && (
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-muted-foreground" />
+                <span className="line-clamp-1">{event.location}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-muted-foreground" />
+              <span className="font-medium text-primary">{priceDisplay}</span>
+            </div>
+          </div>
+
+          <div className="sticky bottom-0 inset-x-0">
+            <SafeAreaBottom className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70 border-t border-border p-3">
+              {!event.is_registered && event.isUpcoming ? (
+                <Button size="lg" className="w-full" onClick={() => onRegister?.(event.id)} data-testid="details-register-button">
+                  <Users className="w-4 h-4 mr-2" />
+                  Register
+                </Button>
+              ) : (
+                <div className="text-center text-sm text-muted-foreground">You're registered</div>
+              )}
+            </SafeAreaBottom>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 });

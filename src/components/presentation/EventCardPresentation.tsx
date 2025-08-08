@@ -1,5 +1,7 @@
 import React, { memo, useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/useMobileFirst';
+import { SafeAreaBottom } from '@/components/ui/safe-area-layout';
 
 // Pure presentational component with zero business logic
 interface EventCardPresentationProps {
@@ -62,6 +64,7 @@ const EventCardPresentation = memo(({
     return 'Free';
   }, [event.loyalty_points_price, event.price_cents]);
 
+  const isMobile = useIsMobile();
   return (
     <div className={cardClasses}>
       {/* Image Section */}
@@ -163,6 +166,20 @@ const EventCardPresentation = memo(({
           )}
         </div>
       </div>
+
+      {isMobile && !event.is_registered && event.isUpcoming && (
+        <div data-testid="mobile-sticky-cta" className="sticky bottom-0 inset-x-0 z-10">
+          <SafeAreaBottom className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70 border-t border-border px-3 py-2">
+            <button
+              onClick={() => onRegister?.(event.id)}
+              className="w-full mobile:px-4 mobile:py-3 sm:px-4 sm:py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium touch-manipulation"
+              data-testid="mobile-register-button"
+            >
+              Register
+            </button>
+          </SafeAreaBottom>
+        </div>
+      )}
     </div>
   );
 });

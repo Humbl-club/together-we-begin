@@ -18,6 +18,7 @@ import { PullToRefresh } from '@/components/ui/pull-to-refresh';
 // Lazy-loaded mobile-optimized components
 const LazyStatsGrid = React.lazy(() => import('@/components/dashboard/StatsGrid'));
 import WellnessWidget from '@/components/wellness/WellnessWidget';
+import HealthPermissionPrompt from '@/components/wellness/HealthPermissionPrompt';
 const LazyMobileUpcomingEvents = React.lazy(() => import('@/components/dashboard/MobileUpcomingEvents'));
 const LazyMobileCommunityFeed = React.lazy(() => import('@/components/dashboard/MobileCommunityFeed'));
 
@@ -180,6 +181,7 @@ const MobileDashboard: React.FC = memo(() => {
                 Your Wellness Journey
               </h2>
               <Suspense fallback={<div className="h-48 bg-muted rounded-2xl animate-pulse" />}>
+                <HealthPermissionPrompt onConnected={() => refetch()} />
                 <WellnessWidget onChallengeSync={(challengeId) => console.log('Sync challenge:', challengeId)} />
               </Suspense>
             </section>

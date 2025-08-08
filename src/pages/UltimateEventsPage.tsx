@@ -18,6 +18,7 @@ import { Calendar, Plus, Grid3X3, List, LayoutGrid, Search, Filter } from 'lucid
 import { cn } from '@/lib/utils';
 import { MobileLoading } from '@/components/ui/mobile-loading';
 import { SEO } from '@/components/seo/SEO';
+import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -298,6 +299,39 @@ const UltimateEventsPage = memo(() => {
   useEffect(() => {
     loadEvents(activeTab);
   }, [loadEvents, activeTab]);
+
+  // Handle Stripe Checkout return and verify payment
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const payment = params.get('payment');
+    const sessionId = params.get('session_id');
+
+    if (payment === 'success' && sessionId) {
+      (async () => {
+        try {
+          toast({ title: 'Verifying payment…', description: 'Please wait a moment.' });
+          const { data, error } = await supabase.functions.invoke('verify-payment', {
+            body: { sessionId }
+          });
+
+          if (error || !data || data.status !== 'completed') {
+            toast({ title: 'Payment not completed', description: 'If you were charged, please contact support.', variant: 'destructive' });
+          } else {
+            toast({ title: 'Payment confirmed', description: 'You are registered for the event!' });
+          }
+
+          await loadEvents(activeTab);
+        } catch (e) {
+          toast({ title: 'Verification failed', description: 'Please refresh the page.', variant: 'destructive' });
+        } finally {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('payment');
+          url.searchParams.delete('session_id');
+          window.history.replaceState({}, '', url.toString());
+        }
+      })();
+    }
+  }, [activeTab, loadEvents]);
 
   // Enhanced render event card with error boundaries
   const renderEventCard = useCallback((event: any, index: number) => (

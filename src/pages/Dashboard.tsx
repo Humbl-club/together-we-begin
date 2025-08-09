@@ -75,7 +75,7 @@ const Dashboard: React.FC = memo(() => {
           <DashboardHeader profile={profile} />
 
           {/* Hero Strip */}
-          <section className="relative overflow-hidden rounded-2xl bg-editorial-hero">
+          <section className="relative overflow-hidden rounded-2xl bg-editorial-hero animate-fade-in">
             <div className="glass-card p-6 flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-semibold font-display tracking-tight text-foreground">
@@ -110,7 +110,7 @@ const Dashboard: React.FC = memo(() => {
               <HealthPermissionPrompt onConnected={() => refetch()} />
               <WellnessWidget onChallengeSync={(challengeId) => console.log('Sync challenge:', challengeId)} />
 
-              <CardKit>
+              <CardKit className="animate-fade-in">
                 <CardKitHeader>
                   <CardKitTitle className="text-lg">Quick Actions</CardKitTitle>
                 </CardKitHeader>

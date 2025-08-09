@@ -84,7 +84,7 @@ export default function Wellness() {
                   <WellnessWidget />
                 </div>
                 
-                <CardKit>
+                <CardKit className="animate-fade-in">
                   <CardKitHeader>
                     <CardKitTitle className="flex items-center gap-2">
                       <Heart className="h-5 w-5 text-primary" />
@@ -107,7 +107,7 @@ export default function Wellness() {
                   </CardKitContent>
                 </CardKit>
 
-                <CardKit>
+                <CardKit className="animate-fade-in">
                   <CardKitHeader>
                     <CardKitTitle className="flex items-center gap-2">
                       <Calendar className="h-5 w-5 text-accent" />
@@ -136,7 +136,7 @@ export default function Wellness() {
 
             <TabsContent value="weekly" className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
-                <CardKit>
+                <CardKit className="animate-fade-in">
                   <CardKitHeader>
                     <CardKitTitle>Weekly Goals Progress</CardKitTitle>
                   </CardKitHeader>
@@ -177,7 +177,7 @@ export default function Wellness() {
                   </CardKitContent>
                 </CardKit>
 
-                <CardKit>
+                <CardKit className="animate-fade-in">
                   <CardKitHeader>
                     <CardKitTitle>Weekly Summary</CardKitTitle>
                   </CardKitHeader>
@@ -209,7 +209,7 @@ export default function Wellness() {
 
             <TabsContent value="metrics" className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
-                <CardKit>
+                <CardKit className="animate-fade-in">
                   <CardKitHeader>
                     <CardKitTitle>Current Health Metrics</CardKitTitle>
                   </CardKitHeader>
@@ -239,7 +239,7 @@ export default function Wellness() {
                   </CardKitContent>
                 </CardKit>
 
-                <CardKit>
+                <CardKit className="animate-fade-in">
                   <CardKitHeader>
                     <CardKitTitle>Health Trends</CardKitTitle>
                   </CardKitHeader>
@@ -267,7 +267,7 @@ export default function Wellness() {
             </TabsContent>
 
             <TabsContent value="achievements" className="space-y-4">
-              <CardKit>
+              <CardKit className="animate-fade-in">
                 <CardKitHeader>
                   <CardKitTitle className="flex items-center gap-2">
                     <Award className="h-5 w-5 text-accent" />

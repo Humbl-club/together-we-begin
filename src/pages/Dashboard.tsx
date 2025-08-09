@@ -76,7 +76,7 @@ const Dashboard: React.FC = memo(() => {
           <DashboardHeader profile={profile} />
 
           {/* Hero Strip */}
-          <section className="relative overflow-hidden rounded-2xl bg-editorial-hero motion-safe:animate-fade-in">
+          <section className="relative overflow-hidden rounded-2xl bg-atelier-hero motion-safe:animate-fade-in">
             <div className="glass-card p-6 flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-semibold font-display tracking-tight text-foreground">

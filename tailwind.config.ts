@@ -166,9 +166,9 @@ export default {
 			// Premium Typography System
 			fontFamily: {
 				'sans': ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
-				'serif': ['Fraunces', 'serif'],
-				'display': ['Fraunces', 'serif'],
-				'editorial': ['Fraunces', 'serif'],
+				'serif': ['Cormorant Garamond', 'Fraunces', 'serif'],
+				'display': ['Cormorant Garamond', 'Fraunces', 'serif'],
+				'editorial': ['Cormorant Garamond', 'Fraunces', 'serif'],
 			},
 			// Enhanced Animations
 			animation: {

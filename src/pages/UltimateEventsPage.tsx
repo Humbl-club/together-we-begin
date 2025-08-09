@@ -407,7 +407,7 @@ const UltimateEventsPage = memo(() => {
       )}
       <div className="max-w-4xl mx-auto space-y-4">
         {/* Header */}
-        <PageSection surface="accent" className="mb-3 motion-safe:animate-fade-in">
+        <PageSection surface="hero" className="mb-3 motion-safe:animate-fade-in">
           <SectionHeader
             title="Events"
             subtitle="Discover and join community events"

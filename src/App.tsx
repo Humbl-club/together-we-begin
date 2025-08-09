@@ -13,6 +13,7 @@ import NotificationService from '@/services/notificationService';
 import { BrandProvider } from '@/contexts/BrandContext';
 import { TenantProvider } from '@/contexts/TenantContext';
 import { FeatureFlagsProvider } from '@/contexts/FeatureFlagsContext';
+import { ThemeController } from '@/components/theme/ThemeController';
 
 // Create a page loader component
 const PageLoader = () => (
@@ -169,6 +170,7 @@ const App = () => {
             <TenantProvider>
               <BrowserRouter>
                 <AuthProvider>
+                  <ThemeController />
                   <RealtimeProvider>
                     <LazyBoundary>
                     <Suspense fallback={<PageLoader />}>

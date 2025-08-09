@@ -38,8 +38,8 @@ export function HealthDataInput({ onDataSubmit, currentData }: HealthDataInputPr
       key: "steps" as keyof HealthData,
       label: "Steps Today",
       icon: Footprints,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       target: 10000,
       unit: "steps"
     },
@@ -56,8 +56,8 @@ export function HealthDataInput({ onDataSubmit, currentData }: HealthDataInputPr
       key: "workouts" as keyof HealthData,
       label: "Workouts This Week",
       icon: Activity,
-      color: "text-purple-600",
-      bgColor: "bg-purple-100",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       target: 3,
       unit: "workouts"
     },
@@ -65,8 +65,8 @@ export function HealthDataInput({ onDataSubmit, currentData }: HealthDataInputPr
       key: "waterGlasses" as keyof HealthData,
       label: "Water Glasses",
       icon: Target,
-      color: "text-cyan-600",
-      bgColor: "bg-cyan-100",
+      color: "text-accent-foreground",
+      bgColor: "bg-accent/30",
       target: 8,
       unit: "glasses"
     },
@@ -74,8 +74,8 @@ export function HealthDataInput({ onDataSubmit, currentData }: HealthDataInputPr
       key: "sleepHours" as keyof HealthData,
       label: "Sleep Last Night",
       icon: Heart,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-100",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       target: 8,
       unit: "hours"
     }

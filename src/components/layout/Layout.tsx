@@ -48,7 +48,7 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   if (loading) {
     return (
       <div className={cn(
-        "min-h-screen flex items-center justify-center bg-editorial-hero safe-area-layout",
+        "min-h-screen flex items-center justify-center bg-atelier-hero safe-area-layout",
         "pt-[env(safe-area-inset-top,0px)]"
       )}>
         <MobileLoading 

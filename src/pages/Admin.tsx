@@ -78,7 +78,7 @@ const Admin: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-editorial-hero">
+      <div className="min-h-screen bg-atelier-hero">
         <div className="container max-w-7xl mx-auto p-4">
           <div className="flex items-center justify-center min-h-[50vh]">
             <Card className="glass-card p-8 text-center">
@@ -93,7 +93,7 @@ const Admin: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-editorial-hero">
+    <div className="min-h-screen bg-atelier-hero">
       <div className="container max-w-7xl mx-auto p-4">
         {/* Admin Header */}
         <div className="flex items-center justify-between mb-6">

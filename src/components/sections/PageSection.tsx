@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface PageSectionProps extends React.HTMLAttributes<HTMLElement> {
-  surface?: 'none' | 'primary' | 'secondary' | 'accent';
+  surface?: 'none' | 'primary' | 'secondary' | 'accent' | 'hero';
   padded?: boolean;
 }
 
@@ -16,7 +16,8 @@ export const PageSection: React.FC<PageSectionProps> = ({
   const surfaceCls =
     surface === 'primary' ? 'card-primary rounded-2xl' :
     surface === 'secondary' ? 'card-secondary rounded-2xl' :
-    surface === 'accent' ? 'card-accent rounded-2xl' : '';
+    surface === 'accent' ? 'card-accent rounded-2xl' :
+    surface === 'hero' ? 'bg-atelier-hero rounded-2xl' : '';
 
   return (
     <section

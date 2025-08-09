@@ -34,7 +34,7 @@ const Auth: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-editorial-hero">
+      <div className="min-h-screen flex items-center justify-center bg-atelier-hero">
         <div className="editorial-card max-w-md mx-auto text-center p-8">
           <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
           <p className="text-muted-foreground font-light">Preparing your experience...</p>
@@ -77,7 +77,7 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-editorial-hero flex items-center justify-center p-4">
+    <div className="min-h-screen bg-atelier-hero flex items-center justify-center p-4">
       {renderCurrentStep()}
     </div>
   );

@@ -49,9 +49,9 @@ const EventCardPresentation = memo(({
   ), [variant, className]);
 
   const statusBadge = useMemo(() => {
-    if (event.isToday) return { text: 'Today', className: 'bg-red-500' };
-    if (event.isUpcoming) return { text: 'Upcoming', className: 'bg-blue-500' };
-    return { text: 'Past', className: 'bg-gray-500' };
+    if (event.isToday) return { text: 'Today', className: 'bg-destructive text-destructive-foreground' };
+    if (event.isUpcoming) return { text: 'Upcoming', className: 'bg-primary text-primary-foreground' };
+    return { text: 'Past', className: 'bg-muted text-muted-foreground' };
   }, [event.isToday, event.isUpcoming]);
 
   const priceDisplay = useMemo(() => {

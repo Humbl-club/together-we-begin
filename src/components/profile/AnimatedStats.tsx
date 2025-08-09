@@ -89,8 +89,8 @@ export const AnimatedStats: React.FC<AnimatedStatsProps> = React.memo(({
         icon={Trophy}
         title="Challenges Won"
         value={completedChallenges}
-        iconColor="text-purple-600"
-        iconBgColor="bg-purple-500/10"
+        iconColor="text-primary"
+        iconBgColor="bg-primary/10"
         delay={400}
       />
     </div>

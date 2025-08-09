@@ -16,7 +16,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-editorial-hero p-4">
+    <div className="min-h-screen flex items-center justify-center bg-atelier-hero p-4">
       <Card className="editorial-card max-w-md w-full text-center">
         <CardContent className="p-8">
           <div className="w-16 h-16 mx-auto mb-6 bg-editorial-sage rounded-xl flex items-center justify-center">
@@ -26,7 +26,7 @@ const NotFound = () => {
           <p className="text-muted-foreground mb-6 font-light leading-relaxed">
             The page you're looking for doesn't exist or has been moved.
           </p>
-          <Button asChild className="bg-editorial-charcoal hover:bg-editorial-navy text-white">
+          <Button asChild>
             <Link to="/dashboard">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Return Home

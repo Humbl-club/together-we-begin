@@ -25,7 +25,7 @@ import { SEO } from '@/components/seo/SEO';
 import { Calendar, Users, Zap } from 'lucide-react';
 
 const Dashboard: React.FC = memo(() => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { stats, profile, loading, refetch } = useDashboardData(user?.id);
   const { isMobile, isTablet, safeAreaInsets } = useMobileFirst();
   const { handleError } = useErrorHandler();
@@ -90,10 +90,12 @@ const Dashboard: React.FC = memo(() => {
                   <Zap className="w-4 h-4 mr-2" />
                   Start Challenge
                 </Button>
-                <Button variant="outline" size="sm" className="touch-target" aria-label="Create an event" haptic="light">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Create Event
-                </Button>
+                {isAdmin && (
+                  <Button variant="outline" size="sm" className="touch-target" aria-label="Create an event" haptic="light">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Create Event
+                  </Button>
+                )}
               </div>
             </div>
           </section>
@@ -115,10 +117,12 @@ const Dashboard: React.FC = memo(() => {
                   <CardKitTitle className="text-lg">Quick Actions</CardKitTitle>
                 </CardKitHeader>
                 <CardKitContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start" size="sm" haptic="tap">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Create Event
-                  </Button>
+                  {isAdmin && (
+                    <Button variant="outline" className="w-full justify-start" size="sm" haptic="tap">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Create Event
+                    </Button>
+                  )}
                   <Button variant="outline" className="w-full justify-start" size="sm" haptic="tap">
                     <Users className="w-4 h-4 mr-2" />
                     Find Friends

@@ -411,7 +411,7 @@ const UltimateEventsPage = memo(() => {
           <SectionHeader
             title="Events"
             subtitle="Discover and join community events"
-            actions={(isAdmin || flags.enableCreateEventButton) && (
+            actions={isAdmin && (
               <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                 <DialogTrigger asChild>
                   <Button className="glass-button mobile:w-full lg:w-auto mobile:h-10 sm:h-11 lg:h-12 mobile:px-4 sm:px-6" aria-label="Create event" haptic="light">

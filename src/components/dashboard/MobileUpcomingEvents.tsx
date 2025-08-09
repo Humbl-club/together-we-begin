@@ -4,6 +4,7 @@ import { MobileFirstCard, MobileFirstCardContent, MobileFirstCardHeader, MobileF
 import { MobileNativeButton } from '@/components/ui/mobile-native-button';
 import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { Calendar, MapPin, Users, Clock, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -26,6 +27,7 @@ interface MobileUpcomingEventsProps {
 
 const MobileUpcomingEvents: React.FC<MobileUpcomingEventsProps> = memo(({ events }) => {
   const { isMobile, safeAreaInsets } = useMobileFirst();
+  const { isAdmin } = useAuth();
   const feedback = useHapticFeedback();
 
   const displayEvents = events || [];
@@ -193,22 +195,23 @@ const MobileUpcomingEvents: React.FC<MobileUpcomingEventsProps> = memo(({ events
         ))}
       </div>
 
-      {/* Quick Action */}
-      <div className="px-4">
-        <MobileNativeButton
-          variant="secondary"
-          fullWidth
-          size="lg"
-          onClick={() => {
-            feedback.tap();
-            console.log('Create event');
-          }}
-          className="text-primary border-primary/20 hover:bg-primary/5"
-        >
-          <Calendar className="h-5 w-5 mr-2" />
-          Create Your Own Event
-        </MobileNativeButton>
-      </div>
+      {isAdmin && (
+        <div className="px-4">
+          <MobileNativeButton
+            variant="secondary"
+            fullWidth
+            size="lg"
+            onClick={() => {
+              feedback.tap();
+              console.log('Create event');
+            }}
+            className="text-primary border-primary/20 hover:bg-primary/5"
+          >
+            <Calendar className="h-5 w-5 mr-2" />
+            Create Your Own Event
+          </MobileNativeButton>
+        </div>
+      )}
     </div>
   );
 });

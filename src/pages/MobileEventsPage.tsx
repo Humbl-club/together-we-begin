@@ -15,7 +15,7 @@ import { Calendar, MapPin, Users, Clock, Search, Filter, Plus } from 'lucide-rea
 
 const MobileEventsPage: React.FC = memo(() => {
   const { isMobile, safeAreaInsets } = useMobileFirst();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { profile } = useDashboardData(user?.id);
 
   if (!isMobile) {
@@ -103,15 +103,17 @@ const MobileEventsPage: React.FC = memo(() => {
         </MobileFirstCard>
 
         {/* Create Event CTA */}
-        <MobileNativeButton 
-          variant="secondary" 
-          fullWidth 
-          size="lg"
-          className="border-dashed border-2 text-primary"
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          Create Your Own Event
-        </MobileNativeButton>
+        {isAdmin && (
+          <MobileNativeButton 
+            variant="secondary" 
+            fullWidth 
+            size="lg"
+            className="border-dashed border-2 text-primary"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Create Your Own Event
+          </MobileNativeButton>
+        )}
 
         {/* Events List */}
         <Suspense fallback={<MobileEnhancedSkeleton variant="mobile-list" />}>

@@ -141,7 +141,7 @@ function applyBrandVariables(brand: BrandConfig) {
 export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [brandKey, setBrandKeyState] = useState<string>(() => {
     const fromQuery = new URLSearchParams(window.location.search).get('brand');
-    return fromQuery || localStorage.getItem('brand') || defaultBrands[0].key;
+    return fromQuery || localStorage.getItem('brand') || 'blush';
   });
 
   const setBrandKey = (key: string) => {

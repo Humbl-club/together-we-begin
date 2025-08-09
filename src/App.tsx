@@ -106,6 +106,10 @@ const QRScanner = lazy(() =>
   import('./pages/QRScanner').then(module => ({ default: module.default }))
 );
 
+const Insights = lazy(() => 
+  import('./pages/Insights').then(module => ({ default: module.default }))
+);
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -177,6 +181,11 @@ const App = () => {
                         <Route path="/dashboard" element={
                           <ProtectedRoute>
                             <Layout><Dashboard /></Layout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/insights" element={
+                          <ProtectedRoute>
+                            <Layout><Insights /></Layout>
                           </ProtectedRoute>
                         } />
                         <Route path="/social" element={

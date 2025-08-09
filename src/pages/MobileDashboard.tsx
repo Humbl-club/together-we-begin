@@ -16,7 +16,7 @@ import { MobileNativeButton } from '@/components/ui/mobile-native-button';
 import { PullToRefresh } from '@/components/ui/pull-to-refresh';
 
 // Lazy-loaded mobile-optimized components
-const LazyStatsGrid = React.lazy(() => import('@/components/dashboard/StatsGrid'));
+
 import WellnessWidget from '@/components/wellness/WellnessWidget';
 import HealthPermissionPrompt from '@/components/wellness/HealthPermissionPrompt';
 const LazyMobileUpcomingEvents = React.lazy(() => import('@/components/dashboard/MobileUpcomingEvents'));
@@ -55,13 +55,6 @@ const MobileDashboard: React.FC = memo(() => {
               <div className="h-4 bg-muted/60 rounded w-24"></div>
             </div>
             <div className="h-10 w-10 bg-muted rounded-full"></div>
-          </div>
-          
-          {/* Stats skeleton */}
-          <div className="grid grid-cols-2 gap-3">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-24 bg-muted rounded-2xl"></div>
-            ))}
           </div>
           
           {/* Content skeleton */}
@@ -161,17 +154,6 @@ const MobileDashboard: React.FC = memo(() => {
               ))}
             </div>
           )}
-
-          {/* Mobile Stats Grid */}
-          <Suspense fallback={
-            <div className="grid grid-cols-2 gap-3">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-24 bg-muted rounded-2xl animate-pulse"></div>
-              ))}
-            </div>
-          }>
-            <LazyStatsGrid stats={stats} />
-          </Suspense>
 
           {/* Mobile Content Stack */}
           <div className="space-y-6">

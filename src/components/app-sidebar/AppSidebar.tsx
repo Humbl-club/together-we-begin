@@ -13,10 +13,11 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
-import { Home, CalendarDays, MessageCircle, Trophy, Users } from 'lucide-react';
+import { Home, CalendarDays, MessageCircle, Trophy, Users, TrendingUp } from 'lucide-react';
 
 const items = [
   { title: 'Dashboard', url: '/dashboard', icon: Home },
+  { title: 'Insights', url: '/insights', icon: TrendingUp },
   { title: 'Social', url: '/social', icon: Users },
   { title: 'Events', url: '/events', icon: CalendarDays },
   { title: 'Messages', url: '/messages', icon: MessageCircle },

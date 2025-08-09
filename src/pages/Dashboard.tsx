@@ -9,7 +9,7 @@ import MobileDashboard from './MobileDashboard';
 
 // Desktop imports
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import StatsGrid from '@/components/dashboard/StatsGrid';
+
 import WellnessWidget from '@/components/wellness/WellnessWidget';
 import HealthPermissionPrompt from '@/components/wellness/HealthPermissionPrompt';
 import UpcomingEvents from '@/components/dashboard/UpcomingEvents';
@@ -100,8 +100,6 @@ const Dashboard: React.FC = memo(() => {
             </div>
           </section>
 
-          <StatsGrid stats={stats} />
-          
           <div className="responsive-grid lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-6">
               <UpcomingEvents />

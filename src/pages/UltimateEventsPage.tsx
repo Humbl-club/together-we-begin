@@ -399,6 +399,7 @@ const UltimateEventsPage = memo(() => {
   return (
     <div className="min-h-screen bg-background mobile:p-2 sm:p-4 lg:p-6 safe-area-top" data-pull-refresh>
       <SEO title="Events" description="Discover and join girls-only meetups, workshops, and activities." canonical="/events" />
+      <h1 className="sr-only">Events</h1>
       {isMobileOptimized && (
         <div className="pull-refresh-indicator">
           <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
@@ -502,7 +503,7 @@ const UltimateEventsPage = memo(() => {
         )}
 
         {/* Search & Filters */}
-        <div className="glass-card-enhanced mobile:p-3 sm:p-4 lg:p-6">
+        <PageSection className="mobile:p-3 sm:p-4 lg:p-6">
           <EventSearch
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -511,10 +512,9 @@ const UltimateEventsPage = memo(() => {
             sortBy={sortBy}
             onSortChange={setSortBy}
           />
-        </div>
+        </PageSection>
 
-        {/* Enhanced Tabs with Better Mobile Support */}
-        <div className="glass-card-enhanced mobile:p-3 sm:p-4 lg:p-6">
+        <PageSection className="mobile:p-3 sm:p-4 lg:p-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="flex mobile:flex-col sm:flex-row mobile:gap-3 sm:items-center sm:justify-between mb-4">
               <TabsList className="grid w-full grid-cols-3 mobile:h-12 sm:h-10 gap-1">
@@ -696,7 +696,7 @@ const UltimateEventsPage = memo(() => {
               )}
             </TabsContent>
           </Tabs>
-        </div>
+        </PageSection>
       </div>
 
       {/* Enhanced Performance Debug Info */}

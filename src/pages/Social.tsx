@@ -458,6 +458,7 @@ const Social: React.FC = () => {
   return (
     <div className={`container mx-auto ${isMobile ? 'p-mobile' : 'max-w-2xl p-mobile'} space-mobile pb-[env(safe-area-inset-bottom,0px)]`} data-pull-refresh>
       <SEO title="Social Feed" description="Share stories, posts, and connect with your community." canonical="/social" />
+      <h1 className="sr-only">Social Feed</h1>
 
       <PageSection surface="accent" className="mb-4">
         <AnnouncementBanner

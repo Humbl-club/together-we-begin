@@ -63,6 +63,7 @@ export default function Wellness() {
   return (
     <Layout>
       <SEO title="Wellness" description="Track your health and wellness journey." canonical="/wellness" />
+      <h1 className="sr-only">Wellness</h1>
       <div className="container mx-auto p-6">
         <div className="space-y-6">
           <PageSection surface="accent" className="mb-2">

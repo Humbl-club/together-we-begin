@@ -84,11 +84,11 @@ const Dashboard: React.FC = memo(() => {
                 </p>
               </div>
               <div className="hidden md:flex gap-2">
-                <Button variant="secondary" size="sm" className="touch-target">
+                <Button variant="secondary" size="sm" className="touch-target" aria-label="Start a challenge">
                   <Zap className="w-4 h-4 mr-2" />
                   Start Challenge
                 </Button>
-                <Button variant="outline" size="sm" className="touch-target">
+                <Button variant="outline" size="sm" className="touch-target" aria-label="Create an event">
                   <Calendar className="w-4 h-4 mr-2" />
                   Create Event
                 </Button>

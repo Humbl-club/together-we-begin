@@ -55,7 +55,7 @@ const MobileFirstNavigation = forwardRef<HTMLElement, MobileFirstNavigationProps
                   "active:scale-95 active:bg-primary/10",
                   isActive(item.href)
                     ? "text-primary bg-primary/10 backdrop-blur-sm" 
-                    : "text-muted-foreground hover:text-foreground hover:bg-background/30"
+                    : "text-foreground/80 hover:text-foreground hover:bg-background/50"
                 )}
               >
                 <item.icon className={cn(
@@ -64,7 +64,7 @@ const MobileFirstNavigation = forwardRef<HTMLElement, MobileFirstNavigationProps
                 )} />
                 <span className={cn(
                   "text-xs font-medium",
-                  isActive(item.href) ? "text-primary" : "text-muted-foreground"
+                  isActive(item.href) ? "text-primary" : "text-foreground/80"
                 )}>
                   {item.label}
                 </span>

@@ -140,7 +140,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
                   "flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 group relative",
                   isActive(href)
                     ? 'bg-primary/20 text-primary backdrop-blur-sm shadow-sm border border-primary/20'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-background/50 hover:backdrop-blur-sm'
+                    : 'text-foreground/80 hover:text-foreground hover:bg-background/60 hover:backdrop-blur-sm'
                 )}
               >
                 <Icon className="w-5 h-5" strokeWidth={isActive(href) ? 2.5 : 2} />
@@ -156,7 +156,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
             <Link
               to="/settings"
               title="Settings"
-              className="flex items-center justify-center w-12 h-12 rounded-xl text-muted-foreground hover:text-foreground hover:bg-background/50 hover:backdrop-blur-sm transition-all duration-200"
+              className="flex items-center justify-center w-12 h-12 rounded-xl text-foreground/80 hover:text-foreground hover:bg-background/60 hover:backdrop-blur-sm transition-all duration-200"
             >
               <Settings className="w-5 h-5" />
             </Link>
@@ -166,7 +166,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
               size="sm"
               title="Logout"
               onClick={() => signOut()}
-              className="flex items-center justify-center w-12 h-12 p-0 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:backdrop-blur-sm transition-all duration-200"
+              className="flex items-center justify-center w-12 h-12 p-0 rounded-xl text-foreground/80 hover:text-destructive hover:bg-destructive/10 hover:backdrop-blur-sm transition-all duration-200"
             >
               <LogOut className="w-5 h-5" />
             </Button>
@@ -198,7 +198,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
                 "flex flex-col items-center space-y-2 p-3 rounded-xl transition-all duration-200 group relative overflow-hidden",
                 isActive(href)
                   ? 'bg-primary/20 text-primary backdrop-blur-md shadow-lg border border-primary/30'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-background/50 hover:backdrop-blur-sm hover:shadow-md'
+                  : 'text-foreground/80 hover:text-foreground hover:bg-background/60 hover:backdrop-blur-sm hover:shadow-md'
               )}
             >
               {isActive(href) && (
@@ -219,7 +219,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
         <div className="p-3 border-t border-border/20 space-y-2">
           <Link
             to="/settings"
-            className="flex flex-col items-center space-y-1 p-3 rounded-xl text-muted-foreground hover:text-foreground hover:bg-background/50 hover:backdrop-blur-sm transition-all duration-200 group"
+            className="flex flex-col items-center space-y-1 p-3 rounded-xl text-foreground/80 hover:text-foreground hover:bg-background/60 hover:backdrop-blur-sm transition-all duration-200 group"
           >
             <Settings className="w-5 h-5 transition-transform group-hover:rotate-90" />
             <span className="text-xs font-medium tracking-wide">Settings</span>
@@ -229,7 +229,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
             variant="ghost"
             size="sm"
             onClick={() => signOut()}
-            className="flex flex-col items-center space-y-1 p-3 w-full rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:backdrop-blur-sm transition-all duration-200 group"
+            className="flex flex-col items-center space-y-1 p-3 w-full rounded-xl text-foreground/80 hover:text-destructive hover:bg-destructive/10 hover:backdrop-blur-sm transition-all duration-200 group"
           >
             <LogOut className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             <span className="text-xs font-medium tracking-wide">Logout</span>

@@ -111,7 +111,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
           onClose={() => setShowMessaging(false)} 
         />
         
-        {/* Profile Dropdown */}
+        {/* Profile Dropdown (Draggable on long-press) */}
         <ProfileDropdown profile={profile || user?.user_metadata || {}} />
       </>
     );

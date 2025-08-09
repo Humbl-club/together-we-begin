@@ -19,6 +19,7 @@ import { PullToRefresh } from '@/components/ui/pull-to-refresh';
 
 import WellnessWidget from '@/components/wellness/WellnessWidget';
 import HealthPermissionPrompt from '@/components/wellness/HealthPermissionPrompt';
+import { WalkingChallengeWidget } from '@/components/wellness/WalkingChallengeWidget';
 const LazyMobileUpcomingEvents = React.lazy(() => import('@/components/dashboard/MobileUpcomingEvents'));
 const LazyMobileCommunityFeed = React.lazy(() => import('@/components/dashboard/MobileCommunityFeed'));
 
@@ -157,7 +158,26 @@ const MobileDashboard: React.FC = memo(() => {
 
           {/* Mobile Content Stack */}
           <div className="space-y-6">
-            {/* Wellness Priority Section */}
+            {/* Events First */}
+            <section>
+              <Suspense fallback={<div className="h-32 bg-muted rounded-2xl animate-pulse" />}>
+                <LazyMobileUpcomingEvents events={upcomingEvents as any} />
+              </Suspense>
+            </section>
+
+            {/* Challenges Forefront */}
+            <section>
+              <WalkingChallengeWidget />
+            </section>
+
+            {/* Community Section */}
+            <section>
+              <Suspense fallback={<div className="h-64 bg-muted rounded-2xl animate-pulse" />}>
+                <LazyMobileCommunityFeed posts={feedPosts as any} />
+              </Suspense>
+            </section>
+
+            {/* Wellness moved below */}
             <section>
               <h2 className="text-lg font-semibold text-foreground mb-3 px-1">
                 Your Wellness Journey
@@ -165,20 +185,6 @@ const MobileDashboard: React.FC = memo(() => {
               <Suspense fallback={<div className="h-48 bg-muted rounded-2xl animate-pulse" />}>
                 <HealthPermissionPrompt onConnected={() => refetch()} />
                 <WellnessWidget onChallengeSync={(challengeId) => console.log('Sync challenge:', challengeId)} />
-              </Suspense>
-            </section>
-
-            {/* Events Section */}
-            <section>
-              <Suspense fallback={<div className="h-32 bg-muted rounded-2xl animate-pulse" />}>
-                <LazyMobileUpcomingEvents events={upcomingEvents as any} />
-              </Suspense>
-            </section>
-
-            {/* Community Section */}
-            <section>
-              <Suspense fallback={<div className="h-64 bg-muted rounded-2xl animate-pulse" />}>
-                <LazyMobileCommunityFeed posts={feedPosts as any} />
               </Suspense>
             </section>
 

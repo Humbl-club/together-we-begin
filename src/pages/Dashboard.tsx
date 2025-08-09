@@ -14,6 +14,7 @@ import WellnessWidget from '@/components/wellness/WellnessWidget';
 import HealthPermissionPrompt from '@/components/wellness/HealthPermissionPrompt';
 import UpcomingEvents from '@/components/dashboard/UpcomingEvents';
 import CommunityFeed from '@/components/dashboard/CommunityFeed';
+import { WalkingChallengeWidget } from '@/components/wellness/WalkingChallengeWidget';
 import WelcomeFlow from '@/components/onboarding/WelcomeFlow';
 import { DashboardLoadingSkeleton, MobileLoading } from '@/components/ui/mobile-loading';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
@@ -102,6 +103,7 @@ const Dashboard: React.FC = memo(() => {
 
           <div className="responsive-grid lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-6">
+              <WalkingChallengeWidget />
               <UpcomingEvents />
               <CommunityFeed />
             </div>

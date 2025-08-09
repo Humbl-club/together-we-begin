@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useViewport } from '@/hooks/use-mobile';
@@ -25,6 +25,7 @@ import {
   Crown,
   type LucideIcon
 } from 'lucide-react';
+import { useGestures } from '@/hooks/useGestures';
 
 interface ProfileDropdownProps {
   profile?: {
@@ -48,7 +49,50 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ profile }) => 
   const haptics = useHapticFeedback();
   const { isMobile, isTablet, isDesktop } = useViewport();
   const [isOpen, setIsOpen] = useState(false);
-  const { brand, availableBrands, setBrandKey } = useBrand();
+const { brand, availableBrands, setBrandKey } = useBrand();
+
+  // Draggable floating trigger (long-press to move on mobile)
+  const [dragging, setDragging] = useState(false);
+  const [basePos, setBasePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const { ref, swipeState } = useGestures({
+    onLongPress: () => {
+      if (isMobile) {
+        setDragging(true);
+      }
+    }
+  });
+
+  // Load saved position
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('profileFabPos');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (typeof parsed?.x === 'number' && typeof parsed?.y === 'number') {
+          setBasePos(parsed);
+        }
+      }
+    } catch {}
+  }, []);
+
+  // Persist position when drag ends
+  useEffect(() => {
+    if (!swipeState.isActive && dragging) {
+      const newPos = {
+        x: basePos.x + swipeState.deltaX,
+        y: basePos.y + swipeState.deltaY,
+      };
+      setBasePos(newPos);
+      try {
+        localStorage.setItem('profileFabPos', JSON.stringify(newPos));
+      } catch {}
+      setDragging(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [swipeState.isActive]);
+
+  const translateX = dragging ? basePos.x + swipeState.deltaX : basePos.x;
+  const translateY = dragging ? basePos.y + swipeState.deltaY : basePos.y;
 
   const getInitials = (name?: string) => {
     return name?.split(' ').map(n => n[0]).join('') || 'AC';
@@ -201,144 +245,151 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ profile }) => 
   };
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
-      <DropdownMenuTrigger asChild>
-        <button 
+    <div
+      ref={ref as unknown as React.RefObject<HTMLDivElement>}
+      className={`fixed z-50 ${isMobile ? 'bottom-28 left-5' : isTablet ? 'bottom-6 left-6' : 'bottom-8 left-8'}`}
+      style={{ transform: `translate(${translateX}px, ${translateY}px)` }}
+    >
+      <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
+        <DropdownMenuTrigger asChild>
+          <button 
+            className={`
+              glass-button-enhanced rounded-full flex items-center justify-center 
+              shadow-2xl border-2 transition-all duration-500 group
+              bg-background/95 hover:bg-primary/15 hover:scale-110 active:scale-95 
+              ring-2 ring-primary/20 hover:ring-primary/40 backdrop-blur-3xl
+              focus:outline-none focus:ring-4 focus:ring-primary/30
+              ${isMobile ? 'w-16 h-16' : isTablet ? 'w-14 h-14' : 'w-16 h-16'}
+              ${isOpen ? 'scale-110 ring-primary/50 shadow-3xl' : ''}
+            `}
+            aria-label="Open profile menu"
+            aria-expanded={isOpen}
+            style={{ pointerEvents: dragging ? 'none' : 'auto' }}
+          >
+            <Avatar className={`ring-2 ring-primary/30 shadow-lg transition-all duration-300 group-hover:ring-primary/50 ${isMobile ? 'w-14 h-14' : isTablet ? 'w-12 h-12' : 'w-14 h-14'}`}>
+              <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
+              <AvatarFallback className="bg-gradient-to-br from-primary/40 to-secondary/40 text-sm font-bold">
+                {getInitials(profile?.full_name)}
+              </AvatarFallback>
+            </Avatar>
+            {/* Online status indicator */}
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background shadow-sm animate-pulse"></div>
+            {/* Subtle glow effect when hovered */}
+            <div className="absolute inset-0 rounded-full bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+          </button>
+        </DropdownMenuTrigger>
+        
+        <DropdownMenuContent 
+          {...dropdownProps}
           className={`
-            fixed z-50 glass-button-enhanced rounded-full flex items-center justify-center 
-            shadow-2xl border-2 transition-all duration-500 group
-            bg-background/95 hover:bg-primary/15 hover:scale-110 active:scale-95 
-            ring-2 ring-primary/20 hover:ring-primary/40 backdrop-blur-3xl
-            focus:outline-none focus:ring-4 focus:ring-primary/30
-            ${isMobile ? 'bottom-28 left-5 w-16 h-16' : isTablet ? 'bottom-6 left-6 w-14 h-14' : 'bottom-8 left-8 w-16 h-16'}
-            ${isOpen ? 'scale-110 ring-primary/50 shadow-3xl' : ''}
+            ${dropdownProps.className}
+            w-80 glass-modal-enhanced border-2 bg-background/98 backdrop-blur-3xl 
+            shadow-2xl rounded-3xl p-4 border-border/40 
+            animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2
+            data-[state=closed]:animate-out data-[state=closed]:fade-out-0 
+            data-[state=closed]:zoom-out-95 data-[state=closed]:slide-out-to-bottom-2
+            duration-300 z-[60]
           `}
-          aria-label="Open profile menu"
-          aria-expanded={isOpen}
+          avoidCollisions={true}
+          collisionPadding={16}
         >
-          <Avatar className={`ring-2 ring-primary/30 shadow-lg transition-all duration-300 group-hover:ring-primary/50 ${isMobile ? 'w-14 h-14' : isTablet ? 'w-12 h-12' : 'w-14 h-14'}`}>
-            <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
-            <AvatarFallback className="bg-gradient-to-br from-primary/40 to-secondary/40 text-sm font-bold">
-              {getInitials(profile?.full_name)}
-            </AvatarFallback>
-          </Avatar>
-          {/* Online status indicator */}
-          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background shadow-sm animate-pulse"></div>
-          {/* Subtle glow effect when hovered */}
-          <div className="absolute inset-0 rounded-full bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-        </button>
-      </DropdownMenuTrigger>
-      
-      <DropdownMenuContent 
-        {...dropdownProps}
-        className={`
-          ${dropdownProps.className}
-          w-80 glass-modal-enhanced border-2 bg-background/98 backdrop-blur-3xl 
-          shadow-2xl rounded-3xl p-4 border-border/40 
-          animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2
-          data-[state=closed]:animate-out data-[state=closed]:fade-out-0 
-          data-[state=closed]:zoom-out-95 data-[state=closed]:slide-out-to-bottom-2
-          duration-300 z-[60]
-        `}
-        avoidCollisions={true}
-        collisionPadding={16}
-      >
-        {/* Enhanced Profile Header */}
-        <DropdownMenuLabel className="px-2 py-4 mb-3">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <Avatar className="w-14 h-14 ring-2 ring-primary/30 shadow-lg">
-                <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
-                <AvatarFallback className="bg-gradient-to-br from-primary/40 to-secondary/40 text-sm font-bold">
-                  {getInitials(profile?.full_name)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background shadow-sm"></div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-base truncate">
-                  {profile?.full_name || 'Alexandra Collins'}
-                </h3>
-                {isAdmin && (
-                  <Crown className="w-4 h-4 text-yellow-500 flex-shrink-0" />
-                )}
+          {/* Enhanced Profile Header */}
+          <DropdownMenuLabel className="px-2 py-4 mb-3">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Avatar className="w-14 h-14 ring-2 ring-primary/30 shadow-lg">
+                  <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
+                  <AvatarFallback className="bg-gradient-to-br from-primary/40 to-secondary/40 text-sm font-bold">
+                    {getInitials(profile?.full_name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background shadow-sm"></div>
               </div>
-              <p className="text-sm text-muted-foreground mb-2">
-                Welcome back, {getFirstName(profile?.full_name)}!
-              </p>
-              <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                Your wellness journey continues
-              </Badge>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-semibold text-base truncate">
+                    {profile?.full_name || 'Alexandra Collins'}
+                  </h3>
+                  {isAdmin && (
+                    <Crown className="w-4 h-4 text-yellow-500 flex-shrink-0" />
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Welcome back, {getFirstName(profile?.full_name)}!
+                </p>
+                <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+                  Your wellness journey continues
+                </Badge>
+              </div>
+            </div>
+          </DropdownMenuLabel>
+          
+          <DropdownMenuSeparator className="my-3 bg-border/60" />
+          
+          {/* Main Menu Items */}
+          <div className="space-y-1">
+            {menuItems.map(renderMenuItem)}
+          </div>
+          
+          {secondaryItems.length > 0 && (
+            <>
+              <DropdownMenuSeparator className="my-3 bg-border/60" />
+              
+              {/* Secondary Tool Items */}
+              <div className="space-y-1">
+                {secondaryItems.map(renderMenuItem)}
+              </div>
+            </>
+          )}
+          
+          <DropdownMenuSeparator className="my-3 bg-border/60" />
+          
+          {/* Appearance / Theme Switcher */}
+          <div className="px-2 py-2">
+            <div className="text-xs text-muted-foreground mb-2">Theme</div>
+            <div className="flex gap-2 flex-wrap">
+              {availableBrands.map((b) => (
+                <button
+                  key={b.key}
+                  onClick={() => { setBrandKey(b.key); haptics.tap(); }}
+                  aria-pressed={brand.key === b.key}
+                  className={cn(
+                    'px-2 py-1 rounded-md border text-xs',
+                    brand.key === b.key
+                      ? 'bg-primary/15 text-primary border-primary/30'
+                      : 'bg-muted/50 hover:bg-muted/70 border-border/50'
+                  )}
+                >
+                  {b.name}
+                </button>
+              ))}
             </div>
           </div>
-        </DropdownMenuLabel>
-        
-        <DropdownMenuSeparator className="my-3 bg-border/60" />
-        
-        {/* Main Menu Items */}
-        <div className="space-y-1">
-          {menuItems.map(renderMenuItem)}
-        </div>
-        
-        {secondaryItems.length > 0 && (
-          <>
-            <DropdownMenuSeparator className="my-3 bg-border/60" />
-            
-            {/* Secondary Tool Items */}
-            <div className="space-y-1">
-              {secondaryItems.map(renderMenuItem)}
-            </div>
-          </>
-        )}
-        
-<DropdownMenuSeparator className="my-3 bg-border/60" />
-
-{/* Appearance / Theme Switcher */}
-<div className="px-2 py-2">
-  <div className="text-xs text-muted-foreground mb-2">Theme</div>
-  <div className="flex gap-2 flex-wrap">
-    {availableBrands.map((b) => (
-      <button
-        key={b.key}
-        onClick={() => { setBrandKey(b.key); haptics.tap(); }}
-        aria-pressed={brand.key === b.key}
-        className={cn(
-          'px-2 py-1 rounded-md border text-xs',
-          brand.key === b.key
-            ? 'bg-primary/15 text-primary border-primary/30'
-            : 'bg-muted/50 hover:bg-muted/70 border-border/50'
-        )}
-      >
-        {b.name}
-      </button>
-    ))}
-  </div>
-</div>
-
-<DropdownMenuSeparator className="my-3 bg-border/60" />
-        
-        {/* Sign Out Button */}
-        <DropdownMenuItem asChild>
-          <button 
-            onClick={handleSignOut}
-            className="
-              flex items-center gap-4 p-4 rounded-2xl cursor-pointer w-full text-left 
-              text-destructive hover:bg-destructive/10 active:bg-destructive/15 
-              min-h-[64px] transition-all duration-300 hover:scale-[1.02]
-              border border-transparent hover:border-destructive/20 group
-            "
-          >
-            <div className="w-12 h-12 rounded-2xl bg-destructive/20 flex items-center justify-center group-hover:bg-destructive/30 transition-colors">
-              <LogOut className="w-6 h-6" strokeWidth={2} />
-            </div>
-            <div className="flex-1">
-              <div className="font-semibold text-sm">Sign Out</div>
-              <div className="text-xs text-muted-foreground mt-0.5">Securely sign out of your account</div>
-            </div>
-          </button>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          
+          <DropdownMenuSeparator className="my-3 bg-border/60" />
+          
+          {/* Sign Out Button */}
+          <DropdownMenuItem asChild>
+            <button 
+              onClick={handleSignOut}
+              className="
+                flex items-center gap-4 p-4 rounded-2xl cursor-pointer w-full text-left 
+                text-destructive hover:bg-destructive/10 active:bg-destructive/15 
+                min-h-[64px] transition-all duration-300 hover:scale-[1.02]
+                border border-transparent hover:border-destructive/20 group
+              "
+            >
+              <div className="w-12 h-12 rounded-2xl bg-destructive/20 flex items-center justify-center group-hover:bg-destructive/30 transition-colors">
+                <LogOut className="w-6 h-6" strokeWidth={2} />
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold text-sm">Sign Out</div>
+                <div className="text-xs text-muted-foreground mt-0.5">Securely sign out of your account</div>
+              </div>
+            </button>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 };

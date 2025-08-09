@@ -21,9 +21,9 @@ export const MobileNativeCard = forwardRef<HTMLDivElement, MobileNativeCardProps
       
       // Padding variants - mobile-first
       padding === 'none' && 'p-0',
-      padding === 'sm' && (isMobile ? 'p-3' : 'p-2'),
-      padding === 'md' && (isMobile ? 'p-4' : 'p-3'),
-      padding === 'lg' && (isMobile ? 'p-6' : 'p-4'),
+      padding === 'sm' && (isMobile ? 'p-2' : 'p-3'),
+      padding === 'md' && (isMobile ? 'p-3' : 'p-4'),
+      padding === 'lg' && (isMobile ? 'p-4' : 'p-6'),
       
       // Variant styles
       {
@@ -59,7 +59,7 @@ export const MobileNativeCardHeader = forwardRef<HTMLDivElement, React.HTMLAttri
         ref={ref}
         className={cn(
           "flex flex-col space-y-1.5",
-          isMobile ? "p-4 pb-0" : "p-3 pb-0",
+          isMobile ? "p-3 pb-0" : "p-4 pb-0",
           className
         )}
         {...props}

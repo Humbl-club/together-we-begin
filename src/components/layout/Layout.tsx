@@ -37,6 +37,12 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
     fetchProfile();
   }, [user?.id, user?.user_metadata]);
 
+  // Apply compact density on mobile for a more elegant, tighter UI
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-density', isMobile ? 'compact' : 'comfortable');
+  }, [isMobile]);
+
   if (loading) {
     return (
       <div className={cn(
@@ -55,7 +61,7 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
 
   // Calculate layout padding based on viewport
   const getLayoutPadding = () => {
-    if (isMobile) return `pb-24 ${showHeader ? 'pt-36' : 'pt-4'}`; // Space for larger artistic header
+    if (isMobile) return `pb-24 ${showHeader ? 'pt-16' : 'pt-4'}`; // Compact header spacing on mobile
     if (isTablet) return 'pl-16 pt-4'; // Space for side nav
     return 'pl-20 pt-4'; // Desktop side nav
   };

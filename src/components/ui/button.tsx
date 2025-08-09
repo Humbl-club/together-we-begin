@@ -16,9 +16,11 @@ const buttonVariants = cva(
         ghost: "hover:card-secondary hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         glass: "button-glass hover:card-secondary",
+        subtle: "bg-transparent text-foreground border border-border/50 hover:bg-muted/40",
       },
       size: {
-        default: "h-10 px-4 py-2 touch-target-large",
+        xs: "h-8 px-3",
+        default: "h-10 px-4 py-2",
         sm: "h-9 rounded-lg px-3",
         lg: "h-12 rounded-lg px-8 touch-target-large",
         icon: "h-10 w-10 touch-target-large",

@@ -27,6 +27,48 @@ const defaultBrands: BrandConfig[] = [
     name: 'Aurora Club',
     colors: {
       '--brand-accent': 'hsl(199 89% 48%)',
+      '--primary': '199 89% 48%',
+      '--primary-foreground': '0 0% 100%',
+      '--accent': '173 63% 50%',
+      '--muted': '200 20% 96%',
+      '--card': '0 0% 100%',
+      '--background': '210 40% 98%',
+      '--foreground': '210 10% 15%',
+      '--border': '200 15% 88%',
+      '--ring': '199 89% 48%'
+    },
+  },
+  {
+    key: 'classic',
+    name: 'Classic Plum',
+    colors: {
+      '--brand-accent': 'hsl(275 60% 52%)',
+      '--primary': '275 60% 52%',
+      '--primary-foreground': '0 0% 100%',
+      '--accent': '330 45% 90%',
+      '--muted': '280 20% 96%',
+      '--card': '0 0% 100%',
+      '--background': '0 0% 99%',
+      '--foreground': '230 15% 15%',
+      '--border': '270 15% 90%',
+      '--ring': '275 60% 52%'
+    },
+  },
+  {
+    key: 'noir',
+    name: 'Noir Ivory',
+    colors: {
+      '--brand-accent': 'hsl(260 5% 90%)',
+      '--background': '240 10% 5%',
+      '--foreground': '0 0% 98%',
+      '--primary': '260 5% 90%',
+      '--primary-foreground': '240 10% 10%',
+      '--secondary': '240 6% 12%',
+      '--muted': '240 6% 12%',
+      '--card': '240 8% 7%',
+      '--accent': '280 5% 15%',
+      '--border': '240 6% 18%',
+      '--ring': '260 5% 90%'
     },
   },
 ];
@@ -36,6 +78,7 @@ const BrandContext = createContext<BrandContextValue | undefined>(undefined);
 function applyBrandVariables(brand: BrandConfig) {
   const root = document.documentElement;
   root.setAttribute('data-brand', brand.key);
+  root.setAttribute('data-theme', brand.key);
   root.style.setProperty('--brand-name', `'${brand.name}'`);
   if (brand.colors) {
     Object.entries(brand.colors).forEach(([k, v]) => {

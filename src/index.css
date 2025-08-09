@@ -450,3 +450,29 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: none;
   -webkit-appearance: none;
 }
+
+/* Compact density overrides for a more elegant mobile UI */
+@layer base {
+  [data-density="compact"] {
+    --mobile-header-height: 48px;
+    --mobile-nav-height: 64px;
+    --radius: 0.625rem;
+  }
+}
+
+@layer components {
+  /* Slightly tighter type scale on compact density */
+  [data-density="compact"] .mobile-text-base { @apply text-[13px]; }
+  [data-density="compact"] .mobile-text-lg { @apply text-sm; }
+  [data-density="compact"] .mobile-text-xl { @apply text-base; }
+
+  /* Tighter grid gaps */
+  [data-density="compact"] .stats-grid { @apply gap-2; }
+
+  /* Softer card radii on compact */
+  [data-density="compact"] .card-primary,
+  [data-density="compact"] .card-secondary { border-radius: 0.75rem !important; }
+
+  /* Buttons look slimmer while remaining 44px hit target */
+  [data-density="compact"] button { min-height: 44px; }
+}

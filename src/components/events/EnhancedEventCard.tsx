@@ -334,7 +334,16 @@ export const EnhancedEventCard = memo(({
             {event.location && (
               <div className="flex items-center gap-2">
                 <MapPin className="w-3 h-3 text-muted-foreground shrink-0" />
-                <span className="line-clamp-1 text-xs">{event.location}</span>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="line-clamp-1 text-xs text-primary hover:underline"
+                  aria-label="Open location in Google Maps"
+                >
+                  {event.location}
+                </a>
               </div>
             )}
 
@@ -488,7 +497,16 @@ export const EnhancedEventCard = memo(({
             {event.location && (
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-muted-foreground" />
-                <span className="line-clamp-1">{event.location}</span>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="line-clamp-1 text-primary hover:underline"
+                  aria-label="Open location in Google Maps"
+                >
+                  {event.location}
+                </a>
               </div>
             )}
             <div className="flex items-center gap-2">

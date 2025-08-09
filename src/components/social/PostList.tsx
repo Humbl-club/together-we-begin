@@ -117,7 +117,6 @@ export const PostList: React.FC<PostListProps> = ({
             aria-label={isLiked ? 'Unlike' : 'Like'}
           >
             <Heart className={`w-4 h-4 mr-1 ${isLiked ? 'fill-current' : ''}`} />
-            {likeCount}
           </Button>
           <Button
             variant="ghost"
@@ -125,7 +124,6 @@ export const PostList: React.FC<PostListProps> = ({
             onClick={() => toggleComments(post.id)}
           >
             <MessageCircle className="w-4 h-4 mr-1" />
-            {commentCount}
           </Button>
         </div>
 

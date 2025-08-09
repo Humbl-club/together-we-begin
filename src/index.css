@@ -52,20 +52,20 @@
     --popover: 0 0% 99%;
     --popover-foreground: 210 11% 15%;
 
-    /* Editorial Primary - Deep charcoal with warmth */
-    --primary: 210 10% 22%;
+    /* Primary - Pastel Sage */
+    --primary: 140 22% 34%;
     --primary-foreground: 0 0% 98%;
 
-    /* Sophisticated Secondary - Warm grey */
-    --secondary: 30 8% 92%;
+    /* Sophisticated Secondary - Soft Mist */
+    --secondary: 200 25% 96%;
     --secondary-foreground: 210 11% 15%;
 
-    /* Muted - Refined neutral */
-    --muted: 210 11% 95%;
-    --muted-foreground: 210 8% 50%;
+    /* Muted - Gentle neutrals */
+    --muted: 200 20% 95%;
+    --muted-foreground: 210 8% 45%;
 
-    /* Accent - Subtle warmth */
-    --accent: 10 20% 88%;
+    /* Accent - Misty Blue */
+    --accent: 200 30% 92%;
     --accent-foreground: 210 11% 15%;
 
     /* Error handling */
@@ -122,16 +122,16 @@
     --popover: 210 15% 8%;
     --popover-foreground: 210 11% 92%;
 
-    --primary: 210 12% 82%;
+    --primary: 140 20% 78%;
     --primary-foreground: 210 15% 8%;
 
-    --secondary: 210 15% 15%;
+    --secondary: 200 15% 18%;
     --secondary-foreground: 210 11% 85%;
 
-    --muted: 210 15% 12%;
-    --muted-foreground: 210 8% 55%;
+    --muted: 200 12% 14%;
+    --muted-foreground: 210 8% 60%;
 
-    --accent: 210 15% 16%;
+    --accent: 200 18% 20%;
     --accent-foreground: 210 11% 85%;
 
     --destructive: 0 55% 45%;

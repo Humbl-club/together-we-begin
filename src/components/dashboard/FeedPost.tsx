@@ -86,11 +86,9 @@ const FeedPost: React.FC<FeedPostProps> = memo(({
           <div className="flex items-center space-x-4">
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary p-0">
               <Heart className="h-4 w-4 mr-1" />
-              <span className="text-xs">{likes}</span>
             </Button>
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary p-0">
               <MessageCircle className="h-4 w-4 mr-1" />
-              <span className="text-xs">{comments}</span>
             </Button>
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary p-0">
               <Share2 className="h-4 w-4" />

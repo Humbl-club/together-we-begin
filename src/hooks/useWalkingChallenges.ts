@@ -42,7 +42,7 @@ export const useWalkingChallenges = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
-  const { syncSteps } = useStepTracking();
+  const { syncSteps, startTracking, isTracking } = useStepTracking();
 
   useEffect(() => {
     if (user) {
@@ -79,6 +79,15 @@ export const useWalkingChallenges = () => {
       };
     }
   }, [user]);
+
+  // Auto-start pedometer when there are active walking challenges
+  useEffect(() => {
+    if (!user) return;
+    const hasActiveWalking = challenges.length > 0;
+    if (hasActiveWalking && !isTracking) {
+      startTracking();
+    }
+  }, [user, challenges, isTracking, startTracking]);
 
   const fetchWalkingChallenges = async () => {
     try {
@@ -224,6 +233,10 @@ export const useWalkingChallenges = () => {
         title: "Challenge Joined!",
         description: "You've successfully joined the walking challenge. Start stepping!"
       });
+
+      // Ensure tracking is on and sync immediately
+      try { await startTracking(); } catch {}
+      const result = await syncStepsForChallenge(challengeId);
 
       // Refresh data
       await fetchUserProgress();

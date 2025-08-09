@@ -189,7 +189,7 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts: p
                       onClick={() => handleLike(post.id)}
                       className={cn(
                         "flex items-center gap-2 h-8 px-2",
-                        post.user_liked && "text-red-500"
+                        post.user_liked && "text-primary"
                       )}
                     >
                       <Heart 
@@ -198,9 +198,6 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts: p
                           post.user_liked && "fill-current"
                         )} 
                       />
-                      <span className="text-xs font-medium">
-                        {post.likes_count}
-                      </span>
                     </MobileNativeButton>
                     
                     <MobileNativeButton
@@ -210,7 +207,6 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts: p
                       className="flex items-center gap-2 h-8 px-2"
                     >
                       <MessageCircle className="h-4 w-4" />
-                      <span className="text-xs font-medium">{post.comments_count}</span>
                     </MobileNativeButton>
                   </div>
                   
@@ -229,33 +225,6 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts: p
         ))}
       </div>
 
-      {/* Real Community Stats */}
-      <div className="px-4">
-        <MobileFirstCard variant="glass" padding="md">
-          <MobileFirstCardContent>
-            <div className="flex items-center justify-center gap-8 text-center">
-              <div>
-                <p className="text-2xl font-bold text-primary">{displayPosts.length}</p>
-                <p className="text-xs text-muted-foreground">Recent Posts</p>
-              </div>
-              <div className="w-px h-8 bg-border"></div>
-              <div>
-                <p className="text-2xl font-bold text-primary">
-                  {displayPosts.reduce((sum, post) => sum + (post.likes_count || 0), 0)}
-                </p>
-                <p className="text-xs text-muted-foreground">Total Likes</p>
-              </div>
-              <div className="w-px h-8 bg-border"></div>
-              <div>
-                <p className="text-2xl font-bold text-primary">
-                  {displayPosts.reduce((sum, post) => sum + (post.comments_count || 0), 0)}
-                </p>
-                <p className="text-xs text-muted-foreground">Total Comments</p>
-              </div>
-            </div>
-          </MobileFirstCardContent>
-        </MobileFirstCard>
-      </div>
     </div>
   );
 });

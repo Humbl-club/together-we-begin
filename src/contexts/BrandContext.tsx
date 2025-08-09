@@ -139,6 +139,34 @@ const defaultBrands: BrandConfig[] = [
       '--ring': '24 64% 52%'
     },
   },
+  {
+    key: 'atelier-ash-rose',
+    name: 'Atelier Ash Rose',
+    colors: {
+      '--brand-accent': 'hsl(332 32% 52%)',
+      '--background': '30 12% 97%', /* light ash */
+      '--foreground': '240 8% 12%',  /* ink */
+      '--primary': '332 32% 52%',   /* dusty rose */
+      '--primary-foreground': '0 0% 100%',
+      '--secondary': '330 20% 92%', /* blush ash */
+      '--secondary-foreground': '240 8% 12%',
+      '--muted': '300 12% 96%',     /* mist */
+      '--muted-foreground': '240 8% 32%',
+      '--card': '0 0% 100%',
+      '--card-foreground': '240 8% 12%',
+      '--accent': '150 20% 40%',    /* sage */
+      '--accent-foreground': '210 11% 15%',
+      '--border': '270 10% 88%',
+      '--ring': '332 32% 52%',
+      /* Extras for gradients and badges */
+      '--rose': '332 32% 52%',
+      '--mauve': '276 16% 62%',
+      '--sage': '150 20% 40%',
+      '--champagne': '37 65% 88%',
+      '--ink': '240 8% 12%',
+      '--mist': '300 12% 96%'
+    }
+  },
 ];
 
 const BrandContext = createContext<BrandContextValue | undefined>(undefined);
@@ -158,7 +186,7 @@ function applyBrandVariables(brand: BrandConfig) {
 export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [brandKey, setBrandKeyState] = useState<string>(() => {
     const fromQuery = new URLSearchParams(window.location.search).get('brand');
-    return fromQuery || localStorage.getItem('brand') || 'ink-copper';
+    return fromQuery || localStorage.getItem('brand') || 'atelier-ash-rose';
   });
 
   const setBrandKey = (key: string) => {

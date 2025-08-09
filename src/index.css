@@ -489,4 +489,43 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   .touch-feedback { @apply transition-transform duration-150 active:scale-95; }
   .hover-scale { @apply transition-transform duration-200 hover:scale-105; }
   .focus-ring { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2; }
+
+  /* Atelier Ash Rose Utilities */
+  .bg-atelier-hero {
+    background-image:
+      radial-gradient(1200px 600px at 80% -20%, hsl(var(--rose) / 0.25), transparent 60%),
+      linear-gradient(135deg, hsl(var(--champagne) / 0.85), hsl(var(--mist) / 0.9));
+    background-blend-mode: soft-light, normal;
+  }
+  .bg-atelier-section {
+    background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted) / 0.7));
+  }
+  .gradient-rose-ink {
+    background: linear-gradient(135deg, hsl(var(--rose) / 0.2), hsl(var(--ink) / 0.85));
+  }
+  .ink-divider {
+    border-top: 1px solid hsl(var(--ink) / 0.08);
+  }
+  .tag-base {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium border;
+  }
+  .tag-event { 
+    @apply tag-base; 
+    color: hsl(var(--sage));
+    background-color: hsl(var(--sage) / 0.12);
+    border-color: hsl(var(--sage) / 0.3);
+  }
+  .tag-challenge { 
+    @apply tag-base; 
+    color: hsl(var(--rose));
+    background-color: hsl(var(--rose) / 0.12);
+    border-color: hsl(var(--rose) / 0.3);
+  }
+  .tag-social { 
+    @apply tag-base; 
+    color: hsl(var(--mauve));
+    background-color: hsl(var(--mauve) / 0.12);
+    border-color: hsl(var(--mauve) / 0.3);
+  }
 }
+

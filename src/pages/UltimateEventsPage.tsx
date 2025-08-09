@@ -414,7 +414,7 @@ const UltimateEventsPage = memo(() => {
             actions={(isAdmin || flags.enableCreateEventButton) && (
               <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                 <DialogTrigger asChild>
-                  <Button className="glass-button mobile:w-full lg:w-auto mobile:h-10 sm:h-11 lg:h-12 mobile:px-4 sm:px-6" aria-label="Create event">
+                  <Button className="glass-button mobile:w-full lg:w-auto mobile:h-10 sm:h-11 lg:h-12 mobile:px-4 sm:px-6" aria-label="Create event" haptic="light">
                     <Plus className="mobile:w-4 mobile:h-4 sm:w-5 sm:h-5 mr-2" />
                     <span className="mobile:text-sm sm:text-base">Create Event</span>
                   </Button>

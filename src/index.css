@@ -484,4 +484,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
   /* Buttons look slimmer while remaining 44px hit target */
   [data-density="compact"] button { min-height: 44px; }
+
+  /* Micro-interaction helpers */
+  .touch-feedback { @apply transition-transform duration-150 active:scale-95; }
+  .hover-scale { @apply transition-transform duration-200 hover:scale-105; }
+  .focus-ring { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2; }
 }

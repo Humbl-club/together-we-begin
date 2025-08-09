@@ -92,16 +92,16 @@ export default function Wellness() {
                     </CardKitTitle>
                   </CardKitHeader>
                   <CardKitContent className="space-y-3">
-                    <Button onClick={logWaterIntake} variant="outline" className="w-full justify-start">
+                    <Button onClick={logWaterIntake} variant="outline" className="w-full justify-start" haptic="tap">
                       💧 Log Water Intake ({healthMetrics.waterIntake}/8 glasses)
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start" haptic="tap">
                       🏃‍♀️ Log Workout
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start" haptic="tap">
                       😴 Log Sleep
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start" haptic="tap">
                       ⚖️ Log Weight
                     </Button>
                   </CardKitContent>
@@ -232,7 +232,7 @@ export default function Wellness() {
                         <Input value={`${healthMetrics.waterIntake}/8 glasses`} readOnly />
                       </div>
                     </div>
-                    <Button className="w-full">
+                    <Button className="w-full" haptic="light">
                       <Plus className="h-4 w-4 mr-2" />
                       Update Metrics
                     </Button>

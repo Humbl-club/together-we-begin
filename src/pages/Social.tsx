@@ -22,6 +22,7 @@ import { PageSection } from '@/components/sections/PageSection';
 import { SectionHeader } from '@/components/sections/SectionHeader';
 import { FilterChips } from '@/components/sections/FilterChips';
 import { AnnouncementBanner } from '@/components/sections/AnnouncementBanner';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
 interface Post {
   id: string;
@@ -69,6 +70,7 @@ const Social: React.FC = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { usePullToRefresh } = useProgressiveEnhancement();
+  const feedback = useHapticFeedback();
 
   // Filters UI state (client-side only, no business logic changes)
   const [filter, setFilter] = useState<'all' | 'media' | 'trending' | 'latest'>('all');
@@ -475,14 +477,14 @@ const Social: React.FC = () => {
 
       <PageSection className="mb-3 motion-safe:animate-fade-in">
         <SectionHeader title="Stories" subtitle="Highlights from your community" />
-        <StoriesBar stories={stories} isMobile={isMobile} onAddStory={() => { setDefaultIsStory(true); setShowCreatePost(true); }} />
+        <StoriesBar stories={stories} isMobile={isMobile} onAddStory={() => { feedback.tap(); setDefaultIsStory(true); setShowCreatePost(true); }} />
       </PageSection>
 
       {/* Composer */}
       {!showCreatePost && (
         <CardKit variant="glass" className="p-4 mb-4">
           <button
-            onClick={() => { setDefaultIsStory(false); setShowCreatePost(true); }}
+            onClick={() => { feedback.tap(); setDefaultIsStory(false); setShowCreatePost(true); }}
             className="w-full text-left p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             aria-label="Open post composer"
           >

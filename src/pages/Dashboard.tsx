@@ -86,11 +86,11 @@ const Dashboard: React.FC = memo(() => {
                 </p>
               </div>
               <div className="hidden md:flex gap-2">
-                <Button variant="secondary" size="sm" className="touch-target" aria-label="Start a challenge">
+                <Button variant="secondary" size="sm" className="touch-target" aria-label="Start a challenge" haptic="light">
                   <Zap className="w-4 h-4 mr-2" />
                   Start Challenge
                 </Button>
-                <Button variant="outline" size="sm" className="touch-target" aria-label="Create an event">
+                <Button variant="outline" size="sm" className="touch-target" aria-label="Create an event" haptic="light">
                   <Calendar className="w-4 h-4 mr-2" />
                   Create Event
                 </Button>
@@ -115,15 +115,15 @@ const Dashboard: React.FC = memo(() => {
                   <CardKitTitle className="text-lg">Quick Actions</CardKitTitle>
                 </CardKitHeader>
                 <CardKitContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start" size="sm">
+                  <Button variant="outline" className="w-full justify-start" size="sm" haptic="tap">
                     <Calendar className="w-4 h-4 mr-2" />
                     Create Event
                   </Button>
-                  <Button variant="outline" className="w-full justify-start" size="sm">
+                  <Button variant="outline" className="w-full justify-start" size="sm" haptic="tap">
                     <Users className="w-4 h-4 mr-2" />
                     Find Friends
                   </Button>
-                  <Button variant="outline" className="w-full justify-start" size="sm">
+                  <Button variant="outline" className="w-full justify-start" size="sm" haptic="tap">
                     <Zap className="w-4 h-4 mr-2" />
                     Start Challenge
                   </Button>

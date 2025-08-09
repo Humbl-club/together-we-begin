@@ -4,6 +4,8 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { useViewport } from '@/hooks/use-mobile';
 import { Navigation } from './Navigation';
 import { MobileGirlsClubHeader } from './MobileGirlsClubHeader';
+import { SidebarTrigger, SidebarProvider } from '@/components/ui/sidebar';
+import AppSidebar from '@/components/app-sidebar/AppSidebar';
 import { MobileLoading } from '@/components/ui/mobile-loading';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
@@ -62,8 +64,8 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   // Calculate layout padding based on viewport
   const getLayoutPadding = () => {
     if (isMobile) return `pb-24 ${showHeader ? 'pt-16' : 'pt-4'}`; // Compact header spacing on mobile
-    if (isTablet) return 'pl-16 pt-4'; // Space for side nav
-    return 'pl-20 pt-4'; // Desktop side nav
+    if (isTablet) return 'pt-4'; // Sidebar handles left spacing
+    return 'pt-4'; // Sidebar handles left spacing
   };
 
   const getMainPadding = () => {
@@ -80,19 +82,43 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
       getLayoutPadding()
     )}>
       <a href="#main-content" className="sr-only focus:not-sr-only fixed top-2 left-2 z-50 px-3 py-2 rounded-md bg-background text-foreground ring-2 ring-primary">Skip to content</a>
-      {/* Mobile Girls Club Header - only on dashboard */}
-      {isMobile && showHeader && <MobileGirlsClubHeader />}
-      
-      <Navigation profile={profile} />
-      <main id="main-content" className={cn(
-        `responsive-container max-w-7xl mx-auto ${getMainPadding()}`,
-        "px-[env(safe-area-inset-left,0px)]",
-        "pr-[env(safe-area-inset-right,0px)]"
-      )}>
-        {/* Pull to refresh indicator */}
-        <div className="pull-refresh-indicator" />
-        {children}
-      </main>
+      {isMobile ? (
+        <>
+          {showHeader && <MobileGirlsClubHeader />}
+          <Navigation profile={profile} />
+          <main id="main-content" className={cn(
+            `responsive-container max-w-7xl mx-auto ${getMainPadding()}`,
+            "px-[env(safe-area-inset-left,0px)]",
+            "pr-[env(safe-area-inset-right,0px)]"
+          )}>
+            <div className="pull-refresh-indicator" />
+            {children}
+          </main>
+        </>
+      ) : (
+        // Desktop/Tablet: Shadcn Sidebar layout
+        <SidebarProvider>
+          <div className="flex w-full">
+            <AppSidebar />
+            <div className="flex-1 min-w-0">
+              <header className="sticky top-0 z-40 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/50">
+                <div className="max-w-7xl mx-auto flex items-center gap-3 p-3">
+                  <SidebarTrigger className="hover-scale" />
+                  <h1 className="sr-only">Main navigation</h1>
+                </div>
+              </header>
+              <main id="main-content" className={cn(
+                `responsive-container max-w-7xl mx-auto ${getMainPadding()} animate-fade-in`,
+                "px-[env(safe-area-inset-left,0px)]",
+                "pr-[env(safe-area-inset-right,0px)]"
+              )}>
+                <div className="pull-refresh-indicator" />
+                {children}
+              </main>
+            </div>
+          </div>
+        </SidebarProvider>
+      )}
     </div>
   );
 });

@@ -13,6 +13,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { cn } from '@/lib/utils';
+import { useBrand } from '@/contexts/BrandContext';
 import { 
   User, 
   Settings, 
@@ -46,6 +48,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ profile }) => 
   const haptics = useHapticFeedback();
   const { isMobile, isTablet, isDesktop } = useViewport();
   const [isOpen, setIsOpen] = useState(false);
+  const { brand, availableBrands, setBrandKey } = useBrand();
 
   const getInitials = (name?: string) => {
     return name?.split(' ').map(n => n[0]).join('') || 'AC';
@@ -289,7 +292,31 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ profile }) => 
           </>
         )}
         
-        <DropdownMenuSeparator className="my-3 bg-border/60" />
+<DropdownMenuSeparator className="my-3 bg-border/60" />
+
+{/* Appearance / Theme Switcher */}
+<div className="px-2 py-2">
+  <div className="text-xs text-muted-foreground mb-2">Theme</div>
+  <div className="flex gap-2 flex-wrap">
+    {availableBrands.map((b) => (
+      <button
+        key={b.key}
+        onClick={() => { setBrandKey(b.key); haptics.tap(); }}
+        aria-pressed={brand.key === b.key}
+        className={cn(
+          'px-2 py-1 rounded-md border text-xs',
+          brand.key === b.key
+            ? 'bg-primary/15 text-primary border-primary/30'
+            : 'bg-muted/50 hover:bg-muted/70 border-border/50'
+        )}
+      >
+        {b.name}
+      </button>
+    ))}
+  </div>
+</div>
+
+<DropdownMenuSeparator className="my-3 bg-border/60" />
         
         {/* Sign Out Button */}
         <DropdownMenuItem asChild>

@@ -111,7 +111,7 @@ const MobileEventsPage: React.FC = memo(() => {
             className="border-dashed border-2 text-primary"
           >
             <Plus className="h-5 w-5 mr-2" />
-            Create Your Own Event
+            Create Event
           </MobileNativeButton>
         )}
 

@@ -4,10 +4,10 @@ import { useOptimizedData } from './useOptimizedData';
 import { Event, Post } from '@/types/api';
 
 interface DashboardStats {
-  loyaltyPoints: number;
-  upcomingEvents: number;
-  activeChallenges: number;
-  totalPosts: number;
+  nextEventInDays: number;
+  unreadMessages: number;
+  stepsToday: number;
+  newPostsToday: number;
 }
 
 interface Profile {
@@ -25,19 +25,19 @@ interface SimpleEvent {
 
 interface DashboardData {
   profile: Profile | null;
-  eventsCount: number;
-  challengesCount: number;
-  postsCount: number;
   events?: SimpleEvent[];
-  feedPosts?: Post[];
+  nextEventInDays: number;
+  unreadMessages: number;
+  stepsToday: number;
+  newPostsToday: number;
 }
 
 export const useDashboardData = (userId?: string) => {
   const [stats, setStats] = useState<DashboardStats>({
-    loyaltyPoints: 0,
-    upcomingEvents: 0,
-    activeChallenges: 0,
-    totalPosts: 0
+    nextEventInDays: 0,
+    unreadMessages: 0,
+    stepsToday: 0,
+    newPostsToday: 0
   });
   const [profile, setProfile] = useState<Profile>({});
   const [loading, setLoading] = useState(true); // Start with loading true
@@ -51,8 +51,13 @@ export const useDashboardData = (userId?: string) => {
       const cacheKey = `dashboard-${userId}`;
       
       const dashboardData = await fetchWithCache(cacheKey, async (): Promise<DashboardData> => {
-        // Optimized parallel queries with better data selection
-        const [profileResult, eventsResult, challengesResult, postsResult] = await Promise.all([
+        const today = new Date();
+        const todayISODate = today.toISOString().slice(0, 10);
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        const startOfTodayISO = startOfToday.toISOString();
+
+        const [profileResult, eventsResult, unreadMessagesResult, stepsResult, postsTodayResult] = await Promise.all([
           supabase
             .from('profiles')
             .select('*')
@@ -65,32 +70,49 @@ export const useDashboardData = (userId?: string) => {
             .order('start_time', { ascending: true })
             .limit(5),
           supabase
-            .from('challenges')
-            .select('id')
-            .eq('status', 'active'),
+            .from('direct_messages')
+            .select('id', { count: 'exact', head: true })
+            .eq('recipient_id', userId)
+            .is('read_at', null),
+          supabase
+            .from('health_data')
+            .select('steps')
+            .eq('user_id', userId)
+            .eq('date', todayISODate)
+            .maybeSingle(),
           supabase
             .from('social_posts')
-            .select('id')
-            .eq('user_id', userId)
+            .select('id', { count: 'exact', head: true })
             .eq('status', 'active')
+            .gte('created_at', startOfTodayISO)
         ]);
+
+        const nextEventStart = (eventsResult.data as any)?.[0]?.start_time as string | undefined;
+        let nextEventInDays = 0;
+        if (nextEventStart) {
+          const now = new Date();
+          const nextDate = new Date(nextEventStart);
+          const diffMs = nextDate.getTime() - now.getTime();
+          nextEventInDays = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+        }
 
         return {
           profile: profileResult.data,
-          eventsCount: eventsResult.data?.length || 0,
-          challengesCount: challengesResult.data?.length || 0,
-          postsCount: postsResult.data?.length || 0,
           events: (eventsResult.data || []) as SimpleEvent[],
+          nextEventInDays,
+          unreadMessages: unreadMessagesResult.count || 0,
+          stepsToday: (stepsResult.data as any)?.steps || 0,
+          newPostsToday: postsTodayResult.count || 0,
         };
       });
 
       if (dashboardData.profile) setProfile(dashboardData.profile);
 
       setStats({
-        loyaltyPoints: dashboardData.profile?.available_loyalty_points || 0,
-        upcomingEvents: dashboardData.eventsCount,
-        activeChallenges: dashboardData.challengesCount,
-        totalPosts: dashboardData.postsCount
+        nextEventInDays: dashboardData.nextEventInDays,
+        unreadMessages: dashboardData.unreadMessages,
+        stepsToday: dashboardData.stepsToday,
+        newPostsToday: dashboardData.newPostsToday
       });
     } catch (error) {
       console.error('Error loading dashboard data:', error);

@@ -208,7 +208,7 @@ const MobileUpcomingEvents: React.FC<MobileUpcomingEventsProps> = memo(({ events
             className="text-primary border-primary/20 hover:bg-primary/5"
           >
             <Calendar className="h-5 w-5 mr-2" />
-            Create Your Own Event
+            Create Event
           </MobileNativeButton>
         </div>
       )}

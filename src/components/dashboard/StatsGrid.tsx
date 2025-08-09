@@ -7,10 +7,10 @@ import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
 interface DashboardStats {
-  loyaltyPoints: number;
-  upcomingEvents: number;
-  activeChallenges: number;
-  totalPosts: number;
+  nextEventInDays: number;
+  unreadMessages: number;
+  stepsToday: number;
+  newPostsToday: number;
 }
 
 interface StatsGridProps {
@@ -83,44 +83,44 @@ const StatsGrid: React.FC<StatsGridProps> = memo(({ stats }) => {
   
   const statCards = useMemo(() => [
     {
-      title: 'Loyalty Points',
-      value: stats.loyaltyPoints,
-      icon: Award,
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-500/20',
-      progress: Math.min((stats.loyaltyPoints / 500) * 100, 100),
-      change: stats.loyaltyPoints > 0 ? `+${Math.round(stats.loyaltyPoints * 0.1)}` : '0',
-      trend: stats.loyaltyPoints > 0 ? 'up' as const : 'stable' as const
-    },
-    {
-      title: 'Events This Month',
-      value: stats.upcomingEvents,
+      title: 'Next Event (days)',
+      value: stats.nextEventInDays,
       icon: Calendar,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-500/20',
-      progress: Math.min((stats.upcomingEvents / 10) * 100, 100),
-      change: stats.upcomingEvents > 0 ? `${stats.upcomingEvents}` : '0',
-      trend: stats.upcomingEvents > 0 ? 'up' as const : 'stable' as const
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
+      progress: Math.min((stats.nextEventInDays / 14) * 100, 100),
+      change: stats.nextEventInDays === 0 ? 'Today' : `${stats.nextEventInDays}d`,
+      trend: 'stable' as const
     },
     {
-      title: 'Active Challenges',
-      value: stats.activeChallenges,
-      icon: Trophy,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-500/20',
-      progress: Math.min((stats.activeChallenges / 5) * 100, 100),
-      change: stats.activeChallenges > 0 ? `${stats.activeChallenges}` : '0',
-      trend: stats.activeChallenges > 0 ? 'up' as const : 'stable' as const
-    },
-    {
-      title: 'Community Posts',
-      value: stats.totalPosts,
+      title: 'Unread Messages',
+      value: stats.unreadMessages,
       icon: Users,
-      color: 'text-green-600',
-      bgColor: 'bg-green-500/20',
-      progress: Math.min((stats.totalPosts / 20) * 100, 100),
-      change: stats.totalPosts > 0 ? `${stats.totalPosts}` : '0',
-      trend: stats.totalPosts > 0 ? 'up' as const : 'stable' as const
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
+      progress: Math.min((stats.unreadMessages / 20) * 100, 100),
+      change: stats.unreadMessages > 0 ? `+${stats.unreadMessages}` : '0',
+      trend: stats.unreadMessages > 0 ? 'up' as const : 'stable' as const
+    },
+    {
+      title: 'Steps Today',
+      value: stats.stepsToday,
+      icon: Trophy,
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
+      progress: Math.min((stats.stepsToday / 8000) * 100, 100),
+      change: `${Math.min(100, Math.round((stats.stepsToday / 8000) * 100))}%`,
+      trend: 'up' as const
+    },
+    {
+      title: 'New Posts Today',
+      value: stats.newPostsToday,
+      icon: Award,
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
+      progress: Math.min((stats.newPostsToday / 20) * 100, 100),
+      change: stats.newPostsToday > 0 ? `+${stats.newPostsToday}` : '0',
+      trend: stats.newPostsToday > 0 ? 'up' as const : 'stable' as const
     }
   ], [stats]);
 

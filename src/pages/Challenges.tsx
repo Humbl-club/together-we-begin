@@ -579,11 +579,11 @@ const Challenges: React.FC = () => {
               icon={<Target className="w-full h-full" />}
               title="Ready for a Challenge?"
               description="New challenges are on the way! These exciting opportunities will help you grow, achieve your goals, and earn rewards along the journey."
-              action={{
+              action={isAdmin ? {
                 label: "Create Challenge",
                 onClick: () => setShowCreateChallenge(true),
                 variant: "default"
-              }}
+              } : undefined}
             />
           )}
         </TabsContent>

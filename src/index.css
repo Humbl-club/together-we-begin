@@ -53,7 +53,7 @@
     --popover-foreground: 210 11% 15%;
 
     /* Editorial Primary - Deep charcoal with warmth */
-    --primary: 210 15% 25%;
+    --primary: 210 10% 22%;
     --primary-foreground: 0 0% 98%;
 
     /* Sophisticated Secondary - Warm grey */
@@ -65,7 +65,7 @@
     --muted-foreground: 210 8% 50%;
 
     /* Accent - Subtle warmth */
-    --accent: 25 15% 90%;
+    --accent: 10 20% 88%;
     --accent-foreground: 210 11% 15%;
 
     /* Error handling */
@@ -122,7 +122,7 @@
     --popover: 210 15% 8%;
     --popover-foreground: 210 11% 92%;
 
-    --primary: 210 11% 85%;
+    --primary: 210 12% 82%;
     --primary-foreground: 210 15% 8%;
 
     --secondary: 210 15% 15%;
@@ -131,7 +131,7 @@
     --muted: 210 15% 12%;
     --muted-foreground: 210 8% 55%;
 
-    --accent: 210 15% 18%;
+    --accent: 210 15% 16%;
     --accent-foreground: 210 11% 85%;
 
     --destructive: 0 55% 45%;

@@ -91,8 +91,6 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts: p
                       <h4 className="font-medium text-sm">{post.profile_data?.full_name || 'Anonymous'}</h4>
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{post.content}</p>
                       <div className="flex items-center gap-4 mt-2">
-                        <span className="text-xs text-muted-foreground">{post.likes_count} likes</span>
-                        <span className="text-xs text-muted-foreground">{post.comments_count} comments</span>
                       </div>
                     </div>
                   </div>

@@ -42,23 +42,7 @@ const WellnessWidget: React.FC<WellnessWidgetProps> = ({ onChallengeSync }) => {
       goal: healthGoals.dailySteps.toLocaleString(),
       progress: getProgressPercentage('dailySteps'),
       icon: Activity,
-      color: 'text-blue-500'
-    },
-    {
-      label: 'Active Minutes',
-      value: healthData.activeMinutes,
-      goal: healthGoals.weeklyExercise,
-      progress: getProgressPercentage('weeklyExercise'),
-      icon: Heart,
-      color: 'text-red-500'
-    },
-    {
-      label: 'Distance (km)',
-      value: healthData.distance.toFixed(1),
-      goal: healthGoals.monthlyDistance,
-      progress: getProgressPercentage('monthlyDistance'),
-      icon: Target,
-      color: 'text-green-500'
+      color: 'text-primary'
     }
   ];
 
@@ -70,7 +54,7 @@ const WellnessWidget: React.FC<WellnessWidgetProps> = ({ onChallengeSync }) => {
             <TrendingUp className="w-5 h-5 text-primary" />
             Wellness Tracking
             {isConnected ? (
-              <Badge className="bg-green-500">Connected</Badge>
+              <Badge className="bg-primary/15 text-primary border-0">Connected</Badge>
             ) : (
               <Badge variant="outline">Manual</Badge>
             )}

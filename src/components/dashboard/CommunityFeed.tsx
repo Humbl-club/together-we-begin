@@ -474,10 +474,9 @@ const CommunityFeed: React.FC = () => {
                       variant="ghost" 
                       size="sm"
                       onClick={() => toggleLike(post.id)}
-                      className={post.user_liked ? 'text-red-500' : ''}
+                      className={post.user_liked ? 'text-primary' : ''}
                     >
                       <Heart className={`w-4 h-4 mr-1 ${post.user_liked ? 'fill-current' : ''}`} />
-                      {post.likes_count || 0}
                     </Button>
                     <Button 
                       variant="ghost" 
@@ -492,7 +491,6 @@ const CommunityFeed: React.FC = () => {
                       }}
                     >
                       <MessageCircle className="w-4 h-4 mr-1" />
-                      {post.comments_count || 0}
                     </Button>
                     <ShareButton 
                       postId={post.id} 

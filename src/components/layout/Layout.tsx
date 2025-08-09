@@ -61,9 +61,8 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
     );
   }
 
-  // Calculate layout padding based on viewport
   const getLayoutPadding = () => {
-    if (isMobile) return `pb-24 ${showHeader ? 'pt-16' : 'pt-4'}`; // Compact header spacing on mobile
+    if (isMobile) return `pb-24 ${showHeader ? 'pt-0' : 'pt-4'}`; // Spacer handles header height when shown
     if (isTablet) return 'pt-4'; // Sidebar handles left spacing
     return 'pt-4'; // Sidebar handles left spacing
   };
@@ -85,6 +84,7 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
       {isMobile ? (
         <>
           {showHeader && <MobileGirlsClubHeader />}
+          {showHeader && <div aria-hidden className="w-full" style={{ height: 'var(--mobile-header-height)' }} />}
           <Navigation profile={profile} />
           <main id="main-content" className={cn(
             `responsive-container max-w-7xl mx-auto ${getMainPadding()}`,

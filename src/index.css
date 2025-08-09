@@ -3,6 +3,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Base typography and colors */
+body { @apply bg-background text-foreground font-sans font-medium antialiased; }
+
 /* Mobile-First Editorial Design System */
 @layer base {
   :root {
@@ -176,26 +179,17 @@
 @layer components {
   /* Enhanced Glass Navigation System */
   .glass-nav {
-    @apply bg-background/85 backdrop-blur-xl border border-border/30 shadow-lg;
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    background: hsl(var(--glass-bg));
-    border-color: hsl(var(--glass-border));
-    box-shadow: 
-      0 8px 32px 0 hsl(var(--glass-shadow)),
-      0 0 0 1px hsl(var(--glass-border)) inset;
+    @apply border shadow-md;
+    background: hsl(var(--card));
+    border-color: hsl(var(--border));
+    box-shadow: 0 8px 24px -8px hsl(var(--foreground) / 0.15);
   }
   
   .nav-glass {
-    @apply bg-background/90 backdrop-blur-2xl border border-border/40 shadow-xl;
-    backdrop-filter: blur(32px) saturate(200%);
-    -webkit-backdrop-filter: blur(32px) saturate(200%);
-    background: hsl(var(--glass-light));
-    border-color: hsl(var(--glass-border));
-    box-shadow: 
-      0 20px 64px -12px hsl(var(--glass-shadow)),
-      0 8px 16px -8px hsl(var(--glass-shadow)),
-      0 0 0 1px hsl(var(--glass-border)) inset;
+    @apply border shadow-xl;
+    background: hsl(var(--card));
+    border-color: hsl(var(--border));
+    box-shadow: 0 20px 48px -16px hsl(var(--foreground) / 0.2);
   }
   
   /* Enhanced Glass Card System */
@@ -224,27 +218,18 @@
   
   /* Floating Glass Navigation */
   .nav-glass-floating {
-    @apply fixed z-50 bg-background/95 backdrop-blur-3xl border border-border/30 shadow-2xl rounded-2xl;
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-    background: hsl(var(--glass-light));
-    border-color: hsl(var(--glass-border));
-    box-shadow: 
-      0 25px 80px -15px hsl(var(--glass-shadow)),
-      0 10px 25px -5px hsl(var(--glass-shadow)),
-      0 0 0 1px hsl(var(--glass-border)) inset,
-      0 1px 0 0 hsl(0 0% 100% / 0.05) inset;
+    @apply fixed z-50 border shadow-2xl rounded-2xl;
+    background: hsl(var(--card));
+    border-color: hsl(var(--border));
+    box-shadow: 0 25px 80px -20px hsl(var(--foreground) / 0.25);
   }
   
   /* Glass Navigation Hover States */
   .glass-nav:hover,
   .nav-glass:hover {
-    background: hsl(var(--glass-hover));
-    border-color: hsl(var(--glass-border));
-    box-shadow: 
-      0 12px 40px 0 hsl(var(--glass-shadow)),
-      0 4px 16px 0 hsl(var(--glass-shadow)),
-      0 0 0 1px hsl(var(--glass-border)) inset;
+    background: hsl(var(--card));
+    border-color: hsl(var(--border));
+    box-shadow: 0 16px 48px -12px hsl(var(--foreground) / 0.25);
   }
   
   /* Mobile-First Design System */

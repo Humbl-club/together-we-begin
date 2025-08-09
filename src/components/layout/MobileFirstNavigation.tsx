@@ -54,8 +54,8 @@ const MobileFirstNavigation = forwardRef<HTMLElement, MobileFirstNavigationProps
                   "transform-gpu touch-manipulation relative overflow-hidden group",
                   "active:scale-95 active:bg-primary/10",
                   isActive(item.href)
-                    ? "text-primary bg-primary/10 backdrop-blur-sm" 
-                    : "text-foreground/80 hover:text-foreground hover:bg-background/50"
+                    ? "text-primary bg-primary/15" 
+                    : "text-foreground hover:bg-muted"
                 )}
               >
                 <item.icon className={cn(
@@ -63,8 +63,8 @@ const MobileFirstNavigation = forwardRef<HTMLElement, MobileFirstNavigationProps
                   isActive(item.href) && "text-primary"
                 )} />
                 <span className={cn(
-                  "text-xs font-medium",
-                  isActive(item.href) ? "text-primary" : "text-foreground/80"
+                  "text-xs font-semibold",
+                  isActive(item.href) ? "text-primary" : "text-foreground"
                 )}>
                   {item.label}
                 </span>

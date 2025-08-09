@@ -122,6 +122,23 @@ const defaultBrands: BrandConfig[] = [
       '--ring': '330 50% 60%'
     },
   },
+  {
+    key: 'ink-copper',
+    name: 'Humbl Ink & Copper',
+    colors: {
+      '--brand-accent': 'hsl(24 64% 52%)',
+      '--background': '40 20% 98%',
+      '--foreground': '240 10% 10%',
+      '--primary': '24 64% 52%',
+      '--primary-foreground': '0 0% 100%',
+      '--secondary': '240 5% 96%',
+      '--muted': '240 6% 96%',
+      '--card': '0 0% 100%',
+      '--accent': '24 50% 50%',
+      '--border': '240 6% 90%',
+      '--ring': '24 64% 52%'
+    },
+  },
 ];
 
 const BrandContext = createContext<BrandContextValue | undefined>(undefined);
@@ -141,7 +158,7 @@ function applyBrandVariables(brand: BrandConfig) {
 export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [brandKey, setBrandKeyState] = useState<string>(() => {
     const fromQuery = new URLSearchParams(window.location.search).get('brand');
-    return fromQuery || localStorage.getItem('brand') || 'blush';
+    return fromQuery || localStorage.getItem('brand') || 'ink-copper';
   });
 
   const setBrandKey = (key: string) => {

@@ -144,26 +144,26 @@ const WelcomeFlow: React.FC<WelcomeFlowProps> = ({ onComplete }) => {
       content: (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 rounded-xl">
-              <Users className="w-8 h-8 text-pink-500 mb-2" />
+            <div className="p-4 bg-gradient-to-br from-primary/10 to-transparent dark:from-primary/20 dark:to-transparent rounded-xl">
+              <Users className="w-8 h-8 text-primary mb-2" />
               <h3 className="font-semibold mb-1">Connect & Share</h3>
               <p className="text-sm text-muted-foreground">Share your journey and connect with like-minded women</p>
             </div>
             
-            <div className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl">
-              <Trophy className="w-8 h-8 text-blue-500 mb-2" />
+            <div className="p-4 bg-gradient-to-br from-foreground/5 to-transparent dark:from-foreground/10 dark:to-transparent rounded-xl">
+              <Trophy className="w-8 h-8 text-foreground mb-2" />
               <h3 className="font-semibold mb-1">Wellness Challenges</h3>
               <p className="text-sm text-muted-foreground">Join challenges and earn loyalty points</p>
             </div>
             
-            <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl">
-              <Sparkles className="w-8 h-8 text-green-500 mb-2" />
+            <div className="p-4 bg-gradient-to-br from-primary/10 to-transparent dark:from-primary/20 dark:to-transparent rounded-xl">
+              <Sparkles className="w-8 h-8 text-primary mb-2" />
               <h3 className="font-semibold mb-1">Exclusive Events</h3>
               <p className="text-sm text-muted-foreground">Access women-only events and workshops</p>
             </div>
             
-            <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl">
-              <Heart className="w-8 h-8 text-amber-500 mb-2" />
+            <div className="p-4 bg-gradient-to-br from-foreground/5 to-transparent dark:from-foreground/10 dark:to-transparent rounded-xl">
+              <Heart className="w-8 h-8 text-foreground mb-2" />
               <h3 className="font-semibold mb-1">Safe Space</h3>
               <p className="text-sm text-muted-foreground">A protected environment designed for women</p>
             </div>

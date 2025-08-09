@@ -33,15 +33,15 @@ export const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'post_created':
-        return <MessageSquare className="w-4 h-4 text-blue-500" />;
+        return <MessageSquare className="w-4 h-4 text-primary" />;
       case 'challenge_joined':
-        return <Trophy className="w-4 h-4 text-yellow-500" />;
+        return <Trophy className="w-4 h-4 text-primary" />;
       case 'event_registered':
-        return <Calendar className="w-4 h-4 text-green-500" />;
+        return <Calendar className="w-4 h-4 text-primary" />;
       case 'goal_achieved':
-        return <Target className="w-4 h-4 text-purple-500" />;
+        return <Target className="w-4 h-4 text-primary" />;
       case 'story_posted':
-        return <ImageIcon className="w-4 h-4 text-pink-500" />;
+        return <ImageIcon className="w-4 h-4 text-primary" />;
       default:
         return <Activity className="w-4 h-4 text-muted-foreground" />;
     }
@@ -124,7 +124,7 @@ export const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
             <Activity className="w-4 h-4 text-primary" />
             Live Activity
             <Badge variant="secondary" className="ml-2 animate-pulse">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-1" />
+              <div className="w-2 h-2 bg-primary rounded-full mr-1" />
               Live
             </Badge>
           </CardTitle>
@@ -189,8 +189,8 @@ export const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({
 
                     {activity.activity_data.points_earned && (
                       <div className="flex items-center gap-1 mt-1">
-                        <Star className="w-3 h-3 text-yellow-500" />
-                        <span className="text-xs font-medium text-yellow-600">
+                        <Star className="w-3 h-3 text-primary" />
+                        <span className="text-xs font-medium text-primary/90">
                           +{activity.activity_data.points_earned} points
                         </span>
                       </div>

@@ -195,7 +195,6 @@ const defaultBrands: BrandConfig[] = [
       '--mist': '210 30% 96%'
     }
   },
-,
   {
     key: 'miu-muse',
     name: 'Miu Muse',
@@ -248,10 +247,11 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.setItem('brand', key);
   };
 
-  const brand = useMemo(
-    () => defaultBrands.find(b => b.key === brandKey) || defaultBrands[0],
-    [brandKey]
-  );
+  const brand = useMemo(() => {
+    const list = (defaultBrands || []).filter(Boolean) as BrandConfig[];
+    const found = list.find((b) => b && b.key === brandKey);
+    return found || list[0];
+  }, [brandKey]);
 
   useEffect(() => {
     applyBrandVariables(brand);

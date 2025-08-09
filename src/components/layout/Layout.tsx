@@ -9,6 +9,7 @@ import AppSidebar from '@/components/app-sidebar/AppSidebar';
 import { MobileLoading } from '@/components/ui/mobile-loading';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import EditorialMasthead from '@/components/layout/EditorialMasthead';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -101,12 +102,7 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
           <div className="flex w-full">
             <AppSidebar />
             <div className="flex-1 min-w-0">
-              <header className="sticky top-0 z-40 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/50">
-                <div className="max-w-7xl mx-auto flex items-center gap-3 p-3">
-                  <SidebarTrigger className="hover-scale" />
-                  <h1 className="sr-only">Main navigation</h1>
-                </div>
-              </header>
+              <EditorialMasthead />
               <main id="main-content" className={cn(
                 `responsive-container max-w-7xl mx-auto ${getMainPadding()} animate-fade-in`,
                 "px-[env(safe-area-inset-left,0px)]",

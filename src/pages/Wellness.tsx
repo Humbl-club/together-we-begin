@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardKit, CardKitContent, CardKitHeader, CardKitTitle } from '@/components/ui/card-kit';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -83,14 +83,14 @@ export default function Wellness() {
                   <WellnessWidget />
                 </div>
                 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                <CardKit>
+                  <CardKitHeader>
+                    <CardKitTitle className="flex items-center gap-2">
                       <Heart className="h-5 w-5 text-primary" />
                       Quick Actions
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
+                    </CardKitTitle>
+                  </CardKitHeader>
+                  <CardKitContent className="space-y-3">
                     <Button onClick={logWaterIntake} variant="outline" className="w-full justify-start">
                       💧 Log Water Intake ({healthMetrics.waterIntake}/8 glasses)
                     </Button>
@@ -103,17 +103,17 @@ export default function Wellness() {
                     <Button variant="outline" className="w-full justify-start">
                       ⚖️ Log Weight
                     </Button>
-                  </CardContent>
-                </Card>
+                  </CardKitContent>
+                </CardKit>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                <CardKit>
+                  <CardKitHeader>
+                    <CardKitTitle className="flex items-center gap-2">
                       <Calendar className="h-5 w-5 text-accent" />
                       This Week
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
+                    </CardKitTitle>
+                  </CardKitHeader>
+                  <CardKitContent className="space-y-3">
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>Workouts Completed</span>
@@ -128,18 +128,18 @@ export default function Wellness() {
                       </div>
                       <Progress value={getProgressPercentage(weeklyProgress.activeMinutes, 420)} className="h-2" />
                     </div>
-                  </CardContent>
-                </Card>
+                  </CardKitContent>
+                </CardKit>
               </div>
             </TabsContent>
 
             <TabsContent value="weekly" className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Weekly Goals Progress</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                <CardKit>
+                  <CardKitHeader>
+                    <CardKitTitle>Weekly Goals Progress</CardKitTitle>
+                  </CardKitHeader>
+                  <CardKitContent className="space-y-4">
                     <div className="space-y-3">
                       <div>
                         <div className="flex justify-between text-sm mb-1">
@@ -173,14 +173,14 @@ export default function Wellness() {
                         <Progress value={getProgressPercentage(weeklyProgress.sleepHours, weeklyGoals.sleepHours)} />
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </CardKitContent>
+                </CardKit>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Weekly Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                <CardKit>
+                  <CardKitHeader>
+                    <CardKitTitle>Weekly Summary</CardKitTitle>
+                  </CardKitHeader>
+                  <CardKitContent>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                         <div>
@@ -201,18 +201,18 @@ export default function Wellness() {
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </CardKitContent>
+                </CardKit>
               </div>
             </TabsContent>
 
             <TabsContent value="metrics" className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Current Health Metrics</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                <CardKit>
+                  <CardKitHeader>
+                    <CardKitTitle>Current Health Metrics</CardKitTitle>
+                  </CardKitHeader>
+                  <CardKitContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Weight (kg)</Label>
@@ -235,14 +235,14 @@ export default function Wellness() {
                       <Plus className="h-4 w-4 mr-2" />
                       Update Metrics
                     </Button>
-                  </CardContent>
-                </Card>
+                  </CardKitContent>
+                </CardKit>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Health Trends</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                <CardKit>
+                  <CardKitHeader>
+                    <CardKitTitle>Health Trends</CardKitTitle>
+                  </CardKitHeader>
+                  <CardKitContent>
                     <div className="space-y-4">
                       <div className="p-4 border rounded-lg">
                         <h4 className="font-semibold mb-2">Weight Trend</h4>
@@ -260,20 +260,20 @@ export default function Wellness() {
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </CardKitContent>
+                </CardKit>
               </div>
             </TabsContent>
 
             <TabsContent value="achievements" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <CardKit>
+                <CardKitHeader>
+                  <CardKitTitle className="flex items-center gap-2">
                     <Award className="h-5 w-5 text-accent" />
                     Your Achievements
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+                  </CardKitTitle>
+                </CardKitHeader>
+                <CardKitContent>
                   <div className="grid gap-3 md:grid-cols-2">
                     {achievements.map((achievement) => (
                       <div
@@ -293,8 +293,8 @@ export default function Wellness() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </CardKitContent>
+              </CardKit>
             </TabsContent>
           </Tabs>
         </div>

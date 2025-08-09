@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useRealtime } from '@/contexts/RealtimeContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent } from '@/components/ui/card';
+import { CardKit } from '@/components/ui/card-kit';
 import { useToast } from '@/hooks/use-toast';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { AdvancedSearch, type SearchableItem } from '@/components/search/AdvancedSearch';
@@ -480,14 +480,15 @@ const Social: React.FC = () => {
 
       {/* Composer */}
       {!showCreatePost && (
-        <Card className="glass-card p-4 mb-4">
+        <CardKit variant="glass" className="p-4 mb-4">
           <button
             onClick={() => { setDefaultIsStory(false); setShowCreatePost(true); }}
             className="w-full text-left p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+            aria-label="Open post composer"
           >
             What's on your mind?
           </button>
-        </Card>
+        </CardKit>
       )}
 
       {showCreatePost && (

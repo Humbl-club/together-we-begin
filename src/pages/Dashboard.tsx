@@ -19,7 +19,7 @@ import { DashboardLoadingSkeleton, MobileLoading } from '@/components/ui/mobile-
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { EnhancedErrorBoundary } from '@/hooks/useEnhancedErrorBoundary';
 import { MobileContainer } from '@/components/ui/mobile-container';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardKit, CardKitContent, CardKitHeader, CardKitTitle } from '@/components/ui/card-kit';
 import { Button } from '@/components/ui/button';
 import { SEO } from '@/components/seo/SEO';
 import { Calendar, Users, Zap } from 'lucide-react';
@@ -108,11 +108,11 @@ const Dashboard: React.FC = memo(() => {
               <HealthPermissionPrompt onConnected={() => refetch()} />
               <WellnessWidget onChallengeSync={(challengeId) => console.log('Sync challenge:', challengeId)} />
 
-              <Card className="card-secondary">
-                <CardHeader>
-                  <CardTitle className="text-lg">Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
+              <CardKit>
+                <CardKitHeader>
+                  <CardKitTitle className="text-lg">Quick Actions</CardKitTitle>
+                </CardKitHeader>
+                <CardKitContent className="space-y-3">
                   <Button variant="outline" className="w-full justify-start" size="sm">
                     <Calendar className="w-4 h-4 mr-2" />
                     Create Event
@@ -125,8 +125,8 @@ const Dashboard: React.FC = memo(() => {
                     <Zap className="w-4 h-4 mr-2" />
                     Start Challenge
                   </Button>
-                </CardContent>
-              </Card>
+                </CardKitContent>
+              </CardKit>
             </div>
           </div>
         </div>

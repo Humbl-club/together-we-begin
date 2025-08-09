@@ -18,6 +18,8 @@ import { Calendar, Plus, Grid3X3, List, LayoutGrid, Search, Filter } from 'lucid
 import { cn } from '@/lib/utils';
 import { MobileLoading } from '@/components/ui/mobile-loading';
 import { SEO } from '@/components/seo/SEO';
+import { PageSection } from '@/components/sections/PageSection';
+import { SectionHeader } from '@/components/sections/SectionHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -404,21 +406,14 @@ const UltimateEventsPage = memo(() => {
       )}
       <div className="max-w-4xl mx-auto space-y-4">
         {/* Header */}
-        <div className="glass-card-enhanced mobile:p-3 sm:p-4 lg:p-6">
-          <div className="flex flex-col mobile:gap-2 sm:gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <h1 className="font-display mobile:text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">
-                Events
-              </h1>
-              <p className="text-muted-foreground mobile:text-sm sm:text-base lg:text-lg">
-                Discover and join community events
-              </p>
-            </div>
-            
-            {(isAdmin || flags.enableCreateEventButton) && (
+        <PageSection surface="accent" className="mb-3">
+          <SectionHeader
+            title="Events"
+            subtitle="Discover and join community events"
+            actions={(isAdmin || flags.enableCreateEventButton) && (
               <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                 <DialogTrigger asChild>
-                  <Button className="glass-button mobile:w-full lg:w-auto mobile:h-10 sm:h-11 lg:h-12 mobile:px-4 sm:px-6">
+                  <Button className="glass-button mobile:w-full lg:w-auto mobile:h-10 sm:h-11 lg:h-12 mobile:px-4 sm:px-6" aria-label="Create event">
                     <Plus className="mobile:w-4 mobile:h-4 sm:w-5 sm:h-5 mr-2" />
                     <span className="mobile:text-sm sm:text-base">Create Event</span>
                   </Button>
@@ -489,8 +484,8 @@ const UltimateEventsPage = memo(() => {
                 </DialogContent>
               </Dialog>
             )}
-          </div>
-        </div>
+          />
+        </PageSection>
 
         {/* Featured Event */}
         {featuredEvent && (

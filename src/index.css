@@ -97,13 +97,13 @@
     --editorial-navy: 220 25% 20%;
     
     /* Enhanced Glass Effects - Apple Glass Style */
-    --glass-bg: 0 0% 98% / 0.8;
+    --glass-bg: 0 0% 98% / 0.95;
     --glass-border: 210 11% 88% / 0.4;
     --glass-shadow: 210 25% 25% / 0.15;
     --glass-backdrop: blur(24px);
     
     /* Apple Glass Variations */
-    --glass-light: 0 0% 100% / 0.9;
+    --glass-light: 0 0% 100% / 0.96;
     --glass-medium: 0 0% 95% / 0.7;
     --glass-dark: 210 15% 20% / 0.5;
     

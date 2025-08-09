@@ -71,7 +71,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
     return (
       <>
         {/* Simple, highly visible mobile navigation */}
-        <nav className="fixed bottom-0 left-0 right-0 z-[9999] glass-nav border-t border-border/40">
+        <nav className="fixed bottom-0 left-0 right-0 z-[9999] glass-nav border-t border-border/40 text-foreground">
           <div className="grid grid-cols-4 gap-0 px-2 py-3">
             {navItems.map(({ href, icon: Icon, label }) => (
               <Link
@@ -80,8 +80,8 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
                 className={cn(
                   "flex flex-col items-center justify-center p-2 rounded-lg transition-colors",
                   isActive(href)
-                    ? 'text-primary bg-primary/10'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    ? 'text-primary bg-primary/12'
+                    : 'text-foreground/80 hover:text-foreground hover:bg-muted/60'
                 )}
               >
                 <Icon className="w-6 h-6 mb-1" strokeWidth={isActive(href) ? 2.5 : 2} />

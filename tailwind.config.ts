@@ -165,10 +165,10 @@ export default {
 			},
 			// Premium Typography System
 			fontFamily: {
-				'sans': ['Inter', 'system-ui', 'sans-serif'],
-				'serif': ['Crimson Text', 'serif'],
-				'display': ['Cormorant Garamond', 'serif'],
-				'editorial': ['Crimson Text', 'serif'],
+				'sans': ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+				'serif': ['Fraunces', 'serif'],
+				'display': ['Fraunces', 'serif'],
+				'editorial': ['Fraunces', 'serif'],
 			},
 			// Enhanced Animations
 			animation: {

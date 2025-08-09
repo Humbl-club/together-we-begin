@@ -71,7 +71,7 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
     return (
       <>
         {/* Simple, highly visible mobile navigation */}
-        <nav className="fixed bottom-0 left-0 right-0 z-[9999] bg-white border-t border-gray-300 shadow-lg">
+        <nav className="fixed bottom-0 left-0 right-0 z-[9999] glass-nav border-t border-border/40">
           <div className="grid grid-cols-4 gap-0 px-2 py-3">
             {navItems.map(({ href, icon: Icon, label }) => (
               <Link
@@ -80,8 +80,8 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
                 className={cn(
                   "flex flex-col items-center justify-center p-2 rounded-lg transition-colors",
                   isActive(href)
-                    ? 'text-blue-600 bg-blue-50' 
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    ? 'text-primary bg-primary/10'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                 )}
               >
                 <Icon className="w-6 h-6 mb-1" strokeWidth={isActive(href) ? 2.5 : 2} />
@@ -96,11 +96,11 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
         {/* Simple floating message button */}
         <button
           onClick={() => setShowMessaging(true)}
-          className="fixed bottom-20 right-4 z-[9999] w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center"
+          className="fixed bottom-20 right-4 z-[9999] w-12 h-12 bg-primary text-primary-foreground rounded-full shadow-lg flex items-center justify-center"
         >
           <MessageCircle className="w-5 h-5" />
           {totalUnreadCount > 0 && (
-            <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+            <span className="absolute -top-2 -right-2 w-5 h-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
               {totalUnreadCount > 9 ? '9+' : totalUnreadCount}
             </span>
           )}

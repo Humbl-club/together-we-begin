@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { Home, CalendarDays, MessageCircle, Trophy, Users } from 'lucide-react';
@@ -24,13 +25,15 @@ const items = [
 
 export function AppSidebar() {
   const location = useLocation();
+  const { state } = useSidebar();
+  const collapsed = state === 'collapsed';
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     cn(isActive ? 'bg-muted text-primary font-medium' : 'hover:bg-muted/50');
 
   const isExpanded = items.some((i) => i.url === location.pathname);
 
   return (
-    <Sidebar variant="floating" collapsible="icon" className="bg-card text-card-foreground border-r border-border/50">
+    <Sidebar variant="floating" collapsible="icon" className="glass-nav bg-card/80 text-card-foreground border-r border-border/40">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs tracking-wide uppercase text-muted-foreground">Navigate</SidebarGroupLabel>
@@ -41,7 +44,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild isActive={location.pathname === item.url} className="rounded-lg">
                     <NavLink to={item.url} end className={getNavCls}>
                       <item.icon className="mr-2 h-4 w-4" />
-                      <span>{item.title}</span>
+                      {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -15,10 +15,10 @@ export const MobileGirlsClubHeader: React.FC<MobileGirlsClubHeaderProps> = ({ cl
       {/* Artistic glassmorphism banner with premium aesthetics */}
       <div className="relative h-32 overflow-hidden">
         {/* Primary glass foundation */}
-        <div className="absolute inset-0 bg-white/25 backdrop-blur-3xl" />
+        <div className="absolute inset-0 bg-background/25 backdrop-blur-3xl" />
         
         {/* Layered gradient system for depth */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-background/30 via-background/10 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-primary/8 via-transparent to-accent/6" />
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-foreground/2 to-transparent" />
         

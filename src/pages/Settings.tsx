@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { MobileToggle } from '@/components/ui/mobile-toggle';
 import { Bell, Shield, Heart, Users, Palette, Save, MessageCircle, Lock, Search, ChevronRight, ArrowLeft, User } from 'lucide-react';
 import { useUserSettings } from '@/hooks/useUserSettings';
-
+import { useBrand } from '@/contexts/BrandContext';
 // Define the UserSettings type locally to match the hook
 interface UserSettings {
   appearance: {
@@ -67,6 +67,19 @@ const Settings: React.FC = () => {
   const feedback = useHapticFeedback();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeMobileSection, setActiveMobileSection] = useState<string | null>(null);
+  const { brand, availableBrands, setBrandKey } = useBrand();
+
+  const [density, setDensity] = useState<string>(() => localStorage.getItem('density') || 'comfortable');
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (density === 'compact') {
+      root.setAttribute('data-density', 'compact');
+    } else {
+      root.removeAttribute('data-density');
+    }
+    localStorage.setItem('density', density);
+  }, [density]);
 
   if (loading) {
     return (
@@ -279,6 +292,42 @@ const Settings: React.FC = () => {
                       <SelectItem value="small">Small</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
                       <SelectItem value="large">Large</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Brand Theme */}
+                <div className="space-y-2">
+                  <Label>Brand theme</Label>
+                  <div className="flex gap-2 flex-wrap">
+                    {availableBrands.map((b) => (
+                      <button
+                        key={b.key}
+                        onClick={() => { setBrandKey(b.key); feedback.tap(); }}
+                        aria-pressed={brand.key === b.key}
+                        className={cn(
+                          'px-2 py-1 rounded-md border text-xs',
+                          brand.key === b.key
+                            ? 'bg-primary/15 text-primary border-primary/30'
+                            : 'bg-muted/50 hover:bg-muted/70 border-border/50'
+                        )}
+                      >
+                        {b.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Density */}
+                <div className="space-y-2">
+                  <Label htmlFor="density">Density</Label>
+                  <Select value={density} onValueChange={(v) => { setDensity(v); feedback.tap(); }}>
+                    <SelectTrigger className="h-12">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="comfortable">Comfortable</SelectItem>
+                      <SelectItem value="compact">Compact</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

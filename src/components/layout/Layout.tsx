@@ -73,11 +73,12 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
       "pt-[env(safe-area-inset-top,0px)]",
       getLayoutPadding()
     )}>
+      <a href="#main-content" className="sr-only focus:not-sr-only fixed top-2 left-2 z-50 px-3 py-2 rounded-md bg-background text-foreground ring-2 ring-primary">Skip to content</a>
       {/* Mobile Girls Club Header - only on dashboard */}
       {isMobile && showHeader && <MobileGirlsClubHeader />}
       
       <Navigation profile={profile} />
-      <main className={cn(
+      <main id="main-content" className={cn(
         `responsive-container max-w-7xl mx-auto ${getMainPadding()}`,
         "px-[env(safe-area-inset-left,0px)]",
         "pr-[env(safe-area-inset-right,0px)]"

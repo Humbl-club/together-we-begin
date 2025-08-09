@@ -484,7 +484,7 @@ const Social: React.FC = () => {
         <CardKit variant="glass" className="p-4 mb-4">
           <button
             onClick={() => { setDefaultIsStory(false); setShowCreatePost(true); }}
-            className="w-full text-left p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+            className="w-full text-left p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             aria-label="Open post composer"
           >
             What's on your mind?

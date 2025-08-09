@@ -56,6 +56,7 @@ const Dashboard: React.FC = memo(() => {
     return (
       <div className="mobile-app-container" data-pull-refresh>
         <SEO title="Dashboard" description="Your community, events, and wellness at a glance." canonical="/dashboard" />
+        <h1 className="sr-only">Dashboard</h1>
         <MobileDashboard />
       </div>
     );
@@ -70,6 +71,7 @@ const Dashboard: React.FC = memo(() => {
       >
         <div className="desktop-dashboard-container p-6 space-y-6 ml-20">
           <SEO title="Dashboard" description="Your community, events, and wellness at a glance." canonical="/dashboard" />
+          <h1 className="sr-only">Dashboard</h1>
           <DashboardHeader profile={profile} />
 
           {/* Hero Strip */}

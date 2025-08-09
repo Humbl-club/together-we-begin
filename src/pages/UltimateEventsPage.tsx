@@ -28,6 +28,9 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as DayPicker } from '@/components/ui/calendar';
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext';
+import { LocationAutocomplete } from '@/components/events/LocationAutocomplete';
+import { PaymentModal } from '@/components/payment/PaymentModal';
+import { useProfileData } from '@/hooks/useProfileData';
 
 // Ultimate Events Page with enterprise architecture
 const UltimateEventsPage = memo(() => {
@@ -75,6 +78,10 @@ const UltimateEventsPage = memo(() => {
   const [priceInput, setPriceInput] = useState('');
   const [capacityInput, setCapacityInput] = useState<number | ''>('');
   const [submitting, setSubmitting] = useState(false);
+  // Payment state
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [paymentEvent, setPaymentEvent] = useState<any | null>(null);
+  const { profile } = useProfileData(user?.id);
 
   // Load events with enhanced caching and monitoring
   const loadEvents = useCallback(async (status = 'upcoming') => {
@@ -110,12 +117,19 @@ const UltimateEventsPage = memo(() => {
     }
   }, [getEvents, user?.id]);
 
-  // Enhanced event registration with optimistic updates
+  // Enhanced event registration with payment flow for paid events
   const handleRegister = useCallback(async (eventId: string) => {
     if (!user) return;
+
+    const evt = events.find(e => e.id === eventId);
+    if (evt && ((evt.price_cents && evt.price_cents > 0) || (evt.loyalty_points_price && evt.loyalty_points_price > 0))) {
+      setPaymentEvent(evt);
+      setPaymentOpen(true);
+      return;
+    }
     
     try {
-      // Optimistic update
+      // Optimistic update for free events
       setEvents(prev => prev.map(event => 
         event.id === eventId 
           ? { ...event, is_registered: true }
@@ -143,7 +157,7 @@ const UltimateEventsPage = memo(() => {
         variant: 'destructive'
       });
     }
-  }, [registerForEvent, user]);
+  }, [events, registerForEvent, user]);
 
   // Save/Unsave event functionality
   const handleSaveEvent = useCallback(async (eventId: string, saved: boolean) => {
@@ -463,11 +477,11 @@ const UltimateEventsPage = memo(() => {
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="evt-location">Location</Label>
-                      <Input id="evt-location" value={locationInput} onChange={(e) => setLocationInput(e.target.value)} placeholder="City park, main gate" />
+                      <LocationAutocomplete id="evt-location" value={locationInput} onChange={setLocationInput} placeholder="Search address or place..." />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div className="grid gap-2">
-                        <Label htmlFor="evt-price">Price (USD)</Label>
+                        <Label htmlFor="evt-price">Price (EUR)</Label>
                         <Input id="evt-price" type="number" min="0" step="0.01" value={priceInput} onChange={(e) => setPriceInput(e.target.value)} />
                       </div>
                       <div className="grid gap-2">
@@ -698,6 +712,20 @@ const UltimateEventsPage = memo(() => {
           </Tabs>
         </PageSection>
       </div>
+
+      {paymentEvent && (
+        <PaymentModal
+          isOpen={paymentOpen}
+          onClose={() => setPaymentOpen(false)}
+          event={{
+            id: paymentEvent.id,
+            title: paymentEvent.title,
+            price_cents: paymentEvent.price_cents || 0,
+            loyalty_points_price: paymentEvent.loyalty_points_price ?? undefined,
+          }}
+          userPoints={profile?.available_loyalty_points ?? 0}
+        />
+      )}
 
       {/* Enhanced Performance Debug Info */}
       {process.env.NODE_ENV === 'development' && (

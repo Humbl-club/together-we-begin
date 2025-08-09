@@ -468,7 +468,7 @@ const EventManagement: React.FC = () => {
                 </div>
                 
                 <div>
-                  <Label htmlFor="price">Price (cents)</Label>
+                  <Label htmlFor="price">Price (EUR cents)</Label>
                   <Input
                     id="price"
                     type="number"
@@ -606,8 +606,9 @@ const EventManagement: React.FC = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Revenue</p>
                 <p className="text-2xl font-bold">
-                  ${(events.reduce((sum, event) => 
-                    sum + (event.current_capacity * event.price_cents), 0) / 100).toFixed(0)}
+                  {new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' }).format(
+                    events.reduce((sum, event) => sum + ((event.current_capacity || 0) * (event.price_cents || 0)), 0) / 100
+                  )}
                 </p>
               </div>
             </div>
@@ -877,7 +878,7 @@ const EventManagement: React.FC = () => {
               </div>
               
               <div>
-                <Label htmlFor="edit-price">Price (cents)</Label>
+                <Label htmlFor="edit-price">Price (EUR cents)</Label>
                 <Input
                   id="edit-price"
                   type="number"

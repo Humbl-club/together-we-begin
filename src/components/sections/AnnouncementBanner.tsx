@@ -35,7 +35,7 @@ export const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
   const styles = {
     info: 'bg-card text-card-foreground border-border',
     success: 'bg-secondary text-secondary-foreground border-secondary',
-    warning: 'bg-destructive/15 text-destructive-foreground border-destructive/40',
+    warning: 'bg-destructive/10 text-destructive-foreground border-destructive/30',
   } as const;
 
   return (

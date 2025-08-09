@@ -22,8 +22,9 @@ export const PageSection: React.FC<PageSectionProps> = ({
     <section
       className={cn(
         'w-full',
-        padded && 'p-mobile',
+        padded && 'p-4 md:p-6',
         surfaceCls,
+        'animate-fade-in',
         className
       )}
       {...props}

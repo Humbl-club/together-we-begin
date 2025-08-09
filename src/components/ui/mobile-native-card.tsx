@@ -14,7 +14,7 @@ export const MobileNativeCard = forwardRef<HTMLDivElement, MobileNativeCardProps
 
     const baseStyles = cn(
       // Base styles
-      "rounded-xl bg-card text-card-foreground transition-all duration-200",
+      "rounded-xl bg-card text-card-foreground transition-all duration-200 animate-fade-in",
       
       // Mobile-first responsive design
       isMobile ? "rounded-2xl" : "rounded-xl",

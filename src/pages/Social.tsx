@@ -460,7 +460,7 @@ const Social: React.FC = () => {
       <SEO title="Social Feed" description="Share stories, posts, and connect with your community." canonical="/social" />
       <h1 className="sr-only">Social Feed</h1>
 
-      <PageSection surface="accent" className="mb-4 animate-fade-in">
+      <PageSection surface="accent" className="mb-4 motion-safe:animate-fade-in">
         <AnnouncementBanner
           id="community-guidelines"
           title="Community Guidelines"
@@ -473,7 +473,7 @@ const Social: React.FC = () => {
         />
       </PageSection>
 
-      <PageSection className="mb-3 animate-fade-in">
+      <PageSection className="mb-3 motion-safe:animate-fade-in">
         <SectionHeader title="Stories" subtitle="Highlights from your community" />
         <StoriesBar stories={stories} isMobile={isMobile} onAddStory={() => { setDefaultIsStory(true); setShowCreatePost(true); }} />
       </PageSection>
@@ -501,7 +501,7 @@ const Social: React.FC = () => {
       )}
 
       {/* Feed header + filters */}
-      <PageSection className="mb-3 animate-fade-in">
+      <PageSection className="mb-3 motion-safe:animate-fade-in">
         <SectionHeader title="Community" subtitle="Latest from women near you" />
         <FilterChips
           options={[
@@ -512,6 +512,7 @@ const Social: React.FC = () => {
           ]}
           value={filter}
           onValueChange={(v) => setFilter(v as any)}
+          size="compact"
           className="mt-1"
         />
       </PageSection>

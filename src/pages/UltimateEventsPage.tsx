@@ -407,7 +407,7 @@ const UltimateEventsPage = memo(() => {
       )}
       <div className="max-w-4xl mx-auto space-y-4">
         {/* Header */}
-        <PageSection surface="accent" className="mb-3 animate-fade-in">
+        <PageSection surface="accent" className="mb-3 motion-safe:animate-fade-in">
           <SectionHeader
             title="Events"
             subtitle="Discover and join community events"
@@ -490,7 +490,7 @@ const UltimateEventsPage = memo(() => {
 
         {/* Featured Event */}
         {featuredEvent && (
-          <div className="glass-card-enhanced p-0 animate-fade-in">
+          <div className="glass-card-enhanced p-0 motion-safe:animate-fade-in">
             <EnhancedEventCard
               event={featuredEvent}
               onRegister={handleRegister}
@@ -503,7 +503,7 @@ const UltimateEventsPage = memo(() => {
         )}
 
         {/* Search & Filters */}
-        <PageSection className="mobile:p-3 sm:p-4 lg:p-6 animate-fade-in">
+        <PageSection className="mobile:p-3 sm:p-4 lg:p-6 motion-safe:animate-fade-in">
           <EventSearch
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}

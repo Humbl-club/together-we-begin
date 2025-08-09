@@ -28,7 +28,7 @@ export const CardKit: React.FC<React.ComponentProps<typeof BaseCard> & {
     variant === 'glass' ? 'glass-card' : 'card-secondary';
 
   return (
-    <BaseCard className={cn(variantCls, 'animate-fade-in', className)} {...props}>
+    <BaseCard className={cn(variantCls, 'motion-safe:animate-fade-in', className)} {...props}>
       {children}
     </BaseCard>
   );

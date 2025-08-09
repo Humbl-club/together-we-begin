@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { GOOGLE_MAPS_API_KEY } from '@/config/maps';
 
-interface LocationAutocompleteProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface LocationAutocompleteProps extends Omit<React.ComponentProps<typeof Input>, 'onChange' | 'value'> {
   value: string;
   onChange: (value: string) => void;
 }

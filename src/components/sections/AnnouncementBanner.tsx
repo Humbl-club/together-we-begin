@@ -33,9 +33,9 @@ export const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
   if (dismissed) return null;
 
   const styles = {
-    info: 'bg-accent/20 text-accent-foreground border-accent/30',
-    success: 'bg-secondary/20 text-secondary-foreground border-secondary/30',
-    warning: 'bg-destructive/10 text-destructive border-destructive/40',
+    info: 'bg-card text-card-foreground border-border',
+    success: 'bg-secondary text-secondary-foreground border-secondary',
+    warning: 'bg-destructive/15 text-destructive-foreground border-destructive/40',
   } as const;
 
   return (
@@ -50,7 +50,7 @@ export const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
     >
       <div className="flex-1">
         {title && <p className="font-medium mb-0.5">{title}</p>}
-        <div className="text-sm leading-relaxed">{message}</div>
+        <div className="text-sm leading-relaxed text-foreground">{message}</div>
       </div>
       <button
         type="button"

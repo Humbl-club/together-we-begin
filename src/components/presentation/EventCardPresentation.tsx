@@ -59,7 +59,7 @@ const EventCardPresentation = memo(({
       return `${event.loyalty_points_price} points`;
     }
     if (event.price_cents) {
-      return `$${(event.price_cents / 100).toFixed(2)}`;
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' }).format(event.price_cents / 100);
     }
     return 'Free';
   }, [event.loyalty_points_price, event.price_cents]);

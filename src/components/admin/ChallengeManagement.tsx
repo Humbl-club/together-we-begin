@@ -326,25 +326,25 @@ const ChallengeManagement: React.FC = () => {
                 </div>
                 
                 <div className="col-span-2">
-                  <Label htmlFor="instructions">Instructions</Label>
+                  <Label htmlFor="instructions">Scoring & Instructions</Label>
                   <Textarea
                     id="instructions"
                     name="instructions"
                     value={createForm.instructions}
                     onChange={(e) => setCreateForm(prev => ({ ...prev, instructions: e.target.value }))}
-                    placeholder="How to participate in this challenge..."
+                    placeholder="Describe rules. For leaderboards, write: 'Most steps wins'. For goal: 'Reach X steps'."
                     rows={2}
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="challenge-type">Challenge Type</Label>
+                  <Label htmlFor="challenge-type">Challenge Duration</Label>
                   <Select 
                     value={createForm.challenge_type} 
                     onValueChange={(value) => setCreateForm(prev => ({ ...prev, challenge_type: value }))}
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Select duration" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="one_time">One Time</SelectItem>
@@ -355,7 +355,7 @@ const ChallengeManagement: React.FC = () => {
                 </div>
                 
                 <div>
-                  <Label htmlFor="step-goal">Step Goal</Label>
+                  <Label htmlFor="step-goal">Step Challenge Goal (optional)</Label>
                   <Input
                     id="step-goal"
                     name="stepGoal"
@@ -366,7 +366,7 @@ const ChallengeManagement: React.FC = () => {
                       ...prev, 
                       step_goal: e.target.value ? parseInt(e.target.value) : null
                     }))}
-                    placeholder="Daily step goal..."
+                    placeholder="e.g., 10,000 steps per day"
                     autoComplete="off"
                   />
                 </div>

@@ -38,6 +38,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { AttendanceManager } from '@/components/events/AttendanceManager';
+import { LocationAutocomplete } from '@/components/events/LocationAutocomplete';
 
 interface Event {
   id: string;
@@ -364,7 +365,7 @@ const EventManagement: React.FC = () => {
 
   const formatPrice = (cents: number) => {
     if (cents === 0) return 'Free';
-    return `$${(cents / 100).toFixed(2)}`;
+    return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' }).format(cents / 100);
   };
 
   const filteredEvents = events.filter(event => {
@@ -458,10 +459,10 @@ const EventManagement: React.FC = () => {
                 
                 <div className="col-span-2">
                   <Label htmlFor="location">Location</Label>
-                  <Input
+                  <LocationAutocomplete
                     id="location"
                     value={createForm.location}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, location: e.target.value }))}
+                    onChange={(val) => setCreateForm(prev => ({ ...prev, location: val }))}
                     placeholder="Event location..."
                   />
                 </div>
@@ -867,10 +868,10 @@ const EventManagement: React.FC = () => {
               
               <div className="col-span-2">
                 <Label htmlFor="edit-location">Location</Label>
-                <Input
+                <LocationAutocomplete
                   id="edit-location"
                   value={editForm.location}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, location: e.target.value }))}
+                  onChange={(val) => setEditForm(prev => ({ ...prev, location: val }))}
                   placeholder="Event location..."
                 />
               </div>

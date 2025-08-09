@@ -24,7 +24,7 @@ export function PaymentModal({ isOpen, onClose, event, userPoints = 0 }: Payment
   const [paymentMethod, setPaymentMethod] = useState<"stripe" | "points">("stripe");
   const { toast } = useToast();
 
-  const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+  const formatPrice = (cents: number) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' }).format(cents / 100);
 
   const canUsePoints = event.loyalty_points_price && userPoints >= event.loyalty_points_price;
 

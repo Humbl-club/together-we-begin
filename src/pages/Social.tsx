@@ -467,7 +467,7 @@ const Social: React.FC = () => {
           id="community-guidelines"
           title="Community Guidelines"
           message={
-            <span>
+            <span className="text-foreground">
               Be kind, supportive, and respectful. This is a women-only space—report anything that doesn’t feel right.
             </span>
           }

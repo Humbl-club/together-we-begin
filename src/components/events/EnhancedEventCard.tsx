@@ -103,7 +103,7 @@ export const EnhancedEventCard = memo(({
       return `${event.loyalty_points_price} points`;
     }
     if (event.price_cents) {
-      return `$${(event.price_cents / 100).toFixed(2)}`;
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' }).format(event.price_cents / 100);
     }
     return 'Free';
   }, [event.loyalty_points_price, event.price_cents]);
@@ -340,7 +340,7 @@ export const EnhancedEventCard = memo(({
 
             <div className="flex items-center gap-2">
               <DollarSign className="w-3 h-3 text-muted-foreground shrink-0" />
-              <span className="text-xs font-medium text-primary">{priceDisplay}</span>
+              <span className="text-xs font-medium text-foreground">{priceDisplay}</span>
             </div>
           </div>
         </div>

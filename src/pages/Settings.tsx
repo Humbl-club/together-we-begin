@@ -71,6 +71,14 @@ const Settings: React.FC = () => {
   const { brand, availableBrands, setBrandKey } = useBrand();
 
   const [density, setDensity] = useState<string>(() => localStorage.getItem('density') || 'comfortable');
+  const [teams, setTeams] = useState(
+    [
+      { id: 'core', name: 'Core Team', role: 'Member', notifications: true, isDefault: true },
+      { id: 'runners', name: 'Runners', role: 'Member', notifications: false, isDefault: false },
+    ]
+  );
+  const setDefaultTeam = (id: string) => setTeams(prev => prev.map(t => ({ ...t, isDefault: t.id === id })));
+  const setTeamNotifications = (id: string, value: boolean) => setTeams(prev => prev.map(t => t.id === id ? { ...t, notifications: value } : t));
 
   useEffect(() => {
     const root = document.documentElement;
@@ -145,6 +153,13 @@ const Settings: React.FC = () => {
       icon: Users,
       description: 'Social interaction settings',
       keywords: ['follow', 'friends', 'content', 'stories', 'activity', 'suggestions']
+    },
+    {
+      id: 'teams',
+      title: 'Teams',
+      icon: Users,
+      description: 'Manage your teams and preferences',
+      keywords: ['teams', 'group', 'club', 'default', 'notifications']
     },
     {
       id: 'appearance',
@@ -238,6 +253,65 @@ const Settings: React.FC = () => {
                     }}
                   />
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case 'teams':
+        return (
+          <Card className="glass-card-enhanced">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Teams
+              </CardTitle>
+              <CardDescription>
+                Manage team defaults and notifications
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="defaultTeam">Default Team</Label>
+                <Select
+                  value={teams.find(t => t.isDefault)?.id ?? (teams[0]?.id || '')}
+                  onValueChange={(value) => {
+                    feedback.tap();
+                    setDefaultTeam(value);
+                  }}
+                >
+                  <SelectTrigger className="h-12">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teams.map(t => (
+                      <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-3">
+                {teams.map(t => (
+                  <div key={t.id} className="flex items-center justify-between py-2">
+                    <div>
+                      <Label>{t.name}</Label>
+                      <p className="text-xs text-muted-foreground">{t.role}{t.isDefault ? ' • Default' : ''}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MobileToggle
+                        checked={t.notifications}
+                        onCheckedChange={(checked) => {
+                          feedback.tap();
+                          setTeamNotifications(t.id, !!checked);
+                        }}
+                      />
+                      <Button variant="ghost" className="text-destructive" onClick={() => { feedback.impact('light'); }}>
+                        Leave
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>

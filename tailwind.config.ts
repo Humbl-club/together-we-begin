@@ -165,12 +165,12 @@ export default {
 				}
 			},
 			// Premium Typography System
-			fontFamily: {
-				'sans': ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
-				'serif': ['Bodoni Moda', 'Cormorant Garamond', 'Georgia', 'serif'],
-				'display': ['Bodoni Moda', 'Cormorant Garamond', 'Georgia', 'serif'],
-				'editorial': ['Bodoni Moda', 'Cormorant Garamond', 'Georgia', 'serif'],
-			},
+				fontFamily: {
+					'sans': ['Inter', 'Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+					'serif': ['Bodoni Moda', 'Cormorant Garamond', 'Georgia', 'serif'],
+					'display': ['Bodoni Moda', 'Cormorant Garamond', 'Georgia', 'serif'],
+					'editorial': ['Bodoni Moda', 'Cormorant Garamond', 'Georgia', 'serif'],
+				},
 			// Enhanced Animations
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',

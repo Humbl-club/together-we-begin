@@ -6,7 +6,7 @@ import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { Navigation as DesktopNavigation } from './Navigation';
 
 // Mobile Navigation Icons
-import { Home, Calendar, MessageCircle, User, Heart, Search, Settings } from 'lucide-react';
+import { Home, Calendar, MessageCircle, Heart, Settings } from 'lucide-react';
 
 interface MobileFirstNavigationProps {
   profile?: {

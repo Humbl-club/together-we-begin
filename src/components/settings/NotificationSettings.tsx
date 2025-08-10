@@ -52,7 +52,7 @@ export const NotificationSettings: React.FC = () => {
         .from('user_notification_settings')
         .select('*')
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         throw error;

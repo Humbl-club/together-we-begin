@@ -30,7 +30,7 @@ export const InviteCodeForm: React.FC<InviteCodeFormProps> = ({ onValidCode }) =
         .select('*')
         .eq('code', code.trim().toUpperCase())
         .eq('status', 'pending')
-        .single();
+        .maybeSingle();
 
       if (error || !invite) {
         toast({

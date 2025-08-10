@@ -50,7 +50,7 @@ export const PrivacyControls = ({ userId }: PrivacyControlsProps) => {
         .from('privacy_settings')
         .select('*')
         .eq('user_id', userId)
-        .single()
+        .maybeSingle()
 
       if (error && error.code !== 'PGRST116') {
         console.error('Failed to load privacy settings:', error)

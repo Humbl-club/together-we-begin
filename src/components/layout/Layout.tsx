@@ -31,7 +31,7 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
           .from('profiles')
           .select('full_name, avatar_url')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
         
         setProfile(data || user.user_metadata);
       }

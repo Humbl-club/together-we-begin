@@ -85,6 +85,32 @@ export const SwipeableCard: React.FC<SwipeableCardProps> = ({
     resetCard();
   };
 
+  // Enable mouse and keyboard interaction in addition to touch
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (disabled) return;
+    // Avoid double-trigger on touch devices (touch handled via useGestures)
+    if (e.pointerType === 'touch') return;
+    if (isActionVisible) {
+      resetCard();
+    } else {
+      feedback.tap();
+      onTap?.();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (disabled) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (isActionVisible) {
+        resetCard();
+      } else {
+        feedback.tap();
+        onTap?.();
+      }
+    }
+  };
+
   const getVisibleActions = () => {
     if (swipeOffset > 0) return leftActions;
     if (swipeOffset < 0) return rightActions;
@@ -146,6 +172,11 @@ export const SwipeableCard: React.FC<SwipeableCardProps> = ({
           "touch-manipulation select-none",
           disabled && "opacity-50 cursor-not-allowed"
         )}
+        role={onTap ? "button" : undefined}
+        tabIndex={onTap && !disabled ? 0 : -1}
+        aria-disabled={disabled || undefined}
+        onPointerUp={handlePointerUp}
+        onKeyDown={handleKeyDown}
         style={{
           transform: `translateX(${swipeOffset}px)`
         }}

@@ -195,31 +195,8 @@ const defaultBrands: BrandConfig[] = [
       '--mist': '210 30% 96%'
     }
   },
-  {
-    key: 'miu-muse',
-    name: 'Miu Muse',
-    colors: {
-      '--brand-accent': 'hsl(345 70% 68%)',
-      '--background': '40 20% 98%',
-      '--foreground': '230 15% 15%',
-      '--primary': '345 70% 68%',
-      '--primary-foreground': '0 0% 100%',
-      '--secondary': '210 55% 93%',
-      '--secondary-foreground': '230 15% 20%',
-      '--muted': '0 0% 96%',
-      '--muted-foreground': '230 10% 35%',
-      '--card': '0 0% 100%',
-      '--card-foreground': '230 15% 15%',
-      '--accent': '195 60% 62%',
-      '--accent-foreground': '0 0% 100%',
-      '--border': '230 12% 88%',
-      '--ring': '345 70% 68%',
-      '--editorial-cream': '45 25% 97%',
-      '--editorial-blush': '345 65% 92%',
-      '--editorial-sage': '140 25% 85%',
-      '--editorial-navy': '220 25% 20%'
-    }
-  }
+  
+
 ];
 
 const BrandContext = createContext<BrandContextValue | undefined>(undefined);
@@ -239,7 +216,7 @@ function applyBrandVariables(brand: BrandConfig) {
 export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [brandKey, setBrandKeyState] = useState<string>(() => {
     const fromQuery = new URLSearchParams(window.location.search).get('brand');
-    return fromQuery || localStorage.getItem('brand') || 'miu-muse';
+    return fromQuery || localStorage.getItem('brand') || 'together';
   });
 
   const setBrandKey = (key: string) => {

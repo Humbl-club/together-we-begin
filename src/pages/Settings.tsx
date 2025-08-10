@@ -60,6 +60,7 @@ import { cn } from '@/lib/utils';
 import { PrivacySettings } from '@/components/settings/PrivacySettings';
 import { NotificationSettings } from '@/components/settings/NotificationSettings';
 import { AccountManagement } from '@/components/settings/AccountManagement';
+import { ThemeGallery } from '@/components/theme/ThemeGallery';
 
 const Settings: React.FC = () => {
   const { settings, loading, saving, updateSetting } = useUserSettings();
@@ -296,27 +297,12 @@ const Settings: React.FC = () => {
                   </Select>
                 </div>
 
-                {/* Brand Theme */}
+                {/* Brand Theme - Visual Gallery */}
                 <div className="space-y-2">
                   <Label>Brand theme</Label>
-                  <div className="flex gap-2 flex-wrap">
-                    {availableBrands.map((b) => (
-                      <button
-                        key={b.key}
-                        onClick={() => { setBrandKey(b.key); feedback.tap(); }}
-                        aria-pressed={brand.key === b.key}
-                        className={cn(
-                          'px-2 py-1 rounded-md border text-xs',
-                          brand.key === b.key
-                            ? 'bg-primary/15 text-primary border-primary/30'
-                            : 'bg-muted/50 hover:bg-muted/70 border-border/50'
-                        )}
-                      >
-                        {b.name}
-                      </button>
-                    ))}
-                  </div>
+                  <ThemeGallery />
                 </div>
+
 
                 {/* Density */}
                 <div className="space-y-2">

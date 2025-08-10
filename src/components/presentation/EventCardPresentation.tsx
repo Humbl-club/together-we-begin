@@ -115,7 +115,16 @@ const EventCardPresentation = memo(({
           {event.location && (
             <div className="flex items-center mobile:gap-1.5 sm:gap-2">
               <span className="text-muted-foreground mobile:text-sm sm:text-base">📍</span>
-              <span className="line-clamp-1 mobile:text-xs sm:text-sm">{event.location}</span>
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="line-clamp-1 mobile:text-xs sm:text-sm text-primary hover:underline"
+                aria-label="Open location in Google Maps"
+              >
+                {event.location}
+              </a>
             </div>
           )}
 

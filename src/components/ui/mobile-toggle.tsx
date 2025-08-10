@@ -24,7 +24,7 @@ export const MobileToggle: React.FC<MobileToggleProps> = ({
       onCheckedChange={onCheckedChange}
       disabled={disabled}
       className={cn(
-        isMobile ? "transform rotate-90 origin-center scale-y-125 scale-x-75" : "",
+        isMobile ? "scale-y-75 h-4 w-10" : "",
         className
       )}
     />

@@ -27,6 +27,9 @@ export const useNotifications = () => {
     // Initialize notification service
     notificationService.initialize();
 
+    // Align push subscription with saved preference
+    notificationService.ensurePushSubscription(user.id);
+
     // Fetch existing notifications
     fetchNotifications();
 

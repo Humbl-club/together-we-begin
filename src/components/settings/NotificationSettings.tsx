@@ -8,6 +8,7 @@ import { Bell, Mail, MessageSquare, Calendar, Trophy, Users, Save, Clock } from 
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import NotificationService from '@/services/notificationService';
 
 interface NotificationSettings {
   push_enabled: boolean;
@@ -107,6 +108,9 @@ export const NotificationSettings: React.FC = () => {
         });
 
       if (error) throw error;
+
+      // Align push subscription with user's preference
+      await NotificationService.getInstance().ensurePushSubscription(user.id);
 
       toast({
         title: "Settings Saved",

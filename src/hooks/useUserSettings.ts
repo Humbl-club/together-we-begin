@@ -53,45 +53,29 @@ export const useUserSettings = () => {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Initialize default settings
+  // Small helper for retry backoff
+  const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
+  // No-op initializer: DB trigger now creates defaults atomically at signup
   const initializeUserSettings = useCallback(async () => {
     if (!user) return;
-
-    try {
-      // Check if user already has settings, if not create them
-      const { data: existingSettings } = await supabase
-        .from('user_appearance_settings')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (!existingSettings) {
-        // Create default settings for new user
-        await Promise.all([
-          supabase.from('user_appearance_settings').insert({ user_id: user.id }),
-          supabase.from('user_notification_settings').insert({ user_id: user.id }),
-          supabase.from('user_wellness_settings').insert({ user_id: user.id }),
-          supabase.from('user_social_settings').insert({ user_id: user.id }),
-          supabase.from('privacy_settings').insert({ user_id: user.id })
-        ]);
-      }
-    } catch (error) {
-      console.error('Error initializing user settings:', error);
-    }
+    // The unified DB trigger (handle_new_user_full) creates all default settings.
+    // We keep this function as a no-op to avoid client-side races and RLS insert issues.
+    console.log('[useUserSettings] Defaults are created in DB trigger for user:', user.id);
   }, [user]);
 
-  // Fetch all user settings
-  const fetchSettings = useCallback(async () => {
-    if (!user) return;
+  // Fetch all user settings (returns boolean for success/failure)
+  const fetchSettings = useCallback(async (): Promise<boolean> => {
+    if (!user) return false;
 
     try {
       setLoading(true);
       const [
-        { data: appearance },
-        { data: notifications },
-        { data: wellness },
-        { data: social },
-        { data: privacy }
+        { data: appearance, error: appearanceErr },
+        { data: notifications, error: notificationsErr },
+        { data: wellness, error: wellnessErr },
+        { data: social, error: socialErr },
+        { data: privacy, error: privacyErr }
       ] = await Promise.all([
         supabase.from('user_appearance_settings').select('*').eq('user_id', user.id).single(),
         supabase.from('user_notification_settings').select('*').eq('user_id', user.id).single(),
@@ -99,6 +83,21 @@ export const useUserSettings = () => {
         supabase.from('user_social_settings').select('*').eq('user_id', user.id).single(),
         supabase.from('privacy_settings').select('*').eq('user_id', user.id).single()
       ]);
+
+      // If any table is missing (rare race right after signup), report not-ready
+      const anyMissing = !(appearance && notifications && wellness && social && privacy);
+      const anyError = appearanceErr || notificationsErr || wellnessErr || socialErr || privacyErr;
+
+      if (anyError) {
+        console.error('[useUserSettings] Errors fetching settings:', {
+          appearanceErr, notificationsErr, wellnessErr, socialErr, privacyErr
+        });
+      }
+
+      if (anyMissing) {
+        console.warn('[useUserSettings] Some settings rows not ready yet for user:', user.id);
+        return false;
+      }
 
       setSettings({
         appearance: {
@@ -142,6 +141,8 @@ export const useUserSettings = () => {
           allow_friend_requests: privacy?.allow_friend_requests ?? true,
         }
       });
+
+      return true;
     } catch (error) {
       console.error('Error fetching user settings:', error);
       toast({
@@ -149,10 +150,31 @@ export const useUserSettings = () => {
         description: 'Failed to load user settings',
         variant: 'destructive'
       });
+      return false;
     } finally {
       setLoading(false);
     }
   }, [user, toast]);
+
+  // Add a tiny retry window to handle just-signed-up users
+  const fetchSettingsWithRetry = useCallback(async () => {
+    if (!user) return;
+    const attempts = [0, 300, 900]; // immediate, 300ms, 900ms
+    for (let i = 0; i < attempts.length; i++) {
+      if (i > 0) {
+        await delay(attempts[i]);
+      }
+      const ok = await fetchSettings();
+      if (ok) return;
+    }
+    // Final fallback toast only if still missing after retries
+    if (!settings) {
+      toast({
+        title: 'Almost there',
+        description: 'We are preparing your settings. Please try again in a moment.',
+      });
+    }
+  }, [user, fetchSettings, settings, toast]);
 
   // Update specific settings category
   const updateSettings = useCallback(async (category: keyof UserSettings, updatedValues: any) => {
@@ -208,10 +230,10 @@ export const useUserSettings = () => {
   useEffect(() => {
     if (user) {
       initializeUserSettings().then(() => {
-        fetchSettings();
+        fetchSettingsWithRetry();
       });
     }
-  }, [user]); // Remove the function dependencies to prevent infinite loops
+  }, [user]); // ... keep existing code (keep dependency only on user to prevent loops) ...
 
   return {
     settings,

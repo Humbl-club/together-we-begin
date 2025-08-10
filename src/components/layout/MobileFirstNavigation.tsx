@@ -31,7 +31,7 @@ const MobileFirstNavigation = forwardRef<HTMLElement, MobileFirstNavigationProps
       { id: 'events', icon: Calendar, label: 'Events', href: '/events' },
       { id: 'social', icon: Heart, label: 'Social', href: '/social' },
       { id: 'messages', icon: MessageCircle, label: 'Messages', href: '/messages' },
-      { id: 'profile', icon: User, label: 'Profile', href: '/profile' },
+      { id: 'settings', icon: Settings, label: 'Settings', href: '/settings' },
     ];
 
     const isActive = (path: string) => location.pathname === path;

@@ -12,6 +12,7 @@ body { @apply bg-background text-foreground font-sans font-medium antialiased; }
     /* Base Editorial Colors - Sophisticated neutrals */
     --background: 0 0% 99%;
     --foreground: 210 11% 15%;
+    --ash: 215 6% 42%;
     
     /* Mobile-First Design Tokens */
     --mobile-header-height: 60px;
@@ -118,6 +119,8 @@ body { @apply bg-background text-foreground font-sans font-medium antialiased; }
   .dark {
     --background: 210 15% 8%;
     --foreground: 210 11% 92%;
+
+    --ash: 210 6% 70%;
 
     --card: 210 15% 10%;
     --card-foreground: 210 11% 92%;

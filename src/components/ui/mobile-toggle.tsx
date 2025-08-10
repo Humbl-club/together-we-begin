@@ -16,7 +16,7 @@ export const MobileToggle: React.FC<MobileToggleProps> = ({
   className = '',
   disabled = false
 }) => {
-  const { isMobile } = useViewport();
+  
 
   return (
     <Switch

@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { MobileToggle } from '@/components/ui/mobile-toggle';
 import { Bell, Shield, Heart, Users, Palette, Save, MessageCircle, Lock, Search, ChevronRight, ArrowLeft, User } from 'lucide-react';
 import { useUserSettings } from '@/hooks/useUserSettings';
-import { useBrand } from '@/contexts/BrandContext';
+
 // Define the UserSettings type locally to match the hook
 interface UserSettings {
   appearance: {
@@ -54,9 +54,9 @@ interface UserSettings {
 }
 import { useViewport } from '@/hooks/use-mobile';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
-import { MobileActionSheet } from '@/components/ui/mobile-action-sheet';
+
 import { SwipeableCard } from '@/components/ui/swipeable-card';
-import { cn } from '@/lib/utils';
+
 import { PrivacySettings } from '@/components/settings/PrivacySettings';
 import { NotificationSettings } from '@/components/settings/NotificationSettings';
 import { AccountManagement } from '@/components/settings/AccountManagement';
@@ -68,17 +68,9 @@ const Settings: React.FC = () => {
   const feedback = useHapticFeedback();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeMobileSection, setActiveMobileSection] = useState<string | null>(null);
-  const { brand, availableBrands, setBrandKey } = useBrand();
+  
 
   const [density, setDensity] = useState<string>(() => localStorage.getItem('density') || 'comfortable');
-  const [teams, setTeams] = useState(
-    [
-      { id: 'core', name: 'Core Team', role: 'Member', notifications: true, isDefault: true },
-      { id: 'runners', name: 'Runners', role: 'Member', notifications: false, isDefault: false },
-    ]
-  );
-  const setDefaultTeam = (id: string) => setTeams(prev => prev.map(t => ({ ...t, isDefault: t.id === id })));
-  const setTeamNotifications = (id: string, value: boolean) => setTeams(prev => prev.map(t => t.id === id ? { ...t, notifications: value } : t));
 
   useEffect(() => {
     const root = document.documentElement;
@@ -89,13 +81,6 @@ const Settings: React.FC = () => {
     }
     localStorage.setItem('density', density);
   }, [density]);
-
-
-  // Enhanced toggle handler with haptic feedback
-  const handleToggleChange = (section: keyof UserSettings, key: string, value: boolean) => {
-    feedback.tap();
-    updateSetting(section, key, value);
-  };
 
   // Settings sections for mobile - stable reference
   const settingSections = useMemo(() => [
@@ -140,13 +125,6 @@ const Settings: React.FC = () => {
       icon: Users,
       description: 'Social interaction settings',
       keywords: ['follow', 'friends', 'content', 'stories', 'activity', 'suggestions']
-    },
-    {
-      id: 'teams',
-      title: 'Teams',
-      icon: Users,
-      description: 'Manage your teams and preferences',
-      keywords: ['teams', 'group', 'club', 'default', 'notifications']
     },
     {
       id: 'appearance',
@@ -245,64 +223,6 @@ const Settings: React.FC = () => {
           </Card>
         );
 
-      case 'teams':
-        return (
-          <Card className="glass-card-enhanced">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Teams
-              </CardTitle>
-              <CardDescription>
-                Manage team defaults and notifications
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="defaultTeam">Default Team</Label>
-                <Select
-                  value={teams.find(t => t.isDefault)?.id ?? (teams[0]?.id || '')}
-                  onValueChange={(value) => {
-                    feedback.tap();
-                    setDefaultTeam(value);
-                  }}
-                >
-                  <SelectTrigger className="h-12">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {teams.map(t => (
-                      <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-3">
-                {teams.map(t => (
-                  <div key={t.id} className="flex items-center justify-between py-2">
-                    <div>
-                      <Label>{t.name}</Label>
-                      <p className="text-xs text-muted-foreground">{t.role}{t.isDefault ? ' • Default' : ''}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MobileToggle
-                        checked={t.notifications}
-                        onCheckedChange={(checked) => {
-                          feedback.tap();
-                          setTeamNotifications(t.id, !!checked);
-                        }}
-                      />
-                      <Button variant="ghost" className="text-destructive" onClick={() => { feedback.impact('light'); }}>
-                        Leave
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        );
 
       case 'appearance':
         return (
@@ -718,17 +638,6 @@ const Settings: React.FC = () => {
                   <MobileToggle
                     checked={settings.notifications.social_interactions}
                     onCheckedChange={(checked) => updateSetting('notifications', 'social_interactions', checked)}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="readReceipts">Read Receipts</Label>
-                    <p className="text-sm text-muted-foreground">Let others know when you've read their messages</p>
-                  </div>
-                  <MobileToggle
-                    checked={true}
-                    onCheckedChange={() => {}}
                   />
                 </div>
 

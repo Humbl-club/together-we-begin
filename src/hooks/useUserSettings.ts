@@ -194,8 +194,7 @@ export const useUserSettings = () => {
       
       const { error } = await supabase
         .from(tableName as any)
-        .update(updatedValues)
-        .eq('user_id', user.id);
+        .upsert({ user_id: user.id, ...updatedValues }, { onConflict: 'user_id' });
 
       if (error) throw error;
 

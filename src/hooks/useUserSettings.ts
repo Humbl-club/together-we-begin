@@ -77,11 +77,11 @@ export const useUserSettings = () => {
         { data: social, error: socialErr },
         { data: privacy, error: privacyErr }
       ] = await Promise.all([
-        supabase.from('user_appearance_settings').select('*').eq('user_id', user.id).single(),
-        supabase.from('user_notification_settings').select('*').eq('user_id', user.id).single(),
-        supabase.from('user_wellness_settings').select('*').eq('user_id', user.id).single(),
-        supabase.from('user_social_settings').select('*').eq('user_id', user.id).single(),
-        supabase.from('privacy_settings').select('*').eq('user_id', user.id).single()
+        supabase.from('user_appearance_settings').select('*').eq('user_id', user.id).maybeSingle(),
+        supabase.from('user_notification_settings').select('*').eq('user_id', user.id).maybeSingle(),
+        supabase.from('user_wellness_settings').select('*').eq('user_id', user.id).maybeSingle(),
+        supabase.from('user_social_settings').select('*').eq('user_id', user.id).maybeSingle(),
+        supabase.from('privacy_settings').select('*').eq('user_id', user.id).maybeSingle()
       ]);
 
       // If any table is missing (rare race right after signup), report not-ready

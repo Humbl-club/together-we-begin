@@ -22,67 +22,100 @@ export const useUserPresence = () => {
   useEffect(() => {
     if (!user) return;
 
-    // Create presence channel
-    const presenceChannel = supabase.channel('online-users', {
-      config: {
-        presence: {
-          key: user.id,
-        },
-      },
-    });
+    let presenceChannel: ReturnType<typeof supabase.channel> | null = null;
+    let isCancelled = false;
 
-    // Track user presence
-    const userPresence = {
-      user_id: user.id,
-      online_at: new Date().toISOString(),
-      status: 'online' as const,
-      activity: currentActivity || 'browsing'
-    };
+    const setupPresence = async () => {
+      try {
+        // Respect user's privacy setting for activity status
+        const { data: privacy } = await supabase
+          .from('privacy_settings')
+          .select('show_activity_status')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-    presenceChannel
-      .on('presence', { event: 'sync' }, () => {
-        const newState = presenceChannel.presenceState();
-        updateOnlineUsers(newState);
-      })
-      .on('presence', { event: 'join' }, ({ key, newPresences }) => {
-        console.log('User joined:', key, newPresences);
-      })
-      .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-        console.log('User left:', key, leftPresences);
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await presenceChannel.track(userPresence);
-          setUserStatus('online');
+        const allowPresence = privacy?.show_activity_status !== false; // default true
+        if (!allowPresence || isCancelled) {
+          setUserStatus('offline');
+          return;
         }
-      });
 
-    // Handle visibility changes
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        setUserStatus('away');
-        presenceChannel.track({
-          ...userPresence,
-          status: 'away',
-          online_at: new Date().toISOString()
+        // Create presence channel
+        presenceChannel = supabase.channel('online-users', {
+          config: {
+            presence: {
+              key: user.id,
+            },
+          },
         });
-      } else {
-        setUserStatus('online');
-        presenceChannel.track({
-          ...userPresence,
-          status: 'online',
-          online_at: new Date().toISOString()
-        });
+
+        // Track user presence
+        const userPresence = {
+          user_id: user.id,
+          online_at: new Date().toISOString(),
+          status: 'online' as const,
+          activity: currentActivity || 'browsing'
+        };
+
+        presenceChannel
+          .on('presence', { event: 'sync' }, () => {
+            const newState = presenceChannel!.presenceState();
+            updateOnlineUsers(newState);
+          })
+          .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+            console.log('User joined:', key, newPresences);
+          })
+          .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+            console.log('User left:', key, leftPresences);
+          })
+          .subscribe(async (status) => {
+            if (status === 'SUBSCRIBED') {
+              await presenceChannel!.track(userPresence);
+              setUserStatus('online');
+            }
+          });
+
+        // Handle visibility changes
+        const handleVisibilityChange = () => {
+          if (!presenceChannel) return;
+          if (document.hidden) {
+            setUserStatus('away');
+            presenceChannel.track({
+              ...userPresence,
+              status: 'away',
+              online_at: new Date().toISOString()
+            });
+          } else {
+            setUserStatus('online');
+            presenceChannel.track({
+              ...userPresence,
+              status: 'online',
+              online_at: new Date().toISOString()
+            });
+          }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        // Cleanup
+        return () => {
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+      } catch (err) {
+        console.error('Presence setup error:', err);
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    const cleanupPromise = setupPresence();
 
-    // Cleanup function
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      presenceChannel.untrack();
-      supabase.removeChannel(presenceChannel);
+      isCancelled = true;
+      if (presenceChannel) {
+        try {
+          presenceChannel.untrack();
+          supabase.removeChannel(presenceChannel);
+        } catch {}
+      }
       setUserStatus('offline');
     };
   }, [user, currentActivity]);

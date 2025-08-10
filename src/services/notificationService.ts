@@ -70,20 +70,101 @@ class NotificationService {
       console.error('Push subscription failed:', error);
       return false;
     }
-  }
+   }
+ 
+   async ensurePushSubscription(userId: string): Promise<boolean> {
+     try {
+       if (!this.registration) {
+         await this.initialize();
+       }
+       if (!this.registration) return false;
+ 
+       const { data: settings } = await supabase
+         .from('user_notification_settings')
+         .select('push_enabled')
+         .eq('user_id', userId)
+         .maybeSingle();
+ 
+       const currentSub = await this.registration.pushManager.getSubscription();
+ 
+       if (settings?.push_enabled) {
+         if (!currentSub) {
+           return await this.subscribeToPush(userId);
+         }
+         return true;
+       } else {
+         if (currentSub) {
+           try { await currentSub.unsubscribe(); } catch (e) { console.warn('Unsubscribe failed', e); }
+         }
+         await supabase.from('push_subscriptions').delete().eq('user_id', userId);
+         return true;
+       }
+     } catch (error) {
+       console.error('ensurePushSubscription failed:', error);
+       return false;
+     }
+   }
 
   async createNotification(userId: string, notification: NotificationData) {
-    const { error } = await supabase
-      .from('notifications')
-      .insert({
-        user_id: userId,
-        type: notification.type,
-        title: notification.title,
-        content: notification.content,
-        data: notification.data
-      });
+    try {
+      // Load user notification preferences
+      const { data: settings } = await supabase
+        .from('user_notification_settings')
+        .select('social_interactions, event_reminders, challenge_updates, quiet_hours_start, quiet_hours_end')
+        .eq('user_id', userId)
+        .maybeSingle();
 
-    if (error) {
+      // Map notification types to user preferences
+      const typeAllowed = (() => {
+        if (!settings) return true; // default allow
+        switch (notification.type) {
+          case 'event':
+            return settings.event_reminders;
+          case 'challenge':
+            return settings.challenge_updates;
+          case 'message':
+          case 'like':
+          case 'comment':
+          case 'friend_request':
+            return settings.social_interactions;
+          default:
+            return true;
+        }
+      })();
+
+      if (!typeAllowed) return;
+
+      // Quiet hours enforcement (local time)
+      const inQuietHours = (() => {
+        if (!settings?.quiet_hours_start || !settings?.quiet_hours_end) return false;
+        const now = new Date();
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        const current = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        const start = settings.quiet_hours_start;
+        const end = settings.quiet_hours_end;
+        if (start === end) return false; // disabled
+        // Normal window (e.g., 22:00 -> 07:00 crosses midnight)
+        if (start <= end) {
+          return current >= start && current < end;
+        }
+        // Overnight window
+        return current >= start || current < end;
+      })();
+
+      if (inQuietHours) return;
+
+      const { error } = await supabase
+        .from('notifications')
+        .insert({
+          user_id: userId,
+          type: notification.type,
+          title: notification.title,
+          content: notification.content,
+          data: notification.data
+        });
+
+      if (error) throw error;
+    } catch (error) {
       console.error('Failed to create notification:', error);
     }
   }

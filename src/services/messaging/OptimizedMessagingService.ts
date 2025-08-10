@@ -323,8 +323,45 @@ export class OptimizedMessagingService {
       throw new Error('Recipient public key not found');
     }
 
-    // Find or create thread
-    let threadId = await this.findOrCreateThread(recipientId);
+    // Enforce recipient messaging privacy settings
+    let threadId: string;
+    try {
+      const { data: privacy } = await supabase
+        .from('privacy_settings')
+        .select('allow_messages')
+        .eq('user_id', recipientId)
+        .maybeSingle();
+
+      const allow = privacy?.allow_messages || 'everyone';
+      if (allow === 'none') {
+        throw new Error("This user isn't accepting new messages.");
+      }
+
+      if (allow === 'friends') {
+        // Allow messages only if a thread already exists between users (approximation for friends-only)
+        const { data: existingThread } = await supabase
+          .from('message_threads')
+          .select('id')
+          .or(`and(participant_1.eq.${this.currentUserId},participant_2.eq.${recipientId}),and(participant_1.eq.${recipientId},participant_2.eq.${this.currentUserId})`)
+          .single();
+
+        if (!existingThread) {
+          throw new Error('Only friends can message this user.');
+        }
+
+        threadId = existingThread.id;
+      } else {
+        // everyone -> create or reuse thread
+        threadId = await this.findOrCreateThread(recipientId);
+      }
+    } catch (privacyErr: any) {
+      // Surface privacy errors to caller
+      if (privacyErr?.message) {
+        throw privacyErr;
+      }
+      // If privacy fetch fails, default to allowing and creating thread
+      threadId = await this.findOrCreateThread(recipientId);
+    }
 
     // Encrypt message
     const { encrypted, nonce } = encryptMessage(

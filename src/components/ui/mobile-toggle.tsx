@@ -1,6 +1,6 @@
 import React from 'react';
 import { Switch } from '@/components/ui/switch';
-import { useViewport } from '@/hooks/use-mobile';
+
 import { cn } from '@/lib/utils';
 
 interface MobileToggleProps {
@@ -24,7 +24,6 @@ export const MobileToggle: React.FC<MobileToggleProps> = ({
       onCheckedChange={onCheckedChange}
       disabled={disabled}
       className={cn(
-        isMobile ? "scale-y-75 h-4 w-10" : "",
         className
       )}
     />

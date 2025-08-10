@@ -90,19 +90,6 @@ const Settings: React.FC = () => {
     localStorage.setItem('density', density);
   }, [density]);
 
-  if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="glass-card-enhanced p-8 text-center">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-muted rounded-lg w-48 mx-auto"></div>
-            <div className="h-4 bg-muted rounded w-64 mx-auto"></div>
-          </div>
-          <p className="text-muted-foreground mt-4">Loading your settings...</p>
-        </div>
-      </div>
-    );
-  }
 
   // Enhanced toggle handler with haptic feedback
   const handleToggleChange = (section: keyof UserSettings, key: string, value: boolean) => {
@@ -580,7 +567,16 @@ const Settings: React.FC = () => {
         )}
       </div>
 
-      {isMobile ? (
+      {loading ? (
+        <div className="glass-card-enhanced p-8 text-center">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-muted rounded-lg w-48 mx-auto"></div>
+            <div className="h-4 bg-muted rounded w-64 mx-auto"></div>
+          </div>
+          <p className="text-muted-foreground mt-4">Loading your settings...</p>
+        </div>
+      ) : (
+        isMobile ? (
         activeMobileSection ? (
           // Mobile section detail view
           <div className="space-y-4">
@@ -641,7 +637,7 @@ const Settings: React.FC = () => {
               })
             )}
           </div>
-        )
+          )
       ) : (
         // Desktop tabs layout
         <Tabs defaultValue="privacy" className="space-y-6">

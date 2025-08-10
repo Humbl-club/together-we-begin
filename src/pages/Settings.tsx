@@ -964,7 +964,7 @@ const Settings: React.FC = () => {
           </Button>
         </div>
         </Tabs>
-      )}
+      ))}
     </div>
   );
 };

@@ -1,0 +1,693 @@
+@import './styles/mobile-enhancements.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base typography and colors */
+body { @apply bg-background text-foreground font-sans font-medium antialiased; }
+
+/* Mobile-First Editorial Design System */
+@layer base {
+  :root {
+    /* Base Editorial Colors - Sophisticated neutrals */
+    --background: 0 0% 99%;
+    --foreground: 210 11% 15%;
+    --ash: 215 6% 42%;
+    
+    /* Mobile-First Design Tokens */
+    --mobile-header-height: 60px;
+    --mobile-nav-height: 80px;
+    --mobile-safe-area-top: env(safe-area-inset-top, 0px);
+    --mobile-safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --mobile-safe-area-left: env(safe-area-inset-left, 0px);
+    --mobile-safe-area-right: env(safe-area-inset-right, 0px);
+    
+    /* Mobile Touch Targets */
+    --touch-target-min: 44px;
+    --touch-target-comfortable: 48px;
+    --touch-target-large: 56px;
+    
+    /* Mobile-First Spacing Scale */
+    --space-mobile-xs: 0.25rem;
+    --space-mobile-sm: 0.5rem;
+    --space-mobile-md: 1rem;
+    --space-mobile-lg: 1.5rem;
+    --space-mobile-xl: 2rem;
+    --space-mobile-2xl: 3rem;
+    
+    /* Enhanced mobile-first typography scaling */
+    --text-mobile-xs: 0.75rem;
+    --text-mobile-sm: 0.875rem;
+    --text-mobile-base: 1rem;
+    --text-mobile-lg: 1.125rem;
+    --text-mobile-xl: 1.25rem;
+    --text-mobile-2xl: 1.5rem;
+    --text-mobile-3xl: 1.875rem;
+    
+    /* Improved line heights for mobile readability */
+    --mobile-leading-tight: 1.25;
+    --mobile-leading-snug: 1.375;
+    --mobile-leading-normal: 1.5;
+    --mobile-leading-relaxed: 1.625;
+
+    --card: 0 0% 98%;
+    --card-foreground: 210 11% 15%;
+
+    --popover: 0 0% 99%;
+    --popover-foreground: 210 11% 15%;
+
+    /* Primary - Pastel Sage */
+    --primary: 140 22% 34%;
+    --primary-foreground: 0 0% 98%;
+
+    /* Sophisticated Secondary - Soft Mist */
+    --secondary: 200 25% 96%;
+    --secondary-foreground: 210 11% 15%;
+
+    /* Muted - Gentle neutrals */
+    --muted: 200 20% 95%;
+    --muted-foreground: 210 8% 45%;
+
+    /* Accent - Misty Blue */
+    --accent: 200 30% 92%;
+    --accent-foreground: 210 11% 15%;
+
+    /* Error handling */
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Interactive elements */
+    --border: 210 11% 88%;
+    --input: 210 11% 88%;
+    --ring: 210 15% 25%;
+
+    --radius: 0.75rem;
+    /* Extended tokens for premium UI */
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --focus-ring: hsl(var(--primary) / 0.35);
+    --focus-ring-offset: 2px;
+    --shadow-soft: 0 8px 24px hsl(var(--primary) / 0.08);
+    --shadow-elevated: 0 12px 40px hsl(var(--primary) / 0.12);
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--accent) / 0.2));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent) / 0.15), hsl(var(--primary) / 0.2));
+
+    /* Editorial Brand Colors - Sophisticated palette */
+    --editorial-charcoal: 210 15% 25%;
+    --editorial-warm-grey: 30 8% 92%;
+    --editorial-cream: 45 25% 97%;
+    --editorial-sage: 140 20% 85%;
+    --editorial-blush: 15 30% 90%;
+    --editorial-navy: 220 25% 20%;
+    
+    /* Enhanced Glass Effects - Apple Glass Style */
+    --glass-bg: 0 0% 98% / 0.95;
+    --glass-border: 210 11% 88% / 0.4;
+    --glass-shadow: 210 25% 25% / 0.15;
+    --glass-backdrop: blur(24px);
+    
+    /* Apple Glass Variations */
+    --glass-light: 0 0% 100% / 0.96;
+    --glass-medium: 0 0% 95% / 0.7;
+    --glass-dark: 210 15% 20% / 0.5;
+    
+    /* Glass Hover States */
+    --glass-hover: 0 0% 100% / 0.95;
+    --glass-active: 0 0% 90% / 0.85;
+  }
+
+  .dark {
+    --background: 210 15% 8%;
+    --foreground: 210 11% 92%;
+
+    --ash: 210 6% 70%;
+
+    --card: 210 15% 10%;
+    --card-foreground: 210 11% 92%;
+
+    --popover: 210 15% 8%;
+    --popover-foreground: 210 11% 92%;
+
+    --primary: 140 20% 78%;
+    --primary-foreground: 210 15% 8%;
+
+    --secondary: 200 15% 18%;
+    --secondary-foreground: 210 11% 85%;
+
+    --muted: 200 12% 14%;
+    --muted-foreground: 210 8% 60%;
+
+    --accent: 200 18% 20%;
+    --accent-foreground: 210 11% 85%;
+
+    --destructive: 0 55% 45%;
+    --destructive-foreground: 210 11% 92%;
+
+    --border: 210 15% 18%;
+    --input: 210 15% 18%;
+    --ring: 210 11% 85%;
+
+    /* Dark Mode Glass Effects */
+    --glass-bg: 210 15% 10% / 0.8;
+    --glass-border: 210 15% 25% / 0.4;
+    --glass-shadow: 0 0% 0% / 0.5;
+    --glass-backdrop: blur(24px);
+    
+    --glass-light: 210 15% 15% / 0.9;
+    --glass-medium: 210 15% 12% / 0.7;
+    --glass-dark: 210 15% 8% / 0.5;
+    
+    --glass-hover: 210 15% 20% / 0.9;
+    --glass-active: 210 15% 15% / 0.95;
+  }
+
+  /* Mobile-First Responsive Utilities */
+  @media (max-width: 767px) {
+    .mobile-app-container {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .mobile-content {
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+    }
+    
+    * {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+  }
+}
+
+@layer components {
+  /* Enhanced Glass Navigation System */
+  .glass-nav {
+    @apply border shadow-md;
+    background: hsl(var(--card));
+    border-color: hsl(var(--border));
+    box-shadow: 0 8px 24px -8px hsl(var(--foreground) / 0.15);
+  }
+  
+  .nav-glass {
+    @apply border shadow-xl;
+    background: hsl(var(--card));
+    border-color: hsl(var(--border));
+    box-shadow: 0 20px 48px -16px hsl(var(--foreground) / 0.2);
+  }
+  
+  /* Enhanced Glass Card System */
+  .glass-card {
+    @apply bg-background/80 backdrop-blur-md border border-border/50 shadow-md;
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    background: hsl(var(--glass-medium));
+    border-color: hsl(var(--glass-border));
+    box-shadow: 
+      0 4px 24px 0 hsl(var(--glass-shadow)),
+      0 0 0 1px hsl(var(--glass-border)) inset;
+  }
+  
+  .glass-card-enhanced {
+    @apply bg-background/85 backdrop-blur-lg border border-border/40 shadow-lg;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    background: hsl(var(--glass-bg));
+    border-color: hsl(var(--glass-border));
+    box-shadow: 
+      0 8px 32px 0 hsl(var(--glass-shadow)),
+      0 4px 16px 0 hsl(var(--glass-shadow)),
+      0 0 0 1px hsl(var(--glass-border)) inset;
+  }
+  
+  /* Floating Glass Navigation */
+  .nav-glass-floating {
+    @apply fixed z-50 border shadow-2xl rounded-2xl;
+    background: hsl(var(--card));
+    border-color: hsl(var(--border));
+    box-shadow: 0 25px 80px -20px hsl(var(--foreground) / 0.25);
+  }
+  
+  /* Glass Navigation Hover States */
+  .glass-nav:hover,
+  .nav-glass:hover {
+    background: hsl(var(--card));
+    border-color: hsl(var(--border));
+    box-shadow: 0 16px 48px -12px hsl(var(--foreground) / 0.25);
+  }
+  
+  /* Mobile-First Design System */
+  .mobile-app-container {
+    @apply min-h-screen bg-background;
+  }
+  
+  .mobile-layout {
+    @apply pb-20; /* Space for bottom navigation */
+  }
+  
+  .desktop-layout {
+    @apply ml-20; /* Space for sidebar navigation */
+  }
+  
+  .card-primary {
+    @apply bg-background/95 backdrop-blur-lg border border-border/60 rounded-xl shadow-lg transition-all duration-300;
+  }
+  
+  .card-secondary {
+    @apply bg-background/80 backdrop-blur-md border border-border/40 rounded-lg shadow-md transition-all duration-300;
+  }
+  
+  .stats-grid {
+    @apply grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4;
+  }
+  
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  .touch-target-large {
+    @apply min-h-[56px] min-w-[56px];
+  }
+  
+  /* Mobile typography optimizations */
+  .mobile-optimized-text {
+    line-height: var(--mobile-leading-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Enhanced mobile typography scaling */
+  .mobile-text-xs { @apply text-[11px] leading-tight sm:text-xs; }
+  .mobile-text-sm { @apply text-xs leading-tight sm:text-sm; }
+  .mobile-text-base { @apply text-sm leading-normal sm:text-base; }
+  .mobile-text-lg { @apply text-base leading-normal sm:text-lg; }
+  .mobile-text-xl { @apply text-lg leading-tight sm:text-xl; }
+  .mobile-text-2xl { @apply text-xl leading-tight sm:text-2xl; }
+
+  /* Mobile-optimized spacing */
+  .mobile-space-y-1 { @apply space-y-1 sm:space-y-2; }
+  .mobile-space-y-2 { @apply space-y-2 sm:space-y-3; }
+  .mobile-space-y-3 { @apply space-y-3 sm:space-y-4; }
+  .mobile-space-y-4 { @apply space-y-4 sm:space-y-6; }
+
+  /* Mobile touch targets */
+  .mobile-touch-target {
+    @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+  }
+
+  /* Mobile-first grid patterns */
+  .mobile-grid-auto { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3; }
+  .mobile-grid-2 { @apply grid grid-cols-1 sm:grid-cols-2; }
+  .mobile-grid-3 { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3; }
+  .mobile-grid-4 { @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4; }
+
+  /* iPad-Specific Layout System */
+  .ipad-layout-container {
+    @apply min-h-screen flex bg-background;
+  }
+
+  .ipad-main-content {
+    @apply flex-1 min-w-0;
+    margin-left: 280px; /* Space for fixed sidebar */
+  }
+
+  .ipad-content-wrapper {
+    @apply min-h-screen p-6 max-w-none;
+  }
+
+  /* iPad Navigation Styles */
+  .ipad-navigation {
+    @apply fixed left-0 top-0 h-full w-70 bg-card/95 backdrop-blur-xl border-r border-border/50 p-6 overflow-y-auto z-40;
+    box-shadow: 4px 0 24px -8px hsl(var(--foreground) / 0.1);
+  }
+
+  .ipad-nav-header {
+    @apply mb-8;
+  }
+
+  .ipad-profile-card {
+    @apply flex items-center gap-3 p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-all duration-200;
+  }
+
+  .ipad-nav-section {
+    @apply mb-8;
+  }
+
+  .ipad-nav-section-title {
+    @apply text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3;
+  }
+
+  .ipad-nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200;
+  }
+
+  .ipad-nav-item-active {
+    @apply bg-primary/10 text-primary font-medium;
+  }
+
+  .ipad-quick-action {
+    @apply h-auto p-3 flex flex-col items-center gap-2 hover:bg-primary/10 hover:text-primary;
+  }
+
+  /* iPad Card System */
+  .ipad-card-base {
+    @apply rounded-2xl transition-all duration-300;
+  }
+
+  .ipad-card-elevated {
+    @apply bg-card border border-border/20 shadow-lg hover:shadow-xl;
+  }
+
+  .ipad-card-glass {
+    @apply bg-card/80 backdrop-blur-lg border border-border/30 shadow-md;
+  }
+
+  .ipad-card-interactive {
+    @apply cursor-pointer hover:scale-[1.02] hover:shadow-xl transition-all duration-200;
+  }
+
+  /* iPad Dashboard Layout */
+  .ipad-dashboard-layout {
+    @apply space-y-8;
+  }
+
+  .ipad-dashboard-hero {
+    @apply bg-gradient-to-br from-primary/5 via-background to-accent/5 rounded-3xl p-8 border border-border/30;
+  }
+
+  .ipad-hero-content {
+    @apply max-w-2xl;
+  }
+
+  .ipad-action-button {
+    @apply h-12 px-6 text-base font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200;
+  }
+
+  .ipad-action-button-outline {
+    @apply h-12 px-6 text-base font-medium rounded-xl border-2 hover:bg-muted/50 transition-all duration-200;
+  }
+
+  .ipad-stats-grid {
+    @apply grid grid-cols-2 lg:grid-cols-4 gap-6;
+  }
+
+  .ipad-stat-card {
+    @apply hover:shadow-lg transition-all duration-200;
+  }
+
+  .ipad-content-grid {
+    @apply grid grid-cols-1 lg:grid-cols-3 gap-8;
+  }
+
+  .ipad-main-column {
+    @apply lg:col-span-2 space-y-6;
+  }
+
+  .ipad-sidebar-column {
+    @apply space-y-6;
+  }
+
+  /* iPad Responsive Improvements */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .ipad-navigation {
+      @apply w-20 p-4;
+    }
+    
+    .ipad-main-content {
+      margin-left: 80px;
+    }
+    
+    .ipad-nav-item span {
+      @apply hidden;
+    }
+    
+    .ipad-quick-action span {
+      @apply hidden;
+    }
+    
+    .ipad-stats-grid {
+      @apply grid-cols-2;
+    }
+    
+    .ipad-content-grid {
+      @apply grid-cols-1;
+    }
+  }
+
+  /* iPad Portrait Optimizations */
+  @media (orientation: portrait) and (min-width: 768px) {
+    .ipad-stats-grid {
+      @apply grid-cols-2;
+    }
+    
+    .ipad-content-grid {
+      @apply grid-cols-1;
+    }
+  }
+
+  /* Error state styling */
+  .mobile-error-state {
+    @apply rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-center;
+  }
+
+  .mobile-error-button {
+    @apply bg-destructive/10 text-destructive hover:bg-destructive/20 border-destructive/30;
+  }
+
+  /* Success state styling */
+  .mobile-success-state {
+    @apply rounded-lg border border-green-200 bg-green-50 p-4 text-green-800;
+  }
+
+  /* Loading state styling */
+  .mobile-loading-skeleton {
+    @apply animate-pulse bg-muted/50 rounded;
+  }
+
+  /* Mobile error states */
+  .mobile-error-container {
+    @apply flex flex-col items-center justify-center min-h-[50vh] p-6 text-center;
+  }
+  
+  .mobile-bounce-in {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* iOS Input Zoom Fix - Prevents automatic zoom on input focus */
+/* This must be 16px or larger to prevent iOS zoom behavior */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+input[type="url"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+textarea,
+select {
+  font-size: 16px !important;
+}
+
+/* Ensure the font size doesn't break our design */
+/* Apply smaller visual size through transform if needed */
+.small-input {
+  font-size: 16px !important;
+  transform: scale(0.875);
+  transform-origin: left center;
+}
+
+/* Pull to Refresh Indicator */
+.pull-refresh-indicator {
+  position: fixed;
+  top: var(--mobile-safe-area-top, 0px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background: hsl(var(--background) / 0.9);
+  backdrop-filter: blur(8px);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Show indicator when pulling */
+[data-pull-refresh] .pull-refresh-indicator {
+  opacity: 1;
+  transform: translateX(-50%) translateY(calc(var(--pull-distance, 0px) * 0.5));
+}
+
+/* Pull to refresh animation */
+@keyframes pullRefreshSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pull-refresh-indicator::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid hsl(var(--primary));
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: pullRefreshSpin 1s linear infinite;
+}
+
+/* iOS Input Zoom Fix */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="search"],
+input[type="time"],
+input[type="url"],
+input[type="week"],
+textarea,
+select {
+  font-size: 16px !important;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Ensure touch targets are at least 44px */
+.btn-mobile,
+button,
+a,
+input,
+textarea,
+select {
+  min-height: 44px;
+}
+
+/* Fix for date inputs on iOS */
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+/* Compact density overrides for a more elegant mobile UI */
+@layer base {
+  [data-density="compact"] {
+    --mobile-header-height: 48px;
+    --mobile-nav-height: 64px;
+    --radius: 0.625rem;
+  }
+}
+
+@layer components {
+  /* Slightly tighter type scale on compact density */
+  [data-density="compact"] .mobile-text-base { @apply text-[13px]; }
+  [data-density="compact"] .mobile-text-lg { @apply text-sm; }
+  [data-density="compact"] .mobile-text-xl { @apply text-base; }
+
+  /* Tighter grid gaps */
+  [data-density="compact"] .stats-grid { @apply gap-2; }
+
+  /* Softer card radii on compact */
+  [data-density="compact"] .card-primary,
+  [data-density="compact"] .card-secondary { border-radius: 0.75rem !important; }
+
+  /* Buttons look slimmer while remaining 44px hit target */
+  [data-density="compact"] button { min-height: 44px; }
+
+  /* Micro-interaction helpers */
+  .touch-feedback { @apply transition-transform duration-150 active:scale-95; }
+  .hover-scale { @apply transition-transform duration-200 hover:scale-105; }
+  .focus-ring { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2; }
+
+  /* Atelier Ash Rose Utilities */
+  .bg-atelier-hero {
+    background-image:
+      radial-gradient(1200px 600px at 80% -20%, hsl(var(--rose) / 0.25), transparent 60%),
+      linear-gradient(135deg, hsl(var(--champagne) / 0.85), hsl(var(--mist) / 0.9));
+    background-blend-mode: soft-light, normal;
+  }
+  .bg-atelier-section {
+    background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted) / 0.7));
+  }
+  .gradient-rose-ink {
+    background: linear-gradient(135deg, hsl(var(--rose) / 0.2), hsl(var(--ink) / 0.85));
+  }
+  .ink-divider {
+    border-top: 1px solid hsl(var(--ink) / 0.08);
+  }
+  .tag-base {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium border;
+  }
+  .tag-event { 
+    @apply tag-base; 
+    color: hsl(var(--sage));
+    background-color: hsl(var(--sage) / 0.12);
+    border-color: hsl(var(--sage) / 0.3);
+  }
+  .tag-challenge { 
+    @apply tag-base; 
+    color: hsl(var(--rose));
+    background-color: hsl(var(--rose) / 0.12);
+    border-color: hsl(var(--rose) / 0.3);
+  }
+  .tag-social { 
+    @apply tag-base; 
+    color: hsl(var(--mauve));
+    background-color: hsl(var(--mauve) / 0.12);
+    border-color: hsl(var(--mauve) / 0.3);
+  }
+}
+
+/* Appearance controls via data-attributes */
+@layer base {
+  html[data-font-size="small"] { font-size: 15px; }
+  html[data-font-size="medium"] { font-size: 16px; }
+  html[data-font-size="large"] { font-size: 17px; }
+
+  html[data-animations="off"] * {
+    animation: none !important;
+    transition-duration: 0ms !important;
+  }
+
+  html[data-glass="off"] .glass-card,
+  html[data-glass="off"] .glass-card-enhanced,
+  html[data-glass="off"] .glass-nav,
+  html[data-glass="off"] .nav-glass,
+  html[data-glass="off"] .nav-glass-floating {
+    background: hsl(var(--card)) !important;
+    border-color: hsl(var(--border)) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: 0 1px 2px hsl(var(--foreground) / 0.04) !important;
+  }
+
+  html[data-contrast="high"] {
+    --muted-foreground: 210 10% 25%;
+    --border: 210 15% 35%;
+    --ring: 210 15% 25%;
+  }
+}
+

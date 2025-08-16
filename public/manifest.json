@@ -1,0 +1,26 @@
+{
+  "name": "Humbl Girls Club",
+  "short_name": "HGC",
+  "description": "A members-only community for women to connect, challenge, and grow together",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon.png", 
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["social", "health", "lifestyle"],
+  "scope": "/",
+  "lang": "en"
+}

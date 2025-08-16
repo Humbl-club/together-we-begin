@@ -1,11 +1,12 @@
 import React, { memo } from 'react';
-import { useMobileFirst } from '@/hooks/useMobileFirst';
+import { useMobileOptimization } from '@/hooks/useMobileOptimization';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { useToast } from '@/hooks/use-toast';
 import { useProgressiveEnhancement } from '@/hooks/useProgressiveEnhancement';
 import MobileDashboard from './MobileDashboard';
+import { iPadDashboard as IPadDashboard } from '@/components/ipad';
 
 // Desktop imports
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
@@ -28,7 +29,7 @@ import { Calendar, Users, Zap } from 'lucide-react';
 const Dashboard: React.FC = memo(() => {
   const { user, isAdmin } = useAuth();
   const { stats, profile, loading, refetch } = useDashboardData(user?.id);
-  const { isMobile, isTablet, safeAreaInsets } = useMobileFirst();
+  const { isMobile, isTablet, isDesktop } = useMobileOptimization();
   const { handleError } = useErrorHandler();
   const { toast } = useToast();
   const { usePullToRefresh } = useProgressiveEnhancement();
@@ -64,48 +65,32 @@ const Dashboard: React.FC = memo(() => {
   }
 
   // Enhanced Tablet experience with iPad Layout
-  if (isTablet) {
+  if (isTablet || isDesktop) {
     return (
-      <div className="ipad-layout min-h-screen bg-background" data-pull-refresh>
+      <div className="ipad-dashboard-container" data-pull-refresh>
         <EnhancedErrorBoundary
           showErrorDetails={process.env.NODE_ENV === 'development'}
           allowRetry={true}
         >
           <SEO title="Dashboard" description="Your community, events, and wellness at a glance." canonical="/dashboard" />
           <h1 className="sr-only">Dashboard</h1>
-          
-          {/* Use iPad Dashboard Component */}
-          <div className="space-y-6">
-            <div className="space-y-4">
+          <IPadDashboard>
+            <div className="space-y-6">
               <WalkingChallengeWidget />
               <UpcomingEvents />
               <CommunityFeed />
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <HealthPermissionPrompt onConnected={() => refetch()} />
-              <WellnessWidget onChallengeSync={(challengeId) => console.log('Sync challenge:', challengeId)} />
-            </div>
-
-            {isAdmin && (
-              <div className="flex gap-3 justify-center">
-                <Button variant="secondary" size="default" className="tablet-button touch-target-tablet" aria-label="Start a challenge">
-                  <Zap className="w-5 h-5 mr-2" />
-                  Start Challenge
-                </Button>
-                <Button variant="outline" size="default" className="tablet-button touch-target-tablet" aria-label="Create an event">
-                  <Calendar className="w-5 h-5 mr-2" />
-                  Create Event
-                </Button>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <HealthPermissionPrompt onConnected={() => refetch()} />
+                <WellnessWidget onChallengeSync={(challengeId) => console.log('Sync challenge:', challengeId)} />
               </div>
-            )}
-          </div>
+            </div>
+          </IPadDashboard>
         </EnhancedErrorBoundary>
       </div>
     );
   }
 
-  // Enhanced Desktop experience
+  // Fallback for non-mobile devices (shouldn't reach here with current logic)
   return (
     <div className="desktop-layout min-h-screen bg-background" data-pull-refresh>
       <EnhancedErrorBoundary

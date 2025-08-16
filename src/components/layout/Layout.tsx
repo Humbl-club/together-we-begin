@@ -11,7 +11,7 @@ import { MobileLoading } from '@/components/ui/mobile-loading';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import EditorialMasthead from '@/components/layout/EditorialMasthead';
-import { iPadLayout } from '@/components/ipad';
+import { iPadLayout as IPadLayout } from '@/components/ipad';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -101,12 +101,10 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
         </>
       ) : (isTabletOptimized || isDesktop) ? (
         // iPad/Tablet: Custom iPad Layout
-        React.createElement(iPadLayout, { profile, children: 
-          React.createElement('main', { id: 'main-content', className: 'ipad-main-content' }, [
-            React.createElement('div', { key: 'indicator', className: 'pull-refresh-indicator' }),
-            children
-          ])
-        })
+        <IPadLayout profile={profile}>
+          <div className="pull-refresh-indicator" />
+          {children}
+        </IPadLayout>
       ) : (
         // Desktop: Shadcn Sidebar layout
         <SidebarProvider>

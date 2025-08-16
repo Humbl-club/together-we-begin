@@ -306,12 +306,12 @@ body { @apply bg-background text-foreground font-sans font-medium antialiased; }
   }
 
   .ipad-main-content {
-    @apply flex-1 min-w-0;
+    @apply flex-1 min-w-0 overflow-y-auto;
     margin-left: 280px; /* Space for fixed sidebar */
   }
 
   .ipad-content-wrapper {
-    @apply min-h-screen p-6 max-w-none;
+    @apply min-h-screen p-8 max-w-none;
   }
 
   /* iPad Navigation Styles */
@@ -409,27 +409,23 @@ body { @apply bg-background text-foreground font-sans font-medium antialiased; }
   /* iPad Responsive Improvements */
   @media (min-width: 768px) and (max-width: 1024px) {
     .ipad-navigation {
-      @apply w-20 p-4;
+      @apply w-72 p-6; /* Keep wider for better readability */
     }
     
     .ipad-main-content {
-      margin-left: 80px;
+      margin-left: 288px; /* Match navigation width */
     }
     
-    .ipad-nav-item span {
-      @apply hidden;
-    }
-    
-    .ipad-quick-action span {
-      @apply hidden;
+    .ipad-content-wrapper {
+      @apply p-6;
     }
     
     .ipad-stats-grid {
-      @apply grid-cols-2;
+      @apply grid-cols-2 gap-4;
     }
     
     .ipad-content-grid {
-      @apply grid-cols-1;
+      @apply grid-cols-1 gap-6;
     }
   }
 

@@ -2,6 +2,7 @@ import React, { memo, useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useViewport } from '@/hooks/use-mobile';
+import { useMobileOptimization } from '@/hooks/useMobileOptimization';
 import { Navigation } from './Navigation';
 import { MobileGirlsClubHeader } from './MobileGirlsClubHeader';
 import { SidebarTrigger, SidebarProvider } from '@/components/ui/sidebar';
@@ -10,6 +11,7 @@ import { MobileLoading } from '@/components/ui/mobile-loading';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import EditorialMasthead from '@/components/layout/EditorialMasthead';
+import { iPadLayout } from '@/components/ipad';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -18,6 +20,7 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
   const { user, loading } = useAuth();
   const { isMobile, isTablet } = useViewport();
+  const { isTablet: isTabletOptimized, isDesktop } = useMobileOptimization();
   const location = useLocation();
   const [profile, setProfile] = useState<any>(null);
   
@@ -96,8 +99,16 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
             {children}
           </main>
         </>
+      ) : (isTabletOptimized || isDesktop) ? (
+        // iPad/Tablet: Custom iPad Layout
+        React.createElement(iPadLayout, { profile, children: 
+          React.createElement('main', { id: 'main-content', className: 'ipad-main-content' }, [
+            React.createElement('div', { key: 'indicator', className: 'pull-refresh-indicator' }),
+            children
+          ])
+        })
       ) : (
-        // Desktop/Tablet: Shadcn Sidebar layout
+        // Desktop: Shadcn Sidebar layout
         <SidebarProvider>
           <div className="flex w-full">
             <AppSidebar />

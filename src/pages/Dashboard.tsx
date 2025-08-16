@@ -63,90 +63,42 @@ const Dashboard: React.FC = memo(() => {
     );
   }
 
-  // Enhanced Tablet experience with optimized layout
+  // Enhanced Tablet experience with iPad Layout
   if (isTablet) {
     return (
-      <div className="tablet-layout min-h-screen bg-background" data-pull-refresh>
+      <div className="ipad-layout min-h-screen bg-background" data-pull-refresh>
         <EnhancedErrorBoundary
           showErrorDetails={process.env.NODE_ENV === 'development'}
           allowRetry={true}
         >
-          <div className="tablet-container">
-            <SEO title="Dashboard" description="Your community, events, and wellness at a glance." canonical="/dashboard" />
-            <h1 className="sr-only">Dashboard</h1>
+          <SEO title="Dashboard" description="Your community, events, and wellness at a glance." canonical="/dashboard" />
+          <h1 className="sr-only">Dashboard</h1>
+          
+          {/* Use iPad Dashboard Component */}
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <WalkingChallengeWidget />
+              <UpcomingEvents />
+              <CommunityFeed />
+            </div>
             
-            {/* Tablet Dashboard Header */}
-            <div className="tablet-header motion-safe:animate-fade-in">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="tablet-title text-foreground">
-                    Welcome back, {profile?.full_name?.split(' ')[0] || 'Friend'} ✨
-                  </h1>
-                  <p className="text-muted-foreground mt-1">
-                    Let's make today empowering and fun.
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <Button variant="secondary" size="default" className="tablet-button touch-target-tablet" aria-label="Start a challenge">
-                    <Zap className="w-5 h-5 mr-2" />
-                    Start Challenge
-                  </Button>
-                  {isAdmin && (
-                    <Button variant="outline" size="default" className="tablet-button touch-target-tablet" aria-label="Create an event">
-                      <Calendar className="w-5 h-5 mr-2" />
-                      Create Event
-                    </Button>
-                  )}
-                </div>
-              </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <HealthPermissionPrompt onConnected={() => refetch()} />
+              <WellnessWidget onChallengeSync={(challengeId) => console.log('Sync challenge:', challengeId)} />
             </div>
 
-            {/* Tablet Dashboard Grid */}
-            <div className="tablet-dashboard-grid">
-              {/* Main Content Column */}
-              <div className="lg:col-span-2 tablet-sidebar-content">
-                <div className="tablet-card-enhanced p-6">
-                  <WalkingChallengeWidget />
-                </div>
-                <div className="tablet-card-enhanced p-6">
-                  <UpcomingEvents />
-                </div>
-                <div className="tablet-card-enhanced p-6">
-                  <CommunityFeed />
-                </div>
+            {isAdmin && (
+              <div className="flex gap-3 justify-center">
+                <Button variant="secondary" size="default" className="tablet-button touch-target-tablet" aria-label="Start a challenge">
+                  <Zap className="w-5 h-5 mr-2" />
+                  Start Challenge
+                </Button>
+                <Button variant="outline" size="default" className="tablet-button touch-target-tablet" aria-label="Create an event">
+                  <Calendar className="w-5 h-5 mr-2" />
+                  Create Event
+                </Button>
               </div>
-
-              {/* Sidebar Column */}
-              <div className="tablet-sidebar-content">
-                <div className="tablet-section">
-                  <HealthPermissionPrompt onConnected={() => refetch()} />
-                </div>
-                
-                <div className="tablet-section">
-                  <WellnessWidget onChallengeSync={(challengeId) => console.log('Sync challenge:', challengeId)} />
-                </div>
-
-                <div className="tablet-section">
-                  <h3 className="tablet-heading mb-4">Quick Actions</h3>
-                  <div className="space-y-3">
-                    {isAdmin && (
-                      <Button variant="outline" className="w-full justify-start tablet-button" haptic="tap">
-                        <Calendar className="w-5 h-5 mr-3" />
-                        Create Event
-                      </Button>
-                    )}
-                    <Button variant="outline" className="w-full justify-start tablet-button" haptic="tap">
-                      <Users className="w-5 h-5 mr-3" />
-                      Find Friends
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start tablet-button" haptic="tap">
-                      <Zap className="w-5 h-5 mr-3" />
-                      Start Challenge
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </EnhancedErrorBoundary>
       </div>

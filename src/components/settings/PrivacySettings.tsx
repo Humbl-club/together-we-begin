@@ -114,7 +114,7 @@ export const PrivacySettings: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -122,12 +122,12 @@ export const PrivacySettings: React.FC = () => {
             Privacy & Security
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4">
           {/* Profile Visibility */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Eye className="w-4 h-4 text-muted-foreground" />
-              <Label htmlFor="profile_visibility" className="text-base font-medium">
+              <Label htmlFor="profile_visibility" className="text-sm font-medium">
                 Profile Visibility
               </Label>
             </div>
@@ -147,10 +147,10 @@ export const PrivacySettings: React.FC = () => {
           </div>
 
           {/* Message Preferences */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-muted-foreground" />
-              <Label htmlFor="allow_messages" className="text-base font-medium">
+              <Label htmlFor="allow_messages" className="text-sm font-medium">
                 Who Can Message You
               </Label>
             </div>
@@ -172,8 +172,8 @@ export const PrivacySettings: React.FC = () => {
           {/* Friend Requests */}
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <Label className="text-base font-medium">Allow Friend Requests</Label>
-              <p className="text-sm text-muted-foreground">
+              <Label className="text-sm font-medium">Allow Friend Requests</Label>
+              <p className="text-xs text-muted-foreground">
                 Let other users send you friend requests
               </p>
             </div>

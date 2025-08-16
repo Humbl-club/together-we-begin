@@ -11,27 +11,25 @@ interface MobileFirstCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const MobileFirstCard = forwardRef<HTMLDivElement, MobileFirstCardProps>(
   ({ className, variant = 'default', size = 'md', interactive = false, padding = 'md', children, ...props }, ref) => {
-    const { isMobile } = useMobileFirst();
-
     const baseStyles = cn(
-      // Base styles
+      // Base styles - mobile-first design
       "relative overflow-hidden transition-all duration-200",
       
-      // Mobile-first border radius
-      isMobile ? "rounded-2xl" : "rounded-xl",
+      // Consistent mobile-first border radius across all devices
+      "rounded-2xl",
       
-      // Size variants
+      // Size variants - mobile baseline maintained
       {
         'min-h-[120px]': size === 'sm',
         'min-h-[160px]': size === 'md', 
         'min-h-[200px]': size === 'lg',
       },
       
-      // Padding variants - mobile-first
+      // Padding variants - mobile-first baseline
       padding === 'none' && 'p-0',
-      padding === 'sm' && (isMobile ? 'p-3' : 'p-2'),
-      padding === 'md' && (isMobile ? 'p-4' : 'p-3'),
-      padding === 'lg' && (isMobile ? 'p-6' : 'p-4'),
+      padding === 'sm' && 'p-3',
+      padding === 'md' && 'p-4',
+      padding === 'lg' && 'p-6',
       
       // Variant styles
       {
@@ -41,10 +39,9 @@ export const MobileFirstCard = forwardRef<HTMLDivElement, MobileFirstCardProps>(
         'card-accent shadow-xl': variant === 'premium',
       },
       
-      // Interactive states
+      // Interactive states - consistent touch optimization
       interactive && cn(
-        "cursor-pointer hover:shadow-md",
-        isMobile && "active:scale-[0.98] transform-gpu touch-manipulation"
+        "cursor-pointer hover:shadow-md active:scale-[0.98] transform-gpu touch-manipulation"
       ),
       
       className
@@ -60,14 +57,12 @@ export const MobileFirstCard = forwardRef<HTMLDivElement, MobileFirstCardProps>(
 
 export const MobileFirstCardHeader = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, children, ...props }, ref) => {
-    const { isMobile } = useMobileFirst();
-    
     return (
       <div
         ref={ref}
         className={cn(
-          "flex flex-col space-y-2",
-          isMobile ? "pb-3" : "pb-2",
+          // Mobile-first spacing baseline - consistent across all devices
+          "flex flex-col space-y-2 pb-3",
           className
         )}
         {...props}
@@ -94,14 +89,12 @@ export const MobileFirstCardContent = forwardRef<HTMLDivElement, React.HTMLAttri
 
 export const MobileFirstCardTitle = forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, children, ...props }, ref) => {
-    const { isMobile } = useMobileFirst();
-    
     return (
       <h3
         ref={ref}
         className={cn(
-          "font-semibold leading-tight tracking-tight text-foreground",
-          isMobile ? "text-lg" : "text-base",
+          // Mobile-first typography baseline - consistent across all devices
+          "font-semibold leading-tight tracking-tight text-foreground text-lg",
           className
         )}
         {...props}
@@ -114,14 +107,12 @@ export const MobileFirstCardTitle = forwardRef<HTMLHeadingElement, React.HTMLAtt
 
 export const MobileFirstCardDescription = forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, children, ...props }, ref) => {
-    const { isMobile } = useMobileFirst();
-    
     return (
       <p
         ref={ref}
         className={cn(
-          "text-muted-foreground leading-relaxed",
-          isMobile ? "text-sm" : "text-xs",
+          // Mobile-first text sizing baseline - consistent across all devices
+          "text-muted-foreground leading-relaxed text-sm",
           className
         )}
         {...props}

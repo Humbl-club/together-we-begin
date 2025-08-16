@@ -160,7 +160,7 @@ export const AccountManagement: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Account Information */}
       <Card className="glass-card">
         <CardHeader>

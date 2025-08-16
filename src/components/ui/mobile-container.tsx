@@ -21,11 +21,12 @@ export const MobileContainer = memo(({
 }: MobileContainerProps) => {
   const { isMobile, safeAreaInsets } = useMobileFirst();
 
+  // Mobile-first padding system - consistent across all devices
   const paddingClasses = {
     none: '',
-    sm: isMobile ? 'p-3' : 'p-4',
-    md: isMobile ? 'p-4' : 'p-6',
-    lg: isMobile ? 'p-6' : 'p-8'
+    sm: 'p-3',
+    md: 'p-4', 
+    lg: 'p-6'
   };
 
   const maxWidthClasses = {
@@ -59,11 +60,8 @@ export const MobileContainer = memo(({
         'w-full',
         // Ensure text doesn't overflow
         'break-words overflow-wrap-anywhere',
-        // Mobile-specific adjustments
-        isMobile && cn(
-          'text-responsive',
-          'space-y-4', // Better mobile spacing
-        )
+        // Mobile-first text and spacing - consistent across all devices
+        'text-responsive space-y-4'
       )}>
         {children}
       </div>
@@ -82,29 +80,21 @@ export const MobileSection = memo(({
   title?: string;
   description?: string;
 }) => {
-  const { isMobile } = useMobileFirst();
-
   return (
     <section className={cn(
-      'glass-card rounded-xl',
-      isMobile ? 'p-4 mb-4' : 'p-6 mb-6',
+      // Mobile-first design - consistent across all devices
+      'glass-card rounded-2xl p-4 mb-4',
       className
     )}>
       {(title || description) && (
-        <div className={cn('mb-4', isMobile && 'mb-3')}>
+        <div className="mb-3">
           {title && (
-            <h2 className={cn(
-              'font-semibold text-foreground',
-              isMobile ? 'text-lg' : 'text-xl'
-            )}>
+            <h2 className="font-semibold text-foreground text-lg">
               {title}
             </h2>
           )}
           {description && (
-            <p className={cn(
-              'text-muted-foreground mt-1',
-              isMobile ? 'text-sm' : 'text-base'
-            )}>
+            <p className="text-muted-foreground mt-1 text-sm">
               {description}
             </p>
           )}

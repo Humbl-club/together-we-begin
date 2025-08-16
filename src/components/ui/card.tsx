@@ -9,7 +9,8 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "card-secondary",
+      // Mobile-first baseline card design
+      "card-secondary rounded-2xl",
       className
     )}
     {...props}
@@ -23,7 +24,11 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    className={cn(
+      // Mobile-first padding and spacing - consistent across devices
+      "flex flex-col space-y-2 p-4", 
+      className
+    )}
     {...props}
   />
 ))
@@ -36,7 +41,8 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-xl font-medium leading-none tracking-tight editorial-heading",
+      // Mobile-first typography - consistent across devices
+      "text-lg font-semibold leading-tight tracking-tight text-foreground",
       className
     )}
     {...props}
@@ -50,7 +56,11 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn(
+      // Mobile-first text sizing - consistent across devices
+      "text-sm text-muted-foreground leading-relaxed", 
+      className
+    )}
     {...props}
   />
 ))
@@ -60,7 +70,15 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  <div 
+    ref={ref} 
+    className={cn(
+      // Mobile-first content padding - consistent across devices
+      "p-4 pt-0", 
+      className
+    )} 
+    {...props} 
+  />
 ))
 CardContent.displayName = "CardContent"
 
@@ -70,7 +88,11 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-6 pt-0", className)}
+    className={cn(
+      // Mobile-first footer layout - consistent across devices
+      "flex items-center p-4 pt-0", 
+      className
+    )}
     {...props}
   />
 ))

@@ -143,7 +143,7 @@ export const NotificationSettings: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Main Notification Types */}
       <Card className="glass-card">
         <CardHeader>
@@ -152,13 +152,13 @@ export const NotificationSettings: React.FC = () => {
             Notification Channels
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4">
           {/* Push Notifications */}
           <div className="flex items-center justify-between">
             <div className="space-y-1 flex-1">
               <div className="flex items-center gap-2">
                 <Bell className="w-4 h-4 text-muted-foreground" />
-                <Label className="text-base font-medium">Push Notifications</Label>
+                <Label className="text-sm font-medium">Push Notifications</Label>
               </div>
               <p className="text-sm text-muted-foreground">
                 Get instant updates on your device

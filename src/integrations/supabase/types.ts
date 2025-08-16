@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -1760,18 +1760,18 @@ export type Database = {
     Functions: {
       admin_adjust_user_points: {
         Args: {
-          target_user_id: string
+          admin_user_id: string
           points_adjustment: number
           reason: string
-          admin_user_id: string
+          target_user_id: string
         }
         Returns: Json
       }
       assign_user_role: {
         Args: {
-          _user_id: string
-          _role: Database["public"]["Enums"]["app_role"]
           _assigned_by: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
         }
         Returns: Json
       }
@@ -1782,9 +1782,9 @@ export type Database = {
       create_invite_code: {
         Args: {
           _created_by: string
+          _expires_at?: string
           _invite_type?: string
           _max_uses?: number
-          _expires_at?: string
           _notes?: string
         }
         Returns: Json
@@ -1800,57 +1800,57 @@ export type Database = {
       get_content_for_moderation: {
         Args: {
           content_type_filter?: string
-          status_filter?: string
-          search_query?: string
           limit_param?: number
           offset_param?: number
+          search_query?: string
+          status_filter?: string
         }
         Returns: {
-          content_id: string
-          content_type: string
-          content: string
           author_id: string
           author_name: string
+          content: string
+          content_id: string
+          content_type: string
           created_at: string
-          status: string
-          reports_count: number
           latest_report_reason: string
+          reports_count: number
+          status: string
         }[]
       }
       get_dashboard_data_v2: {
         Args: { user_id_param: string }
         Returns: {
-          user_profile: Json
-          stats: Json
-          recent_events: Json
           active_challenges: Json
+          recent_events: Json
           recent_posts: Json
+          stats: Json
+          user_profile: Json
         }[]
       }
       get_events_optimized: {
         Args: {
-          user_id_param?: string
-          status_filter?: string
           limit_param?: number
           offset_param?: number
+          status_filter?: string
+          user_id_param?: string
         }
         Returns: {
-          id: string
-          title: string
+          created_at: string
+          created_by: string
+          current_capacity: number
           description: string
-          start_time: string
           end_time: string
-          location: string
+          id: string
           image_url: string
-          price_cents: number
+          is_registered: boolean
+          location: string
           loyalty_points_price: number
           max_capacity: number
-          current_capacity: number
-          status: Database["public"]["Enums"]["event_status"]
-          created_by: string
-          created_at: string
-          is_registered: boolean
+          price_cents: number
           registration_status: Database["public"]["Enums"]["payment_status"]
+          start_time: string
+          status: Database["public"]["Enums"]["event_status"]
+          title: string
         }[]
       }
       get_social_posts_optimized: {
@@ -1860,17 +1860,17 @@ export type Database = {
           user_id_filter?: string
         }
         Returns: {
-          id: string
-          user_id: string
-          content: string
-          image_urls: string[]
-          likes_count: number
           comments_count: number
+          content: string
           created_at: string
-          is_story: boolean
           expires_at: string
-          status: Database["public"]["Enums"]["post_status"]
+          id: string
+          image_urls: string[]
+          is_story: boolean
+          likes_count: number
           profile_data: Json
+          status: Database["public"]["Enums"]["post_status"]
+          user_id: string
         }[]
       }
       get_unread_counts_for_user: {
@@ -1887,45 +1887,45 @@ export type Database = {
       get_user_dashboard_optimized: {
         Args: { user_id_param: string }
         Returns: {
-          user_data: Json
-          stats_data: Json
           recent_activity: Json
+          stats_data: Json
+          user_data: Json
         }[]
       }
       get_user_threads_optimized: {
         Args: {
-          user_id_param: string
           page_limit?: number
           page_offset?: number
+          user_id_param: string
         }
         Returns: {
-          thread_id: string
-          participant_1: string
-          participant_2: string
           last_message_at: string
           last_message_id: string
+          other_user_avatar: string
           other_user_id: string
           other_user_name: string
-          other_user_avatar: string
+          participant_1: string
+          participant_2: string
+          thread_id: string
           unread_count: number
         }[]
       }
       get_users_with_roles: {
         Args: { _requesting_user_id: string }
         Returns: {
-          user_id: string
-          full_name: string
-          username: string
           avatar_url: string
           created_at: string
-          roles: Database["public"]["Enums"]["app_role"][]
+          full_name: string
           is_active: boolean
+          roles: Database["public"]["Enums"]["app_role"][]
+          user_id: string
+          username: string
         }[]
       }
       has_role: {
         Args: {
-          _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
         }
         Returns: boolean
       }
@@ -1936,9 +1936,9 @@ export type Database = {
       log_admin_action: {
         Args: {
           action_text: string
-          target_type_text: string
-          target_id_param?: string
           details_param?: Json
+          target_id_param?: string
+          target_type_text: string
         }
         Returns: undefined
       }
@@ -1952,10 +1952,10 @@ export type Database = {
       }
       moderate_content: {
         Args: {
-          content_type_param: string
           content_ids: string[]
-          new_status: string
+          content_type_param: string
           moderator_id: string
+          new_status: string
           reason?: string
         }
         Returns: Json
@@ -1967,26 +1967,26 @@ export type Database = {
       register_for_event: {
         Args: {
           event_id_param: string
-          user_id_param: string
-          payment_method_param?: string
           loyalty_points_used_param?: number
+          payment_method_param?: string
+          user_id_param: string
         }
         Returns: Json
       }
       remove_user_role: {
         Args: {
-          _user_id: string
-          _role: Database["public"]["Enums"]["app_role"]
           _removed_by: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
         }
         Returns: Json
       }
       resolve_content_reports: {
         Args: {
-          report_ids: string[]
-          resolution: string
           content_action?: string
           moderator_notes?: string
+          report_ids: string[]
+          resolution: string
         }
         Returns: Json
       }

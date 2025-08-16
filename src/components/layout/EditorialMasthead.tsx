@@ -21,8 +21,8 @@ export const EditorialMasthead: React.FC = () => {
           <SidebarTrigger className="hover-scale hidden md:inline-flex text-foreground" />
           <Link to="/dashboard" className="group">
             <div className="flex items-baseline gap-2">
-              <span className="font-display text-2xl md:text-3xl tracking-tight leading-none">Miu Muse</span>
-              <span className="hidden md:inline text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Magazine</span>
+              <span className="font-display text-2xl md:text-3xl tracking-tight leading-none">Humbl Girls Club</span>
+              <span className="hidden md:inline text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Community</span>
             </div>
           </Link>
         </div>

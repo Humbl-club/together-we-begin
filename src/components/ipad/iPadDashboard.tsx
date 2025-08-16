@@ -3,6 +3,7 @@ import { useMobileOptimization } from '@/hooks/useMobileOptimization';
 import { iPadCard } from './iPadCard';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useStepTracking } from '@/hooks/useStepTracking';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { cn } from '@/lib/utils';
 import { 
   Calendar, Users, Trophy, TrendingUp, 
@@ -22,7 +23,8 @@ const IPadCard = iPadCard;
 
 export const iPadDashboard: React.FC<iPadDashboardProps> = memo(({ children }) => {
   const { isTablet, isDesktop } = useMobileOptimization();
-  const { profile } = useDashboardData();
+  const { user } = useAuth();
+  const { profile } = useDashboardData(user?.id);
   const { todaySteps } = useStepTracking();
   const stepGoal = 10000; // Default goal
   const haptics = useHapticFeedback();

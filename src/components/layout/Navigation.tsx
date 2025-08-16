@@ -117,58 +117,72 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
     );
   }
 
-  // Tablet Navigation (Enhanced Glass Sidebar)
+  // Enhanced Tablet Navigation with Labels and Improved UX
   if (shouldRenderTablet) {
     return (
-      <nav className="fixed top-0 left-0 w-16 h-full z-50">
-        <div className="glass-nav h-full border-r border-border/20 flex flex-col">
-          {/* Tablet Logo with Glass Effect */}
-          <div className="p-3 border-b border-border/20">
-            <div className="w-10 h-10 bg-gradient-to-br from-editorial-charcoal to-editorial-navy rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-lg tracking-tight">H</span>
+      <nav className="fixed top-0 left-0 w-20 h-full z-50">
+        <div className="glass-nav h-full border-r border-border/20 flex flex-col bg-background/95 backdrop-blur-xl">
+          {/* Enhanced Tablet Logo */}
+          <div className="p-4 border-b border-border/20">
+            <div className="w-12 h-12 bg-gradient-to-br from-editorial-charcoal via-editorial-navy to-editorial-charcoal rounded-xl flex items-center justify-center shadow-lg relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+              <span className="text-white font-bold text-xl tracking-tight relative z-10">H</span>
             </div>
           </div>
 
-          {/* Navigation Items with Enhanced Glass */}
-          <div className="flex-1 flex flex-col space-y-2 p-2 mt-4">
+          {/* Enhanced Navigation Items with Better Spacing */}
+          <div className="flex-1 flex flex-col space-y-3 p-3 mt-6">
             {[...navItems, ...secondaryNavItems].map(({ href, icon: Icon, label }) => (
               <Link
                 key={href}
                 to={href}
                 title={label}
                 className={cn(
-                  "flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 group relative",
+                  "flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 group relative overflow-hidden",
                   isActive(href)
-                    ? 'bg-primary/20 text-primary backdrop-blur-sm shadow-sm border border-primary/20'
-                    : 'text-foreground/80 hover:text-foreground hover:bg-background/60 hover:backdrop-blur-sm'
+                    ? 'bg-primary/20 text-primary backdrop-blur-md shadow-lg border border-primary/30'
+                    : 'text-foreground/80 hover:text-foreground hover:bg-background/60 hover:backdrop-blur-sm hover:shadow-md'
                 )}
+                onClick={() => haptics.tap()}
               >
-                <Icon className="w-5 h-5" strokeWidth={isActive(href) ? 2.5 : 2} />
                 {isActive(href) && (
-                  <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-primary rounded-full" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl" />
+                )}
+                <Icon className="w-6 h-6 relative z-10 transition-transform group-hover:scale-110" strokeWidth={isActive(href) ? 2.5 : 2} />
+                <span className="text-[10px] font-medium tracking-wide text-center leading-none relative z-10 mt-1">
+                  {label}
+                </span>
+                {isActive(href) && (
+                  <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-primary rounded-full shadow-md" />
                 )}
               </Link>
             ))}
           </div>
 
-          {/* Tablet Actions with Glass Effects */}
-          <div className="p-2 border-t border-border/20 space-y-2">
+          {/* Enhanced Tablet Actions */}
+          <div className="p-3 border-t border-border/20 space-y-2">
             <Link
               to="/settings"
               title="Settings"
-              className="flex items-center justify-center w-12 h-12 rounded-xl text-foreground/80 hover:text-foreground hover:bg-background/60 hover:backdrop-blur-sm transition-all duration-200"
+              className="flex flex-col items-center justify-center w-14 h-14 rounded-xl text-foreground/80 hover:text-foreground hover:bg-background/60 hover:backdrop-blur-sm transition-all duration-200 group"
+              onClick={() => haptics.tap()}
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="w-5 h-5 transition-transform group-hover:rotate-90" />
+              <span className="text-[10px] font-medium tracking-wide mt-1">Settings</span>
             </Link>
             
             <Button
               variant="ghost"
               size="sm"
               title="Logout"
-              onClick={() => signOut()}
-              className="flex items-center justify-center w-12 h-12 p-0 rounded-xl text-foreground/80 hover:text-destructive hover:bg-destructive/10 hover:backdrop-blur-sm transition-all duration-200"
+              onClick={() => {
+                haptics.tap();
+                signOut();
+              }}
+              className="flex flex-col items-center justify-center w-14 h-14 p-0 rounded-xl text-foreground/80 hover:text-destructive hover:bg-destructive/10 hover:backdrop-blur-sm transition-all duration-200 group"
             >
-              <LogOut className="w-5 h-5" />
+              <LogOut className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+              <span className="text-[10px] font-medium tracking-wide mt-1">Logout</span>
             </Button>
           </div>
         </div>

@@ -46,37 +46,41 @@ export const MobileFirstLayout: React.FC<MobileFirstLayoutProps> = memo(({ child
     );
   }
 
-  // Tablet layout
+  // Enhanced Tablet layout with improved spacing and glassmorphism
   if (isTablet) {
     return (
       <div className="tablet-layout flex min-h-screen bg-background">
-        {/* Sidebar navigation */}
-        <div className="w-16 border-r border-border">
+        {/* Enhanced Tablet Sidebar Navigation */}
+        <div className="w-20 border-r border-border/60 glass-nav">
           <Navigation profile={profile} />
         </div>
         
-        {/* Main content */}
+        {/* Tablet Main content with optimized spacing */}
         <main className="flex-1 overflow-auto">
-          <div className="container mx-auto px-6 py-8 max-w-4xl">
-            {children}
+          <div className="tablet-container mx-auto px-6 py-6 max-w-5xl">
+            <div className="tablet-content-wrapper space-y-6">
+              {children}
+            </div>
           </div>
         </main>
       </div>
     );
   }
 
-  // Desktop layout
+  // Enhanced Desktop layout
   return (
     <div className="desktop-layout flex min-h-screen bg-background">
-      {/* Sidebar navigation */}
-      <div className="w-20 border-r border-border">
+      {/* Enhanced Desktop Sidebar */}
+      <div className="w-24 border-r border-border/60 glass-nav">
         <Navigation profile={profile} />
       </div>
       
-      {/* Main content */}
+      {/* Desktop Main content */}
       <main className="flex-1 overflow-auto">
-        <div className="container mx-auto px-8 py-12 max-w-7xl">
-          {children}
+        <div className="desktop-container mx-auto px-8 py-12 max-w-7xl">
+          <div className="desktop-content-wrapper space-y-8">
+            {children}
+          </div>
         </div>
       </main>
     </div>

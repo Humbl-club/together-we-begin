@@ -102,7 +102,6 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
       ) : (isTabletOptimized || isDesktop) ? (
         // iPad/Tablet: Custom iPad Layout
         <IPadLayout profile={profile}>
-          <div className="pull-refresh-indicator" />
           {children}
         </IPadLayout>
       ) : (

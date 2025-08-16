@@ -33,11 +33,11 @@ export const iPadLayout: React.FC<iPadLayoutProps> = memo(({ children, profile }
         
         {/* Main Content Area */}
         <main className={cn(
-          "ipad-main-content flex-1 overflow-y-auto",
+          "ipad-main-content",
           "pt-[env(safe-area-inset-top,0px)]",
           "pb-[env(safe-area-inset-bottom,0px)]"
         )}>
-          <div className="ipad-content-wrapper p-8 max-w-7xl mx-auto">
+          <div className="ipad-content-wrapper">
             {children}
           </div>
         </main>

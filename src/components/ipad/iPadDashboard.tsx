@@ -79,15 +79,15 @@ export const iPadDashboard: React.FC<iPadDashboardProps> = memo(({ children }) =
       {/* Hero Section */}
       <div className="ipad-dashboard-hero">
         <div className="ipad-hero-content">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
             Good morning, {profile?.full_name?.split(' ')[0] || 'there'}! ✨
           </h1>
-          <p className="text-lg text-muted-foreground mb-6">
+          <p className="text-base md:text-lg text-muted-foreground mb-6">
             Ready to continue your wellness journey today?
           </p>
           
           {/* Quick Action Buttons */}
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button 
               size="lg" 
               className="ipad-action-button"
@@ -153,10 +153,10 @@ export const iPadDashboard: React.FC<iPadDashboardProps> = memo(({ children }) =
             variant="elevated"
             className="mb-6"
           >
-            <div className="space-y-4">
-              {recentActivity.map((activity, index) => (
+            <div className="space-y-3">
+              {recentActivity.slice(0, 4).map((activity, index) => (
                 <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-                  <activity.icon className="w-5 h-5 text-primary mt-0.5" />
+                  <activity.icon className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground leading-relaxed">
                       {activity.message}
@@ -178,17 +178,17 @@ export const iPadDashboard: React.FC<iPadDashboardProps> = memo(({ children }) =
           >
             <div className="space-y-4">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-1">147</div>
+                <div className="text-2xl md:text-3xl font-bold text-primary mb-1">147</div>
                 <p className="text-sm text-muted-foreground">Active members today</p>
               </div>
               
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
                 <div className="text-center">
-                  <div className="text-xl font-semibold text-foreground">23</div>
+                  <div className="text-lg md:text-xl font-semibold text-foreground">23</div>
                   <p className="text-xs text-muted-foreground">New posts</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-xl font-semibold text-foreground">8</div>
+                  <div className="text-lg md:text-xl font-semibold text-foreground">8</div>
                   <p className="text-xs text-muted-foreground">Live events</p>
                 </div>
               </div>

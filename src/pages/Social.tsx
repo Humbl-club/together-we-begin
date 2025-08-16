@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { AdvancedSearch, type SearchableItem } from '@/components/search/AdvancedSearch';
 import { useContentModeration, ReportModal, ContentWarning } from '@/components/moderation/ContentModeration';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useMobileOptimization } from '@/hooks/useMobileOptimization';
 import { useProgressiveEnhancement } from '@/hooks/useProgressiveEnhancement';
 import { dbPerformance } from '@/services/core/DatabasePerformanceService';
 import { MobileLoading } from '@/components/ui/mobile-loading';
@@ -68,7 +68,7 @@ const Social: React.FC = () => {
   const { user, isAdmin } = useAuth();
   const { subscribeToTable } = useRealtime();
   const { toast } = useToast();
-  const isMobile = useIsMobile();
+  const { isMobile, isTablet, spacing, padding, fontSize, containerClass } = useMobileOptimization();
   const { usePullToRefresh } = useProgressiveEnhancement();
   const feedback = useHapticFeedback();
 
@@ -446,12 +446,12 @@ const Social: React.FC = () => {
 
   if (loading) {
     return (
-      <div className={`container mx-auto ${isMobile ? 'px-2 py-2' : 'max-w-2xl px-4 py-4'}`}>
+      <div className={`${containerClass} ${padding}`}>
         <MobileLoading 
           variant="skeleton"
-          size={isMobile ? "md" : "lg"}
+          size={isMobile ? "md" : isTablet ? "lg" : "lg"}
           text="Loading social feed..."
-          className="glass-card p-6"
+          className={isTablet ? "tablet-card-enhanced p-8" : "glass-card p-6"}
         />
       </div>
     );
@@ -482,13 +482,13 @@ const Social: React.FC = () => {
 
       {/* Composer */}
       {!showCreatePost && (
-        <CardKit variant="glass" className="p-4 mb-4">
+        <CardKit variant="glass" className={`${isTablet ? 'tablet-card-enhanced p-6 mb-6' : 'p-4 mb-4'}`}>
           <button
             onClick={() => { feedback.tap(); setDefaultIsStory(false); setShowCreatePost(true); }}
-            className="w-full text-left p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className={`w-full text-left ${isTablet ? 'p-4 tablet-button' : 'p-3'} rounded-lg bg-muted hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2`}
             aria-label="Open post composer"
           >
-            What's on your mind?
+            <span className={isTablet ? fontSize.body : ''}>What's on your mind?</span>
           </button>
         </CardKit>
       )}

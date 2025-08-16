@@ -52,7 +52,7 @@ interface UserSettings {
     allow_friend_requests: boolean;
   };
 }
-import { useViewport } from '@/hooks/use-mobile';
+import { useMobileOptimization } from '@/hooks/useMobileOptimization';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
 import { SwipeableCard } from '@/components/ui/swipeable-card';
@@ -64,7 +64,7 @@ import { ThemeGallery } from '@/components/theme/ThemeGallery';
 
 const Settings: React.FC = () => {
   const { settings, loading, saving, updateSetting } = useUserSettings();
-  const { isMobile } = useViewport();
+  const { isMobile, isTablet, spacing, padding, fontSize, formLayout, containerClass } = useMobileOptimization();
   const feedback = useHapticFeedback();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeMobileSection, setActiveMobileSection] = useState<string | null>(null);

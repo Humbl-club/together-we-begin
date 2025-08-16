@@ -61,7 +61,7 @@ export const iPadNavigation: React.FC<iPadNavigationProps> = memo(({ profile }) 
         {/* Profile Section */}
         <Link 
           to="/profile"
-          className="ipad-profile-card"
+          className="ipad-profile-card group"
           onClick={() => haptics.tap()}
         >
           <Avatar className="w-12 h-12">
@@ -110,7 +110,7 @@ export const iPadNavigation: React.FC<iPadNavigationProps> = memo(({ profile }) 
               key={item.href}
               to={item.href}
               className={cn(
-                'ipad-nav-item',
+                'ipad-nav-item group',
                 isActive(item.href) && 'ipad-nav-item-active'
               )}
               onClick={() => haptics.tap()}
@@ -139,7 +139,7 @@ export const iPadNavigation: React.FC<iPadNavigationProps> = memo(({ profile }) 
               key={item.href}
               to={item.href}
               className={cn(
-                'ipad-nav-item',
+                'ipad-nav-item group',
                 isActive(item.href) && 'ipad-nav-item-active'
               )}
               onClick={() => haptics.tap()}

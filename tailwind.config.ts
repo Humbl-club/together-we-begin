@@ -54,6 +54,9 @@ export default {
 				'fluid-8': 'clamp(2rem, 1.6rem + 2vw, 3rem)',
 				'fluid-10': 'clamp(2.5rem, 2rem + 2.5vw, 3.75rem)',
 				'fluid-12': 'clamp(3rem, 2.4rem + 3vw, 4.5rem)',
+				// iPad-specific spacing
+				'70': '17.5rem', // 280px for iPad navigation
+				'80': '20rem', // 320px
 			},
 			// Modern grid systems
 			gridTemplateColumns: {

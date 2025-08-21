@@ -87,12 +87,7 @@
             color: #6b7280;
             font-size: 16px;
             margin: 0 0 24px;
-          ">Preparing your experience...</p>
-          <div id="loading-details" style="
-            color: #9ca3af;
-            font-size: 14px;
-            max-width: 300px;
-          ">Connecting to app...</div>
+          ">Loading...</p>
         </div>
       </div>
       <style>
@@ -179,13 +174,13 @@
         }
       };
       
-      // Set timeout to show error if React doesn't load
+      // Set timeout to show error if React doesn't load (reduced from 15s to 3s)
       setTimeout(() => {
         if (document.getElementById('capacitor-loading').style.display !== 'none') {
           window.capacitorDebug.log('App loading timeout, showing error', 'error');
           window.showCapacitorError('App loading timeout. Please try again.');
         }
-      }, 15000);
+      }, 3000);
     </script>
     
     <script type="module" src="/src/main.tsx"></script>

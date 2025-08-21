@@ -51,26 +51,15 @@ if (document.readyState === 'loading') {
   checkCSSLoaded();
 }
 
-// Enhanced initialization with error handling
+// Enhanced initialization with error handling - optimized for speed
 const initializeApp = async () => {
   try {
     window.capacitorDebug?.log('Starting React app initialization...');
     
-    // Validate critical assets
-    try {
-      const validator = AssetValidator.getInstance();
-      const cssValid = await validator.validateCSSAssets();
-      if (cssValid) {
-        window.capacitorDebug?.log('Critical assets validated');
-      } else {
-        window.capacitorDebug?.log('CSS validation failed, but continuing', 'warn');
-      }
-    } catch (assetError) {
-      console.warn('Asset validation failed:', assetError);
-      window.capacitorDebug?.log('Asset validation failed, continuing anyway', 'warn');
-    }
+    // Skip asset validation - it's blocking and not essential for initial load
+    window.capacitorDebug?.log('Skipping asset validation for faster startup');
     
-    // Create and render the app
+    // Create and render the app immediately
     const rootElement = document.getElementById("root");
     if (!rootElement) {
       throw new Error('Root element not found');
@@ -82,11 +71,11 @@ const initializeApp = async () => {
     window.capacitorDebug?.log('Rendering App component...');
     root.render(<App />);
     
-    // Hide Capacitor loading screen after successful render
+    // Hide Capacitor loading screen quickly after render
     setTimeout(() => {
       window.capacitorDebug?.log('App rendered successfully');
       window.hideCapacitorLoading?.();
-    }, 1000);
+    }, 100);
     
   } catch (error) {
     console.error('Failed to initialize app:', error);

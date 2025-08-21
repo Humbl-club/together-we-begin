@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Capacitor } from '@capacitor/core';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { CheckCircle, AlertCircle } from 'lucide-react';
+import { ReliableHealthService } from '@/services/native/ReliableHealthService';
 import { useToast } from '@/hooks/use-toast';
-import { HealthIntegrationService } from '@/services/native/HealthIntegrationService';
-import { HeartPulse, Activity } from 'lucide-react';
 
 interface HealthPermissionPromptProps {
   onConnected?: () => void;
@@ -16,54 +15,71 @@ const HealthPermissionPrompt: React.FC<HealthPermissionPromptProps> = ({ onConne
   const { toast } = useToast();
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const ok = await HealthIntegrationService.isAvailable();
-      if (mounted) setAvailable(ok);
-    })();
-    return () => { mounted = false; };
+    const checkAvailability = async () => {
+      const isAvailable = await ReliableHealthService.isHealthAppAvailable();
+      setAvailable(isAvailable);
+    };
+    checkAvailability();
   }, []);
 
   const handleConnect = useCallback(async () => {
+    setConnecting(true);
     try {
-      setConnecting(true);
-      const granted = await HealthIntegrationService.requestPermissions();
-      if (!granted) {
-        toast({ title: 'Permission required', description: 'We could not access health data. Please grant permissions in system settings.', variant: 'destructive' });
-        return;
+      const success = await ReliableHealthService.requestHealthAppPermissions();
+      if (success) {
+        toast({
+          title: "Success!",
+          description: "Health app connected successfully"
+        });
+        onConnected?.();
+      } else {
+        toast({
+          title: "Connection failed",
+          description: "Health app integration is temporarily unavailable",
+          variant: "destructive"
+        });
       }
-      // Attempt a read to confirm
-      const steps = await HealthIntegrationService.getTodaySteps();
-      toast({ title: 'Health connected', description: steps != null ? `Imported ${steps} steps today.` : 'Connection successful.' });
-      onConnected?.();
-    } catch (e) {
-      console.error('Health connect error', e);
-      toast({ title: 'Connection failed', description: 'Please try again.', variant: 'destructive' });
+    } catch (error) {
+      console.error('Health connection error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to connect to health app",
+        variant: "destructive"
+      });
     } finally {
       setConnecting(false);
     }
-  }, [onConnected, toast]);
+  }, [toast, onConnected]);
 
-  if (!available) return null;
-
-  const platform = Capacitor.getPlatform();
-  const label = platform === 'ios' ? 'Connect Apple Health' : 'Connect Health Connect';
+  if (!available) {
+    return null;
+  }
 
   return (
-    <Card className="card-secondary">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-lg flex items-center gap-2">
-          <HeartPulse className="w-5 h-5 text-primary" />
-          Sync your steps
+        <CardTitle className="flex items-center space-x-2">
+          <AlertCircle className="w-5 h-5 text-blue-600" />
+          <span>Connect Health App</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <p className="text-sm text-muted-foreground">
-          Grant permission to securely read today’s steps from your device and sync with challenges.
+      <CardContent>
+        <p className="text-sm text-muted-foreground mb-4">
+          Connect your health app to automatically sync your steps and improve tracking accuracy.
         </p>
-        <Button onClick={handleConnect} disabled={connecting} className="w-full">
-          <Activity className="w-4 h-4 mr-2" />
-          {connecting ? 'Connecting…' : label}
+        <Button 
+          onClick={handleConnect} 
+          disabled={connecting}
+          className="w-full"
+        >
+          {connecting ? (
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin w-4 h-4 border border-white border-t-transparent rounded-full" />
+              <span>Connecting...</span>
+            </div>
+          ) : (
+            'Connect Health App'
+          )}
         </Button>
       </CardContent>
     </Card>

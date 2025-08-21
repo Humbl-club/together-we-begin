@@ -17,7 +17,7 @@ import { PullToRefresh } from '@/components/ui/pull-to-refresh';
 
 // Lazy-loaded mobile-optimized components
 
-import WellnessWidget from '@/components/wellness/WellnessWidget';
+import { WellnessWidget } from '@/components/wellness/WellnessWidget';
 import HealthPermissionPrompt from '@/components/wellness/HealthPermissionPrompt';
 import { WalkingChallengeWidget } from '@/components/wellness/WalkingChallengeWidget';
 const LazyMobileUpcomingEvents = React.lazy(() => import('@/components/dashboard/MobileUpcomingEvents'));

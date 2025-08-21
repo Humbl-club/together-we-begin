@@ -11,7 +11,7 @@ import { iPadDashboard as IPadDashboard } from '@/components/ipad';
 // Desktop imports
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 
-import WellnessWidget from '@/components/wellness/WellnessWidget';
+import { WellnessWidget } from '@/components/wellness/WellnessWidget';
 import HealthPermissionPrompt from '@/components/wellness/HealthPermissionPrompt';
 import UpcomingEvents from '@/components/dashboard/UpcomingEvents';
 import CommunityFeed from '@/components/dashboard/CommunityFeed';

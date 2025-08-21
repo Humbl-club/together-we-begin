@@ -3,7 +3,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { pedometerService, StepData, DailyStepData } from '@/services/PedometerService';
-import { HealthIntegrationService } from '@/services/native/HealthIntegrationService';
+import { ReliableHealthService } from '@/services/native/ReliableHealthService';
 
 interface HealthData {
   steps: number;
@@ -67,10 +67,10 @@ export const useHealthTracking = () => {
       
       // Try native health integrations first (Apple Health / Health Connect)
       try {
-        const available = await HealthIntegrationService.isAvailable();
+        const available = await ReliableHealthService.isHealthAppAvailable();
         if (available) {
-          await HealthIntegrationService.requestPermissions();
-          const today = await HealthIntegrationService.getTodaySteps();
+          await ReliableHealthService.requestHealthAppPermissions();
+          const today = await ReliableHealthService.getTodaySteps();
           if (today != null) {
             setHealthData(prev => ({
               ...prev,

@@ -2,18 +2,21 @@ import React from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Navigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart, Calendar, Trophy } from 'lucide-react';
+import { ArrowRight, Heart, Calendar, Trophy, AlertCircle, RefreshCw } from 'lucide-react';
 import { IOSScrollView } from '@/components/ui/ios-native';
 import { SafeAreaLayout } from '@/components/ui/safe-area-layout';
 import { MobileNativeButton } from '@/components/ui/mobile-native-button';
 import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { useConnectionStatus } from '@/hooks/useConnectionStatus';
+import { ConnectionStatus } from '@/components/ui/connection-status';
 import { cn } from '@/lib/utils';
 
 const Index = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, connectionError } = useAuth();
   const { isMobile, orientation, safeAreaInsets } = useMobileFirst();
   const haptic = useHapticFeedback();
+  const { connectionStatus, retryConnection } = useConnectionStatus();
 
   if (user && !loading) {
     return <Navigate to="/dashboard" replace />;
@@ -21,14 +24,41 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin"></div>
-      </div>
+      <SafeAreaLayout edges={['top', 'bottom']} className="min-h-screen">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
+          <div className="text-center space-y-4 max-w-sm">
+            <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin mx-auto"></div>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Loading Humbl Girls Club...</p>
+              {connectionError && (
+                <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 text-center">
+                  <AlertCircle className="w-4 h-4 text-destructive mx-auto mb-2" />
+                  <p className="text-xs text-destructive mb-2">{connectionError}</p>
+                  <MobileNativeButton
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => retryConnection()}
+                    className="text-destructive hover:bg-destructive/10"
+                  >
+                    <RefreshCw className="w-3 h-3 mr-1" />
+                    Retry
+                  </MobileNativeButton>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </SafeAreaLayout>
     );
   }
 
   return (
     <SafeAreaLayout edges={['top', 'bottom']} className="min-h-screen">
+      {/* Connection Status Indicator */}
+      <div className="fixed top-4 right-4 z-50">
+        <ConnectionStatus showText={connectionStatus !== 'connected'} />
+      </div>
+      
       <IOSScrollView className="min-h-screen">
         {/* iOS Native Background */}
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 relative overflow-hidden">

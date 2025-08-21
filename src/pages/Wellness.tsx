@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Activity, Heart, Target, TrendingUp, Calendar, Plus, Award } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
-import WellnessWidget from '@/components/wellness/WellnessWidget';
+import { WellnessWidget } from '@/components/wellness/WellnessWidget';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/seo/SEO';
 import { PageSection } from '@/components/sections/PageSection';

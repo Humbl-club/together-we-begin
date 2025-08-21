@@ -14,6 +14,7 @@ import { BrandProvider } from '@/contexts/BrandContext';
 import { TenantProvider } from '@/contexts/TenantContext';
 import { FeatureFlagsProvider } from '@/contexts/FeatureFlagsContext';
 import { ThemeController } from '@/components/theme/ThemeController';
+import EnhancedErrorBoundary from '@/components/ui/enhanced-error-boundary';
 
 // Create a page loader component
 const PageLoader = () => (
@@ -161,20 +162,27 @@ const App = () => {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrandProvider>
-          <FeatureFlagsProvider>
-            <TenantProvider>
-              <BrowserRouter>
-                <AuthProvider>
-                  <ThemeController />
-                  <RealtimeProvider>
-                    <LazyBoundary>
-                    <Suspense fallback={<PageLoader />}>
-                      <Routes>
+    <EnhancedErrorBoundary 
+      onError={(error, errorInfo) => {
+        console.error('Global Error Boundary:', error, errorInfo);
+      }}
+      showDetails={process.env.NODE_ENV === 'development'}
+      allowRetry={true}
+    >
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrandProvider>
+            <FeatureFlagsProvider>
+              <TenantProvider>
+                <BrowserRouter>
+                  <AuthProvider>
+                    <ThemeController />
+                    <RealtimeProvider>
+                      <LazyBoundary>
+                      <Suspense fallback={<PageLoader />}>
+                        <Routes>
                         {/* Public routes */}
                         <Route path="/" element={<Index />} />
                         <Route path="/auth" element={<Auth />} />
@@ -247,6 +255,7 @@ const App = () => {
         </BrandProvider>
       </TooltipProvider>
     </QueryClientProvider>
+    </EnhancedErrorBoundary>
   );
 };
 

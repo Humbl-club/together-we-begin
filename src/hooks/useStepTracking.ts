@@ -110,9 +110,51 @@ export const useStepTracking = () => {
     try {
       const todayStepCount = pedometerService.getTodaySteps();
       const dailyStepsData = pedometerService.getDailySteps();
+      const today = new Date().toISOString().split('T')[0];
       
       // Validate steps
       const validation = pedometerService.validateSteps(todayStepCount);
+      
+      // Sync daily step data to health_data table
+      if (validation.isValid && todayStepCount > 0) {
+        const { error: healthDataError } = await supabase
+          .from('health_data')
+          .upsert({
+            user_id: user.id,
+            date: today,
+            steps: todayStepCount,
+            distance_km: Math.round((todayStepCount * 0.0008) * 100) / 100, // Rough estimate: 0.8m per step
+            calories_burned: Math.round(todayStepCount * 0.04), // Rough estimate: 0.04 calories per step
+            active_minutes: Math.min(Math.round(todayStepCount / 100), 60) // Rough estimate based on step count
+          }, {
+            onConflict: 'user_id,date'
+          });
+
+        if (healthDataError) {
+          console.error('Error syncing to health_data:', healthDataError);
+        }
+      }
+
+      // Sync historical daily data if available
+      for (const [date, steps] of Object.entries(dailyStepsData)) {
+        if (steps > 0 && date !== today) { // Don't duplicate today's data
+          const dayValidation = pedometerService.validateSteps(steps);
+          if (dayValidation.isValid) {
+            await supabase
+              .from('health_data')
+              .upsert({
+                user_id: user.id,
+                date,
+                steps,
+                distance_km: Math.round((steps * 0.0008) * 100) / 100,
+                calories_burned: Math.round(steps * 0.04),
+                active_minutes: Math.min(Math.round(steps / 100), 60)
+              }, {
+                onConflict: 'user_id,date'
+              });
+          }
+        }
+      }
       
       // Log validation data
       const { error: validationError } = await supabase
@@ -136,8 +178,6 @@ export const useStepTracking = () => {
 
       // Sync to walking leaderboards if challenge specified
       if (challengeId && validation.isValid) {
-        const today = new Date().toISOString().split('T')[0];
-        
         const { error: syncError } = await supabase
           .from('walking_leaderboards')
           .upsert({
@@ -214,12 +254,38 @@ export const useStepTracking = () => {
     if (!isTracking || !user) return;
 
     const interval = setInterval(() => {
-      // Auto-sync without specific challenge (just for validation logging)
+      // Auto-sync without specific challenge (for health data and validation logging)
       syncSteps();
     }, 5 * 60 * 1000); // 5 minutes
 
     return () => clearInterval(interval);
   }, [isTracking, user, syncSteps]);
+
+  // Daily sync at midnight to ensure daily data is captured
+  useEffect(() => {
+    if (!user) return;
+
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 1, 0); // 1 second after midnight
+
+    const timeUntilMidnight = tomorrow.getTime() - now.getTime();
+
+    const timeout = setTimeout(() => {
+      // Sync yesterday's final step count
+      syncSteps();
+      
+      // Set up daily recurring sync
+      const dailyInterval = setInterval(() => {
+        syncSteps();
+      }, 24 * 60 * 60 * 1000); // Every 24 hours
+
+      return () => clearInterval(dailyInterval);
+    }, timeUntilMidnight);
+
+    return () => clearTimeout(timeout);
+  }, [user, syncSteps]);
 
   // Check permission status on mount
   useEffect(() => {

@@ -15,10 +15,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-atelier-hero">
-        <div className="editorial-card max-w-md mx-auto text-center p-8">
-          <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-muted-foreground font-light">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5">
+        <div className="glass-card max-w-sm mx-4 text-center p-6 border border-white/10">
+          <div className="animate-spin w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full mx-auto mb-3"></div>
+          <p className="text-sm font-medium">Loading your account...</p>
         </div>
       </div>
     );

@@ -28,30 +28,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let mounted = true;
     let loadingTimeout: NodeJS.Timeout;
-    let connectionRetryCount = 0;
-    const maxRetries = 3;
 
-    // Set loading timeout to prevent infinite loading
+    // Fast timeout - show UI quickly
     const setLoadingTimeout = () => {
       loadingTimeout = setTimeout(() => {
         if (mounted && loading) {
-          console.warn('Auth loading timeout - forcing completion');
+          console.log('Auth initialization complete - showing UI');
           setLoading(false);
-          setConnectionError('Connection timeout. Please check your internet connection.');
         }
-      }, 10000); // 10 second timeout
+      }, 2000); // 2 second timeout for fast UI
     };
 
     setLoadingTimeout();
-
-    // Check connection first
-    const connectionService = ConnectionService.getInstance();
-    connectionService.checkConnection().then(isConnected => {
-      if (!isConnected) {
-        console.warn('No connection detected during auth init');
-        setConnectionError('No internet connection detected.');
-      }
-    });
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -60,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         console.log('Auth state changed:', event, !!session);
         
-        // Clear any connection errors on successful auth events
+        // Clear connection errors on auth success
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           setConnectionError(null);
         }
@@ -68,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Check admin status when user changes
+        // Defer admin check - don't block UI
         if (session?.user) {
           setTimeout(async () => {
             try {
@@ -83,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setIsAdmin(false);
               }
             }
-          }, 0);
+          }, 100); // Quick defer, non-blocking
         } else {
           setIsAdmin(false);
         }
@@ -96,33 +84,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // Get initial session with retry logic
+    // Get initial session - non-blocking
     const getInitialSession = async () => {
       try {
-        console.log('Getting initial session...');
-        
+        // Fast timeout for session retrieval
         const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Session timeout')), 8000)
+          setTimeout(() => reject(new Error('Session timeout')), 2000)
         );
 
         const sessionPromise = supabase.auth.getSession();
         const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
         
         if (mounted) {
-          console.log('Initial session retrieved:', !!session);
           setSession(session);
           setUser(session?.user ?? null);
           setConnectionError(null);
           
+          // Defer admin check to after UI loads
           if (session?.user) {
-            try {
-              const { data: adminCheck } = await supabase
-                .rpc('is_admin', { _user_id: session.user.id });
-              setIsAdmin(adminCheck || false);
-            } catch (error) {
-              console.error('Error checking admin status:', error);
-              setIsAdmin(false);
-            }
+            setTimeout(async () => {
+              try {
+                const { data: adminCheck } = await supabase
+                  .rpc('is_admin', { _user_id: session.user.id });
+                if (mounted) {
+                  setIsAdmin(adminCheck || false);
+                }
+              } catch (error) {
+                console.error('Error checking admin status:', error);
+                if (mounted) {
+                  setIsAdmin(false);
+                }
+              }
+            }, 100);
           }
           
           if (loadingTimeout) {
@@ -131,20 +124,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error getting initial session:', error);
+        console.error('Session retrieval failed - showing UI anyway:', error);
         if (mounted) {
-          connectionRetryCount++;
-          
-          if (connectionRetryCount < maxRetries) {
-            console.log(`Retrying session fetch (${connectionRetryCount}/${maxRetries})...`);
-            setTimeout(() => getInitialSession(), 2000 * connectionRetryCount);
-          } else {
-            setConnectionError('Failed to connect. Please check your internet connection and try again.');
-            if (loadingTimeout) {
-              clearTimeout(loadingTimeout);
-            }
-            setLoading(false);
-          }
+          // Don't block UI - show it even if session fails
+          setLoading(false);
         }
       }
     };

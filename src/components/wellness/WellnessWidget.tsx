@@ -3,11 +3,12 @@ import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Activity, Zap, AlertCircle, Smartphone } from 'lucide-react';
-import { useHealthTracking } from '@/hooks/useHealthTracking';
+import { Activity, TrendingUp, AlertCircle, Smartphone } from 'lucide-react';
+import { useIntegratedStepTracking } from '@/hooks/useIntegratedStepTracking';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WalkingChallengeWidget } from './WalkingChallengeWidget';
 import { WellnessCalibrationWidget } from './WellnessCalibrationWidget';
+import { StepHistoryChart } from './StepHistoryChart';
 
 interface WellnessWidgetProps {
   onChallengeSync?: (challengeId: string) => void;
@@ -15,15 +16,18 @@ interface WellnessWidgetProps {
 
 export const WellnessWidget: React.FC<WellnessWidgetProps> = ({ onChallengeSync }) => {
   const { 
-    healthData, 
-    healthGoals, 
-    isConnected, 
-    loading, 
-    getProgressPercentage,
-    checkHealthKitConnection
-  } = useHealthTracking();
+    todaySteps,
+    weeklyStepTotal,
+    dailyStepAverage,
+    weeklyStepData,
+    isTracking,
+    hasPermission,
+    syncing,
+    startTracking,
+    requestPermissions
+  } = useIntegratedStepTracking();
 
-  if (loading) {
+  if (syncing) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-32 w-full" />
@@ -32,14 +36,25 @@ export const WellnessWidget: React.FC<WellnessWidgetProps> = ({ onChallengeSync 
     );
   }
 
+  const dailyGoal = 8000; // Default step goal
+  const progress = Math.min((todaySteps / dailyGoal) * 100, 100);
+
   const wellnessMetrics = [
     {
       label: 'Daily Steps',
-      current: healthData.steps.toLocaleString(),
-      goal: healthGoals.dailySteps.toLocaleString(),
-      progress: getProgressPercentage('dailySteps'),
+      current: todaySteps.toLocaleString(),
+      goal: dailyGoal.toLocaleString(),
+      progress,
       icon: Activity,
       color: '#10b981'
+    },
+    {
+      label: 'Weekly Total',
+      current: weeklyStepTotal.toLocaleString(),
+      goal: (dailyGoal * 7).toLocaleString(),
+      progress: Math.min((weeklyStepTotal / (dailyGoal * 7)) * 100, 100),
+      icon: TrendingUp,
+      color: '#3b82f6'
     }
   ];
 
@@ -50,29 +65,37 @@ export const WellnessWidget: React.FC<WellnessWidgetProps> = ({ onChallengeSync 
           <CardTitle className="flex items-center justify-between">
             <span>Today's Wellness</span>
             <div className="flex items-center space-x-2">
-              <Badge variant={isConnected ? "default" : "secondary"}>
+              <Badge variant={isTracking ? "default" : "secondary"}>
                 <Smartphone className="w-3 h-3 mr-1" />
-                {isConnected ? "Motion Tracking" : "Disconnected"}
+                {isTracking ? "Motion Tracking" : "Disconnected"}
               </Badge>
+              {dailyStepAverage > 0 && (
+                <Badge variant="outline" className="text-xs">
+                  Avg: {dailyStepAverage.toLocaleString()}/day
+                </Badge>
+              )}
             </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {!isConnected && (
+          {!isTracking && hasPermission !== null && (
             <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
               <div className="flex items-start space-x-3">
                 <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
                 <div className="text-sm">
                   <p className="font-medium text-yellow-800">Step tracking unavailable</p>
                   <p className="text-yellow-700 mt-1">
-                    Motion sensor tracking is only available on mobile devices.
+                    {hasPermission === false 
+                      ? "Motion permissions required to track steps."
+                      : "Motion sensor tracking is only available on mobile devices."
+                    }
                   </p>
                   <Button 
                     size="sm" 
                     className="mt-2" 
-                    onClick={checkHealthKitConnection}
+                    onClick={hasPermission === false ? requestPermissions : startTracking}
                   >
-                    Retry Connection
+                    {hasPermission === false ? "Enable Permissions" : "Start Tracking"}
                   </Button>
                 </div>
               </div>
@@ -108,6 +131,11 @@ export const WellnessWidget: React.FC<WellnessWidgetProps> = ({ onChallengeSync 
       </Card>
 
       <WellnessCalibrationWidget />
+      
+      {weeklyStepData.length > 0 && (
+        <StepHistoryChart data={weeklyStepData} />
+      )}
+      
       <WalkingChallengeWidget />
     </div>
   );

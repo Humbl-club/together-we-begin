@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Send, Search, MessageCircle, MessageSquare, Lock, Shield, Plus, ArrowLeft, Loader2 } from 'lucide-react';
+import { Send, Search, MessageCircle, MessageSquare, Lock, Shield, Plus, ArrowLeft, Loader2, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
-import { useMessaging } from '@/hooks/useMessaging';
+import { useMobileMessaging } from '@/hooks/useMobileMessaging';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useMobileFirst } from '@/hooks/useMobileFirst';
 import { UserSearch } from './UserSearch';
@@ -34,12 +34,15 @@ export const DirectMessaging = () => {
     loading,
     loadingMessages,
     sending,
+    connectionStatus,
+    retryCount,
+    totalUnreadCount,
     sendMessage,
     createNewThread,
     selectThread,
     setSelectedThread,
-    totalUnreadCount
-  } = useMessaging();
+    retryConnection
+  } = useMobileMessaging();
 
   useEffect(() => {
     scrollToBottom();
@@ -80,6 +83,12 @@ export const DirectMessaging = () => {
         <div className="text-center">
           <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
           <p className="text-muted-foreground">Loading conversations...</p>
+          {connectionStatus === 'offline' && (
+            <div className="mt-4">
+              <WifiOff className="h-6 w-6 text-destructive mx-auto mb-2" />
+              <p className="text-sm text-destructive">No internet connection</p>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -87,19 +96,45 @@ export const DirectMessaging = () => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
+      {/* Header with Connection Status */}
       <div className="mb-4 p-4 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-lg border border-primary/20">
         <div className="flex items-center gap-3">
           <Shield className="w-5 h-5 text-primary" />
           <div className="flex-1">
-            <h2 className="text-lg font-semibold">Secure Messaging</h2>
-            <p className="text-sm text-muted-foreground">End-to-end encrypted conversations</p>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold">Secure Messaging</h2>
+              {connectionStatus === 'offline' ? (
+                <WifiOff className="w-4 h-4 text-destructive" />
+              ) : connectionStatus === 'poor' ? (
+                <Wifi className="w-4 h-4 text-warning" />
+              ) : (
+                <Wifi className="w-4 h-4 text-success" />
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {connectionStatus === 'offline' 
+                ? 'Offline - Messages will sync when connected'
+                : 'End-to-end encrypted conversations'
+              }
+            </p>
           </div>
-          {totalUnreadCount > 0 && (
-            <Badge variant="destructive" className="ml-auto">
-              {totalUnreadCount}
-            </Badge>
-          )}
+          <div className="flex items-center gap-2">
+            {(connectionStatus === 'offline' || retryCount > 0) && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={retryConnection}
+                disabled={connectionStatus === 'offline'}
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            )}
+            {totalUnreadCount > 0 && (
+              <Badge variant="destructive">
+                {totalUnreadCount}
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
 
@@ -153,16 +188,29 @@ export const DirectMessaging = () => {
             <div className="space-y-1 max-h-[400px] overflow-y-auto">
               {filteredThreads.length === 0 ? (
                 <div className="p-6 text-center">
-                  <EmptyState
-                    icon={<MessageSquare className="w-full h-full" />}
-                    title={searchQuery ? 'No conversations match your search' : 'No conversations yet'}
-                    description={searchQuery ? 'Try different search terms' : 'Start a conversation with someone from the community'}
-                    action={!searchQuery ? {
-                      label: "Start a conversation",
-                      onClick: () => setShowNewMessageDialog(true),
-                      variant: "default"
-                    } : undefined}
-                  />
+                  {connectionStatus === 'offline' ? (
+                    <EmptyState
+                      icon={<WifiOff className="w-full h-full" />}
+                      title="No Internet Connection"
+                      description="Please check your connection and try again"
+                      action={{
+                        label: "Retry",
+                        onClick: retryConnection,
+                        variant: "default"
+                      }}
+                    />
+                  ) : (
+                    <EmptyState
+                      icon={<MessageSquare className="w-full h-full" />}
+                      title={searchQuery ? 'No conversations match your search' : 'No conversations yet'}
+                      description={searchQuery ? 'Try different search terms' : 'Start a conversation with someone from the community'}
+                      action={!searchQuery ? {
+                        label: "Start a conversation",
+                        onClick: () => setShowNewMessageDialog(true),
+                        variant: "default"
+                      } : undefined}
+                    />
+                  )}
                 </div>
               ) : (
                 filteredThreads.map((thread) => (

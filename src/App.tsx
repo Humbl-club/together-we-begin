@@ -15,6 +15,7 @@ import { TenantProvider } from '@/contexts/TenantContext';
 import { FeatureFlagsProvider } from '@/contexts/FeatureFlagsContext';
 import { ThemeController } from '@/components/theme/ThemeController';
 import EnhancedErrorBoundary from '@/components/ui/enhanced-error-boundary';
+import { CapacitorErrorBoundary } from '@/components/ui/capacitor-error-boundary';
 
 // Create a page loader component
 const PageLoader = () => (
@@ -162,13 +163,15 @@ const App = () => {
   }, []);
 
   return (
-    <EnhancedErrorBoundary 
-      onError={(error, errorInfo) => {
-        console.error('Global Error Boundary:', error, errorInfo);
-      }}
-      showDetails={process.env.NODE_ENV === 'development'}
-      allowRetry={true}
-    >
+    <CapacitorErrorBoundary>
+      <EnhancedErrorBoundary 
+        onError={(error, errorInfo) => {
+          console.error('Global Error Boundary:', error, errorInfo);
+          window.capacitorDebug?.log(`App Error: ${error.message}`, 'error');
+        }}
+        showDetails={process.env.NODE_ENV === 'development'}
+        allowRetry={true}
+      >
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
@@ -256,6 +259,7 @@ const App = () => {
       </TooltipProvider>
     </QueryClientProvider>
     </EnhancedErrorBoundary>
+    </CapacitorErrorBoundary>
   );
 };
 

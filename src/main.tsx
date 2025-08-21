@@ -4,6 +4,18 @@ import './index.css'
 import { register } from './utils/serviceWorkerRegistration'
 import { AssetValidator } from './utils/assetValidator'
 
+// Capacitor debugging
+declare global {
+  interface Window {
+    capacitorDebug: {
+      log: (message: string, type?: string) => void;
+      logs: Array<{ timestamp: string; message: string; type: string }>;
+    };
+    hideCapacitorLoading: () => void;
+    showCapacitorError: (error: string) => void;
+  }
+}
+
 // Critical CSS fallback to prevent complete style loss
 const addCriticalCSS = () => {
   const style = document.createElement('style');
@@ -39,7 +51,52 @@ if (document.readyState === 'loading') {
   checkCSSLoaded();
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+// Enhanced initialization with error handling
+const initializeApp = async () => {
+  try {
+    window.capacitorDebug?.log('Starting React app initialization...');
+    
+    // Validate critical assets
+    try {
+      const validator = AssetValidator.getInstance();
+      const cssValid = await validator.validateCSSAssets();
+      if (cssValid) {
+        window.capacitorDebug?.log('Critical assets validated');
+      } else {
+        window.capacitorDebug?.log('CSS validation failed, but continuing', 'warn');
+      }
+    } catch (assetError) {
+      console.warn('Asset validation failed:', assetError);
+      window.capacitorDebug?.log('Asset validation failed, continuing anyway', 'warn');
+    }
+    
+    // Create and render the app
+    const rootElement = document.getElementById("root");
+    if (!rootElement) {
+      throw new Error('Root element not found');
+    }
+    
+    window.capacitorDebug?.log('Creating React root...');
+    const root = createRoot(rootElement);
+    
+    window.capacitorDebug?.log('Rendering App component...');
+    root.render(<App />);
+    
+    // Hide Capacitor loading screen after successful render
+    setTimeout(() => {
+      window.capacitorDebug?.log('App rendered successfully');
+      window.hideCapacitorLoading?.();
+    }, 1000);
+    
+  } catch (error) {
+    console.error('Failed to initialize app:', error);
+    window.capacitorDebug?.log(`App initialization failed: ${error}`, 'error');
+    window.showCapacitorError?.(`Initialization failed: ${error}`);
+  }
+};
+
+// Initialize the app
+initializeApp();
 
 // Register service worker with proper error handling
 if (process.env.NODE_ENV === 'production') {

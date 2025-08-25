@@ -316,7 +316,7 @@ body { @apply bg-background text-foreground font-sans font-medium antialiased; }
 
   /* iPad Navigation Styles */
   .ipad-navigation {
-    @apply fixed left-0 top-0 h-full w-70 bg-card/95 backdrop-blur-xl border-r border-border/50 p-6 overflow-y-auto z-40;
+    @apply fixed left-0 top-0 h-full w-72 bg-card/95 backdrop-blur-xl border-r border-border/50 p-6 overflow-y-auto z-40;
     box-shadow: 4px 0 24px -8px hsl(var(--foreground) / 0.1);
   }
 

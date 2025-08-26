@@ -39,14 +39,14 @@ import { Textarea } from '@/components/ui/textarea';
 interface Invite {
   id: string;
   code: string;
-  invite_type: string;
-  max_uses: number;
-  current_uses: number;
-  status: 'pending' | 'used' | 'expired';
+  invite_type: string | null;
+  max_uses: number | null;
+  current_uses: number | null;
+  status: 'pending' | 'used' | 'expired' | null;
   expires_at: string | null;
   notes: string | null;
-  created_at: string;
-  created_by: string;
+  created_at: string | null;
+  created_by: string | null;
 }
 
 const InviteManagement: React.FC = () => {
@@ -77,7 +77,15 @@ const InviteManagement: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setInvites(data || []);
+      setInvites((data || []).map(invite => ({
+        ...invite,
+        invite_type: invite.invite_type || 'general',
+        max_uses: invite.max_uses || 1,
+        current_uses: invite.current_uses || 0,
+        status: invite.status as 'pending' | 'used' | 'expired' || 'pending',
+        created_at: invite.created_at || new Date().toISOString(),
+        created_by: invite.created_by || ''
+      })));
     } catch (error) {
       console.error('Error loading invites:', error);
       toast({
@@ -97,11 +105,11 @@ const InviteManagement: React.FC = () => {
         : null;
 
       const { data, error } = await supabase.rpc('create_invite_code', {
-        _created_by: user?.id,
+        _created_by: user?.id || '',
         _invite_type: createForm.invite_type,
         _max_uses: createForm.max_uses,
-        _expires_at: expiresAt,
-        _notes: createForm.notes || null
+        _expires_at: expiresAt || undefined,
+        _notes: createForm.notes || undefined
       });
 
       if (error) throw error;
@@ -142,7 +150,7 @@ const InviteManagement: React.FC = () => {
   };
 
   const getStatusIcon = (invite: Invite) => {
-    if (invite.status === 'used' || invite.current_uses >= invite.max_uses) {
+    if (invite.status === 'used' || (invite.current_uses || 0) >= (invite.max_uses || 1)) {
       return <CheckCircle className="w-4 h-4 text-green-500" />;
     }
     if (invite.expires_at && new Date(invite.expires_at) < new Date()) {
@@ -152,7 +160,7 @@ const InviteManagement: React.FC = () => {
   };
 
   const getStatusColor = (invite: Invite) => {
-    if (invite.status === 'used' || invite.current_uses >= invite.max_uses) {
+    if (invite.status === 'used' || (invite.current_uses || 0) >= (invite.max_uses || 1)) {
       return 'default';
     }
     if (invite.expires_at && new Date(invite.expires_at) < new Date()) {
@@ -162,14 +170,14 @@ const InviteManagement: React.FC = () => {
   };
 
   const getStatusText = (invite: Invite) => {
-    if (invite.current_uses >= invite.max_uses) return 'Fully Used';
+    if ((invite.current_uses || 0) >= (invite.max_uses || 1)) return 'Fully Used';
     if (invite.expires_at && new Date(invite.expires_at) < new Date()) return 'Expired';
     return 'Active';
   };
 
   const filteredInvites = invites.filter(invite => {
     const matchesSearch = invite.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         invite.invite_type.toLowerCase().includes(searchTerm.toLowerCase());
+                         (invite.invite_type || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     if (filterStatus === 'all') return matchesSearch;
     
@@ -315,7 +323,7 @@ const InviteManagement: React.FC = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Used Invites</p>
                 <p className="text-2xl font-bold">
-                  {invites.filter(i => i.current_uses >= i.max_uses).length}
+                  {invites.filter(i => (i.current_uses || 0) >= (i.max_uses || 1)).length}
                 </p>
               </div>
             </div>
@@ -330,7 +338,7 @@ const InviteManagement: React.FC = () => {
                 <p className="text-sm text-muted-foreground">Active Invites</p>
                 <p className="text-2xl font-bold">
                   {invites.filter(i => {
-                    const notFullyUsed = i.current_uses < i.max_uses;
+                    const notFullyUsed = (i.current_uses || 0) < (i.max_uses || 1);
                     const notExpired = !i.expires_at || new Date(i.expires_at) > new Date();
                     return notFullyUsed && notExpired;
                   }).length}
@@ -347,7 +355,7 @@ const InviteManagement: React.FC = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Total Uses</p>
                 <p className="text-2xl font-bold">
-                  {invites.reduce((sum, invite) => sum + invite.current_uses, 0)}
+                  {invites.reduce((sum, invite) => sum + (invite.current_uses || 0), 0)}
                 </p>
               </div>
             </div>

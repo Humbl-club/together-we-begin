@@ -32,9 +32,9 @@ interface SystemConfig {
   id: string;
   key: string;
   value: any;
-  description: string;
+  description: string | null;
   updated_at: string;
-  updated_by: string;
+  updated_by: string | null;
 }
 
 const SystemConfiguration: React.FC = () => {

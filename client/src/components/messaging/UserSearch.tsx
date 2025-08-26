@@ -10,9 +10,9 @@ import { Label } from '@/components/ui/label';
 
 interface User {
   id: string;
-  full_name: string;
-  username: string;
-  avatar_url?: string;
+  full_name: string | null;
+  username: string | null;
+  avatar_url?: string | null;
 }
 
 interface UserSearchProps {
@@ -70,7 +70,7 @@ export const UserSearch: React.FC<UserSearchProps> = ({ onSelectUser }) => {
 
   const handleUserSelect = (user: User) => {
     setSelectedUser(user);
-    setSearchQuery(user.full_name);
+    setSearchQuery(user.full_name || '');
     setUsers([]);
   };
 
@@ -79,13 +79,13 @@ export const UserSearch: React.FC<UserSearchProps> = ({ onSelectUser }) => {
       <div className="space-y-4">
         <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
           <Avatar>
-            <AvatarImage src={selectedUser.avatar_url} />
+            <AvatarImage src={selectedUser.avatar_url || undefined} />
             <AvatarFallback>
-              {selectedUser.full_name.split(' ').map(n => n[0]).join('')}
+              {(selectedUser.full_name || '').split(' ').map(n => n[0]).join('')}
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-medium">{selectedUser.full_name}</p>
+            <p className="font-medium">{selectedUser.full_name || 'Unknown'}</p>
             {selectedUser.username && (
               <p className="text-sm text-muted-foreground">@{selectedUser.username}</p>
             )}
@@ -166,13 +166,13 @@ export const UserSearch: React.FC<UserSearchProps> = ({ onSelectUser }) => {
               onClick={() => handleUserSelect(user)}
             >
               <Avatar>
-                <AvatarImage src={user.avatar_url} />
+                <AvatarImage src={user.avatar_url || undefined} />
                 <AvatarFallback>
-                  {user.full_name.split(' ').map(n => n[0]).join('')}
+                  {(user.full_name || '').split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <p className="font-medium">{user.full_name}</p>
+                <p className="font-medium">{user.full_name || 'Unknown'}</p>
                 {user.username && (
                   <p className="text-sm text-muted-foreground">@{user.username}</p>
                 )}

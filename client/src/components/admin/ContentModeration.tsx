@@ -173,7 +173,7 @@ const ContentModeration: React.FC = () => {
       const { data, error } = await supabase.rpc('get_content_for_moderation', {
         content_type_filter: filterContentType,
         status_filter: filterStatus === 'pending' ? 'active' : filterStatus,
-        search_query: searchTerm || null,
+        search_query: searchTerm || undefined,
         limit_param: 50,
         offset_param: 0
       });
@@ -212,7 +212,7 @@ const ContentModeration: React.FC = () => {
       if (error) throw error;
       
       // Get admin profiles separately
-      const adminIds = [...new Set(data?.map(action => action.admin_id) || [])];
+      const adminIds = Array.from(new Set(data?.map(action => action.admin_id) || []));
       const { data: adminProfiles } = await supabase
         .from('profiles')
         .select('id, full_name, avatar_url')
@@ -249,7 +249,7 @@ const ContentModeration: React.FC = () => {
       await supabase.rpc('log_admin_action', {
         action_text: `bulk_content_report_${action}`,
         target_type_text: 'content_report_bulk',
-        target_id_param: null,
+        target_id_param: undefined,
         details_param: { report_ids: selectedReports, count: selectedReports.length }
       });
 
@@ -280,7 +280,7 @@ const ContentModeration: React.FC = () => {
         content_type_param: 'post', // We'll handle mixed types later
         content_ids: selectedContent,
         new_status: action,
-        moderator_id: user?.id,
+        moderator_id: user?.id || '',
         reason: `Bulk ${action} action`
       });
 
@@ -315,7 +315,7 @@ const ContentModeration: React.FC = () => {
       const { data, error } = await supabase.rpc('resolve_content_reports', {
         report_ids: [reportId],
         resolution: action,
-        content_action: contentAction,
+        content_action: contentAction || undefined,
         moderator_notes: reviewNotes
       });
 

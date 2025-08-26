@@ -43,20 +43,20 @@ interface Challenge {
   title: string;
   description: string | null;
   instructions: string | null;
-  challenge_type: string;
+  challenge_type: string | null;
   start_date: string | null;
   end_date: string | null;
   step_goal: number | null;
-  points_reward: number;
-  winner_reward_points: number;
-  runner_up_reward_points: number;
-  participation_reward_points: number;
-  status: 'draft' | 'active' | 'completed';
-  auto_award_enabled: boolean;
+  points_reward: number | null;
+  winner_reward_points: number | null;
+  runner_up_reward_points: number | null;
+  participation_reward_points: number | null;
+  status: 'draft' | 'active' | 'completed' | null;
+  auto_award_enabled: boolean | null;
   badge_name: string | null;
   badge_image_url: string | null;
-  created_by: string;
-  created_at: string;
+  created_by: string | null;
+  created_at: string | null;
   participant_count?: number;
 }
 
@@ -114,7 +114,18 @@ const ChallengeManagement: React.FC = () => {
         })
       );
 
-      setChallenges(challengesWithCounts);
+      setChallenges(challengesWithCounts.map(challenge => ({
+        ...challenge,
+        challenge_type: challenge.challenge_type || 'one_time',
+        points_reward: challenge.points_reward || 0,
+        winner_reward_points: challenge.winner_reward_points || 0,
+        runner_up_reward_points: challenge.runner_up_reward_points || 0,
+        participation_reward_points: challenge.participation_reward_points || 0,
+        status: challenge.status as 'draft' | 'active' | 'completed' || 'draft',
+        auto_award_enabled: challenge.auto_award_enabled || false,
+        created_by: challenge.created_by || '',
+        created_at: challenge.created_at || new Date().toISOString()
+      })));
     } catch (error) {
       console.error('Error loading challenges:', error);
       toast({
@@ -212,7 +223,7 @@ const ChallengeManagement: React.FC = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | null) => {
     switch (status) {
       case 'draft':
         return 'secondary';
@@ -227,7 +238,7 @@ const ChallengeManagement: React.FC = () => {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: string | null) => {
     switch (status) {
       case 'draft':
         return <Square className="w-4 h-4" />;
@@ -242,7 +253,7 @@ const ChallengeManagement: React.FC = () => {
     }
   };
 
-  const getChallengeTypeIcon = (type: string) => {
+  const getChallengeTypeIcon = (type: string | null) => {
     switch (type) {
       case 'weekly':
         return <Calendar className="w-4 h-4" />;
@@ -256,7 +267,7 @@ const ChallengeManagement: React.FC = () => {
   const filteredChallenges = challenges.filter(challenge => {
     const matchesSearch = 
       challenge.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      challenge.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      (challenge.description || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = filterStatus === 'all' || challenge.status === filterStatus;
     
@@ -577,16 +588,16 @@ const ChallengeManagement: React.FC = () => {
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-lg font-semibold">{challenge.title}</h3>
                         <Badge variant={getStatusColor(challenge.status)}>
-                          {challenge.status}
+                          {challenge.status || 'draft'}
                         </Badge>
                         <Badge variant="outline">
-                          {challenge.challenge_type}
+                          {challenge.challenge_type || 'one_time'}
                         </Badge>
                       </div>
                       
                       {challenge.description && (
                         <p className="text-muted-foreground mb-2">
-                          {challenge.description}
+                          {challenge.description || ''}
                         </p>
                       )}
                       
@@ -616,11 +627,11 @@ const ChallengeManagement: React.FC = () => {
                         )}
                       </div>
                       
-                      {challenge.winner_reward_points > 0 && (
+                      {(challenge.winner_reward_points || 0) > 0 && (
                         <div className="mt-2 text-xs text-muted-foreground">
-                          Bonus: Winner +{challenge.winner_reward_points}, 
-                          Runner-up +{challenge.runner_up_reward_points}, 
-                          Participation +{challenge.participation_reward_points}
+                          Bonus: Winner +{challenge.winner_reward_points || 0}, 
+                          Runner-up +{challenge.runner_up_reward_points || 0}, 
+                          Participation +{challenge.participation_reward_points || 0}
                         </div>
                       )}
                     </div>

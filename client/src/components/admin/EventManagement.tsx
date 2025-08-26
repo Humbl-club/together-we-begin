@@ -48,14 +48,14 @@ interface Event {
   end_time: string | null;
   location: string | null;
   image_url: string | null;
-  price_cents: number;
+  price_cents: number | null;
   loyalty_points_price: number | null;
   max_capacity: number | null;
-  current_capacity: number;
-  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
-  created_by: string;
-  created_at: string;
-  attendance_points: number;
+  current_capacity: number | null;
+  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled' | null;
+  created_by: string | null;
+  created_at: string | null;
+  attendance_points: number | null;
   qr_code_token: string | null;
   qr_code_generated_at: string | null;
 }
@@ -110,7 +110,15 @@ const EventManagement: React.FC = () => {
         .order('start_time', { ascending: false });
 
       if (error) throw error;
-      setEvents(data || []);
+      setEvents((data || []).map(event => ({
+        ...event,
+        price_cents: event.price_cents || 0,
+        current_capacity: event.current_capacity || 0,
+        status: event.status as 'upcoming' | 'ongoing' | 'completed' | 'cancelled' || 'upcoming',
+        created_by: event.created_by || '',
+        created_at: event.created_at || new Date().toISOString(),
+        attendance_points: event.attendance_points || 0
+      })));
     } catch (error) {
       console.error('Error loading events:', error);
       toast({
@@ -207,10 +215,10 @@ const EventManagement: React.FC = () => {
       start_time: event.start_time.slice(0, 16), // Format for datetime-local
       end_time: event.end_time?.slice(0, 16) || '',
       location: event.location || '',
-      price_cents: event.price_cents,
-      loyalty_points_price: event.loyalty_points_price,
-      max_capacity: event.max_capacity,
-      attendance_points: event.attendance_points
+      price_cents: event.price_cents || 0,
+      loyalty_points_price: event.loyalty_points_price || null,
+      max_capacity: event.max_capacity || null,
+      attendance_points: event.attendance_points || 0
     });
     setShowEditDialog(true);
   };
@@ -348,7 +356,7 @@ const EventManagement: React.FC = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | null) => {
     switch (status) {
       case 'upcoming':
         return 'secondary';
@@ -363,9 +371,9 @@ const EventManagement: React.FC = () => {
     }
   };
 
-  const formatPrice = (cents: number) => {
-    if (cents === 0) return 'Free';
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' }).format(cents / 100);
+  const formatPrice = (cents: number | null) => {
+    if (!cents || cents === 0) return 'Free';
+    return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' }).format((cents || 0) / 100);
   };
 
   const filteredEvents = events.filter(event => {
@@ -657,7 +665,7 @@ const EventManagement: React.FC = () => {
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-lg font-semibold">{event.title}</h3>
                         <Badge variant={getStatusColor(event.status)}>
-                          {event.status}
+                          {event.status || 'upcoming'}
                         </Badge>
                         {event.qr_code_token && (
                           <Badge variant="outline" className="flex items-center gap-1">
@@ -682,7 +690,7 @@ const EventManagement: React.FC = () => {
                         {event.location && (
                           <div className="flex items-center gap-1">
                             <MapPin className="w-4 h-4" />
-                            {event.location}
+                            {event.location || ''}
                           </div>
                         )}
                         
@@ -694,7 +702,7 @@ const EventManagement: React.FC = () => {
                         {event.max_capacity && (
                           <div className="flex items-center gap-1">
                             <Users className="w-4 h-4" />
-                            {event.current_capacity}/{event.max_capacity}
+                            {event.current_capacity || 0}/{event.max_capacity || '∞'}
                           </div>
                         )}
                       </div>
@@ -965,7 +973,7 @@ const EventManagement: React.FC = () => {
                 eventId={selectedEvent.id}
                 eventTitle={selectedEvent.title}
                 eventDate={selectedEvent.start_time}
-                attendancePoints={selectedEvent.attendance_points}
+                attendancePoints={selectedEvent.attendance_points || 0}
                 qrCodeToken={selectedEvent.qr_code_token || undefined}
               />
             )}

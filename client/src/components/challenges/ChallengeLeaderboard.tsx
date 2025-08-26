@@ -25,8 +25,8 @@ interface LeaderboardEntry {
   total_steps: number;
   daily_steps: { [date: string]: number };
   last_updated: string;
-  is_validated: boolean;
-  flagged_for_review: boolean;
+  is_validated: boolean | null;
+  flagged_for_review: boolean | null;
   profile: {
     full_name: string;
     avatar_url?: string;
@@ -111,8 +111,8 @@ export const ChallengeLeaderboard: React.FC<ChallengeLeaderboardProps> = ({
         total_steps: entry.total_steps,
         daily_steps: (entry.daily_steps as { [date: string]: number }) || {},
         last_updated: entry.last_updated,
-        is_validated: entry.is_validated,
-        flagged_for_review: entry.flagged_for_review,
+        is_validated: entry.is_validated ?? false,
+        flagged_for_review: entry.flagged_for_review ?? false,
         profile: {
           full_name: (entry.profiles as any)?.full_name || 'Anonymous',
           avatar_url: (entry.profiles as any)?.avatar_url

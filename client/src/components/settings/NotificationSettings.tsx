@@ -52,7 +52,7 @@ export const NotificationSettings: React.FC = () => {
       const { data, error } = await supabase
         .from('user_notification_settings')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('user_id', user?.id || '')
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {

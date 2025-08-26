@@ -25,10 +25,10 @@ interface PointsTransaction {
   id: string;
   type: 'earned' | 'redeemed';
   points: number;
-  description: string;
-  created_at: string;
-  source_category: string;
-  expires_at?: string;
+  description: string | null;
+  created_at: string | null;
+  source_category: string | null;
+  expires_at?: string | null;
 }
 
 interface PointsSummary {
@@ -393,9 +393,9 @@ export const PointsEarningSystem: React.FC = () => {
                       }
                     </div>
                     <div>
-                      <p className="font-medium">{transaction.description}</p>
+                      <p className="font-medium">{transaction.description || 'No description'}</p>
                       <p className="text-sm text-muted-foreground">
-                        {formatDistanceToNow(new Date(transaction.created_at), { addSuffix: true })}
+                        {transaction.created_at ? formatDistanceToNow(new Date(transaction.created_at), { addSuffix: true }) : 'Unknown date'}
                       </p>
                     </div>
                   </div>

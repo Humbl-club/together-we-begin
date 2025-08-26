@@ -30,9 +30,9 @@ import { EmptyState } from '@/components/ui/empty-state';
 
 interface UserWithRoles {
   user_id: string;
-  full_name: string;
-  username: string;
-  avatar_url: string;
+  full_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
   created_at: string;
   roles: string[];
   is_active?: boolean;
@@ -55,7 +55,7 @@ const UserManagement: React.FC = () => {
   const loadUsers = async () => {
     try {
       const { data, error } = await supabase.rpc('get_users_with_roles', {
-        _requesting_user_id: user?.id
+        _requesting_user_id: user?.id || ''
       });
 
       if (error) throw error;
@@ -77,7 +77,7 @@ const UserManagement: React.FC = () => {
       const { data, error } = await supabase.rpc('assign_user_role', {
         _user_id: userId,
         _role: role as 'admin' | 'member',
-        _assigned_by: user?.id
+        _assigned_by: user?.id || ''
       });
 
       if (error) throw error;
@@ -107,7 +107,7 @@ const UserManagement: React.FC = () => {
       const { data, error } = await supabase.rpc('remove_user_role', {
         _user_id: userId,
         _role: role as 'admin' | 'member',
-        _removed_by: user?.id
+        _removed_by: user?.id || ''
       });
 
       if (error) throw error;
@@ -277,7 +277,7 @@ const UserManagement: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <Avatar>
-                    <AvatarImage src={userData.avatar_url} />
+                    <AvatarImage src={userData.avatar_url || undefined} />
                     <AvatarFallback>
                       {userData.full_name?.charAt(0) || userData.username?.charAt(0) || 'U'}
                     </AvatarFallback>

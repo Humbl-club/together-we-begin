@@ -14,6 +14,13 @@ interface FeedPost {
     full_name: string;
     avatar_url?: string;
   };
+  user_liked?: boolean;
+  profile_data?: {
+    id: string;
+    full_name: string;
+    username?: string;
+    avatar_url?: string;
+  };
 }
 
 export const useCommunityFeed = (userId?: string) => {

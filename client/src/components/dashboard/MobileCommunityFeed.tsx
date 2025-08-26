@@ -19,10 +19,14 @@ interface Post {
   comments_count: number;
   is_story: boolean;
   status: string;
-  profile_data: {
+  profile_data?: {
     id: string;
     full_name: string;
     username?: string;
+    avatar_url?: string;
+  };
+  user_profile?: {
+    full_name: string;
     avatar_url?: string;
   };
   user_liked?: boolean;
@@ -84,11 +88,11 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts: p
               <div key={post.id} className="p-3 rounded-lg border border-border">
                   <div className="flex items-start gap-3">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={post.profile_data?.avatar_url} />
-                      <AvatarFallback>{post.profile_data?.full_name?.[0] || '?'}</AvatarFallback>
+                      <AvatarImage src={(post.profile_data?.avatar_url || post.user_profile?.avatar_url) || undefined} />
+                      <AvatarFallback>{(post.profile_data?.full_name || post.user_profile?.full_name)?.[0] || '?'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-sm">{post.profile_data?.full_name || 'Anonymous'}</h4>
+                      <h4 className="font-medium text-sm">{post.profile_data?.full_name || post.user_profile?.full_name || 'Anonymous'}</h4>
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{post.content}</p>
                       <div className="flex items-center gap-4 mt-2">
                       </div>
@@ -138,14 +142,14 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts: p
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <Avatar className="h-10 w-10 flex-shrink-0">
-                      <AvatarImage src={post.profile_data?.avatar_url} />
-                      <AvatarFallback className="text-sm">{post.profile_data?.full_name?.[0] || '?'}</AvatarFallback>
+                      <AvatarImage src={(post.profile_data?.avatar_url || post.user_profile?.avatar_url) || undefined} />
+                      <AvatarFallback className="text-sm">{(post.profile_data?.full_name || post.user_profile?.full_name)?.[0] || '?'}</AvatarFallback>
                     </Avatar>
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="font-semibold text-sm text-foreground truncate">
-                          {post.profile_data?.full_name || 'Anonymous'}
+                          {post.profile_data?.full_name || post.user_profile?.full_name || 'Anonymous'}
                         </h3>
                       </div>
                       <p className="text-xs text-muted-foreground">{formatTimestamp(post.created_at)}</p>

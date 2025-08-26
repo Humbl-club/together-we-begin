@@ -14,10 +14,11 @@ interface AttendanceRecord {
   id: string;
   user_id: string;
   attended_at: string;
-  points_awarded: number;
+  points_awarded: number | null;
   profiles?: {
-    full_name: string;
-    avatar_url?: string;
+    id: string;
+    full_name: string | null;
+    avatar_url?: string | null;
   } | null;
 }
 
@@ -116,7 +117,7 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
       ...attendance.map(record => [
         record.profiles?.full_name || 'Unknown',
         format(new Date(record.attended_at), 'yyyy-MM-dd HH:mm:ss'),
-        record.points_awarded.toString()
+(record.points_awarded || 0).toString()
       ])
     ];
 
@@ -137,7 +138,7 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
     });
   };
 
-  const totalPointsAwarded = attendance.reduce((sum, record) => sum + record.points_awarded, 0);
+  const totalPointsAwarded = attendance.reduce((sum, record) => sum + (record.points_awarded || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -249,10 +250,10 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        {record.points_awarded > 0 && (
+                        {(record.points_awarded || 0) > 0 && (
                           <Badge variant="secondary" className="flex items-center gap-1">
                             <Trophy className="w-3 h-3" />
-                            +{record.points_awarded}
+                            +{record.points_awarded || 0}
                           </Badge>
                         )}
                       </div>

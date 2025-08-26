@@ -38,7 +38,7 @@ export const PostComments: React.FC<PostCommentsProps> = ({
       setComments(data);
       
       // Fetch profiles for commenters
-      const userIds = [...new Set(data.map(c => c.user_id))];
+      const userIds = [...new Set(data.map(c => c.user_id).filter(Boolean))] as string[];
       const { data: profilesData } = await supabase
         .from('profiles')
         .select('*')
@@ -70,7 +70,7 @@ export const PostComments: React.FC<PostCommentsProps> = ({
   return (
     <div className="space-y-3 border-t pt-3">
       {comments.map((comment) => {
-        const profile = profiles[comment.user_id];
+        const profile = comment.user_id ? profiles[comment.user_id] : undefined;
         return (
           <div key={comment.id} className="flex space-x-2">
             <Avatar className="w-8 h-8">
@@ -85,7 +85,7 @@ export const PostComments: React.FC<PostCommentsProps> = ({
                 <p className="text-sm">{comment.content}</p>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                {comment.created_at ? formatDistanceToNow(new Date(comment.created_at), { addSuffix: true }) : 'Unknown time'}
               </p>
             </div>
           </div>

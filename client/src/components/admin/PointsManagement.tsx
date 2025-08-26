@@ -36,7 +36,7 @@ interface UserBalance {
   expiring_soon: number;
   profiles: {
     full_name: string;
-    username?: string;
+    username?: string | null;
   };
 }
 
@@ -75,7 +75,10 @@ export const PointsManagement: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setExpirationPolicies(data || []);
+      setExpirationPolicies((data || []).map(policy => ({
+        ...policy,
+        applies_to_point_type: policy.applies_to_point_type || 'general'
+      })));
     } catch (error) {
       console.error('Error fetching expiration policies:', error);
       toast({
@@ -366,7 +369,7 @@ export const PointsManagement: React.FC = () => {
                       <div>
                         <h4 className="font-medium">{policy.policy_name}</h4>
                         <p className="text-sm text-muted-foreground">
-                          {policy.expiration_months} months • {policy.applies_to_point_type} points
+                          {policy.expiration_months} months • {policy.applies_to_point_type || 'general'} points
                         </p>
                       </div>
                     </div>

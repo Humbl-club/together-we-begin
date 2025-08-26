@@ -101,7 +101,7 @@ const CommunityFeed: React.FC = () => {
           ? { 
               ...p, 
               user_liked: !p.user_liked,
-              likes_count: p.user_liked ? p.likes_count - 1 : p.likes_count + 1
+              likes_count: p.user_liked ? (p.likes_count || 0) - 1 : (p.likes_count || 0) + 1
             }
           : p
       ));
@@ -139,7 +139,7 @@ const CommunityFeed: React.FC = () => {
       }
 
       // Get unique user IDs
-      const userIds = [...new Set(commentsData.map(c => c.user_id))];
+      const userIds = [...new Set(commentsData.map(c => c.user_id).filter(Boolean))] as string[];
 
       // Fetch profiles for all users
       const { data: profilesData, error: profilesError } = await supabase
@@ -431,7 +431,7 @@ const CommunityFeed: React.FC = () => {
             <CardContent className="p-4">
               <div className="flex items-start space-x-3">
                 <Avatar>
-                  <AvatarImage src={post.profile_data?.avatar_url} />
+                  <AvatarImage src={post.profile_data?.avatar_url || undefined} />
                   <AvatarFallback>
                     {post.profile_data?.full_name?.charAt(0) || 'U'}
                   </AvatarFallback>
@@ -440,7 +440,7 @@ const CommunityFeed: React.FC = () => {
                   <div className="flex items-center space-x-2">
                     <h4 className="font-semibold">{post.profile_data?.full_name || 'Anonymous'}</h4>
                     <span className="text-sm text-muted-foreground">
-                      {new Date(post.created_at).toLocaleDateString()}
+                      {post.created_at ? new Date(post.created_at).toLocaleDateString() : 'Unknown date'}
                     </span>
                   </div>
                   <p className="mt-2">{post.content}</p>
@@ -504,7 +504,7 @@ const CommunityFeed: React.FC = () => {
                         {comments.map((comment) => (
                           <div key={comment.id} className="flex gap-3">
                             <Avatar className="w-8 h-8">
-                              <AvatarImage src={comment.profiles?.avatar_url} />
+                              <AvatarImage src={comment.profiles?.avatar_url || undefined} />
                               <AvatarFallback>
                                 {comment.profiles?.full_name?.charAt(0) || comment.profiles?.username?.charAt(0) || '?'}
                               </AvatarFallback>
@@ -515,7 +515,7 @@ const CommunityFeed: React.FC = () => {
                                   {comment.profiles?.full_name || comment.profiles?.username}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
-                                  {new Date(comment.created_at).toLocaleDateString()}
+                                  {comment.created_at ? new Date(comment.created_at).toLocaleDateString() : 'Unknown date'}
                                 </span>
                               </div>
                               <p className="text-sm leading-relaxed">

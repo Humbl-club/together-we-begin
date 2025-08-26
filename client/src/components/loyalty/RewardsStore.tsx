@@ -14,13 +14,17 @@ import { EmptyState } from '@/components/ui/empty-state';
 interface Reward {
   id: string;
   title: string;
-  description: string;
-  image_url?: string;
+  description: string | null;
+  image_url?: string | null;
   points_cost: number;
   category: string;
-  stock_quantity?: number;
-  redemption_limit_per_user?: number;
+  stock_quantity?: number | null;
+  redemption_limit_per_user?: number | null;
   is_active: boolean;
+  created_at: string;
+  created_by: string | null;
+  expiry_date: string | null;
+  updated_at: string;
 }
 
 interface RedemptionHistory {
@@ -28,7 +32,7 @@ interface RedemptionHistory {
   reward_id: string;
   points_spent: number;
   status: string;
-  redemption_code: string;
+  redemption_code: string | null;
   redeemed_at: string;
   rewards_catalog: {
     title: string;
@@ -272,13 +276,13 @@ export const RewardsStore: React.FC = () => {
                     disabled={
                       redeeming === reward.id ||
                       userPoints < reward.points_cost ||
-                      (reward.stock_quantity !== null && reward.stock_quantity <= 0)
+                      (reward.stock_quantity != null && reward.stock_quantity <= 0)
                     }
                     className="w-full"
                   >
                     {redeeming === reward.id ? 'Redeeming...' : 
                      userPoints < reward.points_cost ? 'Insufficient Points' :
-                     (reward.stock_quantity !== null && reward.stock_quantity <= 0) ? 'Out of Stock' :
+                     (reward.stock_quantity != null && reward.stock_quantity <= 0) ? 'Out of Stock' :
                      'Redeem'}
                   </Button>
                 </CardContent>

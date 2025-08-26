@@ -103,7 +103,12 @@ const NotificationManagement: React.FC = () => {
       if (templatesResult.error) throw templatesResult.error;
       if (notificationsResult.error) throw notificationsResult.error;
 
-      setTemplates(templatesResult.data || []);
+      setTemplates((templatesResult.data || []).map(template => ({
+        ...template,
+        created_by: template.created_by || '',
+        created_at: template.created_at || new Date().toISOString(),
+        updated_at: template.updated_at || new Date().toISOString()
+      })));
       setNotifications(notificationsResult.data || []);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -180,7 +185,7 @@ const NotificationManagement: React.FC = () => {
           .eq('role', 'admin');
         
         if (error) throw error;
-        targetUserIds = admins.map(a => a.user_id);
+        targetUserIds = admins.map(a => a.user_id).filter(id => id !== null);
       } else if (notificationForm.target_audience === 'recent_users') {
         const { data: users, error } = await supabase
           .from('profiles')
@@ -198,7 +203,7 @@ const NotificationManagement: React.FC = () => {
         title: notificationForm.title,
         content: notificationForm.content,
         type: notificationForm.type,
-        data: { sent_by_admin: user?.id }
+        data: { sent_by_admin: user?.id || '' }
       }));
 
       const { error } = await supabase
@@ -211,7 +216,7 @@ const NotificationManagement: React.FC = () => {
       await supabase.rpc('log_admin_action', {
         action_text: 'notification_sent',
         target_type_text: 'notification',
-        target_id_param: null,
+        target_id_param: undefined,
         details_param: { 
           title: notificationForm.title, 
           target_count: targetUserIds.length,

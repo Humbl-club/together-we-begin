@@ -20,11 +20,11 @@ interface AttendanceRecord {
   id: string;
   event_id: string;
   attended_at: string;
-  points_awarded: number;
+  points_awarded: number | null;
   events: {
     title: string;
     start_time: string;
-    location?: string;
+    location: string | null;
   };
 }
 

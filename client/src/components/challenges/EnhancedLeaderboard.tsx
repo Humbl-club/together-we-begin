@@ -13,8 +13,8 @@ interface LeaderboardEntry {
   user_id: string;
   total_steps: number;
   daily_steps: { [date: string]: number };
-  is_validated: boolean;
-  flagged_for_review: boolean;
+  is_validated: boolean | null;
+  flagged_for_review: boolean | null;
   last_updated: string;
   profiles: {
     full_name: string;
@@ -83,7 +83,7 @@ export const EnhancedLeaderboard: React.FC<EnhancedLeaderboardProps> = ({
             .order('created_at', { ascending: false })
             .limit(5);
 
-          const avgValidationScore = validationData?.length > 0
+          const avgValidationScore = validationData && validationData.length > 0
             ? validationData.reduce((sum, log) => sum + (log.validation_score || 1), 0) / validationData.length
             : 1;
 
@@ -92,7 +92,9 @@ export const EnhancedLeaderboard: React.FC<EnhancedLeaderboardProps> = ({
             daily_steps: (entry.daily_steps as any) || {},
             validation_score: avgValidationScore,
             rank: index + 1,
-            profiles: entry.profiles as any
+            profiles: entry.profiles as any,
+            is_validated: entry.is_validated ?? false,
+            flagged_for_review: entry.flagged_for_review ?? false
           };
         })
       );

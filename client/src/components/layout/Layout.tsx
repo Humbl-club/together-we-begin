@@ -12,6 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import EditorialMasthead from '@/components/layout/EditorialMasthead';
 import { iPadLayout as IPadLayout } from '@/components/ipad';
+import { UserThemeController } from '@/components/theme/UserThemeController';
+import { AuthDebug } from '@/components/debug/AuthDebug';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -84,6 +86,12 @@ export const Layout: React.FC<LayoutProps> = memo(({ children }) => {
       "pt-[env(safe-area-inset-top,0px)]",
       getLayoutPadding()
     )}>
+      {/* User theme controller for authenticated users */}
+      <UserThemeController />
+      
+      {/* Auth Debug Panel - shows your admin status */}
+      {process.env.NODE_ENV === 'development' && <AuthDebug />}
+      
       <a href="#main-content" className="sr-only focus:not-sr-only fixed top-2 left-2 z-50 px-3 py-2 rounded-md bg-background text-foreground ring-2 ring-primary">Skip to content</a>
       {isMobile ? (
         <>

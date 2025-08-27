@@ -1,3 +1,8 @@
 {
-  "outputStyle": "mobile-first-developer"
+  "outputStyle": "mobile-first-expert",
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)"
+    ]
+  }
 }

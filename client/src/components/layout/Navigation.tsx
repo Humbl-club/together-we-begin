@@ -18,8 +18,15 @@ import {
   X,
   MessageCircle,
   QrCode,
-  Plus
+  Plus,
+  Building2
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { OrganizationAdminDropdown } from '@/components/admin/OrganizationAdminDropdown';
 import { ProfileDropdown } from './ProfileDropdown';
 import { MessagingOverlay } from '@/components/messaging/MessagingOverlay';
 import { useMessaging } from '@/hooks/useMessaging';
@@ -32,11 +39,12 @@ interface NavigationProps {
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
-  const { user, signOut, isAdmin } = useAuth();
+  const { user, signOut, isAdmin, isSuperAdmin, isOrganizationAdmin } = useAuth();
   const location = useLocation();
   const { isMobile, isTablet, isDesktop } = useViewport();
   const haptics = useHapticFeedback();
   const [showMessaging, setShowMessaging] = useState(false);
+  const [showOrgAdmin, setShowOrgAdmin] = useState(false);
   const { totalUnreadCount } = useMessaging();
 
   // Force re-render and ensure navigation is always visible
@@ -93,18 +101,45 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
           </div>
         </nav>
         
-        {/* Simple floating message button */}
-        <button
-          onClick={() => setShowMessaging(true)}
-          className="fixed bottom-20 right-4 z-[9999] w-12 h-12 bg-primary text-primary-foreground rounded-full shadow-lg flex items-center justify-center"
-        >
-          <MessageCircle className="w-5 h-5" />
-          {totalUnreadCount > 0 && (
-            <span className="absolute -top-2 -right-2 w-5 h-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
-              {totalUnreadCount > 9 ? '9+' : totalUnreadCount}
-            </span>
+        {/* Floating action buttons */}
+        <div className="fixed bottom-20 right-4 z-[9999] flex flex-col gap-3">
+          {/* Organization Admin Button (Club Owners) */}
+          {isOrganizationAdmin && (
+            <DropdownMenu open={showOrgAdmin} onOpenChange={setShowOrgAdmin}>
+              <DropdownMenuTrigger asChild>
+                <button className="w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center">
+                  <Building2 className="w-5 h-5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="left" align="end" className="w-auto mb-2">
+                <OrganizationAdminDropdown />
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
-        </button>
+
+          {/* Super Admin Button (YOU - Platform Owner) */}
+          {isSuperAdmin && (
+            <Link 
+              to="/super-admin"
+              className="w-12 h-12 bg-purple-600 text-white rounded-full shadow-lg flex items-center justify-center"
+            >
+              <Shield className="w-5 h-5" />
+            </Link>
+          )}
+
+          {/* Messages Button */}
+          <button
+            onClick={() => setShowMessaging(true)}
+            className="w-12 h-12 bg-primary text-primary-foreground rounded-full shadow-lg flex items-center justify-center"
+          >
+            <MessageCircle className="w-5 h-5" />
+            {totalUnreadCount > 0 && (
+              <span className="absolute -top-2 -right-2 w-5 h-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
+                {totalUnreadCount > 9 ? '9+' : totalUnreadCount}
+              </span>
+            )}
+          </button>
+        </div>
         
         <MessagingOverlay 
           isOpen={showMessaging} 

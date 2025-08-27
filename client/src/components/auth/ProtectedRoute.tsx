@@ -5,13 +5,15 @@ import { useAuth } from './AuthProvider';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
+  requireSuperAdmin?: boolean;
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
-  requireAdmin = false 
+  requireAdmin = false,
+  requireSuperAdmin = false
 }) => {
-  const { user, loading, isAdmin } = useAuth();
+  const { user, loading, isAdmin, isSuperAdmin } = useAuth();
 
   if (loading) {
     return (
@@ -29,6 +31,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (requireAdmin && !isAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  if (requireSuperAdmin && !isSuperAdmin) {
     return <Navigate to="/dashboard" replace />;
   }
 

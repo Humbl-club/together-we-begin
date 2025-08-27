@@ -13,6 +13,7 @@ import NotificationService from '@/services/notificationService';
 import { BrandProvider } from '@/contexts/BrandContext';
 import { TenantProvider } from '@/contexts/TenantContext';
 import { FeatureFlagsProvider } from '@/contexts/FeatureFlagsContext';
+import { OrganizationProvider } from '@/contexts/OrganizationContext';
 import { ThemeController } from '@/components/theme/ThemeController';
 import EnhancedErrorBoundary from '@/components/ui/enhanced-error-boundary';
 import { CapacitorErrorBoundary } from '@/components/ui/capacitor-error-boundary';
@@ -69,6 +70,13 @@ import Auth from './pages/Auth';
 import NotFound from './pages/NotFound';
 
 // Lazy load all other pages
+const OrganizationSignup = lazy(() => 
+  import('./pages/OrganizationSignup').then(module => ({ default: module.default }))
+);
+
+const InviteJoin = lazy(() => 
+  import('./pages/InviteJoin').then(module => ({ default: module.default }))
+);
 const Dashboard = lazy(() => 
   import('./pages/Dashboard').then(module => ({ default: module.default }))
 );
@@ -111,6 +119,14 @@ const QRScanner = lazy(() =>
 
 const Insights = lazy(() => 
   import('./pages/Insights').then(module => ({ default: module.default }))
+);
+
+const OrganizationAdmin = lazy(() => 
+  import('./pages/admin/OrganizationAdmin').then(module => ({ default: module.default }))
+);
+
+const SuperAdminDashboard = lazy(() => 
+  import('./pages/SuperAdminDashboard').then(module => ({ default: module.SuperAdminDashboard }))
 );
 
 const queryClient = new QueryClient({
@@ -181,14 +197,19 @@ const App = () => {
               <TenantProvider>
                 <BrowserRouter>
                   <AuthProvider>
-                    <ThemeController />
-                    <RealtimeProvider>
+                    <OrganizationProvider>
+                      <RealtimeProvider>
                       <LazyBoundary>
                       <Suspense fallback={<PageLoader />}>
+                        <ThemeController />
                         <Routes>
                         {/* Public routes */}
                         <Route path="/" element={<Index />} />
                         <Route path="/auth" element={<Auth />} />
+                        
+                        {/* Organization signup routes */}
+                        <Route path="/:slug/signup" element={<OrganizationSignup />} />
+                        <Route path="/join/:code" element={<InviteJoin />} />
                         
                         {/* Protected routes */}
                         <Route path="/dashboard" element={
@@ -236,6 +257,16 @@ const App = () => {
                             <Layout><PerformanceMonitor /></Layout>
                           </ProtectedRoute>
                         } />
+                        <Route path="/admin/organization" element={
+                          <ProtectedRoute requireAdmin>
+                            <Layout><OrganizationAdmin /></Layout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/super-admin" element={
+                          <ProtectedRoute requireSuperAdmin>
+                            <SuperAdminDashboard />
+                          </ProtectedRoute>
+                        } />
                         <Route path="/settings" element={
                           <ProtectedRoute>
                             <Layout><Settings /></Layout>
@@ -250,9 +281,10 @@ const App = () => {
                       </Routes>
                     </Suspense>
                     </LazyBoundary>
-                  </RealtimeProvider>
-                </AuthProvider>
-              </BrowserRouter>
+                      </RealtimeProvider>
+                    </OrganizationProvider>
+                  </AuthProvider>
+                </BrowserRouter>
             </TenantProvider>
           </FeatureFlagsProvider>
         </BrandProvider>

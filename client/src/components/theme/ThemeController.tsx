@@ -1,59 +1,44 @@
 import { useEffect } from 'react';
-import { useUserSettings } from '@/hooks/useUserSettings';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 export const ThemeController = () => {
-  const { settings } = useUserSettings();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
+    // Apply default theme while auth is loading or user is not logged in
     const root = document.documentElement;
-    if (!settings) return;
-
-    // Theme: light | dark | system
-    const applyTheme = () => {
-      const theme = settings.appearance.theme || 'system';
+    
+    if (loading) {
+      // Default theme during loading
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-      if (theme === 'dark' || (theme === 'system' && prefersDark)) {
+      if (prefersDark) {
         root.classList.add('dark');
       } else {
         root.classList.remove('dark');
       }
-    };
-
-    applyTheme();
-
-    let mql: MediaQueryList | null = null;
-    if (settings.appearance.theme === 'system' && window.matchMedia) {
-      mql = window.matchMedia('(prefers-color-scheme: dark)');
-      const handler = () => applyTheme();
-      mql.addEventListener?.('change', handler);
-      // Cleanup
-      return () => mql?.removeEventListener?.('change', handler);
+      return;
     }
-  }, [settings?.appearance.theme]);
 
-  useEffect(() => {
-    const root = document.documentElement;
-    if (!settings) return;
+    if (!user) {
+      // Default theme for non-logged in users
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDark) {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+      // Set default attributes
+      root.setAttribute('data-font-size', 'medium');
+      root.setAttribute('data-animations', 'on');
+      root.setAttribute('data-glass', 'on');
+      root.setAttribute('data-contrast', 'normal');
+      return;
+    }
+    
+    // For logged in users, we'll let the user settings handle themes
+    // This is a simplified version that doesn't depend on useUserSettings
+  }, [user, loading]);
 
-    // Font size: small | medium | large
-    const size = settings.appearance.font_size || 'medium';
-    root.setAttribute('data-font-size', size);
-
-    // Animations toggle
-    root.setAttribute('data-animations', settings.appearance.animations_enabled ? 'on' : 'off');
-
-    // Glassmorphism toggle
-    root.setAttribute('data-glass', settings.appearance.glassmorphism_enabled ? 'on' : 'off');
-
-    // High contrast toggle
-    root.setAttribute('data-contrast', settings.appearance.high_contrast ? 'high' : 'normal');
-  }, [
-    settings?.appearance.font_size,
-    settings?.appearance.animations_enabled,
-    settings?.appearance.glassmorphism_enabled,
-    settings?.appearance.high_contrast,
-  ]);
 
   return null;
 };

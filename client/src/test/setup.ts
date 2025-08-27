@@ -39,9 +39,11 @@ vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     auth: {
       getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
+      getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
       signInWithPassword: vi.fn(),
       signUp: vi.fn(),
       signOut: vi.fn(),
+      resetPasswordForEmail: vi.fn(),
       onAuthStateChange: vi.fn().mockReturnValue({
         data: { subscription: { unsubscribe: vi.fn() } }
       }),
@@ -58,6 +60,10 @@ vi.mock('@/integrations/supabase/client', () => ({
       maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
       then: vi.fn(),
     })),
+    rpc: vi.fn().mockResolvedValue({ data: false, error: null }),
+    functions: {
+      invoke: vi.fn().mockResolvedValue({ data: null, error: null }),
+    },
     storage: {
       from: vi.fn(() => ({
         upload: vi.fn().mockResolvedValue({ data: { path: 'test-path' }, error: null }),

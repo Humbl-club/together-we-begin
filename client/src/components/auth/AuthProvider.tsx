@@ -13,6 +13,8 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
+  isOrganizationAdmin: boolean;
   connectionError: string | null;
 }
 
@@ -23,6 +25,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [isOrganizationAdmin, setIsOrganizationAdmin] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -60,20 +64,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session?.user) {
           setTimeout(async () => {
             try {
-              const { data: adminCheck } = await supabase
-                .rpc('is_admin', { _user_id: session.user.id });
+              // Check for organization admin (club owners)
+              const { data: orgAdminCheck } = await supabase
+                .rpc('is_organization_admin', { user_id: session.user.id });
               if (mounted) {
-                setIsAdmin(adminCheck || false);
+                setIsOrganizationAdmin(orgAdminCheck || false);
+                setIsAdmin(orgAdminCheck || false); // Keep backwards compatibility
+              }
+
+              // Check for super admin role (platform owner - YOU)
+              const { data: superAdminCheck } = await supabase
+                .rpc('is_platform_admin', { user_id: session.user.id });
+              if (mounted) {
+                setIsSuperAdmin(superAdminCheck || false);
               }
             } catch (error) {
               console.error('Error checking admin status:', error);
               if (mounted) {
                 setIsAdmin(false);
+                setIsSuperAdmin(false);
+                setIsOrganizationAdmin(false);
               }
             }
           }, 100); // Quick defer, non-blocking
         } else {
           setIsAdmin(false);
+          setIsSuperAdmin(false);
+          setIsOrganizationAdmin(false);
         }
         
         // Clear timeout and set loading to false
@@ -104,15 +121,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (session?.user) {
             setTimeout(async () => {
               try {
-                const { data: adminCheck } = await supabase
-                  .rpc('is_admin', { _user_id: session.user.id });
+                // Check for organization admin (club owners)
+                const { data: orgAdminCheck } = await supabase
+                  .rpc('is_organization_admin', { user_id: session.user.id });
                 if (mounted) {
-                  setIsAdmin(adminCheck || false);
+                  setIsOrganizationAdmin(orgAdminCheck || false);
+                  setIsAdmin(orgAdminCheck || false);
+                }
+
+                // Check for super admin role (platform owner - YOU)
+                const { data: superAdminCheck } = await supabase
+                  .rpc('is_platform_admin', { user_id: session.user.id });
+                if (mounted) {
+                  setIsSuperAdmin(superAdminCheck || false);
                 }
               } catch (error) {
                 console.error('Error checking admin status:', error);
                 if (mounted) {
                   setIsAdmin(false);
+                  setIsSuperAdmin(false);
+                  setIsOrganizationAdmin(false);
                 }
               }
             }, 100);
@@ -173,6 +201,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       setSession(null);
       setIsAdmin(false);
+      setIsSuperAdmin(false);
+      setIsOrganizationAdmin(false);
     }
   };
 
@@ -195,6 +225,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signOut,
     resetPassword,
     isAdmin,
+    isSuperAdmin,
+    isOrganizationAdmin,
     connectionError
   };
 

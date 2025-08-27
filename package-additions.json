@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "supabase:start": "npx supabase start",
+    "supabase:stop": "npx supabase stop",
+    "supabase:push": "npx supabase db push",
+    "supabase:query": "npx supabase db query \"SELECT * FROM public.profiles;\""
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "nodejs": {
+    "basicConnection": false,
+    "authentication": false,
+    "queryExecution": false,
+    "realtimeConnection": false,
+    "organizationQueries": false,
+    "rpcFunctions": false,
+    "errorHandling": false,
+    "errors": [
+      "General: Connection failed: relation \"public.information_schema.tables\" does not exist"
+    ]
+  },
+  "react": {
+    "supabaseClientLoads": true,
+    "contextProviderWorks": false,
+    "hooksExecute": true,
+    "componentsRender": true,
+    "realtimeSubscriptions": true,
+    "organizationSwitching": true,
+    "errors": [
+      "Context missing: supabase.from"
+    ]
+  },
+  "performance": {
+    "connectionTime": 121,
+    "queryResponseTimes": {},
+    "memoryUsage": {
+      "rss": 94,
+      "heapTotal": 20,
+      "heapUsed": 12,
+      "external": 4
+    },
+    "connectionPooling": {
+      "concurrentQueries": 10,
+      "totalTime": 300,
+      "averageTime": 30,
+      "allSuccessful": false
+    }
+  },
+  "integration": {
+    "dataFlowWorks": false,
+    "organizationIsolation": true,
+    "realtimeSync": true,
+    "errorBoundaries": true,
+    "errors": [
+      "Data flow patterns incomplete"
+    ]
+  }
+}

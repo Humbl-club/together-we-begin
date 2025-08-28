@@ -27,9 +27,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { OrganizationAdminDropdown } from '@/components/admin/OrganizationAdminDropdown';
+import { OrganizationSwitcher } from '@/components/organization/OrganizationSwitcher';
 import { ProfileDropdown } from './ProfileDropdown';
 import { MessagingOverlay } from '@/components/messaging/MessagingOverlay';
 import { useMessaging } from '@/hooks/useMessaging';
+import { useOrganization } from '@/contexts/OrganizationContext';
 
 interface NavigationProps {
   profile?: {
@@ -40,6 +42,7 @@ interface NavigationProps {
 
 export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
   const { user, signOut, isAdmin, isSuperAdmin, isOrganizationAdmin } = useAuth();
+  const { currentOrganization } = useOrganization();
   const location = useLocation();
   const { isMobile, isTablet, isDesktop } = useViewport();
   const haptics = useHapticFeedback();
@@ -78,6 +81,22 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
   if (shouldRenderMobile) {
     return (
       <>
+        {/* Organization Switcher at Top */}
+        {currentOrganization ? (
+          <div className="fixed top-0 left-0 right-0 z-[9998] glass-nav border-b border-border/40 p-2">
+            <OrganizationSwitcher />
+          </div>
+        ) : (
+          <div className="fixed top-0 left-0 right-0 z-[9998] glass-nav border-b border-border/40 p-2">
+            <Link to="/organization/new">
+              <Button variant="outline" className="w-full">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your Organization
+              </Button>
+            </Link>
+          </div>
+        )}
+        
         {/* Simple, highly visible mobile navigation */}
         <nav className="fixed bottom-0 left-0 right-0 z-[9999] glass-nav border-t border-border/40 text-foreground">
           <div className="grid grid-cols-4 gap-0 px-2 py-3">
@@ -157,12 +176,17 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
     return (
       <nav className="fixed top-0 left-0 w-20 h-full z-50">
         <div className="glass-nav h-full border-r border-border/20 flex flex-col bg-background/95 backdrop-blur-xl">
-          {/* Enhanced Tablet Logo */}
+          {/* Enhanced Tablet Logo with Org Switcher */}
           <div className="p-4 border-b border-border/20">
-            <div className="w-12 h-12 bg-gradient-to-br from-editorial-charcoal via-editorial-navy to-editorial-charcoal rounded-xl flex items-center justify-center shadow-lg relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-              <span className="text-white font-bold text-xl tracking-tight relative z-10">H</span>
-            </div>
+            {currentOrganization ? (
+              <OrganizationSwitcher compact />
+            ) : (
+              <Link to="/organization/new" className="block">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg relative overflow-hidden hover:scale-105 transition-transform">
+                  <Plus className="text-white w-6 h-6" />
+                </div>
+              </Link>
+            )}
           </div>
 
           {/* Enhanced Navigation Items with Better Spacing */}
@@ -229,12 +253,16 @@ export const Navigation: React.FC<NavigationProps> = ({ profile }) => {
   return (
     <nav className="fixed top-0 left-0 w-20 h-full z-50">
       <div className="glass-nav h-full border-r border-border/20 flex flex-col">
-        {/* Desktop Logo with Enhanced Glass */}
+        {/* Desktop Logo with Org Switcher */}
         <div className="p-4 border-b border-border/20">
-          <div className="w-12 h-12 mx-auto bg-gradient-to-br from-editorial-charcoal via-editorial-navy to-editorial-charcoal rounded-xl flex items-center justify-center shadow-xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-            <span className="text-white font-bold text-xl tracking-tight relative z-10">H</span>
-          </div>
+          {currentOrganization ? (
+            <OrganizationSwitcher compact />
+          ) : (
+            <div className="w-12 h-12 mx-auto bg-gradient-to-br from-editorial-charcoal via-editorial-navy to-editorial-charcoal rounded-xl flex items-center justify-center shadow-xl relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+              <span className="text-white font-bold text-xl tracking-tight relative z-10">H</span>
+            </div>
+          )}
         </div>
 
         {/* Navigation Items with Premium Glass Effect */}

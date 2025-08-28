@@ -50,6 +50,7 @@
     "@radix-ui/react-tooltip": "^1.2.0",
     "@supabase/supabase-js": "^2.56.0",
     "@tanstack/react-query": "^5.60.5",
+    "@types/ioredis": "^4.28.10",
     "@types/qrcode": "^1.5.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -61,6 +62,7 @@
     "express": "^4.21.2",
     "framer-motion": "^11.13.1",
     "input-otp": "^1.4.2",
+    "ioredis": "^5.7.0",
     "localforage": "^1.10.0",
     "lucide-react": "^0.453.0",
     "next-themes": "^0.4.6",
@@ -87,6 +89,8 @@
     "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/ios": "^7.4.3",
     "@playwright/test": "^1.55.0",
     "@replit/vite-plugin-cartographer": "^0.2.5",
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
@@ -111,6 +115,7 @@
     "esbuild": "^0.25.0",
     "happy-dom": "^18.0.1",
     "node-fetch": "^3.3.2",
+    "playwright": "^1.55.0",
     "postcss": "^8.4.47",
     "puppeteer": "^24.17.0",
     "supabase": "^2.39.2",

@@ -1,74 +1,81 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Supabase: Start Local",
-      "type": "shell",
-      "command": "npx supabase start",
-      "group": "build",
-      "presentation": {
-        "reveal": "always"
-      },
-      "problemMatcher": [],
-      "isBackground": true
-    },
-    {
-      "label": "Supabase: Stop Local",
-      "type": "shell",
-      "command": "npx supabase stop",
-      "group": "build",
-      "presentation": {
-        "reveal": "always"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Supabase: Push Migrations",
-      "type": "shell",
-      "command": "npx supabase db push",
-      "group": "build",
-      "presentation": {
-        "reveal": "always"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Supabase: Run SQL Query - Version",
-      "type": "shell",
-      "command": "docker exec supabase_db_workspace psql -U postgres -d postgres -c \"SELECT version();\"",
-      "group": "test",
-      "presentation": {
-        "reveal": "always"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Supabase: Run SQL Query - List Tables",
-      "type": "shell",
-      "command": "docker exec supabase_db_workspace psql -U postgres -d postgres -c \"\\dt\"",
-      "group": "test",
-      "presentation": {
-        "reveal": "always"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Supabase: Run Custom SQL Query",
-      "type": "shell",
-      "command": "docker exec supabase_db_workspace psql -U postgres -d postgres -c \"${input:sqlQuery}\"",
-      "group": "test",
-      "presentation": {
-        "reveal": "always"
-      },
-      "problemMatcher": []
-    }
-  ],
-  "inputs": [
-    {
-      "id": "sqlQuery",
-      "description": "Enter your SQL query",
-      "default": "SELECT NOW();",
-      "type": "promptString"
-    }
-  ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Supabase: Start Local",
+			"type": "shell",
+			"command": "npx supabase start",
+			"group": "build",
+			"presentation": {
+				"reveal": "always"
+			},
+			"problemMatcher": [],
+			"isBackground": true
+		},
+		{
+			"label": "Supabase: Stop Local",
+			"type": "shell",
+			"command": "npx supabase stop",
+			"group": "build",
+			"presentation": {
+				"reveal": "always"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Supabase: Push Migrations",
+			"type": "shell",
+			"command": "npx supabase db push",
+			"group": "build",
+			"presentation": {
+				"reveal": "always"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Supabase: Run SQL Query - Version",
+			"type": "shell",
+			"command": "docker exec supabase_db_workspace psql -U postgres -d postgres -c \"SELECT version();\"",
+			"group": "test",
+			"presentation": {
+				"reveal": "always"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Supabase: Run SQL Query - List Tables",
+			"type": "shell",
+			"command": "docker exec supabase_db_workspace psql -U postgres -d postgres -c \"\\dt\"",
+			"group": "test",
+			"presentation": {
+				"reveal": "always"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Supabase: Run Custom SQL Query",
+			"type": "shell",
+			"command": "docker exec supabase_db_workspace psql -U postgres -d postgres -c \"${input:sqlQuery}\"",
+			"group": "test",
+			"presentation": {
+				"reveal": "always"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Complete Test Suite",
+			"type": "shell",
+			"command": "node run-tests.js",
+			"isBackground": false,
+			"group": "test"
+		}
+	],
+	"inputs": [
+		{
+			"id": "sqlQuery",
+			"description": "Enter your SQL query",
+			"default": "SELECT NOW();",
+			"type": "promptString"
+		}
+	]
 }

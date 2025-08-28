@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
+import { useOrganization } from '@/contexts/OrganizationContext';
 
 export interface HealthData {
   id: string;
@@ -45,6 +46,7 @@ export const useHealthData = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { currentOrganization } = useOrganization();
 
   // Fetch health data for a date range
   const fetchHealthData = useCallback(async (startDate?: string, endDate?: string) => {
@@ -84,7 +86,7 @@ export const useHealthData = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, toast]);
+  }, [user, toast, currentOrganization]);
 
   // Add or update health data for a specific date
   const updateHealthData = useCallback(async (input: HealthDataInput) => {
@@ -134,7 +136,7 @@ export const useHealthData = () => {
       });
       throw error;
     }
-  }, [user, toast]);
+  }, [user, toast, currentOrganization]);
 
   // Get weekly summary
   const getWeeklySummary = useCallback(() => {

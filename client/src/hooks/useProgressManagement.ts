@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useOrganization } from '@/contexts/OrganizationContext';
 import { useToast } from '@/hooks/use-toast';
 
 interface ProgressUpdate {
@@ -28,15 +29,16 @@ export const useProgressManagement = () => {
   const [userBadges, setUserBadges] = useState<Badge[]>([]);
   const [processing, setProcessing] = useState(false);
   const { user } = useAuth();
+  const { currentOrganization } = useOrganization();
   const { toast } = useToast();
 
   // Check and update progress for all active challenges
   const checkProgressUpdates = useCallback(async () => {
-    if (!user || processing) return;
+    if (!user || !currentOrganization || processing) return;
 
     setProcessing(true);
     try {
-      // Get user's active challenge participations
+      // Get user's active challenge participations for current organization
       const { data: participations, error: participationError } = await supabase
         .from('challenge_participations')
         .select(`
@@ -56,6 +58,7 @@ export const useProgressManagement = () => {
           )
         `)
         .eq('user_id', user.id)
+        .eq('organization_id', currentOrganization.id)
         .eq('completed', false);
 
       if (participationError) throw participationError;
@@ -72,6 +75,7 @@ export const useProgressManagement = () => {
           .select('total_steps')
           .eq('challenge_id', challenge.id)
           .eq('user_id', user.id)
+          .eq('organization_id', currentOrganization.id)
           .single();
 
         const currentSteps = leaderboardData?.total_steps || 0;
@@ -102,7 +106,7 @@ export const useProgressManagement = () => {
     } finally {
       setProcessing(false);
     }
-  }, [user, processing]);
+  }, [user, currentOrganization, processing]);
 
   // Mark challenge as completed and award rewards
   const markChallengeCompleted = async (
@@ -110,7 +114,7 @@ export const useProgressManagement = () => {
     finalSteps: number, 
     challenge: any
   ) => {
-    if (!user) return;
+    if (!user || !currentOrganization) return;
 
     try {
       const completionTime = new Date().toISOString();
@@ -128,7 +132,8 @@ export const useProgressManagement = () => {
           }
         })
         .eq('challenge_id', challengeId)
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .eq('organization_id', currentOrganization.id);
 
       if (updateError) throw updateError;
 
@@ -138,6 +143,7 @@ export const useProgressManagement = () => {
           .from('loyalty_transactions')
           .insert({
             user_id: user.id,
+            organization_id: currentOrganization.id,
             type: 'earned',
             points: challenge.participation_reward_points,
             description: `Challenge completion: ${challenge.title}`,
@@ -200,15 +206,16 @@ export const useProgressManagement = () => {
 
   // Verify completion with additional validation
   const verifyCompletion = async (challengeId: string, reportedSteps: number) => {
-    if (!user) return { verified: false, reason: 'User not authenticated' };
+    if (!user || !currentOrganization) return { verified: false, reason: 'User not authenticated or no organization selected' };
 
     try {
-      // Get validation logs for this user and challenge
+      // Get validation logs for this user and challenge in current organization
       const { data: validationLogs } = await supabase
         .from('step_validation_logs')
         .select('*')
         .eq('user_id', user.id)
         .eq('challenge_id', challengeId)
+        .eq('organization_id', currentOrganization.id)
         .order('created_at', { ascending: false })
         .limit(10);
 
@@ -243,7 +250,7 @@ export const useProgressManagement = () => {
   // Manual completion trigger (for admin use)
   const manuallyCompleteChallenge = async (challengeId: string, userId?: string) => {
     const targetUserId = userId || user?.id;
-    if (!targetUserId) return;
+    if (!targetUserId || !currentOrganization) return;
 
     try {
       const { error } = await supabase
@@ -254,7 +261,8 @@ export const useProgressManagement = () => {
           progress_data: { manually_completed: true }
         })
         .eq('challenge_id', challengeId)
-        .eq('user_id', targetUserId);
+        .eq('user_id', targetUserId)
+        .eq('organization_id', currentOrganization.id);
 
       if (error) throw error;
 
@@ -276,7 +284,7 @@ export const useProgressManagement = () => {
 
   // Auto-check progress every 30 seconds when user is active
   useEffect(() => {
-    if (!user) return;
+    if (!user || !currentOrganization) return;
 
     checkProgressUpdates(); // Initial check
 
@@ -285,7 +293,7 @@ export const useProgressManagement = () => {
     }, 30000); // 30 seconds
 
     return () => clearInterval(interval);
-  }, [user, checkProgressUpdates]);
+  }, [user, currentOrganization?.id, checkProgressUpdates]);
 
   return {
     progressUpdates,

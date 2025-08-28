@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useOptimizedData } from './useOptimizedData';
 import { Event, Post } from '@/types/api';
+import { useOrganization } from '@/contexts/OrganizationContext';
 
 interface DashboardStats {
   nextEventInDays: number;
@@ -42,13 +43,14 @@ export const useDashboardData = (userId?: string) => {
   const [profile, setProfile] = useState<Profile>({});
   const [loading, setLoading] = useState(true); // Start with loading true
   const { fetchWithCache } = useOptimizedData<any>('dashboard', 2 * 60 * 1000); // 2 minute cache
+  const { currentOrganization } = useOrganization();
 
   const loadDashboardData = useCallback(async () => {
-    if (!userId) return;
+    if (!userId || !currentOrganization) return;
     
     setLoading(true);
     try {
-      const cacheKey = `dashboard-${userId}`;
+      const cacheKey = `dashboard-${userId}-${currentOrganization.id}`;
       
       const dashboardData = await fetchWithCache(cacheKey, async (): Promise<DashboardData> => {
         const today = new Date();
@@ -66,12 +68,14 @@ export const useDashboardData = (userId?: string) => {
           supabase
             .from('events')
             .select('id, title, start_time, location')
+            .eq('organization_id', currentOrganization.id)
             .eq('status', 'upcoming')
             .order('start_time', { ascending: true })
             .limit(5),
           supabase
             .from('direct_messages')
             .select('id', { count: 'exact', head: true })
+            .eq('organization_id', currentOrganization.id)
             .eq('recipient_id', userId)
             .is('read_at', null),
           supabase
@@ -83,6 +87,7 @@ export const useDashboardData = (userId?: string) => {
           supabase
             .from('social_posts')
             .select('id', { count: 'exact', head: true })
+            .eq('organization_id', currentOrganization.id)
             .eq('status', 'active')
             .gte('created_at', startOfTodayISO)
         ]);
@@ -119,11 +124,11 @@ export const useDashboardData = (userId?: string) => {
     } finally {
       setLoading(false);
     }
-  }, [userId, fetchWithCache]);
+  }, [userId, currentOrganization, fetchWithCache]);
 
   useEffect(() => {
     loadDashboardData();
-  }, [userId]);
+  }, [userId, currentOrganization?.id]);
 
   return {
     stats,

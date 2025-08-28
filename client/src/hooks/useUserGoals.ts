@@ -2,10 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
+import { useOrganization } from '@/contexts/OrganizationContext';
 
 export interface UserGoal {
   id: string;
   user_id: string;
+  organization_id?: string;
   goal_type: string;
   target_value: number;
   current_value: number;
@@ -31,11 +33,16 @@ export const useUserGoals = () => {
   const [goals, setGoals] = useState<UserGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { currentOrganization } = useOrganization();
   const { toast } = useToast();
 
-  // Fetch user goals
+  // Fetch user goals for current organization
   const fetchGoals = useCallback(async () => {
-    if (!user) return;
+    if (!user || !currentOrganization) {
+      setGoals([]);
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
@@ -43,6 +50,7 @@ export const useUserGoals = () => {
         .from('user_goals')
         .select('*')
         .eq('user_id', user.id)
+        .eq('organization_id', currentOrganization.id)
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
@@ -58,17 +66,18 @@ export const useUserGoals = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, toast]);
+  }, [user, currentOrganization, toast]);
 
   // Create a new goal
   const createGoal = useCallback(async (input: GoalInput) => {
-    if (!user) return;
+    if (!user || !currentOrganization) return;
 
     try {
       const { data, error } = await supabase
         .from('user_goals')
         .insert({
           user_id: user.id,
+          organization_id: currentOrganization.id,
           goal_type: input.goal_type,
           target_value: input.target_value,
           unit: input.unit,
@@ -98,11 +107,11 @@ export const useUserGoals = () => {
       });
       throw error;
     }
-  }, [user, toast]);
+  }, [user, currentOrganization, toast]);
 
   // Update goal progress
   const updateGoalProgress = useCallback(async (goalId: string, currentValue: number) => {
-    if (!user) return;
+    if (!user || !currentOrganization) return;
 
     try {
       const { data, error } = await supabase
@@ -110,6 +119,7 @@ export const useUserGoals = () => {
         .update({ current_value: currentValue })
         .eq('id', goalId)
         .eq('user_id', user.id)
+        .eq('organization_id', currentOrganization.id)
         .select()
         .single();
 
@@ -124,18 +134,19 @@ export const useUserGoals = () => {
       console.error('Error updating goal progress:', error);
       throw error;
     }
-  }, [user]);
+  }, [user, currentOrganization]);
 
   // Deactivate a goal
   const deactivateGoal = useCallback(async (goalId: string) => {
-    if (!user) return;
+    if (!user || !currentOrganization) return;
 
     try {
       const { error } = await supabase
         .from('user_goals')
         .update({ is_active: false })
         .eq('id', goalId)
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .eq('organization_id', currentOrganization.id);
 
       if (error) throw error;
 
@@ -153,7 +164,7 @@ export const useUserGoals = () => {
         variant: 'destructive'
       });
     }
-  }, [user, toast]);
+  }, [user, currentOrganization, toast]);
 
   // Get goals by type
   const getGoalsByType = useCallback((goalType: string) => {
@@ -172,10 +183,10 @@ export const useUserGoals = () => {
 
   // Initialize data on mount
   useEffect(() => {
-    if (user) {
+    if (user && currentOrganization) {
       fetchGoals();
     }
-  }, [user, fetchGoals]);
+  }, [user, currentOrganization?.id, fetchGoals]);
 
   return {
     goals,

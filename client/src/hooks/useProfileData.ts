@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useOrganization } from '@/contexts/OrganizationContext';
+import { useRateLimited } from '@/hooks/useRateLimited';
 
 interface UserProfile {
   id: string;
@@ -40,12 +42,19 @@ export const useProfileData = (userId: string | undefined) => {
   const [completedChallenges, setCompletedChallenges] = useState<CompletedChallenge[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { currentOrganization } = useOrganization();
+  const { executeWithRateLimit } = useRateLimited();
 
   useEffect(() => {
-    if (userId) {
+    if (userId && currentOrganization) {
       fetchAllData();
+    } else if (!currentOrganization) {
+      setProfile(null);
+      setLoyaltyTransactions([]);
+      setCompletedChallenges([]);
+      setLoading(false);
     }
-  }, [userId]);
+  }, [userId, currentOrganization?.id]);
 
   const fetchAllData = async () => {
     try {
@@ -82,13 +91,14 @@ export const useProfileData = (userId: string | undefined) => {
   };
 
   const fetchLoyaltyTransactions = async () => {
-    if (!userId) return;
+    if (!userId || !currentOrganization) return;
     
     try {
       const { data, error } = await supabase
         .from('loyalty_transactions')
         .select('*')
         .eq('user_id', userId)
+        .eq('organization_id', currentOrganization.id)
         .order('created_at', { ascending: false })
         .limit(50);
 
@@ -100,7 +110,7 @@ export const useProfileData = (userId: string | undefined) => {
   };
 
   const fetchCompletedChallenges = async () => {
-    if (!userId) return;
+    if (!userId || !currentOrganization) return;
     
     try {
       const { data, error } = await supabase
@@ -115,6 +125,7 @@ export const useProfileData = (userId: string | undefined) => {
           )
         `)
         .eq('user_id', userId)
+        .eq('organization_id', currentOrganization.id)
         .eq('completed', true)
         .order('completion_date', { ascending: false });
 
@@ -128,25 +139,20 @@ export const useProfileData = (userId: string | undefined) => {
   const updateProfile = async (updates: Partial<UserProfile>) => {
     if (!userId) return false;
     
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', userId);
+    return executeWithRateLimit(
+      async () => {
+        const { error } = await supabase
+          .from('profiles')
+          .update(updates)
+          .eq('id', userId);
 
-      if (error) throw error;
-      
-      setProfile(prev => prev ? { ...prev, ...updates } : null);
-      return true;
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update profile",
-        variant: "destructive"
-      });
-      return false;
-    }
+        if (error) throw error;
+        
+        setProfile(prev => prev ? { ...prev, ...updates } : null);
+        return true;
+      },
+      { configKey: 'profiles:update', showToast: true }
+    );
   };
 
   return {

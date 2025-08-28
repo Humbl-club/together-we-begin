@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { pedometerService, StepData } from '@/services/PedometerService';
 import { useToast } from '@/hooks/use-toast';
+import { useOrganization } from '@/contexts/OrganizationContext';
 
 interface StepValidationResult {
   isValid: boolean;
@@ -27,6 +28,7 @@ export const useStepTracking = () => {
   
   const { user } = useAuth();
   const { toast } = useToast();
+  const { currentOrganization } = useOrganization();
 
   // Request device permissions
   const requestPermissions = useCallback(async () => {
@@ -104,7 +106,7 @@ export const useStepTracking = () => {
 
   // Sync steps with server and validate
   const syncSteps = useCallback(async (challengeId?: string): Promise<StepSyncResult | null> => {
-    if (!user || syncing) return null;
+    if (!user || !currentOrganization || syncing) return null;
 
     setSyncing(true);
     try {
@@ -121,13 +123,14 @@ export const useStepTracking = () => {
           .from('health_data')
           .upsert({
             user_id: user.id,
+            organization_id: currentOrganization.id,
             date: today,
             steps: todayStepCount,
             distance_km: Math.round((todayStepCount * 0.0008) * 100) / 100, // Rough estimate: 0.8m per step
             calories_burned: Math.round(todayStepCount * 0.04), // Rough estimate: 0.04 calories per step
             active_minutes: Math.min(Math.round(todayStepCount / 100), 60) // Rough estimate based on step count
           }, {
-            onConflict: 'user_id,date'
+            onConflict: 'user_id,date,organization_id'
           });
 
         if (healthDataError) {
@@ -144,13 +147,14 @@ export const useStepTracking = () => {
               .from('health_data')
               .upsert({
                 user_id: user.id,
+                organization_id: currentOrganization.id,
                 date,
                 steps,
                 distance_km: Math.round((steps * 0.0008) * 100) / 100,
                 calories_burned: Math.round(steps * 0.04),
                 active_minutes: Math.min(Math.round(steps / 100), 60)
               }, {
-                onConflict: 'user_id,date'
+                onConflict: 'user_id,date,organization_id'
               });
           }
         }
@@ -161,6 +165,7 @@ export const useStepTracking = () => {
         .from('step_validation_logs')
         .insert({
           user_id: user.id,
+          organization_id: currentOrganization.id,
           challenge_id: challengeId || null,
           reported_steps: todayStepCount,
           validation_score: validation.score,
@@ -183,6 +188,7 @@ export const useStepTracking = () => {
           .upsert({
             challenge_id: challengeId,
             user_id: user.id,
+            organization_id: currentOrganization.id,
             total_steps: todayStepCount,
             daily_steps: { [today]: todayStepCount },
             is_validated: validation.score > 0.7,
@@ -226,7 +232,7 @@ export const useStepTracking = () => {
     } finally {
       setSyncing(false);
     }
-  }, [user, syncing, toast]);
+  }, [user, syncing, toast, currentOrganization]);
 
   // Update local step data
   const updateStepData = useCallback(() => {
@@ -251,7 +257,7 @@ export const useStepTracking = () => {
 
   // Auto-sync every 5 minutes when tracking
   useEffect(() => {
-    if (!isTracking || !user) return;
+    if (!isTracking || !user || !currentOrganization) return;
 
     const interval = setInterval(() => {
       // Auto-sync without specific challenge (for health data and validation logging)
@@ -259,11 +265,11 @@ export const useStepTracking = () => {
     }, 5 * 60 * 1000); // 5 minutes
 
     return () => clearInterval(interval);
-  }, [isTracking, user, syncSteps]);
+  }, [isTracking, user, currentOrganization, syncSteps]);
 
   // Daily sync at midnight to ensure daily data is captured
   useEffect(() => {
-    if (!user) return;
+    if (!user || !currentOrganization) return;
 
     const now = new Date();
     const tomorrow = new Date(now);
@@ -285,7 +291,7 @@ export const useStepTracking = () => {
     }, timeUntilMidnight);
 
     return () => clearTimeout(timeout);
-  }, [user, syncSteps]);
+  }, [user, currentOrganization, syncSteps]);
 
   // Check permission status on mount
   useEffect(() => {

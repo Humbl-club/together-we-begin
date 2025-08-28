@@ -1,8 +1,9 @@
 {
-  "outputStyle": "mobile-first-expert",
   "permissions": {
     "allow": [
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
-  }
+  },
+  "outputStyle": "mobile-first-expert"
 }

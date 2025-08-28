@@ -150,9 +150,24 @@ BEGIN
     SELECT COUNT(*) INTO active_users FROM auth.users 
     WHERE created_at > start_date OR updated_at > start_date;
     
-    SELECT COUNT(*) INTO total_events FROM events;
-    SELECT COUNT(*) INTO total_posts FROM social_posts WHERE status = 'published';
-    SELECT COUNT(*) INTO total_messages FROM direct_messages;
+    -- Check if tables exist before counting
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'events') THEN
+        SELECT COUNT(*) INTO total_events FROM events;
+    ELSE
+        total_events := 0;
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'social_posts') THEN
+        SELECT COUNT(*) INTO total_posts FROM social_posts WHERE status = 'published';
+    ELSE
+        total_posts := 0;
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'direct_messages') THEN
+        SELECT COUNT(*) INTO total_messages FROM direct_messages;
+    ELSE
+        total_messages := 0;
+    END IF;
     
     SELECT COALESCE(SUM(total_revenue_cents), 0) INTO total_revenue FROM organizations;
     
@@ -244,8 +259,8 @@ BEGIN
         o.custom_domain,
         o.location
     FROM organizations o
+    LEFT JOIN auth.users au ON o.owner_id = au.id
     LEFT JOIN profiles p ON o.owner_id = p.id
-    LEFT JOIN auth.users au ON p.id = au.id
     LEFT JOIN (
         SELECT organization_id, COUNT(*) as count
         FROM organization_members
@@ -319,35 +334,47 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Add some sample moderation queue items for testing (these can be real reports)
-INSERT INTO content_moderation_queue (
-    organization_id, content_type, content_id, reported_by, report_reason, 
-    report_details, content_snapshot, ai_moderation_score, ai_moderation_flags, 
-    status, created_at
-) 
-SELECT 
-    o.id as organization_id,
-    'post' as content_type,
-    gen_random_uuid() as content_id,
-    (SELECT id FROM profiles LIMIT 1) as reported_by,
-    'Inappropriate content' as report_reason,
-    'This post contains content that violates community guidelines' as report_details,
-    jsonb_build_object(
-        'content', 'Sample content that was reported by users',
-        'author', 'Test User',
-        'created_at', now()
-    ) as content_snapshot,
-    0.75 as ai_moderation_score,
-    ARRAY['inappropriate_content'] as ai_moderation_flags,
-    'pending' as status,
-    now() - interval '2 hours' as created_at
-FROM organizations o
-LIMIT 3
-ON CONFLICT DO NOTHING;
+-- Skip sample data if profiles table doesn't exist yet
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'profiles') THEN
+        -- Add some sample moderation queue items for testing (these can be real reports)
+        INSERT INTO content_moderation_queue (
+            organization_id, content_type, content_id, reported_by, report_reason, 
+            report_details, content_snapshot, ai_moderation_score, ai_moderation_flags, 
+            status, created_at
+        ) 
+        SELECT 
+            o.id as organization_id,
+            'post' as content_type,
+            gen_random_uuid() as content_id,
+            (SELECT id FROM profiles LIMIT 1) as reported_by,
+            'Inappropriate content' as report_reason,
+            'This post contains content that violates community guidelines' as report_details,
+            jsonb_build_object(
+                'content', 'Sample content that was reported by users',
+                'author', 'Test User',
+                'created_at', now()
+            ) as content_snapshot,
+            0.75 as ai_moderation_score,
+            ARRAY['inappropriate_content'] as ai_moderation_flags,
+            'pending' as status,
+            now() - interval '2 hours' as created_at
+        FROM organizations o
+        LIMIT 3
+        ON CONFLICT DO NOTHING;
+    END IF;
+END $$;
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_platform_admins_user_active ON platform_admins(user_id, is_active);
-CREATE INDEX IF NOT EXISTS idx_organizations_status_health ON organizations(status, health_score);
+-- Skip indexes on columns that might not exist yet
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'organizations' AND column_name = 'status') THEN
+        CREATE INDEX IF NOT EXISTS idx_organizations_status_health ON organizations(status, health_score);
+    END IF;
+END $$;
 CREATE INDEX IF NOT EXISTS idx_content_moderation_status_score ON content_moderation_queue(status, ai_moderation_score);
 
 -- Grant necessary permissions

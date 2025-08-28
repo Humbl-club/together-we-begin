@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 interface CapacitorErrorFallbackProps {
@@ -19,7 +19,7 @@ const CapacitorErrorFallback: React.FC<CapacitorErrorFallbackProps> = ({
   };
 
   // Log error to Capacitor debug
-  React.useEffect(() => {
+  useEffect(() => {
     window.capacitorDebug?.log(`React Error: ${error.message}`, 'error');
   }, [error]);
 

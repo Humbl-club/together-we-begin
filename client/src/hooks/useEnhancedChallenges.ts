@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
 import { useHealthTracking } from '@/hooks/useHealthTracking';
+import { useOrganization } from '@/contexts/OrganizationContext';
 
 interface EnhancedChallenge {
   id: string;
@@ -55,38 +56,48 @@ export const useEnhancedChallenges = () => {
   const [challengeStats, setChallengeStats] = useState<{ [challengeId: string]: ChallengeStats }>({});
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { currentOrganization } = useOrganization();
   const { toast } = useToast();
   const { healthData, syncChallengeProgress } = useHealthTracking();
 
   useEffect(() => {
-    if (user) {
+    if (user && currentOrganization) {
       fetchChallenges();
       fetchUserProgress();
       setupRealtimeSubscriptions();
+    } else if (!currentOrganization) {
+      setChallenges([]);
+      setUserProgress({});
+      setLeaderboards({});
+      setChallengeStats({});
+      setLoading(false);
     }
-  }, [user]);
+  }, [user, currentOrganization?.id]);
 
   const setupRealtimeSubscriptions = () => {
-    // Subscribe to challenge updates
+    if (!currentOrganization) return () => {};
+    
+    // Subscribe to challenge updates for current organization
     const challengeChannel = supabase
-      .channel('enhanced-challenges')
+      .channel(`enhanced-challenges-${currentOrganization.id}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: 'challenges',
-        filter: 'step_goal=not.is.null'
+        filter: `organization_id=eq.${currentOrganization.id}`
       }, () => {
         fetchChallenges();
       })
       .subscribe();
 
-    // Subscribe to leaderboard updates
+    // Subscribe to leaderboard updates for current organization
     const leaderboardChannel = supabase
-      .channel('enhanced-leaderboards')
+      .channel(`enhanced-leaderboards-${currentOrganization.id}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
-        table: 'walking_leaderboards'
+        table: 'walking_leaderboards',
+        filter: `organization_id=eq.${currentOrganization.id}`
       }, () => {
         fetchUserProgress();
         fetchLeaderboards();
@@ -100,10 +111,16 @@ export const useEnhancedChallenges = () => {
   };
 
   const fetchChallenges = async () => {
+    if (!currentOrganization) {
+      setLoading(false);
+      return;
+    }
+    
     try {
       const { data, error } = await supabase
         .from('challenges')
         .select('*')
+        .eq('organization_id', currentOrganization.id)
         .not('step_goal', 'is', null)
         .in('status', ['active', 'completed'])
         .order('created_at', { ascending: false });
@@ -135,13 +152,14 @@ export const useEnhancedChallenges = () => {
   };
 
   const fetchUserProgress = async () => {
-    if (!user) return;
+    if (!user || !currentOrganization) return;
 
     try {
       const { data, error } = await supabase
         .from('walking_leaderboards')
         .select('*')
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .eq('organization_id', currentOrganization.id);
 
       if (error) throw error;
 
@@ -165,6 +183,8 @@ export const useEnhancedChallenges = () => {
   };
 
   const fetchChallengeLeaderboard = async (challengeId: string) => {
+    if (!currentOrganization) return;
+    
     try {
       const { data, error } = await supabase
         .from('walking_leaderboards')
@@ -177,6 +197,7 @@ export const useEnhancedChallenges = () => {
           )
         `)
         .eq('challenge_id', challengeId)
+        .eq('organization_id', currentOrganization.id)
         .eq('is_validated', true)
         .order('total_steps', { ascending: false })
         .limit(10);
@@ -202,11 +223,14 @@ export const useEnhancedChallenges = () => {
   };
 
   const fetchChallengeStats = async (challengeId: string) => {
+    if (!currentOrganization) return;
+    
     try {
       const { data, error } = await supabase
         .from('walking_leaderboards')
         .select('total_steps')
         .eq('challenge_id', challengeId)
+        .eq('organization_id', currentOrganization.id)
         .eq('is_validated', true);
 
       if (error) throw error;
@@ -235,7 +259,7 @@ export const useEnhancedChallenges = () => {
   };
 
   const joinChallenge = async (challengeId: string) => {
-    if (!user) return false;
+    if (!user || !currentOrganization) return false;
 
     try {
       // First join the challenge_participations table
@@ -244,6 +268,7 @@ export const useEnhancedChallenges = () => {
         .upsert([{
           challenge_id: challengeId,
           user_id: user.id,
+          organization_id: currentOrganization.id,
           progress_data: { steps: 0 },
           joined_at: new Date().toISOString()
         }]);
@@ -256,6 +281,7 @@ export const useEnhancedChallenges = () => {
         .upsert([{
           challenge_id: challengeId,
           user_id: user.id,
+          organization_id: currentOrganization.id,
           total_steps: 0,
           daily_steps: {},
           last_updated: new Date().toISOString(),
@@ -292,7 +318,7 @@ export const useEnhancedChallenges = () => {
   };
 
   const leaveChallenge = async (challengeId: string) => {
-    if (!user) return false;
+    if (!user || !currentOrganization) return false;
 
     try {
       // Remove from participations
@@ -300,7 +326,8 @@ export const useEnhancedChallenges = () => {
         .from('challenge_participations')
         .delete()
         .eq('challenge_id', challengeId)
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .eq('organization_id', currentOrganization.id);
 
       if (participationError) throw participationError;
 
@@ -309,7 +336,8 @@ export const useEnhancedChallenges = () => {
         .from('walking_leaderboards')
         .delete()
         .eq('challenge_id', challengeId)
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .eq('organization_id', currentOrganization.id);
 
       if (leaderboardError) throw leaderboardError;
 

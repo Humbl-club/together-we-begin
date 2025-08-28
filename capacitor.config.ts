@@ -3,7 +3,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.girlsclub.platform',
   appName: 'Girls Club Platform',
-  webDir: 'dist',
+  webDir: 'dist/public',
   bundledWebRuntime: false,
   ios: {
     contentInset: 'automatic',

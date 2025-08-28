@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
+import { useOrganization } from '@/contexts/OrganizationContext';
 
 interface ActivityFeedItem {
   id: string;
@@ -33,22 +34,27 @@ export const useRealtimeActivityFeed = (limit: number = 20) => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { currentOrganization } = useOrganization();
 
   useEffect(() => {
-    if (user) {
+    if (user && currentOrganization) {
       fetchActivities();
-      setupRealtimeSubscription();
+      const cleanup = setupRealtimeSubscription();
+      return cleanup;
     }
-  }, [user, limit]);
+  }, [user, currentOrganization, limit]);
 
   const setupRealtimeSubscription = () => {
+    if (!currentOrganization) return () => {};
+    
     // Subscribe to new posts
     const postsChannel = supabase
-      .channel('activity-posts')
+      .channel(`activity-posts-${currentOrganization.id}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
-        table: 'social_posts'
+        table: 'social_posts',
+        filter: `organization_id=eq.${currentOrganization.id}`
       }, (payload) => {
         handlePostActivity(payload.new);
       })
@@ -56,11 +62,12 @@ export const useRealtimeActivityFeed = (limit: number = 20) => {
 
     // Subscribe to challenge participations
     const challengesChannel = supabase
-      .channel('activity-challenges')
+      .channel(`activity-challenges-${currentOrganization.id}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
-        table: 'challenge_participations'
+        table: 'challenge_participations',
+        filter: `organization_id=eq.${currentOrganization.id}`
       }, (payload) => {
         handleChallengeActivity(payload.new);
       })
@@ -68,11 +75,12 @@ export const useRealtimeActivityFeed = (limit: number = 20) => {
 
     // Subscribe to event registrations
     const eventsChannel = supabase
-      .channel('activity-events')
+      .channel(`activity-events-${currentOrganization.id}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
-        table: 'event_registrations'
+        table: 'event_registrations',
+        filter: `organization_id=eq.${currentOrganization.id}`
       }, (payload) => {
         handleEventActivity(payload.new);
       })
@@ -80,12 +88,12 @@ export const useRealtimeActivityFeed = (limit: number = 20) => {
 
     // Subscribe to loyalty transactions (goal achievements)
     const loyaltyChannel = supabase
-      .channel('activity-loyalty')
+      .channel(`activity-loyalty-${currentOrganization.id}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'loyalty_transactions',
-        filter: 'type=eq.earned'
+        filter: `type=eq.earned,organization_id=eq.${currentOrganization.id}`
       }, (payload) => {
         handleGoalActivity(payload.new);
       })
@@ -100,6 +108,12 @@ export const useRealtimeActivityFeed = (limit: number = 20) => {
   };
 
   const fetchActivities = async () => {
+    if (!currentOrganization) {
+      setActivities([]);
+      setLoading(false);
+      return;
+    }
+    
     try {
       // Fetch recent posts
       const { data: posts } = await supabase
@@ -111,6 +125,7 @@ export const useRealtimeActivityFeed = (limit: number = 20) => {
           created_at,
           profiles!user_id (full_name, avatar_url)
         `)
+        .eq('organization_id', currentOrganization.id)
         .eq('status', 'active')
         .order('created_at', { ascending: false })
         .limit(10);
@@ -126,6 +141,7 @@ export const useRealtimeActivityFeed = (limit: number = 20) => {
           challenges!challenge_id (title),
           profiles!user_id (full_name, avatar_url)
         `)
+        .eq('organization_id', currentOrganization.id)
         .order('joined_at', { ascending: false })
         .limit(10);
 
@@ -140,6 +156,7 @@ export const useRealtimeActivityFeed = (limit: number = 20) => {
           events!event_id (title),
           profiles!user_id (full_name, avatar_url)
         `)
+        .eq('organization_id', currentOrganization.id)
         .order('registered_at', { ascending: false })
         .limit(10);
 
@@ -154,6 +171,7 @@ export const useRealtimeActivityFeed = (limit: number = 20) => {
           created_at,
           profiles!user_id (full_name, avatar_url)
         `)
+        .eq('organization_id', currentOrganization.id)
         .eq('type', 'earned')
         .order('created_at', { ascending: false })
         .limit(10);

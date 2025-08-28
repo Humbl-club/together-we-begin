@@ -1,21 +1,27 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
+import { useOrganization } from '../../contexts/OrganizationContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
   requireSuperAdmin?: boolean;
+  requireAuth?: boolean;
+  requireOrganization?: boolean;
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
   requireAdmin = false,
-  requireSuperAdmin = false
+  requireSuperAdmin = false,
+  requireAuth = true,
+  requireOrganization = true
 }) => {
   const { user, loading, isAdmin, isSuperAdmin } = useAuth();
+  const { currentOrganization, loading: orgLoading } = useOrganization();
 
-  if (loading) {
+  if (loading || (requireOrganization && orgLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5">
         <div className="glass-card max-w-sm mx-4 text-center p-6 border border-white/10">
@@ -26,8 +32,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  if (!user) {
+  if (requireAuth && !user) {
     return <Navigate to="/auth" replace />;
+  }
+
+  if (requireOrganization && !currentOrganization && user) {
+    // If user needs an organization but doesn't have one, redirect to create one
+    return <Navigate to="/organization/new" replace />;
   }
 
   if (requireAdmin && !isAdmin) {

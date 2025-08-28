@@ -298,14 +298,101 @@ export interface ProfileWithOrganization {
   // ... other profile fields
 }
 
+// Dashboard widget types
+export interface DashboardWidget {
+  id: string;
+  organization_id: string;
+  widget_type: string;
+  title: string;
+  position_x: number;
+  position_y: number;
+  width: number;
+  height: number;
+  size_preset: 'small' | 'medium' | 'large' | 'full';
+  is_visible: boolean;
+  configuration: Record<string, any>;
+  style_overrides: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NavigationItem {
+  id: string;
+  organization_id: string;
+  item_type: 'page' | 'external_link' | 'action' | 'separator';
+  label: string;
+  icon?: string;
+  url?: string;
+  action?: string;
+  position: number;
+  parent_id?: string;
+  is_visible: boolean;
+  requires_auth: boolean;
+  required_role?: string;
+  device_visibility: 'all' | 'mobile' | 'tablet' | 'desktop';
+  style_overrides: Record<string, any>;
+}
+
+export interface PlatformAdmin {
+  id: string;
+  user_id: string;
+  role: 'super_admin' | 'platform_moderator' | 'billing_admin' | 'support_admin';
+  permissions: string[];
+  is_active: boolean;
+  last_active_at: string;
+  created_at: string;
+}
+
 // Helper types for organization context
 export interface OrganizationContextType {
+  // Core organization data
   currentOrganization: Organization | null;
   userMemberships: OrganizationMember[];
   switchOrganization: (orgId: string) => Promise<void>;
   userRole: string | null;
   isAdmin: boolean;
+  isModerator: boolean;
+  isOwner: boolean;
   isMember: boolean;
+  isPlatformAdmin: boolean;
+  isSuperAdmin: boolean;
   loading: boolean;
   error: string | null;
+  
+  // Multi-tenant features
+  organizationFeatures: OrganizationFeature[];
+  featureCatalog: FeatureCatalogItem[];
+  organizationTheme: OrganizationTheme | null;
+  organizationTypography: OrganizationTypography | null;
+  organizationBranding: OrganizationBranding | null;
+  organizationLayout: OrganizationLayout | null;
+  inviteCodes: InviteCode[];
+  signupPage: ClubSignupPage | null;
+  dashboardWidgets: DashboardWidget[];
+  navigationItems: NavigationItem[];
+  platformAdmin: PlatformAdmin | null;
+  organizationStats: any;
+  
+  // Feature management
+  isFeatureEnabled: (featureKey: string) => boolean;
+  toggleFeature: (featureKey: string, enabled: boolean) => Promise<void>;
+  
+  // Theme management
+  updateTheme: (updates: Partial<OrganizationTheme>) => Promise<void>;
+  updateTypography: (updates: Partial<OrganizationTypography>) => Promise<void>;
+  updateBranding: (updates: Partial<OrganizationBranding>) => Promise<void>;
+  
+  // Widget management
+  addWidget: (widget: Partial<DashboardWidget>) => Promise<void>;
+  updateWidget: (widgetId: string, updates: Partial<DashboardWidget>) => Promise<void>;
+  removeWidget: (widgetId: string) => Promise<void>;
+  
+  // Invite management
+  createInviteCode: (inviteData: Partial<InviteCode>) => Promise<InviteCode>;
+  
+  // Refresh functions
+  refreshOrganization: () => Promise<void>;
+  refreshFeatures: () => Promise<void>;
+  refreshTheme: () => Promise<void>;
+  refreshWidgets: () => Promise<void>;
 }

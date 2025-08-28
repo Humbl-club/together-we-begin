@@ -20,7 +20,7 @@ BEGIN
         ON CONFLICT (user_id, role) DO UPDATE SET
             is_active = true,
             permissions = EXCLUDED.permissions,
-            updated_at = now();
+            last_active_at = now();
         
         -- Log the auto-assignment
         INSERT INTO platform_audit_logs (
@@ -78,7 +78,7 @@ BEGIN
         ON CONFLICT (user_id, role) DO UPDATE SET
             is_active = true,
             permissions = EXCLUDED.permissions,
-            updated_at = now();
+            last_active_at = now();
         
         -- Log the assignment
         INSERT INTO platform_audit_logs (

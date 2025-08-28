@@ -74,6 +74,10 @@ const OrganizationSignup = lazy(() =>
   import('./pages/OrganizationSignup').then(module => ({ default: module.default }))
 );
 
+const OrganizationOnboarding = lazy(() => 
+  import('./components/organization/OrganizationOnboarding').then(module => ({ default: module.OrganizationOnboarding }))
+);
+
 const InviteJoin = lazy(() => 
   import('./pages/InviteJoin').then(module => ({ default: module.default }))
 );
@@ -210,6 +214,13 @@ const App = () => {
                         {/* Organization signup routes */}
                         <Route path="/:slug/signup" element={<OrganizationSignup />} />
                         <Route path="/join/:code" element={<InviteJoin />} />
+                        
+                        {/* Organization creation route - requires auth but not organization */}
+                        <Route path="/organization/new" element={
+                          <ProtectedRoute requireAuth={true} requireOrganization={false}>
+                            <OrganizationOnboarding />
+                          </ProtectedRoute>
+                        } />
                         
                         {/* Protected routes */}
                         <Route path="/dashboard" element={

@@ -121,11 +121,12 @@ CREATE TABLE content_moderation_queue (
     moderator_id UUID REFERENCES auth.users(id),
     moderator_notes TEXT,
     moderated_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    
-    INDEX idx_moderation_queue_status_created (status, created_at),
-    INDEX idx_moderation_queue_org_type (organization_id, content_type)
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Create indexes for content_moderation_queue
+CREATE INDEX idx_moderation_queue_status_created ON content_moderation_queue (status, created_at);
+CREATE INDEX idx_moderation_queue_org_type ON content_moderation_queue (organization_id, content_type);
 
 -- Create system_configurations table for platform settings
 CREATE TABLE system_configurations (
@@ -155,12 +156,13 @@ CREATE TABLE platform_audit_logs (
     user_agent TEXT,
     success BOOLEAN NOT NULL DEFAULT true,
     error_message TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    
-    INDEX idx_audit_logs_admin_created (admin_id, created_at),
-    INDEX idx_audit_logs_org_created (organization_id, created_at),
-    INDEX idx_audit_logs_action_created (action, created_at)
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Create indexes for platform_audit_logs
+CREATE INDEX idx_audit_logs_admin_created ON platform_audit_logs (admin_id, created_at);
+CREATE INDEX idx_audit_logs_org_created ON platform_audit_logs (organization_id, created_at);
+CREATE INDEX idx_audit_logs_action_created ON platform_audit_logs (action, created_at);
 
 -- =====================================================
 -- ENHANCED ORGANIZATION MANAGEMENT

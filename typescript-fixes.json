@@ -1,0 +1,228 @@
+{
+  "summary": "Generated 28 type fixes",
+  "critical": 26,
+  "high": 2,
+  "medium": 0,
+  "fixes": [
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2339: Property 'type' does not exist on type '{ code: string; created_at: string | null; created_by: string | null; current_uses: number | null; expires_at: string | null; id: string; invite_type: string | null; max_uses: number | null; ... 5 more ...; organizations: SelectQueryError<...>; }'.",
+      "file": "client/src/components/auth/OrganizationAuth.tsx",
+      "line": 100,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module '@dnd-kit/core' or its corresponding type declarations.",
+      "file": "client/src/components/dashboard/DraggableDashboard.tsx",
+      "line": 2,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module '@dnd-kit/sortable' or its corresponding type declarations.",
+      "file": "client/src/components/dashboard/DraggableDashboard.tsx",
+      "line": 3,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module '@dnd-kit/modifiers' or its corresponding type declarations.",
+      "file": "client/src/components/dashboard/DraggableDashboard.tsx",
+      "line": 4,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module '@dnd-kit/sortable' or its corresponding type declarations.",
+      "file": "client/src/components/dashboard/DraggableWidget.tsx",
+      "line": 2,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module '@dnd-kit/utilities' or its corresponding type declarations.",
+      "file": "client/src/components/dashboard/DraggableWidget.tsx",
+      "line": 3,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module '@tiptap/react' or its corresponding type declarations.",
+      "file": "client/src/components/editor/RichTextEditor.tsx",
+      "line": 1,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module '@tiptap/starter-kit' or its corresponding type declarations.",
+      "file": "client/src/components/editor/RichTextEditor.tsx",
+      "line": 2,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module 'react-dropzone' or its corresponding type declarations.",
+      "file": "client/src/components/image/ImageUpload.tsx",
+      "line": 2,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module 'compressorjs' or its corresponding type declarations.",
+      "file": "client/src/components/image/ImageUpload.tsx",
+      "line": 3,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module 'bad-words' or its corresponding type declarations.",
+      "file": "client/src/components/moderation/ContentModeration.tsx",
+      "line": 2,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module '@dnd-kit/core' or its corresponding type declarations.",
+      "file": "client/src/components/organization/DraggableDashboard.tsx",
+      "line": 2,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module '@dnd-kit/sortable' or its corresponding type declarations.",
+      "file": "client/src/components/organization/DraggableDashboard.tsx",
+      "line": 3,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module '@dnd-kit/sortable' or its corresponding type declarations.",
+      "file": "client/src/components/organization/DraggableDashboard.tsx",
+      "line": 4,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module '@dnd-kit/utilities' or its corresponding type declarations.",
+      "file": "client/src/components/organization/DraggableDashboard.tsx",
+      "line": 5,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module 'fuse.js' or its corresponding type declarations.",
+      "file": "client/src/components/search/AdvancedSearch.tsx",
+      "line": 2,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2345: Argument of type '({ action: string; admin_id: string; created_at: string; details: Json; id: string; target_id: string | null; target_type: string; organizations: SelectQueryError<\"could not find the relation between challenges and organizations\">; } | ... 1679 more ... | { ...; })[]' is not assignable to parameter of type 'SetStateAction<OrganizationMember[]>'.",
+      "file": "client/src/contexts/OrganizationContext.tsx",
+      "line": 350,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2551: Property 'organization_id' does not exist on type '{ action: string; admin_id: string; created_at: string; details: Json; id: string; target_id: string | null; target_type: string; organizations: SelectQueryError<\"could not find the relation between challenges and organizations\">; } | ... 1679 more ... | { ...; }'. Did you mean 'organizations'?",
+      "file": "client/src/contexts/OrganizationContext.tsx",
+      "line": 361,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2551: Property 'organization_id' does not exist on type '{ action: string; admin_id: string; created_at: string; details: Json; id: string; target_id: string | null; target_type: string; organizations: SelectQueryError<\"could not find the relation between challenges and organizations\">; } | ... 1679 more ... | { ...; }'. Did you mean 'organizations'?",
+      "file": "client/src/contexts/OrganizationContext.tsx",
+      "line": 362,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2551: Property 'organization_id' does not exist on type '{ action: string; admin_id: string; created_at: string; details: Json; id: string; target_id: string | null; target_type: string; organizations: SelectQueryError<\"could not find the relation between challenges and organizations\">; } | ... 1679 more ... | { ...; }'. Did you mean 'organizations'?",
+      "file": "client/src/contexts/OrganizationContext.tsx",
+      "line": 365,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2352: Conversion of type 'SelectQueryError<\"could not find the relation between challenges and organizations\"> | SelectQueryError<\"could not find the relation between profiles and organizations\"> | ... 38 more ... | SelectQueryError<...>' to type 'Organization' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.",
+      "file": "client/src/contexts/OrganizationContext.tsx",
+      "line": 367,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module '@dnd-kit/core' or its corresponding type declarations.",
+      "file": "client/src/hooks/useDragAndDrop.ts",
+      "line": 2,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module '@dnd-kit/sortable' or its corresponding type declarations.",
+      "file": "client/src/hooks/useDragAndDrop.ts",
+      "line": 3,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module 'compressorjs' or its corresponding type declarations.",
+      "file": "client/src/hooks/useImageOptimization.ts",
+      "line": 2,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2307: Cannot find module 'react-intersection-observer' or its corresponding type declarations.",
+      "file": "client/src/hooks/useInfiniteScroll.ts",
+      "line": 2,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "CRITICAL",
+      "category": "TypeScript Errors",
+      "description": "Fix TS2345: Argument of type '\"get_organizations_for_admin\"' is not assignable to parameter of type '\"admin_adjust_user_points\" | \"assign_user_role\" | \"cleanup_expired_points_regularly\" | \"create_invite_code\" | \"expire_old_points\" | \"generate_event_qr_code\" | \"get_content_for_moderation\" | ... 18 more ... | \"use_invite_code\"'.",
+      "file": "client/src/hooks/useOrganizationList.ts",
+      "line": 92,
+      "rationale": "Critical TypeScript errors prevent compilation"
+    },
+    {
+      "priority": "HIGH",
+      "category": "Import Resolution",
+      "description": "Fix unresolved import: client/src/components/organization/OrganizationSwitcher.tsx -> ../../integrations/supabase/client",
+      "rationale": "Unresolved imports cause compilation failures"
+    },
+    {
+      "priority": "HIGH",
+      "category": "Import Resolution",
+      "description": "Fix unresolved import: client/src/hooks/useOrganizationData.ts -> ../types/organization",
+      "rationale": "Unresolved imports cause compilation failures"
+    }
+  ]
+}

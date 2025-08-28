@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { OptimizedMessagingService } from '@/services/messaging/OptimizedMessagingService';
@@ -7,21 +7,63 @@ import { useToast } from '@/hooks/use-toast';
 import { useOptimizedMessageCache } from './useOptimizedMessageCache';
 import { useMessagePerformance } from './useMessagePerformance';
 import { useRequestDeduplication } from './useOptimizedRequests';
+import { useRateLimited } from './useRateLimited';
+import { useOrganization } from '@/contexts/OrganizationContext';
+
+interface ThreadPagination {
+  page: number;
+  pageSize: number;
+  hasMore: boolean;
+  total: number | null;
+}
+
+interface MessagePagination {
+  [threadId: string]: {
+    page: number;
+    pageSize: number;
+    hasMore: boolean;
+    oldestMessageId: string | null;
+  };
+}
 
 export const useMessaging = () => {
+  // Thread state
   const [threads, setThreads] = useState<MessageThread[]>([]);
+  const [threadPagination, setThreadPagination] = useState<ThreadPagination>({
+    page: 0,
+    pageSize: 20,
+    hasMore: true,
+    total: null
+  });
+  
+  // Message state
   const [messages, setMessages] = useState<DirectMessage[]>([]);
+  const [messagePagination, setMessagePagination] = useState<MessagePagination>({});
+  
+  // UI state
   const [selectedThread, setSelectedThread] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMoreThreads, setLoadingMoreThreads] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
   const [sending, setSending] = useState(false);
   
+  // Refs for scroll position tracking
+  const messageContainerRef = useRef<HTMLDivElement>(null);
+  const isInitialMessageLoad = useRef(true);
+  
+  // Hooks
   const { user } = useAuth();
+  const { currentOrganization } = useOrganization();
   const { toast } = useToast();
+  const { executeWithRateLimit } = useRateLimited();
+  
+  // Services
   const messagingService = OptimizedMessagingService.getInstance();
   const { measureDatabase, measureEncryption } = useMessagePerformance();
   const { deduplicate, clearCache: clearRequestCache } = useRequestDeduplication();
   
+  // Cache
   const {
     cacheMessages,
     getCachedMessages,
@@ -35,117 +77,71 @@ export const useMessaging = () => {
     clearCache
   } = useOptimizedMessageCache();
 
-  // Initialize messaging service when user is available
+  // Initialize messaging service
   useEffect(() => {
     if (user?.id) {
       messagingService.initialize(user.id);
       loadThreads();
-      
-      // Set up global real-time subscription for all threads
-      const subscription = supabase
-        .channel('user_messages')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'direct_messages',
-            filter: `or(sender_id.eq.${user.id},recipient_id.eq.${user.id})`
-          },
-          async (payload) => {
-            console.log('New message received:', payload);
-            
-            try {
-              const newMessage = payload.new as any;
-              
-              // Smart update: only refresh if this is the first new message or affects current view
-              const needsRefresh = threads.length === 0 || 
-                (selectedThread && threads.find(t => t.id === selectedThread));
-              
-              if (needsRefresh) {
-                // Use cached threads first, then background refresh
-                const cachedThreads = getCachedThreads();
-                if (cachedThreads) {
-                  setThreads(cachedThreads);
-                  // Background refresh without blocking UI
-                  setTimeout(() => loadThreadsFromDatabase(), 500);
-                } else {
-                  await loadThreadsFromDatabase();
-                }
-              }
-              
-              // If this message is for the currently selected thread, add it to messages
-              if (selectedThread) {
-                const selectedThreadData = threads.find(t => t.id === selectedThread);
-                if (selectedThreadData) {
-                  const isMessageForCurrentThread = (
-                    (newMessage.sender_id === selectedThreadData.participant_1 && newMessage.recipient_id === selectedThreadData.participant_2) ||
-                    (newMessage.sender_id === selectedThreadData.participant_2 && newMessage.recipient_id === selectedThreadData.participant_1)
-                  );
-                  
-                  if (isMessageForCurrentThread) {
-                    // For received messages, show encrypted content placeholder for now
-                    // Real decryption happens when messages are reloaded
-                    const displayMessage = {
-                      ...newMessage,
-                      content: newMessage.sender_id === user.id 
-                        ? newMessage.content 
-                        : '[New message - refresh to decrypt]'
-                    };
-                    
-                    setMessages(prev => {
-                      // Avoid duplicates
-                      if (prev.some(msg => msg.id === displayMessage.id)) {
-                        return prev;
-                      }
-                      return [...prev, displayMessage];
-                    });
-                    
-                    // Mark as read if user is viewing the thread
-                    if (newMessage.recipient_id === user.id) {
-                      setTimeout(() => {
-                        messagingService.markThreadAsRead(selectedThread);
-                      }, 1000);
-                    }
-                  }
-                }
-              }
-            } catch (error) {
-              console.error('Error handling real-time message:', error);
-              // Fallback: just refresh threads
-              await loadThreads();
-            }
-          }
-        )
-        .subscribe();
-      
-      return () => {
-        subscription.unsubscribe();
-      };
+      setupRealtimeSubscriptions();
     }
-  }, [user?.id, selectedThread, threads]);
-
-  const loadThreads = useCallback(async () => {
-    if (!user?.id) return;
     
+    return () => {
+      if (user?.id) {
+        clearCache();
+        clearRequestCache();
+        messagingService.clearUserData(user.id);
+      }
+    };
+  }, [user?.id, currentOrganization?.id]);
+
+  // Load threads with pagination
+  const loadThreads = useCallback(async (append = false) => {
+    if (!user || !currentOrganization) {
+      setThreads([]);
+      setLoading(false);
+      return;
+    }
+
+    const isLoadingMore = append;
+    if (isLoadingMore) {
+      setLoadingMoreThreads(true);
+    } else {
+      setLoading(true);
+    }
+
     try {
-      // Try to get cached threads first
-      const cachedThreads = getCachedThreads();
-      if (cachedThreads && cachedThreads.length > 0) {
-        setThreads(cachedThreads);
-        
-        // Only do background refresh if cache is getting stale (>5 minutes)
-        const cacheAge = Date.now() - (cachedThreads[0]?.last_message_at ? new Date(cachedThreads[0].last_message_at).getTime() : 0);
-        if (cacheAge > 5 * 60 * 1000) {
-          setTimeout(() => {
-            loadThreadsFromDatabase();
-          }, 5000); // Delayed background refresh to avoid UI blocking
-        }
-        return;
+      const page = append ? threadPagination.page + 1 : 0;
+      
+      // Use deduplication to prevent duplicate requests
+      const userThreads = await deduplicate(
+        `threads-${user.id}-${currentOrganization.id}-page-${page}`,
+        () => measureDatabase(
+          'load_threads',
+          () => messagingService.getThreads(page, threadPagination.pageSize),
+          page
+        )
+      );
+      
+      // Check if we have more threads
+      const hasMore = userThreads.length === threadPagination.pageSize;
+      
+      setThreadPagination(prev => ({
+        ...prev,
+        page,
+        hasMore
+      }));
+      
+      if (append) {
+        setThreads(prev => [...prev, ...userThreads]);
+      } else {
+        setThreads(userThreads);
+        cacheThreads(userThreads);
       }
       
-      setLoading(true);
-      await loadThreadsFromDatabase();
+      // Update unread counts
+      userThreads.forEach(thread => {
+        updateUnreadCount(thread.id, thread.unread_count);
+      });
     } catch (error) {
       console.error('Error loading threads:', error);
       toast({
@@ -155,56 +151,114 @@ export const useMessaging = () => {
       });
     } finally {
       setLoading(false);
+      setLoadingMoreThreads(false);
     }
-  }, [user?.id, toast, getCachedThreads]);
+  }, [user, currentOrganization, threadPagination.page, threadPagination.pageSize]);
 
-  const loadThreadsFromDatabase = useCallback(async () => {
-    if (!user?.id) return;
-    
-    try {
-      // Use request deduplication to prevent multiple simultaneous calls
-      const userThreads = await deduplicate(
-        `threads-${user.id}`,
-        () => measureDatabase(
-          'load_threads',
-          () => messagingService.getThreads(),
-          0
-        )
-      );
-      
-      setThreads(userThreads);
-      cacheThreads(userThreads);
-      
-      // Update unread counts in cache
-      userThreads.forEach(thread => {
-        updateUnreadCount(thread.id, thread.unread_count);
-      });
-    } catch (error) {
-      console.error('Database load threads error:', error);
-      // Don't throw - let the UI handle gracefully
-    }
-  }, [user?.id, measureDatabase, messagingService, cacheThreads, updateUnreadCount, deduplicate]);
+  // Load more threads
+  const loadMoreThreads = useCallback(async () => {
+    if (!threadPagination.hasMore || loadingMoreThreads) return;
+    await loadThreads(true);
+  }, [threadPagination.hasMore, loadingMoreThreads, loadThreads]);
 
-  const loadMessages = useCallback(async (threadId: string) => {
-    try {
+  // Load messages with pagination
+  const loadMessages = useCallback(async (threadId: string, append = false) => {
+    if (!user || !threadId) return;
+
+    const isLoadingMore = append;
+    if (isLoadingMore) {
+      setLoadingMoreMessages(true);
+    } else {
       setLoadingMessages(true);
+      isInitialMessageLoad.current = true;
+    }
+
+    try {
+      // Get current pagination state for this thread
+      const currentPagination = messagePagination[threadId] || {
+        page: 0,
+        pageSize: 50,
+        hasMore: true,
+        oldestMessageId: null
+      };
       
-      // Try to get cached messages first
-      const cachedMessages = getCachedMessages(threadId);
-      if (cachedMessages) {
-        setMessages(cachedMessages);
-        setLoadingMessages(false);
-        // Mark as read
-        markThreadAsRead(threadId);
-        return;
+      const page = append ? currentPagination.page + 1 : 0;
+      
+      // Try cache first for initial load
+      if (!append) {
+        const cachedMessages = getCachedMessages(threadId);
+        if (cachedMessages && cachedMessages.length > 0) {
+          setMessages(cachedMessages);
+          setLoadingMessages(false);
+          markThreadAsRead(threadId);
+          
+          // Set pagination based on cached messages
+          setMessagePagination(prev => ({
+            ...prev,
+            [threadId]: {
+              page: 0,
+              pageSize: 50,
+              hasMore: cachedMessages.length === 50,
+              oldestMessageId: cachedMessages[0]?.id || null
+            }
+          }));
+          return;
+        }
       }
       
-      const threadMessages = await messagingService.getMessages(threadId);
-      setMessages(threadMessages);
-      cacheMessages(threadId, threadMessages);
+      // Load from database with rate limiting
+      const threadMessages = await executeWithRateLimit(
+        () => messagingService.getMessages(threadId, page, currentPagination.pageSize),
+        { configKey: 'api:read', showToast: false }
+      );
       
-      // Mark as read
-      markThreadAsRead(threadId);
+      // Update pagination state
+      const hasMore = threadMessages.length === currentPagination.pageSize;
+      const oldestId = threadMessages.length > 0 ? threadMessages[0].id : currentPagination.oldestMessageId;
+      
+      setMessagePagination(prev => ({
+        ...prev,
+        [threadId]: {
+          page,
+          pageSize: currentPagination.pageSize,
+          hasMore,
+          oldestMessageId: oldestId
+        }
+      }));
+      
+      if (append) {
+        // Prepend older messages (they come in ascending order)
+        setMessages(prev => [...threadMessages, ...prev]);
+        
+        // Maintain scroll position when prepending
+        if (messageContainerRef.current) {
+          const scrollHeight = messageContainerRef.current.scrollHeight;
+          requestAnimationFrame(() => {
+            if (messageContainerRef.current) {
+              const newScrollHeight = messageContainerRef.current.scrollHeight;
+              messageContainerRef.current.scrollTop = newScrollHeight - scrollHeight;
+            }
+          });
+        }
+      } else {
+        setMessages(threadMessages);
+        cacheMessages(threadId, threadMessages);
+        
+        // Scroll to bottom on initial load
+        if (isInitialMessageLoad.current && messageContainerRef.current) {
+          requestAnimationFrame(() => {
+            if (messageContainerRef.current) {
+              messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+            }
+          });
+          isInitialMessageLoad.current = false;
+        }
+      }
+      
+      // Mark thread as read
+      if (!append) {
+        markThreadAsRead(threadId);
+      }
     } catch (error) {
       console.error('Error loading messages:', error);
       toast({
@@ -214,117 +268,213 @@ export const useMessaging = () => {
       });
     } finally {
       setLoadingMessages(false);
+      setLoadingMoreMessages(false);
     }
-  }, [toast, getCachedMessages, cacheMessages, markThreadAsRead]);
+  }, [user, messagePagination, getCachedMessages, cacheMessages, markThreadAsRead, executeWithRateLimit, toast]);
 
+  // Load more messages for current thread
+  const loadMoreMessages = useCallback(async () => {
+    if (!selectedThread) return;
+    
+    const pagination = messagePagination[selectedThread];
+    if (!pagination?.hasMore || loadingMoreMessages) return;
+    
+    await loadMessages(selectedThread, true);
+  }, [selectedThread, messagePagination, loadingMoreMessages, loadMessages]);
+
+  // Send a message with rate limiting
   const sendMessage = useCallback(async (recipientId: string, content: string): Promise<DirectMessage | null> => {
     if (!user?.id || !content.trim()) return null;
 
-    try {
-      setSending(true);
-      
-      // Add optimistic message to UI immediately
-      const tempMessage: DirectMessage = {
-        id: `temp-${Date.now()}`,
-        content: content.trim(),
-        sender_id: user.id,
-        recipient_id: recipientId,
-        created_at: new Date().toISOString()
-      };
-      
-      setMessages(prev => [...prev, tempMessage]);
-      
-      const sentMessage = await messagingService.sendMessage(recipientId, content);
-      
-      // Replace temp message with real message
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === tempMessage.id ? sentMessage : msg
-        )
-      );
-      
-      // Update cache
-      if (selectedThread) {
-        addMessageToCache(selectedThread, sentMessage);
-      }
-      
-      // Smart thread refresh: only if needed
-      if (selectedThread) {
-        // Update local thread state instead of full reload
-        setThreads(prev => prev.map(t => 
-          t.id === selectedThread 
-            ? { ...t, last_message_at: new Date().toISOString() }
-            : t
-        ));
-        // Background refresh without blocking
-        setTimeout(() => loadThreadsFromDatabase(), 1000);
-      } else {
-        await loadThreadsFromDatabase();
-      }
-      
-      return sentMessage;
-    } catch (error) {
-      console.error('Error sending message:', error);
-      
-      // Remove temp message on error
-      setMessages(prev => prev.filter(msg => !msg.id.startsWith('temp-')));
-      
-      const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive"
-      });
-      return null;
-    } finally {
-      setSending(false);
-    }
-  }, [user?.id, toast, loadThreads, selectedThread, addMessageToCache]);
+    return executeWithRateLimit(
+      async () => {
+        setSending(true);
+        
+        try {
+          // Add optimistic message
+          const tempMessage: DirectMessage = {
+            id: `temp-${Date.now()}`,
+            content: content.trim(),
+            sender_id: user.id,
+            recipient_id: recipientId,
+            created_at: new Date().toISOString()
+          };
+          
+          setMessages(prev => [...prev, tempMessage]);
+          
+          // Scroll to bottom
+          if (messageContainerRef.current) {
+            requestAnimationFrame(() => {
+              if (messageContainerRef.current) {
+                messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+              }
+            });
+          }
+          
+          // Send message
+          const sentMessage = await messagingService.sendMessage(recipientId, content);
+          
+          // Replace temp message with real one
+          setMessages(prev => 
+            prev.map(msg => msg.id === tempMessage.id ? sentMessage : msg)
+          );
+          
+          // Update cache
+          if (selectedThread) {
+            addMessageToCache(selectedThread, sentMessage);
+          }
+          
+          // Update thread list
+          await loadThreads();
+          
+          return sentMessage;
+        } finally {
+          setSending(false);
+        }
+      },
+      { configKey: 'messages:send', showToast: true }
+    );
+  }, [user?.id, selectedThread, executeWithRateLimit, addMessageToCache, loadThreads]);
 
+  // Create a new thread
   const createNewThread = useCallback(async (recipientId: string, initialMessage: string) => {
     const sentMessage = await sendMessage(recipientId, initialMessage);
     if (sentMessage) {
       await loadThreads();
-      // Find the new thread and select it
+      
+      // Find and select the new thread
       const newThread = threads.find(t => 
         (t.participant_1 === user?.id && t.participant_2 === recipientId) ||
         (t.participant_1 === recipientId && t.participant_2 === user?.id)
       );
+      
       if (newThread) {
         setSelectedThread(newThread.id);
         await loadMessages(newThread.id);
       }
     }
-  }, [sendMessage, loadThreads, loadMessages, threads, user?.id]);
+  }, [sendMessage, loadThreads, threads, user?.id, loadMessages]);
 
+  // Select a thread
   const selectThread = useCallback((threadId: string) => {
     setSelectedThread(threadId);
     loadMessages(threadId);
   }, [loadMessages]);
 
-  // Cleanup on logout
-  useEffect(() => {
-    if (!user?.id) {
-      clearCache();
-      clearRequestCache();
-      messagingService.clearUserData(user?.id || '');
+  // Setup real-time subscriptions
+  const setupRealtimeSubscriptions = useCallback(() => {
+    if (!user?.id || !currentOrganization?.id) return;
+
+    const subscription = supabase
+      .channel(`user_messages_${user.id}_${currentOrganization.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'direct_messages',
+          filter: `organization_id=eq.${currentOrganization.id}`
+        },
+        async (payload) => {
+          const newMessage = payload.new as DirectMessage;
+          
+          // Check if message is for current user
+          if (newMessage.sender_id !== user.id && newMessage.recipient_id !== user.id) {
+            return;
+          }
+          
+          // Refresh threads if it's a new conversation
+          const existingThread = threads.find(t => 
+            (t.participant_1 === newMessage.sender_id && t.participant_2 === newMessage.recipient_id) ||
+            (t.participant_1 === newMessage.recipient_id && t.participant_2 === newMessage.sender_id)
+          );
+          
+          if (!existingThread) {
+            await loadThreads();
+          } else {
+            // Update thread's last message time
+            setThreads(prev => prev.map(t => 
+              t.id === existingThread.id 
+                ? { ...t, last_message_at: newMessage.created_at }
+                : t
+            ).sort((a, b) => 
+              new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime()
+            ));
+          }
+          
+          // Add message to current thread if it's selected
+          if (selectedThread && existingThread?.id === selectedThread) {
+            if (newMessage.sender_id !== user.id) {
+              // It's a received message, add it
+              setMessages(prev => {
+                // Avoid duplicates
+                if (prev.some(msg => msg.id === newMessage.id)) {
+                  return prev;
+                }
+                return [...prev, newMessage];
+              });
+              
+              // Mark as read after delay
+              setTimeout(() => {
+                messagingService.markThreadAsRead(selectedThread);
+              }, 1000);
+            }
+          } else if (existingThread) {
+            // Update unread count for other threads
+            updateUnreadCount(existingThread.id, (existingThread.unread_count || 0) + 1);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [user?.id, currentOrganization?.id, threads, selectedThread, loadThreads, updateUnreadCount]);
+
+  // Check if near top for loading older messages
+  const handleMessageScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    
+    // Load more messages when scrolled near top (within 100px)
+    if (container.scrollTop < 100 && selectedThread) {
+      const pagination = messagePagination[selectedThread];
+      if (pagination?.hasMore && !loadingMoreMessages) {
+        loadMoreMessages();
+      }
     }
-  }, [user?.id, clearCache, clearRequestCache]);
+  }, [selectedThread, messagePagination, loadingMoreMessages, loadMoreMessages]);
 
   return {
+    // Thread data
     threads,
-    messages,
-    selectedThread,
     loading,
+    loadingMoreThreads,
+    hasMoreThreads: threadPagination.hasMore,
+    loadMoreThreads,
+    
+    // Message data
+    messages,
     loadingMessages,
-    sending,
-    loadThreads,
-    loadMessages,
+    loadingMoreMessages,
+    hasMoreMessages: selectedThread ? messagePagination[selectedThread]?.hasMore || false : false,
+    loadMoreMessages,
+    
+    // Actions
     sendMessage,
     createNewThread,
     selectThread,
     setSelectedThread,
+    
+    // UI helpers
+    selectedThread,
+    sending,
     totalUnreadCount,
-    getUnreadCount
+    getUnreadCount,
+    messageContainerRef,
+    handleMessageScroll,
+    
+    // Refresh
+    refetch: () => loadThreads()
   };
 };

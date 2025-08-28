@@ -39,7 +39,14 @@ interface MobileCommunityFeedProps {
 const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts: propPosts }) => {
   const { isMobile, safeAreaInsets } = useMobileFirst();
   const feedback = useHapticFeedback();
-  const { posts: feedPosts, loading, toggleLike } = useCommunityFeed();
+  const { 
+    posts: feedPosts, 
+    loading, 
+    loadingMore,
+    hasMore,
+    toggleLike, 
+    loadMore 
+  } = useCommunityFeed();
 
   const displayPosts = propPosts || feedPosts;
 
@@ -227,6 +234,32 @@ const MobileCommunityFeed: React.FC<MobileCommunityFeedProps> = memo(({ posts: p
             </MobileFirstCardContent>
           </MobileFirstCard>
         ))}
+        
+        {/* Load More Button */}
+        {hasMore && (
+          <div className="py-4">
+            <MobileNativeButton
+              variant="outline"
+              size="lg"
+              onClick={() => {
+                feedback.tap();
+                loadMore();
+              }}
+              disabled={loadingMore}
+              className="w-full"
+            >
+              {loadingMore ? 'Loading...' : 'Load More'}
+            </MobileNativeButton>
+          </div>
+        )}
+        
+        {!loading && displayPosts.length === 0 && (
+          <div className="text-center py-8">
+            <Users className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+            <p className="text-sm text-muted-foreground">No posts yet</p>
+            <p className="text-xs text-muted-foreground mt-1">Be the first to share something!</p>
+          </div>
+        )}
       </div>
 
     </div>

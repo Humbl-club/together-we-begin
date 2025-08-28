@@ -1,0 +1,109 @@
+{
+  "startTime": "2025-08-27T23:48:30.106Z",
+  "mode": "postRepair",
+  "totalTests": 5,
+  "passedTests": 0,
+  "failedTests": 5,
+  "skippedTests": 0,
+  "criticalFailures": 5,
+  "testResults": {
+    "Post-Repair Validation": {
+      "name": "Post-Repair Validation",
+      "script": "test-post-repair-validation.js",
+      "startTime": 1756338510107,
+      "endTime": 1756338513398,
+      "duration": 3291,
+      "exitCode": 1,
+      "stdout": "🧪 POST-REPAIR VALIDATION SUITE\n==============================\nTarget Database: https://ynqdddwponrqwhtqfepi.supabase.co\nValidation Time: 2025-08-27T23:48:30.161Z\nEnvironment: Node.js v24.2.0 on darwin\n\n🔧 VALIDATING DATABASE REPAIR COMPLETENESS...\nChecking all expected tables...\n❌ Database repair validation failed: relation \"public.information_schema.tables\" does not exist\n\n🏢 VALIDATING MULTI-TENANT FUNCTIONALITY...\nTesting organization context...\n✅ Organization queries work (1 organizations)\n✅ Organization member relationships work\nTesting data isolation...\n❌ events missing organization_id\n❌ social_posts missing organization_id\n❌ dashboard_widgets missing organization_id\nTesting organization features...\n✅ Organization features work (5 features)\nTesting theme system...\n⚠️  Theme system: relation \"public.organization_themes\" does not exist\n\n⚛️  VALIDATING FRONTEND FUNCTIONALITY...\nTesting TypeScript compilation...\n❌ TypeScript compilation failed\n❌ 373 TypeScript errors (too many)\nTesting React components...\n✅ OrganizationContext.tsx: Valid React component\n✅ OrganizationSwitcher.tsx: Valid React component\n✅ ThemeCustomization.tsx: Valid React component\nTesting custom hooks...\n✅ useOrganizationData.ts: Valid custom hook\n❌ useAuth.ts: Invalid hook structure\nTesting Organization Context Provider...\n✅ Organization Context Provider complete\n\n🛠️ VALIDATING PLATFORM ADMINISTRATION...\nTesting super admin system...\n❌ Super admin system: relation \"public.platform_admins\" does not exist\nTesting platform analytics...\n⚠️  Platform analytics: relation \"public.platform_analytics\" does not exist\nTesting content moderation...\n⚠️  Content moderation: relation \"public.content_reports\" does not exist\nTesting audit trails...\n⚠️  Audit trails: relation \"public.platform_audit_logs\" does not exist\n\n⚡ VALIDATING PERFORMANCE & SCALABILITY...\nTesting query performance...\nFast Organizations Query: 51ms (1 records)\nFast Complex Join Query: 40ms (1 records)\nFast Analytics Query: 65ms (0 records)\n✅ Memory usage: 14MB heap\nTesting real-time latency...\nExcellent Real-time latency: 460ms\n✅ Scalability score: 100/100\n\n🔄 VALIDATING END-TO-END INTEGRATION...\nTesting complete data flow...\n❌ Data flow broken: Could not find a relationship between 'organization_members' and 'profiles' in the schema cache\nTesting real-time synchronization...\n✅ Real-time sync established\nTesting error handling...\nTesting user experience flow...\n✅ User experience components complete\n\n📊 POST-REPAIR VALIDATION REPORT\n================================================================================\n\n🔧 DATABASE REPAIR:\nTables: ❌ Incomplete\nFunctions: ❌ Issues\nRLS Policies: ❌ Inactive\nIndexes: ❌ Missing\nCompleteness: 0%\n\n🏢 MULTI-TENANT FUNCTIONALITY:\nOrganization Context: ✅ Working\nData Isolation: ❌ Broken\nFeature Toggles: ✅ Working\nTheme System: ❌ Broken\nCompleteness: 50%\n\n⚛️  FRONTEND:\nTypeScript: ❌ Errors\nComponents: ✅ Render\nHooks: ✅ Function\nContext: ✅ Working\nCompleteness: 75%\nCritical errors:\n  - 373 TypeScript compilation errors\n\n🛠️ PLATFORM ADMINISTRATION:\nSuper Admin: ❌ Broken\nAnalytics: ❌ Broken\nModeration: ❌ Broken\nAudit Trails: ❌ Broken\nCompleteness: 0%\n\n⚡ PERFORMANCE:\nQuery Performance: 3 tests\nMemory Usage: 14MB\nReal-time Latency: 460ms\nScalability Score: 100/100\n\n🔄 INTEGRATION:\nEnd-to-End Flow: ❌ Broken\nReal-time Sync: ✅ Working\nError Handling: ❌ Broken\nUser Experience: ✅ Complete\nCompleteness: 50%\n\n🎯 OVERALL ASSESSMENT:\nOverall Score: 46/100\nProduction Ready: ❌ NO\n\n🚨 CRITICAL ISSUES TO RESOLVE:\n❌ Database tables missing - run repair migration\n❌ End-to-end data flow broken - functionality incomplete\n\n💡 NEXT STEPS:\n1. URGENT: Resolve critical issues above\n2. Re-run this validation suite\n3. Address any remaining issues\n\n📋 DETAILED RESULTS SAVED TO: post-repair-validation-results.json\n📋 SUMMARY SAVED TO: validation-summary.json\n",
+      "stderr": "",
+      "success": false,
+      "critical": true,
+      "skipped": false,
+      "error": null
+    },
+    "Database State Verification (Post-Repair)": {
+      "name": "Database State Verification (Post-Repair)",
+      "script": "test-database-state.js",
+      "startTime": 1756338514399,
+      "endTime": 1756338514582,
+      "duration": 183,
+      "exitCode": 1,
+      "stdout": "🔍 DATABASE STATE VERIFICATION TEST SUITE\n==========================================\nTarget Database: https://ynqdddwponrqwhtqfepi.supabase.co\nExpected Tables: 72\nExpected Functions: 82\n\n📡 TESTING DATABASE CONNECTIVITY...\n⚠️  No authenticated user (expected for anonymous connection)\n❌ Database connectivity failed: relation \"public.information_schema.tables\" does not exist\n\n❌ Cannot proceed without database connectivity\n",
+      "stderr": "",
+      "success": false,
+      "critical": true,
+      "skipped": false,
+      "error": null
+    },
+    "Multi-Tenant Integration (Post-Repair)": {
+      "name": "Multi-Tenant Integration (Post-Repair)",
+      "script": "test-multitenant-integration.js",
+      "startTime": 1756338515583,
+      "endTime": 1756338515609,
+      "duration": 26,
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "node:internal/modules/esm/resolve:274\n    throw new ERR_MODULE_NOT_FOUND(\n          ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/lazy/Downloads/together-we-begin/client/src/services/RateLimitService.js' imported from /Users/lazy/Downloads/together-we-begin/test-multitenant-integration.js\n    at finalizeResolution (node:internal/modules/esm/resolve:274:11)\n    at moduleResolve (node:internal/modules/esm/resolve:859:10)\n    at defaultResolve (node:internal/modules/esm/resolve:983:11)\n    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:801:12)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:725:25)\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:708:38)\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:309:38)\n    at #link (node:internal/modules/esm/module_job:201:49) {\n  code: 'ERR_MODULE_NOT_FOUND',\n  url: 'file:///Users/lazy/Downloads/together-we-begin/client/src/services/RateLimitService.js'\n}\n\nNode.js v24.2.0\n",
+      "success": false,
+      "critical": true,
+      "skipped": false,
+      "error": null
+    },
+    "TypeScript Compilation": {
+      "name": "TypeScript Compilation",
+      "script": "test-typescript-types.js",
+      "startTime": 1756338516611,
+      "endTime": 1756338518721,
+      "duration": 2110,
+      "exitCode": 1,
+      "stdout": "📋 TYPESCRIPT TYPE VERIFICATION & ERROR DEBUGGING\n=================================================\nWorking Directory: /Users/lazy/Downloads/together-we-begin\nNode Version: v24.2.0\n\n📋 RUNNING TYPESCRIPT COMPILATION CHECK...\nRunning tsc --noEmit...\n❌ TypeScript compilation failed\nParsing errors...\nFound 373 TypeScript errors\nCritical errors: 26\nFixable errors: 347\nDatabase Types: 35 errors\nOrganization Types: 94 errors\nComponent Props: 62 errors\nHook Types: 99 errors\nImport/Export: 19 errors\nSupabase Types: 10 errors\nGeneric Types: 18 errors\nOther: 95 errors\n\n🔍 VERIFYING TYPE DEFINITIONS...\n✅ Organization Types file exists\n✅ All required types found in Organization Types\n✅ Database Types file exists\n❌ Missing types in Database Types: organizations, organization_members\n\n📦 TESTING IMPORT RESOLUTION...\n✅ client/src/contexts/OrganizationContext.tsx exists\n  ✅ Imports ../integrations/supabase/client\n  ✅ Imports ../types/organization\n✅ client/src/components/organization/OrganizationSwitcher.tsx exists\n  ✅ Imports ../../contexts/OrganizationContext\n  ❌ Missing import ../../integrations/supabase/client\n✅ client/src/hooks/useOrganizationData.ts exists\n  ✅ Imports ../integrations/supabase/client\n  ❌ Missing import ../types/organization\n\nChecking for circular dependencies...\n✅ No circular dependencies found\n\n⚛️  TESTING COMPONENT TYPE COMPATIBILITY...\n✅ client/src/contexts/OrganizationContext.tsx exists\n  ⚠️  Type issues:\n    - Context type may be undefined\n✅ client/src/components/organization/OrganizationSwitcher.tsx exists\n  ✅ No obvious type issues\n✅ client/src/components/organization/ThemeCustomization.tsx exists\n  ⚠️  Type issues:\n    - React.FC used without proper props typing\n✅ client/src/components/organization/FeatureToggleManager.tsx exists\n  ⚠️  Type issues:\n    - React.FC used without proper props typing\n✅ client/src/hooks/useOrganizationData.ts exists\n  ✅ No obvious type issues\n\n🔧 GENERATING TYPE FIXES...\n✅ Generated fix-typescript-types.sh\n✅ Generated typescript-fixes.json\n\n📊 TYPESCRIPT TYPE VERIFICATION REPORT\n================================================================================\n\n📋 COMPILATION SUMMARY:\nTypeScript Compilation: ❌ Fails\nTotal Errors: 373\nCritical Errors: 26\nFixable Errors: 347\n\n📊 ERROR BREAKDOWN BY CATEGORY:\nDatabase Types: 35 errors\n  - OrganizationAdminDropdown.tsx:77 TS2345: Argument of type '\"get_organization_admin_data\"' is not assi...\n  - OrganizationAdminDropdown.tsx:86 TS2345: Argument of type '\"get_organization_members_for_admin\"' is n...\n  - OrganizationDetailModal.tsx:84 TS2345: Argument of type '\"get_organization_admin_details\"' is not a...\n  ... and 32 more\nOrganization Types: 94 errors\n  - OrganizationAdminDropdown.tsx:82 TS2345: Argument of type 'Json | { author_id: string; author_name: s...\n  - OrganizationAdminDropdown.tsx:91 TS2345: Argument of type 'string | number | true | { [key: string]: ...\n  - OrganizationDetailModal.tsx:90 TS2345: Argument of type 'Json | { author_id: string; author_name: s...\n  ... and 91 more\nComponent Props: 62 errors\n  - ContentModerationQueue.tsx:101 TS2339: Property 'map' does not exist on type 'string | number | boo...\n  - PlatformAdminDashboard.tsx:96 TS2339: Property 'amount_cents' does not exist on type 'SelectQueryE...\n  - OrganizationAuth.tsx:100 TS2339: Property 'type' does not exist on type '{ code: string; crea...\n  ... and 59 more\nHook Types: 99 errors\n  - useCommunityFeed.ts:100 TS2345: Argument of type '(string | null)[]' is not assignable to pa...\n  - useCommunityFeed.ts:111 TS2345: Argument of type 'string | null' is not assignable to parame...\n  - useCommunityFeed.ts:125 TS2345: Argument of type '(prev: FeedPost[]) => (FeedPost | { id: st...\n  ... and 96 more\nImport/Export: 19 errors\n  - DraggableDashboard.tsx:2 TS2307: Cannot find module '@dnd-kit/core' or its corresponding type...\n  - DraggableDashboard.tsx:3 TS2307: Cannot find module '@dnd-kit/sortable' or its corresponding ...\n  - DraggableDashboard.tsx:4 TS2307: Cannot find module '@dnd-kit/modifiers' or its corresponding...\n  ... and 16 more\nSupabase Types: 10 errors\n  - supabase-org.ts:22 TS2339: Property 'current_organization_id' does not exist on type 'S...\n  - supabase-org.ts:23 TS2339: Property 'current_organization_id' does not exist on type 'S...\n  - supabase-org.ts:28 TS2769: No overload matches this call....\n  ... and 7 more\nGeneric Types: 18 errors\n  - PlatformAdminDashboard.tsx:290 TS2322: Type '{ compact: true; }' is not assignable to type 'Intrins...\n  - PlatformAdminDashboard.tsx:291 TS2322: Type '{ compact: true; }' is not assignable to type 'Intrins...\n  - MobileCommunityFeed.tsx:242 TS2322: Type '\"outline\"' is not assignable to type '\"destructive\" | ...\n  ... and 15 more\nOther: 95 errors\n  - InviteCodeManager.tsx:87 TS2769: No overload matches this call....\n  - InviteCodeManager.tsx:93 TS2345: Argument of type '({ action: string; admin_id: string; creat...\n  - InviteCodeManager.tsx:137 TS2769: No overload matches this call....\n  ... and 92 more\n\n🔍 TYPE DEFINITION SUMMARY:\nDatabase Types: ✅ Exist\nOrganization Types: ✅ Exist\nSupabase Generated: ✅ Yes\nMissing Types: 2\nMissing types:\n  - Database Types:organizations\n  - Database Types:organization_members\n\n📦 IMPORT RESOLUTION SUMMARY:\nWorking Imports: 4\nUnresolved Imports: 2\nCircular Dependencies: 0\n\n⚛️  COMPONENT TYPE SUMMARY:\nComponents with Issues: 3\n\n🚨 CRITICAL TYPE ISSUES:\n❌ TypeScript compilation fails - app cannot build\n❌ Too many critical errors (26)\n\n💡 IMMEDIATE ACTIONS REQUIRED:\n3. Fix unresolved imports\n   Check import paths and module exports\n4. Fix critical TypeScript errors\n   Focus on TS2307 and TS2305 errors first\n\n🎯 TYPE SAFETY SCORE: 20/100 - Critical Issues\n\n📋 DETAILED RESULTS SAVED TO:\n- typescript-test-results.json (detailed analysis)\n- typescript-fixes.json (fix recommendations)\n- fix-typescript-types.sh (executable fix script)\n",
+      "stderr": "- Finding files\n✔ No circular dependency found!\n",
+      "success": false,
+      "critical": true,
+      "skipped": false,
+      "error": null
+    },
+    "Database Connectivity (Final)": {
+      "name": "Database Connectivity (Final)",
+      "script": "test-database-connectivity.js",
+      "startTime": 1756338519722,
+      "endTime": 1756338520218,
+      "duration": 496,
+      "exitCode": 1,
+      "stdout": "🔗 DATABASE CONNECTIVITY TEST SUITE\n===================================\nTarget Database: https://ynqdddwponrqwhtqfepi.supabase.co\nTest Environment: darwin / Node.js v24.2.0\n\n🔗 TESTING NODE.JS DATABASE CONNECTIVITY...\nTesting basic Supabase connection...\n❌ Node.js connectivity test failed: Connection failed: relation \"public.information_schema.tables\" does not exist\n\n⚛️  TESTING REACT ENVIRONMENT CONNECTIVITY...\nTesting Supabase client import...\n✅ Supabase client configuration exists\n✅ Database types are imported\nTesting Organization Context Provider...\n❌ Organization Context missing: supabase.from\n✅ Context has error handling\nTesting organization hooks...\n✅ useOrganizationData.ts exists and has React hooks\n✅ useOrganizationFeatures.ts exists and has React hooks\n✅ useOrganizationMembers.ts exists and has React hooks\nTesting organization components...\n✅ OrganizationSwitcher.tsx is a valid React component\n  └─ Uses organization context\n✅ ThemeCustomization.tsx is a valid React component\n  └─ Uses organization context\n✅ FeatureToggleManager.tsx is a valid React component\n  └─ Uses organization context\n✅ DraggableDashboard.tsx is a valid React component\n  └─ Uses organization context\nTesting real-time subscription patterns...\n✅ Real-time subscriptions implemented in context\n  └─ Uses postgres_changes for real-time updates\n  └─ Subscriptions are organization-filtered\nTesting organization switching logic...\n✅ Organization switching logic exists\n  └─ Organization preference persistence implemented\n\n🔄 TESTING FRONTEND-BACKEND DATA FLOW...\nTesting data flow integration...\n❌ Data flow patterns incomplete\nTesting organization data isolation...\n✅ Organization data isolation implemented\nTesting real-time sync...\n✅ Real-time sync implemented\n  └─ Handles real-time updates\n  └─ Handles organization deletions\nTesting error boundaries...\n✅ client/src/components/ui/enhanced-error-boundary.tsx exists\n✅ client/src/components/ui/error-boundary.tsx exists\n\n⚡ TESTING PERFORMANCE METRICS...\n✅ Memory usage: 12MB heap, 94MB RSS\nTesting connection pooling...\n✅ Connection pooling: 10 queries in 300ms (avg 30.0ms)\n\n📊 DATABASE CONNECTIVITY REPORT\n================================================================================\n\n🔗 NODE.JS CONNECTIVITY:\nBasic Connection: ❌ Failed\nAuthentication: ❌ Failed\nQuery Execution: ❌ Failed\nRPC Functions: ❌ Failed\nOrganization Queries: ❌ Failed\nReal-time Connection: ❌ Failed\nError Handling: ❌ Failed\nErrors: 1\n  - General: Connection failed: relation \"public.information_schema.tables\" does not exist\n\n⚛️  REACT CONNECTIVITY:\nSupabase Client: ✅ Working\nContext Provider: ❌ Failed\nHooks Execute: ✅ Working\nComponents Render: ✅ Working\nRealtime Subscriptions: ✅ Working\nOrganization Switching: ✅ Working\nErrors: 1\n  - Context missing: supabase.from\n\n🔄 INTEGRATION:\nData Flow: ❌ Failed\nOrganization Isolation: ✅ Working\nReal-time Sync: ✅ Working\nError Boundaries: ✅ Working\n\n⚡ PERFORMANCE:\nConnection Time: 121ms\nMemory Usage: 12MB heap\nConnection Pooling: 30ms avg (10 concurrent)\n\n🚨 CRITICAL CONNECTIVITY ISSUES:\n❌ Node.js cannot connect to database\n❌ Organization Context Provider broken - app will crash\n❌ Frontend-backend data flow broken\n❌ Organization queries fail - multi-tenant broken\n\n🎯 CONNECTIVITY SCORE: 30/100 - Poor\n\n📋 DETAILED RESULTS SAVED TO: connectivity-test-results.json\n",
+      "stderr": "",
+      "success": false,
+      "critical": true,
+      "skipped": false,
+      "error": null
+    }
+  },
+  "overallStatus": "CRITICAL ISSUES",
+  "recommendations": [
+    "🚨 URGENT: Fix critical test failures before proceeding",
+    "✅ Complete database repair process",
+    "🔧 Run database repair migration to create missing tables",
+    "🏢 Fix multi-tenant integration issues",
+    "📋 Fix TypeScript compilation errors",
+    "🔗 Fix database connectivity issues",
+    "🔧 Additional fixes needed after repair"
+  ],
+  "nextSteps": [
+    "Address critical failures immediately",
+    "Re-run repair validation after fixes",
+    "Execute: npm run db:repair",
+    "Verify organization context and data isolation",
+    "Run: bash fix-typescript-types.sh",
+    "Check Supabase configuration and network",
+    "Address remaining issues"
+  ],
+  "endTime": "2025-08-27T23:48:41.220Z",
+  "summary": {
+    "status": "CRITICAL ISSUES",
+    "readyForProduction": false,
+    "criticalIssues": 5,
+    "minorIssues": 0,
+    "totalDuration": 6106,
+    "averageDuration": 1221
+  }
+}

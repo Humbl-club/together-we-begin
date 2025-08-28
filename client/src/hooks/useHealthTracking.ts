@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { pedometerService, StepData, DailyStepData } from '@/services/PedometerService';
 import { ReliableHealthService } from '@/services/native/ReliableHealthService';
+import { useOrganization } from '@/contexts/OrganizationContext';
 
 interface HealthData {
   steps: number;
@@ -28,6 +29,7 @@ interface HealthGoals {
 }
 
 export const useHealthTracking = () => {
+  const { currentOrganization } = useOrganization();
   const [healthData, setHealthData] = useState<HealthData>({
     steps: 0,
     calories: 0,
@@ -170,11 +172,12 @@ export const useHealthTracking = () => {
   }, []);
 
   const logStepValidation = async (stepData: StepData, validation: any) => {
-    if (!user) return;
+    if (!user || !currentOrganization) return;
     
     try {
       await supabase.from('step_validation_logs').insert({
         user_id: user.id,
+        organization_id: currentOrganization.id,
         challenge_id: null, // Will be set when syncing with specific challenges
         reported_steps: stepData.steps,
         validation_score: validation.score,
@@ -191,7 +194,7 @@ export const useHealthTracking = () => {
   };
 
   const syncChallengeProgress = async (challengeId: string, progressData?: any) => {
-    if (!user) return;
+    if (!user || !currentOrganization) return;
     
     try {
       const todaySteps = pedometerService.getTodaySteps();
@@ -203,6 +206,7 @@ export const useHealthTracking = () => {
         .upsert({
           challenge_id: challengeId,
           user_id: user.id,
+          organization_id: currentOrganization.id,
           total_steps: todaySteps,
           daily_steps: Object.fromEntries(
             weeklySteps.map(day => [day.date, day.steps])
@@ -224,7 +228,8 @@ export const useHealthTracking = () => {
           }
         })
         .eq('challenge_id', challengeId)
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .eq('organization_id', currentOrganization.id);
 
       if (participationError) throw participationError;
 

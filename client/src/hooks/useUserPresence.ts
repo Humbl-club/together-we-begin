@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useOrganization } from '@/contexts/OrganizationContext';
 
 interface UserPresence {
   user_id: string;
@@ -18,9 +19,10 @@ export const useUserPresence = () => {
   const [userStatus, setUserStatus] = useState<'online' | 'away' | 'offline'>('offline');
   const [currentActivity, setCurrentActivity] = useState<string>('');
   const { user } = useAuth();
+  const { currentOrganization } = useOrganization();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !currentOrganization) return;
 
     let presenceChannel: ReturnType<typeof supabase.channel> | null = null;
     let isCancelled = false;
@@ -40,8 +42,8 @@ export const useUserPresence = () => {
           return;
         }
 
-        // Create presence channel
-        presenceChannel = supabase.channel('online-users', {
+        // Create presence channel for current organization
+        presenceChannel = supabase.channel(`online-users-${currentOrganization.id}`, {
           config: {
             presence: {
               key: user.id,
@@ -49,9 +51,10 @@ export const useUserPresence = () => {
           },
         });
 
-        // Track user presence
+        // Track user presence with organization context
         const userPresence = {
           user_id: user.id,
+          organization_id: currentOrganization.id,
           online_at: new Date().toISOString(),
           status: 'online' as const,
           activity: currentActivity || 'browsing'
@@ -118,7 +121,7 @@ export const useUserPresence = () => {
       }
       setUserStatus('offline');
     };
-  }, [user, currentActivity]);
+  }, [user, currentOrganization?.id, currentActivity]);
 
   const updateOnlineUsers = async (presenceState: any) => {
     const users: UserPresence[] = [];
@@ -159,10 +162,11 @@ export const useUserPresence = () => {
   const updateActivity = async (activity: string) => {
     setCurrentActivity(activity);
     
-    if (user) {
-      const presenceChannel = supabase.channel('online-users');
+    if (user && currentOrganization) {
+      const presenceChannel = supabase.channel(`online-users-${currentOrganization.id}`);
       await presenceChannel.track({
         user_id: user.id,
+        organization_id: currentOrganization.id,
         online_at: new Date().toISOString(),
         status: userStatus,
         activity: activity
@@ -173,13 +177,14 @@ export const useUserPresence = () => {
   const setStatus = async (status: 'online' | 'away' | 'offline') => {
     setUserStatus(status);
     
-    if (user) {
-      const presenceChannel = supabase.channel('online-users');
+    if (user && currentOrganization) {
+      const presenceChannel = supabase.channel(`online-users-${currentOrganization.id}`);
       if (status === 'offline') {
         await presenceChannel.untrack();
       } else {
         await presenceChannel.track({
           user_id: user.id,
+          organization_id: currentOrganization.id,
           online_at: new Date().toISOString(),
           status: status,
           activity: currentActivity

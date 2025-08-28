@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useOptimizedData } from '@/hooks/useOptimizedData';
+import { useOrganization } from '@/contexts/OrganizationContext';
 
 interface UserProfile {
   id: string;
@@ -47,11 +48,13 @@ export const useOptimizedProfileData = (userId: string | undefined) => {
   const [completedChallenges, setCompletedChallenges] = useState<CompletedChallenge[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { currentOrganization } = useOrganization();
   
   const { fetchWithCache, invalidateCache } = useOptimizedData<ProfileData>('profile', 5 * 60 * 1000);
 
   const fetchProfileData = useCallback(async (): Promise<ProfileData> => {
     if (!userId) throw new Error('No user ID provided');
+    if (!currentOrganization) throw new Error('No organization selected');
 
     const [profileResult, transactionsResult, challengesResult] = await Promise.allSettled([
       supabase
@@ -64,6 +67,7 @@ export const useOptimizedProfileData = (userId: string | undefined) => {
         .from('loyalty_transactions')
         .select('*')
         .eq('user_id', userId)
+        .eq('organization_id', currentOrganization.id)
         .order('created_at', { ascending: false })
         .limit(50),
       
@@ -79,6 +83,7 @@ export const useOptimizedProfileData = (userId: string | undefined) => {
           )
         `)
         .eq('user_id', userId)
+        .eq('organization_id', currentOrganization.id)
         .eq('completed', true)
         .order('completion_date', { ascending: false })
         .limit(20)
@@ -115,16 +120,19 @@ export const useOptimizedProfileData = (userId: string | undefined) => {
     }
 
     return { profile, loyaltyTransactions, completedChallenges };
-  }, [userId]);
+  }, [userId, currentOrganization]);
 
   const loadData = useCallback(async () => {
-    if (!userId) {
+    if (!userId || !currentOrganization) {
+      setProfile(null);
+      setLoyaltyTransactions([]);
+      setCompletedChallenges([]);
       setLoading(false);
       return;
     }
 
     try {
-      const data = await fetchWithCache(`profile-${userId}`, fetchProfileData);
+      const data = await fetchWithCache(`profile-${userId}-${currentOrganization.id}`, fetchProfileData);
       setProfile(data.profile);
       setLoyaltyTransactions(data.loyaltyTransactions);
       setCompletedChallenges(data.completedChallenges);
@@ -158,7 +166,9 @@ export const useOptimizedProfileData = (userId: string | undefined) => {
       setProfile(prev => prev ? { ...prev, ...updates } : null);
       
       // Invalidate cache to force refresh on next load
-      invalidateCache(`profile-${userId}`);
+      if (currentOrganization) {
+        invalidateCache(`profile-${userId}-${currentOrganization.id}`);
+      }
       
       return true;
     } catch (error) {
@@ -173,9 +183,11 @@ export const useOptimizedProfileData = (userId: string | undefined) => {
   };
 
   const refreshData = useCallback(() => {
-    invalidateCache(`profile-${userId}`);
+    if (currentOrganization) {
+      invalidateCache(`profile-${userId}-${currentOrganization.id}`);
+    }
     loadData();
-  }, [userId, invalidateCache, loadData]);
+  }, [userId, currentOrganization, invalidateCache, loadData]);
 
   return {
     profile,

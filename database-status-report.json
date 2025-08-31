@@ -1,0 +1,110 @@
+{
+  "tables": {
+    "expected": 72,
+    "found": 0,
+    "missing": [
+      "organizations",
+      "organization_members",
+      "organization_features",
+      "organization_themes",
+      "organization_typography",
+      "organization_layouts",
+      "organization_branding",
+      "organization_bans",
+      "club_signup_pages",
+      "feature_catalog",
+      "profiles",
+      "user_roles",
+      "user_settings",
+      "privacy_settings",
+      "user_notification_settings",
+      "user_appearance_settings",
+      "user_social_settings",
+      "user_wellness_settings",
+      "events",
+      "event_registrations",
+      "event_attendance",
+      "event_qr_codes",
+      "challenges",
+      "challenge_participations",
+      "challenge_cycles",
+      "walking_leaderboards",
+      "health_data",
+      "step_validation_logs",
+      "social_posts",
+      "post_likes",
+      "post_comments",
+      "post_reactions",
+      "direct_messages",
+      "message_threads",
+      "blocked_users",
+      "loyalty_transactions",
+      "rewards_catalog",
+      "reward_redemptions",
+      "expired_points",
+      "points_expiration_policies",
+      "user_achievements",
+      "platform_admins",
+      "platform_analytics",
+      "platform_billing",
+      "platform_incidents",
+      "platform_audit_logs",
+      "platform_feature_flags",
+      "admin_actions",
+      "content_reports",
+      "content_deletions",
+      "moderation_actions",
+      "user_warnings",
+      "content_moderation_queue",
+      "dashboard_widgets",
+      "dashboard_layouts",
+      "widget_templates",
+      "navigation_items",
+      "google_fonts_catalog",
+      "theme_presets",
+      "font_presets",
+      "container_presets",
+      "system_configurations",
+      "performance_metrics",
+      "notifications",
+      "invite_codes",
+      "invite_redemptions",
+      "email_invitations",
+      "push_subscriptions",
+      "integration_settings",
+      "notification_templates",
+      "system_config",
+      "invites"
+    ]
+  },
+  "functions": {
+    "expected": 82,
+    "found": 82,
+    "missing": []
+  },
+  "storage": {
+    "buckets": [
+      {
+        "name": "avatars",
+        "status": "missing",
+        "error": "signature verification failed"
+      },
+      {
+        "name": "posts",
+        "status": "missing",
+        "error": "signature verification failed"
+      },
+      {
+        "name": "events",
+        "status": "missing",
+        "error": "signature verification failed"
+      },
+      {
+        "name": "challenges",
+        "status": "missing",
+        "error": "signature verification failed"
+      }
+    ]
+  },
+  "timestamp": "2025-08-30T14:48:45.160Z"
+}

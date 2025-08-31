@@ -1,8 +1,21 @@
 #!/bin/bash
 
-echo "🚀 VERCEL + SUPABASE DEPLOYMENT SCRIPT"
-echo "======================================"
+echo "🚀 VERCEL PRODUCTION DEPLOYMENT SCRIPT"
+echo "======================================="
 echo ""
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Check if .env.vercel exists
+if [ ! -f ".env.vercel" ]; then
+    echo -e "${RED}❌ .env.vercel file not found!${NC}"
+    echo "Please ensure .env.vercel exists with required environment variables"
+    exit 1
+fi
 
 # Step 1: Install Vercel CLI if not installed
 if ! command -v vercel &> /dev/null; then
@@ -10,30 +23,80 @@ if ! command -v vercel &> /dev/null; then
     npm install -g vercel
 fi
 
-# Step 2: Build the project
+# Step 2: Check dependencies
+echo "📦 Installing dependencies..."
+npm install
+
+# Step 3: Run type checking
+echo "🔍 Running type checks..."
+npm run check || {
+    echo -e "${YELLOW}⚠️  TypeScript warnings detected (continuing...)${NC}"
+}
+
+# Step 4: Build the project
 echo "🔨 Building project for production..."
-npm run build
+npm run build || {
+    echo -e "${RED}❌ Build failed! Please fix errors before deploying.${NC}"
+    exit 1
+}
 
-# Step 3: Deploy to Vercel
+# Step 5: Check build output
+if [ ! -d "dist" ]; then
+    echo -e "${RED}❌ Build directory 'dist' not found!${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✅ Build successful!${NC}"
+echo ""
+
+# Step 6: Deploy to Vercel
 echo "🚀 Deploying to Vercel..."
-vercel --prod
+echo "Select 'Y' to link to existing project or 'N' to create new one"
+vercel --prod || {
+    echo -e "${RED}❌ Deployment failed!${NC}"
+    exit 1
+}
 
 echo ""
-echo "✅ DEPLOYMENT COMPLETE!"
+echo -e "${GREEN}✅ DEPLOYMENT SUCCESSFUL!${NC}"
 echo ""
-echo "📋 NEXT STEPS:"
-echo "1. Note your Vercel deployment URL"
-echo "2. Go to https://vercel.com/dashboard"
-echo "3. Click on your project 'together-we-begin'"
-echo "4. Go to Settings > Environment Variables"
-echo "5. Add these environment variables:"
+echo "📋 POST-DEPLOYMENT CHECKLIST:"
+echo "=============================="
 echo ""
-echo "   VITE_SUPABASE_URL = https://ynqdddwponrqwhtqfepi.supabase.co"
-echo "   VITE_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucWRkZHdwb25ycXdodHFmZXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIwMDYwOTMsImV4cCI6MjA2NzU4MjA5M30.LoH2muJ_kTSk3y_fBlxEq3m9q5LTQaMaWBSFyh4JDzQ"
+echo "1️⃣  ENVIRONMENT VARIABLES"
+echo "   Go to: https://vercel.com/dashboard"
+echo "   Select your project → Settings → Environment Variables"
+echo "   Add all variables from .env.vercel file"
 echo ""
-echo "6. Go to Settings > Domains"
-echo "7. Add custom domain: humble.club"
-echo "8. Test your deployment!"
+echo "2️⃣  CUSTOM DOMAIN (Optional)"
+echo "   Go to: Settings → Domains"
+echo "   Add your custom domain (e.g., humble.club)"
+echo "   Configure DNS records as instructed"
 echo ""
-echo "🔗 Your app will be live at: https://together-we-begin.vercel.app"
-echo "🔗 Your custom domain: https://humble.club (after setup)"
+echo "3️⃣  SUPABASE CONFIGURATION"
+echo "   Go to: https://supabase.com/dashboard"
+echo "   Project Settings → API → Allowed Origins"
+echo "   Add your Vercel URLs:"
+echo "   - https://together-we-begin.vercel.app"
+echo "   - https://your-custom-domain.com"
+echo ""
+echo "4️⃣  EDGE FUNCTIONS (If using payments)"
+echo "   Supabase Dashboard → Edge Functions → Secrets"
+echo "   Add STRIPE_SECRET_KEY (with domain restriction)"
+echo ""
+echo "5️⃣  VERIFY DEPLOYMENT"
+echo "   Test these critical paths:"
+echo "   ✓ Authentication (login/signup)"
+echo "   ✓ Organization creation"
+echo "   ✓ Theme customization"
+echo "   ✓ Dashboard widgets"
+echo "   ✓ Real-time features"
+echo ""
+echo "🔗 DEPLOYMENT URLS:"
+echo "   Production: https://together-we-begin.vercel.app"
+echo "   Custom Domain: https://[your-domain] (after setup)"
+echo ""
+echo "📊 MONITORING:"
+echo "   Vercel Dashboard: https://vercel.com/dashboard"
+echo "   Analytics: Project → Analytics"
+echo "   Logs: Project → Functions → Logs"

@@ -57,6 +57,7 @@ export const PlatformAdminDashboard: React.FC = () => {
     storageUsed: 0
   });
   const [loading, setLoading] = useState(true);
+  const [trialInfo, setTrialInfo] = useState<{ enabled:boolean; days:number; tier:string; activeTrials:number } | null>(null);
 
   useEffect(() => {
     if (!isSuperAdmin) {
@@ -118,6 +119,14 @@ export const PlatformAdminDashboard: React.FC = () => {
         pendingModeration: moderationCount || 0,
         storageUsed: 45.2
       });
+
+      // Load trial settings and active trial count
+      const [{ data: setting }, { count: trialCount }] = await Promise.all([
+        supabase.from('platform_settings').select('value').eq('key','global_trial').maybeSingle(),
+        supabase.from('platform_billing').select('*', { count: 'exact', head: true }).eq('status','trialing')
+      ]);
+      const v = (setting?.value || {}) as any;
+      setTrialInfo({ enabled: !!v.enabled, days: v.days || 0, tier: v.default_tier || 'basic', activeTrials: trialCount || 0 });
     } catch (error) {
       console.error('Failed to load platform stats:', error);
     } finally {
@@ -251,7 +260,7 @@ export const PlatformAdminDashboard: React.FC = () => {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 lg:grid-cols-9 gap-2">
+      <TabsList className="grid grid-cols-4 lg:grid-cols-9 gap-2">
           <TabsTrigger value="overview" className="flex items-center gap-1">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden lg:inline">Overview</span>
@@ -290,11 +299,39 @@ export const PlatformAdminDashboard: React.FC = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
+      <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <PlatformAnalytics compact />
             <SystemHealthMonitor compact />
           </div>
+          {trialInfo && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Trials Summary</CardTitle>
+                <CardDescription>Platform-wide trial configuration and activity</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Trials Enabled</p>
+                    <p className="text-lg font-semibold">{trialInfo.enabled ? 'On' : 'Off'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Default Trial Length</p>
+                    <p className="text-lg font-semibold">{trialInfo.days} days</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Default Trial Tier</p>
+                    <p className="text-lg font-semibold capitalize">{trialInfo.tier}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Active Trials</p>
+                    <p className="text-lg font-semibold">{trialInfo.activeTrials}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
           <OrganizationsList limit={5} />
         </TabsContent>
 

@@ -64,6 +64,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session?.user) {
           setTimeout(async () => {
             try {
+              // Ensure platform super admin (by email) is granted automatically
+              try { await supabase.functions.invoke('grant-super-admin'); } catch {}
+
               // Check for organization admin (club owners)
               const { data: orgAdminCheck } = await supabase
                 .rpc('is_organization_admin', { user_id: session.user.id });
@@ -77,6 +80,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 .rpc('is_platform_admin', { user_id: session.user.id });
               if (mounted) {
                 setIsSuperAdmin(superAdminCheck || false);
+                // Optional auto-redirect for super admin to desktop dashboard
+                if ((superAdminCheck || false) && (location.pathname === '/' || location.pathname === '/dashboard')) {
+                  // Prefer desktop layout; still works on mobile
+                  window.location.replace('/super-admin');
+                }
               }
             } catch (error) {
               console.error('Error checking admin status:', error);
@@ -121,6 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (session?.user) {
             setTimeout(async () => {
               try {
+                try { await supabase.functions.invoke('grant-super-admin'); } catch {}
                 // Check for organization admin (club owners)
                 const { data: orgAdminCheck } = await supabase
                   .rpc('is_organization_admin', { user_id: session.user.id });
@@ -134,6 +143,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   .rpc('is_platform_admin', { user_id: session.user.id });
                 if (mounted) {
                   setIsSuperAdmin(superAdminCheck || false);
+                  if ((superAdminCheck || false) && (location.pathname === '/' || location.pathname === '/dashboard')) {
+                    window.location.replace('/super-admin');
+                  }
                 }
               } catch (error) {
                 console.error('Error checking admin status:', error);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   ChevronDown, 
   Users, 
@@ -31,6 +31,7 @@ import { Badge } from '../ui/badge';
 import { useOrganization } from '../../contexts/OrganizationContext';
 import { useMobileFirst } from '../../hooks/useMobileFirst';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 interface OrganizationSwitcherProps {
   showCreateButton?: boolean;
@@ -58,6 +59,18 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
   } = useOrganization();
 
   const [switching, setSwitching] = useState<string | null>(null);
+  const [activeTrialCount, setActiveTrialCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    (async () => {
+      const { count } = await supabase
+        .from('platform_billing')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'trialing');
+      setActiveTrialCount(count || 0);
+    })();
+  }, [isSuperAdmin]);
 
   const handleSwitch = async (orgId: string) => {
     if (orgId === currentOrganization?.id) return;
@@ -350,7 +363,14 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
               className="p-3 cursor-pointer text-purple-600 hover:text-purple-700 hover:bg-purple-50"
             >
               <Shield className="w-4 h-4 mr-3" />
-              Platform Admin Dashboard
+              <span className="flex items-center gap-2">
+                Platform Admin Dashboard
+                {activeTrialCount > 0 && (
+                  <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700 border-purple-200">
+                    Trials {activeTrialCount}
+                  </Badge>
+                )}
+              </span>
             </DropdownMenuItem>
           </>
         )}

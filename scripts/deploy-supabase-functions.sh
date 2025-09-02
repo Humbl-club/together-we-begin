@@ -53,7 +53,7 @@ supabase functions secrets set \
   ALLOWED_ORIGINS="${ALLOWED_ORIGINS:-}" \
   APP_URL="${APP_URL:-}" \
   PLATFORM_FEE_BPS="${PLATFORM_FEE_BPS:-0}" \
-  STRIPE_CONNECT_WEBHOOK_SECRET="${STRIPE_CONNECT_WEBHOOK_SECRET:-}" || true
+  $STRIPE_CONNECT_WEBHOOK_SECRET \n  SUPERADMIN_EMAILS="${SUPERADMIN_EMAILS:-}"="${STRIPE_CONNECT_WEBHOOK_SECRET:-}" || true
 
 echo "📦 Deploying functions"
 supabase functions deploy create-payment || true
@@ -65,5 +65,6 @@ supabase functions deploy grant-free-account || true
 supabase functions deploy stripe-connect || true
 supabase functions deploy stripe-sync-status || true
 supabase functions deploy stripe-connect-webhook || true
+supabase functions deploy grant-super-admin || true
 
 echo "✅ Deployment complete"

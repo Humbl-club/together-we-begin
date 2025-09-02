@@ -28,7 +28,7 @@ import { FeatureFlagManager } from './FeatureFlagManager';
 import { ContentModerationQueue } from './ContentModerationQueue';
 import { BillingOverview } from './BillingOverview';
 import { IncidentManagement } from './IncidentManagement';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { cn } from '../../../lib/utils';
 
 interface PlatformStats {
@@ -44,8 +44,10 @@ interface PlatformStats {
 
 export const PlatformAdminDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { isSuperAdmin, platformAdmin } = useOrganization();
-  const [activeTab, setActiveTab] = useState('overview');
+  const allowedTabs = ['overview','organizations','analytics','billing','system','features','trials','moderation','incidents'] as const;
+  const [activeTab, setActiveTab] = useState<string>('overview');
   const [stats, setStats] = useState<PlatformStats>({
     totalOrganizations: 0,
     totalUsers: 0,
@@ -64,8 +66,22 @@ export const PlatformAdminDashboard: React.FC = () => {
       navigate('/dashboard');
       return;
     }
+    // Initialize active tab from query param (validated)
+    const t = (searchParams.get('tab') || '').toLowerCase();
+    if (allowedTabs.includes(t as any)) {
+      setActiveTab(t);
+    }
     loadPlatformStats();
   }, [isSuperAdmin, navigate]);
+
+  // Sync URL when tab changes (replace history to avoid back-button spam)
+  useEffect(() => {
+    const current = (searchParams.get('tab') || '').toLowerCase();
+    if (activeTab !== current) {
+      setSearchParams({ tab: activeTab }, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
 
   const loadPlatformStats = async () => {
     try {
@@ -328,6 +344,9 @@ export const PlatformAdminDashboard: React.FC = () => {
                     <p className="text-sm text-muted-foreground">Active Trials</p>
                     <p className="text-lg font-semibold">{trialInfo.activeTrials}</p>
                   </div>
+                </div>
+                <div className="mt-4 flex justify-end">
+                  <Button variant="outline" onClick={() => setActiveTab('trials')}>Manage Trials</Button>
                 </div>
               </CardContent>
             </Card>

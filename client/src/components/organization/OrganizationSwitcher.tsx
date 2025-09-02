@@ -372,6 +372,13 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
                 )}
               </span>
             </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => handleNavigate('/super-admin?tab=trials')}
+              className="p-3 cursor-pointer text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+            >
+              <Shield className="w-4 h-4 mr-3" />
+              Trials & Grants
+            </DropdownMenuItem>
           </>
         )}
       </DropdownMenuContent>

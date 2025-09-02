@@ -6,12 +6,14 @@ struct Event: Decodable, Identifiable {
     let description: String?
     let start_time: String
     let price_cents: Int?
+    let loyalty_points_price: Int?
 }
 
 struct EventsListView: View {
     @State private var events: [Event] = []
     @State private var loading = true
     @State private var error: String?
+    @StateObject private var loyalty = LoyaltyStore()
 
     var body: some View {
         NavigationView {
@@ -71,17 +73,21 @@ struct EventsListView: View {
                                                     Text("Free").font(.caption).foregroundColor(GCColors.success)
                                                 }
                                             }
-                                            HStack(spacing: GCSpacing.sm) {
-                                                GCButton(title: "Details", variant: .glass) {}
-                                                if let cents = e.price_cents, cents > 0 {
-                                                    GCButton(title: "Register", variant: .primary, fullWidth: true) {
-                                                        // Present native PaymentSheet
-                                                        presentPayment(for: e)
-                                                    }
-                                                } else {
-                                                    GCButton(title: "Register", variant: .primary, fullWidth: true) {}
-                                                }
-                                            }.padding(.top, GCSpacing.sm)
+                        HStack(spacing: GCSpacing.sm) {
+                            GCButton(title: "Details", variant: .glass) {}
+                            if let cents = e.price_cents, cents > 0 {
+                                GCButton(title: "Register", variant: .primary, fullWidth: true) {
+                                    presentPayment(for: e)
+                                }
+                            } else if let points = e.loyalty_points_price, points > 0 {
+                                GCButton(title: "Use Points (\(points))", variant: .primary, fullWidth: true) {
+                                    Task { await pointsFlow(for: e) }
+                                }
+                                .disabled(loyalty.availablePoints < (e.loyalty_points_price ?? Int.max))
+                            } else {
+                                GCButton(title: "Register", variant: .primary, fullWidth: true) {}
+                            }
+                        }.padding(.top, GCSpacing.sm)
                                         }
                                     }
                                     .padding(.horizontal, GCSpacing.xl)
@@ -94,7 +100,10 @@ struct EventsListView: View {
             }
             .navigationBarHidden(true)
         }
-        .task { await loadEvents() }
+        .task {
+            await loadEvents()
+            await loyalty.refresh()
+        }
     }
 
     func loadEvents() async {
@@ -138,6 +147,11 @@ struct EventsListView: View {
         UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.keyWindow }.first?
             .rootViewController?
             .present(vc, animated: true)
+    }
+
+    func pointsFlow(for e: Event) async {
+        let ok = await loyalty.redeemPoints(for: e.id)
+        if !ok { self.error = loyalty.lastError }
     }
 
 }

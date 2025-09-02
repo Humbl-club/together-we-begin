@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useOrganization } from '../../contexts/OrganizationContext';
+import { supabase as sb } from '@/integrations/supabase/client';
 
 const STEPS = [
   { id: 'basics', title: 'Organization Basics', icon: Building },
@@ -203,38 +204,66 @@ export const OrganizationOnboarding: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      // Use the new RPC function to create organization with all defaults
-      const { data: result, error } = await supabase
-        .rpc('create_organization_with_defaults', {
-          p_name: formData.name,
-          p_slug: formData.slug,
-          p_description: formData.description,
-          p_org_type: formData.orgType,
-          p_subscription_tier: formData.subscriptionTier,
-          p_primary_color: formData.primaryColor,
-          p_logo_url: formData.logoUrl,
-          p_tagline: formData.tagline,
-          p_selected_features: formData.selectedFeatures
-        });
-
-      if (error) throw error;
-
-      if (!result?.success) {
-        throw new Error(result?.error || 'Organization creation failed');
+      // Check entitlement for free unlimited access
+      let freeUnlimited = false;
+      if (user) {
+        const { data: ent } = await sb
+          .from('user_entitlements')
+          .select('free_unlimited')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        freeUnlimited = Boolean(ent?.free_unlimited);
       }
 
-      toast({
-        title: "Organization Created!",
-        description: `Welcome to ${formData.name}. Setting up your dashboard...`,
-      });
+      const selectedPlan = formData.subscriptionTier as 'free' | 'basic' | 'pro' | 'enterprise';
 
-      // Refresh organization context to load the new organization
-      await refreshOrganization();
+      if (selectedPlan === 'free' || freeUnlimited) {
+        const tier = freeUnlimited && selectedPlan === 'enterprise' ? 'enterprise' : selectedPlan;
+        const { data: result, error } = await supabase
+          .rpc('create_organization_with_defaults', {
+            p_name: formData.name,
+            p_slug: formData.slug,
+            p_description: formData.description,
+            p_org_type: formData.orgType,
+            p_subscription_tier: tier,
+            p_primary_color: formData.primaryColor,
+            p_logo_url: formData.logoUrl,
+            p_tagline: formData.tagline,
+            p_selected_features: formData.selectedFeatures
+          });
+        if (error) throw error;
+        if (!result?.success) {
+          throw new Error(result?.error || 'Organization creation failed');
+        }
+        toast({ title: 'Organization Created!', description: `Welcome to ${formData.name}.` });
+        await refreshOrganization();
+        setTimeout(() => navigate('/dashboard'), 1000);
+        return;
+      }
 
-      // Navigate to the new organization's dashboard
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1500);
+      if (selectedPlan === 'basic' || selectedPlan === 'pro') {
+        const origin = window.location.origin;
+        const successUrl = `${origin}/organization/new?org_payment=success&session_id={CHECKOUT_SESSION_ID}`;
+        const cancelUrl = `${origin}/organization/new?org_payment=cancel`;
+        const { data, error } = await supabase.functions.invoke('create-org-subscription', {
+          body: {
+            plan: selectedPlan,
+            billingCycle: 'monthly',
+            orgName: formData.name,
+            slug: formData.slug,
+            successUrl,
+            cancelUrl,
+          }
+        });
+        if (error) throw error;
+        if (data?.url) {
+          window.location.href = data.url as string;
+          return;
+        }
+        throw new Error('Failed to create checkout session');
+      }
+
+      throw new Error('Unsupported plan');
 
     } catch (error) {
       console.error('Failed to create organization:', error);
@@ -247,6 +276,33 @@ export const OrganizationOnboarding: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+
+  // Handle Stripe Checkout return for organization subscription
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('org_payment');
+    const sessionId = params.get('session_id');
+    if (status === 'success' && sessionId) {
+      (async () => {
+        try {
+          toast({ title: 'Finalizing organization setup…' });
+          const { data, error } = await supabase.functions.invoke('verify-org-subscription', {
+            body: { sessionId }
+          });
+          if (error) throw error;
+          if (!data?.success) throw new Error('Subscription not active');
+          await refreshOrganization();
+          const url = new URL(window.location.href);
+          url.searchParams.delete('org_payment');
+          url.searchParams.delete('session_id');
+          window.history.replaceState({}, '', url.toString());
+          navigate('/dashboard');
+        } catch (e) {
+          toast({ title: 'Setup failed', description: 'Please contact support.', variant: 'destructive' });
+        }
+      })();
+    }
+  }, [navigate, refreshOrganization]);
 
   const renderStepContent = () => {
     switch (STEPS[currentStep].id) {

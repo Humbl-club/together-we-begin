@@ -15,18 +15,21 @@ Node/CI (scripts, tools)
 
 Supabase Edge Functions (Secrets)
 - STRIPE_SECRET_KEY: Stripe secret key for payments (sk_live... or sk_test...)
+- STRIPE_PRICE_BASIC_MONTHLY / STRIPE_PRICE_PRO_MONTHLY: Price IDs for org subscriptions
+- STRIPE_PRICE_BASIC_YEARLY / STRIPE_PRICE_PRO_YEARLY: Optional yearly price IDs
+- ALLOWED_ORIGINS: Comma-separated allowed origins for functions
 
 Where to set values
 - Local: copy .env.example to .env and fill values. For Node scripts, export vars in your shell or use a .env loader.
 - Vercel: Project → Settings → Environment Variables. Add all VITE_* vars for Production and Preview. Do NOT add service role to client runtime.
-- Supabase: Project → Edge Functions → Secrets. Add STRIPE_SECRET_KEY for payment functions.
+- Supabase: Project → Edge Functions → Secrets. Add STRIPE_SECRET_KEY, STRIPE_PRICE_* variables, and ALLOWED_ORIGINS for payment functions.
 
 Google Maps key restrictions
 - Application restrictions: HTTP referrers → add your production and preview domains (e.g., https://yourapp.vercel.app/*, https://yourdomain.com/*).
 - API restrictions: Restrict to “Maps JavaScript API”.
 
 Stripe configuration
-- Publishable key (VITE_STRIPE_PUBLIC_KEY) goes to client. Secret key (STRIPE_SECRET_KEY) goes to Supabase function secrets.
+- Publishable key (VITE_STRIPE_PUBLIC_KEY) goes to client. Secret key (STRIPE_SECRET_KEY), STRIPE_PRICE_* variables, and ALLOWED_ORIGINS go to Supabase function secrets.
 - Ensure allowed origins are set in create-payment function CORS list.
 
 Supabase notes
@@ -38,3 +41,6 @@ Quick verification
 - Type check: npm run check
 - E2E smoke (optional): npm run test:e2e
 
+Organization subscription flow
+- Basic/Pro: client calls `create-org-subscription` to open Stripe Checkout; on return `verify-org-subscription` creates the org and billing record.
+- Free unlimited: grant via `grant-free-account` Edge Function to user_id; onboarding bypasses payment and creates org directly (enterprise allowed).

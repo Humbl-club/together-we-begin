@@ -79,6 +79,51 @@ const UltimateEventsPage = memo(() => {
   const [priceInput, setPriceInput] = useState('');
   const [capacityInput, setCapacityInput] = useState<number | ''>('');
   const [submitting, setSubmitting] = useState(false);
+  // Stripe Connect state for gating paid events
+  const { currentOrganization } = useOrganization();
+  const [orgStripeStatus, setOrgStripeStatus] = useState<{ charges_enabled?: boolean; payouts_enabled?: boolean } | null>(null);
+  const [stripeLinkLoading, setStripeLinkLoading] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      if (!currentOrganization?.id) return;
+      const { data } = await supabase
+        .from('organizations')
+        .select('charges_enabled, payouts_enabled')
+        .eq('id', currentOrganization.id)
+        .maybeSingle();
+      if (data) setOrgStripeStatus(data as any);
+    })();
+  }, [currentOrganization?.id]);
+
+  const connectWithStripe = async (mode: 'onboarding' | 'update' = 'onboarding') => {
+    try {
+      setStripeLinkLoading(true);
+      const { data, error } = await supabase.functions.invoke('stripe-connect', { body: { mode } });
+      if (error) throw error;
+      if (data?.url) window.location.href = data.url as string;
+    } catch (e) {
+      toast({ title: 'Failed to open Stripe', description: e instanceof Error ? e.message : 'Please try again', variant: 'destructive' });
+    } finally {
+      setStripeLinkLoading(false);
+    }
+  };
+
+  const refreshStripeStatus = async () => {
+    try {
+      const { error } = await supabase.functions.invoke('stripe-sync-status');
+      if (error) throw error;
+      const { data } = await supabase
+        .from('organizations')
+        .select('charges_enabled, payouts_enabled')
+        .eq('id', currentOrganization!.id)
+        .maybeSingle();
+      if (data) setOrgStripeStatus(data as any);
+      toast({ title: 'Stripe status refreshed' });
+    } catch (e) {
+      toast({ title: 'Refresh failed', description: e instanceof Error ? e.message : 'Please try again', variant: 'destructive' });
+    }
+  };
   // Payment state
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [paymentEvent, setPaymentEvent] = useState<any | null>(null);
@@ -494,6 +539,15 @@ const UltimateEventsPage = memo(() => {
                       <div className="grid gap-2">
                         <Label htmlFor="evt-price">Price (EUR)</Label>
                         <Input id="evt-price" type="number" min="0" step="0.01" value={priceInput} onChange={(e) => setPriceInput(e.target.value)} />
+                        {isAdmin && Number(priceInput || 0) > 0 && (!orgStripeStatus?.charges_enabled || !orgStripeStatus?.payouts_enabled) && (
+                          <div className="text-xs rounded-md border border-amber-200 bg-amber-50 text-amber-800 p-2">
+                            Paid events require Stripe Connect. Connect your Stripe account to accept payments.
+                            <div className="mt-2 flex gap-2">
+                              <Button size="sm" onClick={() => connectWithStripe('onboarding')} disabled={stripeLinkLoading}>Connect with Stripe</Button>
+                              <Button size="sm" variant="outline" onClick={refreshStripeStatus}>Refresh</Button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       <div className="grid gap-2">
                         <Label htmlFor="evt-capacity">Capacity</Label>
@@ -512,6 +566,23 @@ const UltimateEventsPage = memo(() => {
             )}
           />
         </PageSection>
+
+        {/* Stripe Connect Banner for Admins */}
+        {isAdmin && (!orgStripeStatus?.charges_enabled || !orgStripeStatus?.payouts_enabled) && (
+          <PageSection className="mobile:p-3 sm:p-4 lg:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-md border border-amber-200 bg-amber-50 p-3">
+              <div className="text-amber-900 text-sm">
+                <div className="font-medium">Enable paid events with Stripe Connect</div>
+                <div className="opacity-90">Connect your Stripe account to accept payments and receive payouts directly.</div>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={() => connectWithStripe('onboarding')} disabled={stripeLinkLoading}>Connect with Stripe</Button>
+                <Button variant="outline" onClick={() => connectWithStripe('update')}>Update Details</Button>
+                <Button variant="secondary" onClick={refreshStripeStatus}>Refresh Status</Button>
+              </div>
+            </div>
+          </PageSection>
+        )}
 
         {/* Featured Event */}
         {featuredEvent && (
@@ -743,20 +814,6 @@ const UltimateEventsPage = memo(() => {
         <div className="fixed mobile:bottom-4 sm:bottom-6 right-4 glass-modal p-2 rounded-lg mobile:text-xs sm:text-sm space-y-1 z-40 max-w-32">
           <div>Mobile: {isMobileOptimized ? '✓' : '✗'}</div>
           <div>View: {viewMode}</div>
-  const { currentOrganization } = useOrganization();
-  const [orgStripeStatus, setOrgStripeStatus] = useState<{ charges_enabled?: boolean; payouts_enabled?: boolean } | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      if (!currentOrganization?.id) return;
-      const { data } = await supabase
-        .from('organizations')
-        .select('charges_enabled, payouts_enabled')
-        .eq('id', currentOrganization.id)
-        .maybeSingle();
-      if (data) setOrgStripeStatus(data as any);
-    })();
-  }, [currentOrganization?.id]);
           <div>Events: {filteredEvents.length}/{events.length}</div>
         </div>
       )}

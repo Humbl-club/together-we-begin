@@ -21,8 +21,8 @@ const CONFIG = {
   TEST_DURATION_MS: 300000,  // 5 minutes
   
   // Supabase configuration (replace with your test environment)
-  SUPABASE_URL: process.env.SUPABASE_URL || 'https://ynqdddwponrqwhtqfepi.supabase.co',
-  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || 'your-anon-key',
+  SUPABASE_URL: process.env.SUPABASE_URL || '',
+  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || '',
   
   // Test scenarios with realistic usage patterns
   SCENARIOS: [

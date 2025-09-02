@@ -44,8 +44,8 @@ Go to: https://vercel.com/lazy-53aeee76/together-we-begin/settings/environment-v
 
 Add these variables:
 ```
-VITE_SUPABASE_URL = https://ynqdddwponrqwhtqfepi.supabase.co
-VITE_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucWRkZHdwb25ycXdodHFmZXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA5ODU1NTgsImV4cCI6MjA0NjU2MTU1OH0.qNiiDoOBPRh3Afhh66sYMWPl1R5kHx2-hDLtLqooFPM
+VITE_SUPABASE_URL = https://YOUR-PROJECT.supabase.co
+VITE_SUPABASE_ANON_KEY = your-anon-key
 ```
 
 ### **2. Test Your Application:**

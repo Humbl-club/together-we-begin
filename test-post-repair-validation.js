@@ -13,8 +13,11 @@ import { readFile, writeFile } from 'fs/promises';
 import chalk from 'chalk';
 
 // Database connection
-const SUPABASE_URL = "https://ynqdddwponrqwhtqfepi.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucWRkZHdwb25ycXdodHFmZXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIwMDYwOTMsImV4cCI6MjA2NzU4MjA5M30.LoH2muJ_kTSk3y_fBlxEq3m9q5LTQaMaWBSFyh4JDzQ";
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  throw new Error('Please set SUPABASE_URL and SUPABASE_ANON_KEY environment variables');
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 

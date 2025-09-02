@@ -34,7 +34,7 @@ chmod +x deploy-to-vercel.sh
 #### Environment Variables (Settings → Environment Variables)
 Add these variables for Production, Preview, and Development:
 
-- [ ] `VITE_SUPABASE_URL` = `https://ynqdddwponrqwhtqfepi.supabase.co`
+- [ ] `VITE_SUPABASE_URL` = `https://YOUR-PROJECT.supabase.co`
 - [ ] `VITE_SUPABASE_ANON_KEY` = `[your-anon-key]`
 - [ ] `VITE_GOOGLE_MAPS_API_KEY` = `[your-maps-key]`
 

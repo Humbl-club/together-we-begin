@@ -71,7 +71,7 @@ Instead of Resend, you can:
 ## 📝 ACTUAL CONFIGURATION STATUS
 
 ### Already Configured & Working:
-- ✅ Google Maps API (`AIzaSyDmUPebupZ1E2F6DkzaN7briqe0uCAKllI`)
+- ✅ Google Maps API (`VITE_GOOGLE_MAPS_API_KEY`)
 - ✅ Supabase (all keys configured)
 - ✅ Database URL (Neon PostgreSQL)
 - ✅ Push notifications (browser-based)

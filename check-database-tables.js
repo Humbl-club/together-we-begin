@@ -2,11 +2,12 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  'https://ynqdddwponrqwhtqfepi.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucWRkZHdwb25ycXdodHFmZXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIwMDYwOTMsImV4cCI6MjA2NzU4MjA5M30.LoH2muJ_kTSk3y_fBlxEq3m9q5LTQaMaWBSFyh4JDzQ',
-  { auth: { persistSession: false } }
-);
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Please set SUPABASE_URL and SUPABASE_ANON_KEY');
+}
+const supabase = createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false } });
 
 async function checkTables() {
   const tablesToCheck = [

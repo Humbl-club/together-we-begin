@@ -8,11 +8,12 @@ import { readFile } from 'fs/promises';
 
 console.log('🚨 EXECUTING EMERGENCY DATABASE REPAIR...\n');
 
-const supabase = createClient(
-  'https://ynqdddwponrqwhtqfepi.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucWRkZHdwb25ycXdodHFmZXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIwMDYwOTMsImV4cCI6MjA2NzU4MjA5M30.LoH2muJ_kTSk3y_fBlxEq3m9q5LTQaMaWBSFyh4JDzQ',
-  { auth: { persistSession: false } }
-);
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+if (!supabaseUrl || !supabaseServiceKey) {
+  throw new Error('Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY');
+}
+const supabase = createClient(supabaseUrl, supabaseServiceKey, { auth: { persistSession: false } });
 
 async function executeEmergencyRepair() {
   try {

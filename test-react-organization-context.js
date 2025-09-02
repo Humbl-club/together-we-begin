@@ -8,8 +8,8 @@ import { createClient } from '@supabase/supabase-js';
 console.log('⚛️ Testing React Organization Context Functionality...\n');
 
 const supabase = createClient(
-  'https://ynqdddwponrqwhtqfepi.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucWRkZHdwb25ycXdodHFmZXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIwMDYwOTMsImV4cCI6MjA2NzU4MjA5M30.LoH2muJ_kTSk3y_fBlxEq3m9q5LTQaMaWBSFyh4JDzQ',
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY,
   { auth: { persistSession: false } }
 );
 

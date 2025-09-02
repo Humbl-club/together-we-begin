@@ -8,9 +8,15 @@ set -e  # Exit on any error
 echo "🚀 Starting Multi-Tenant Migration Deployment"
 echo "============================================"
 
-# Configuration
-SUPABASE_URL="https://ynqdddwponrqwhtqfepi.supabase.co"
-SUPABASE_SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucWRkZHdwb25ycXdodHFmZXBpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MjAwNjA5MywImV4cCI6MjA2NzU4MjA5M30.Xd_gxkWK1ufyG9chejudVrfOyiTQQZZ0MIH3mOvwo_E"
+# Configuration (read from environment)
+SUPABASE_URL="${SUPABASE_URL:-}"
+SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-}"
+
+if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+  echo -e "${RED}❌ Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env variables.${NC}"
+  echo "Please export them or add to your environment before running."
+  exit 1
+fi
 
 # Migration files in order
 MIGRATIONS=(

@@ -3,14 +3,14 @@
 ## 🌐 Live URLs
 - **Production App**: https://together-we-begin-cy20ey4l0-lazy-53aeee76.vercel.app
 - **Supabase Dashboard**: https://app.supabase.com/project/ynqdddwponrqwhtqfepi
-- **Database URL**: https://ynqdddwponrqwhtqfepi.supabase.co
+- **Database URL**: https://YOUR-PROJECT.supabase.co
 
 ## 🔑 Environment Variables
 
 ### Required for Production:
 ```env
-VITE_SUPABASE_URL=https://ynqdddwponrqwhtqfepi.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucWRkZHdwb25ycXdodHFmZXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA5ODU1NTgsImV4cCI6MjA0NjU2MTU1OH0.qNiiDoOBPRh3Afhh66sYMWPl1R5kHx2-hDLtLqooFPM
+VITE_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 ### For Stripe (in Supabase Edge Functions):

@@ -378,8 +378,8 @@ describe('Multi-Tenant Security', () => {
 
 ```bash
 # .env.production
-VITE_SUPABASE_URL=https://ynqdddwponrqwhtqfepi.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGc...
+VITE_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_ENABLE_MULTI_TENANT=true
 VITE_ENFORCE_ORG_ISOLATION=true
 ```

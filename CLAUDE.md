@@ -457,9 +457,9 @@ FOR SELECT USING (
 ### Environment Variables
 ```bash
 # In codebase
-SUPABASE_URL=https://ynqdddwponrqwhtqfepi.supabase.co
+SUPABASE_URL=https://YOUR-PROJECT.supabase.co
 SUPABASE_ANON_KEY=eyJhbGc...
-GOOGLE_MAPS_API_KEY=AIzaSy...
+GOOGLE_MAPS_API_KEY=your-maps-key
 
 # In Supabase Dashboard
 STRIPE_SECRET_KEY=sk_live_... (needs restriction)

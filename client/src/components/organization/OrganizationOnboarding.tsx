@@ -218,22 +218,23 @@ export const OrganizationOnboarding: React.FC = () => {
       const selectedPlan = formData.subscriptionTier as 'free' | 'basic' | 'pro' | 'enterprise';
 
       if (selectedPlan === 'free' || freeUnlimited) {
-        const tier = freeUnlimited && selectedPlan === 'enterprise' ? 'enterprise' : selectedPlan;
-        const { data: result, error } = await supabase
-          .rpc('create_organization_with_defaults', {
-            p_name: formData.name,
-            p_slug: formData.slug,
-            p_description: formData.description,
-            p_org_type: formData.orgType,
-            p_subscription_tier: tier,
-            p_primary_color: formData.primaryColor,
-            p_logo_url: formData.logoUrl,
-            p_tagline: formData.tagline,
-            p_selected_features: formData.selectedFeatures
-          });
+        const tier = freeUnlimited && selectedPlan === 'enterprise' ? 'enterprise' : 'free';
+        const { data, error } = await supabase.functions.invoke('create-org-free', {
+          body: {
+            name: formData.name,
+            slug: formData.slug,
+            description: formData.description,
+            orgType: formData.orgType,
+            primaryColor: formData.primaryColor,
+            logoUrl: formData.logoUrl,
+            tagline: formData.tagline,
+            selectedFeatures: formData.selectedFeatures,
+            plan: tier,
+          }
+        });
         if (error) throw error;
-        if (!result?.success) {
-          throw new Error(result?.error || 'Organization creation failed');
+        if (!data?.success) {
+          throw new Error('Organization creation failed');
         }
         toast({ title: 'Organization Created!', description: `Welcome to ${formData.name}.` });
         await refreshOrganization();

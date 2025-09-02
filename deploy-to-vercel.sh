@@ -35,14 +35,14 @@ npm run check || {
 
 # Step 4: Build the project
 echo "🔨 Building project for production..."
-npm run build || {
+npm run build:vercel || {
     echo -e "${RED}❌ Build failed! Please fix errors before deploying.${NC}"
     exit 1
 }
 
 # Step 5: Check build output
-if [ ! -d "dist" ]; then
-    echo -e "${RED}❌ Build directory 'dist' not found!${NC}"
+if [ ! -d "dist/public" ]; then
+    echo -e "${RED}❌ Build directory 'dist/public' not found!${NC}"
     exit 1
 fi
 

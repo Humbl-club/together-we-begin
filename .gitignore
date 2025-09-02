@@ -4,3 +4,15 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+.vercel
+# Environment files (prevent secrets from being committed)
+.env
+.env.*
+*.env
+.env* 
+
+# Common build/output caches
+.next
+out
+build
+coverage

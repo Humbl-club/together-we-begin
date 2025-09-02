@@ -7,6 +7,7 @@ struct Event: Decodable, Identifiable {
     let start_time: String
     let price_cents: Int?
     let loyalty_points_price: Int?
+    let location: String?
 }
 
 struct EventsListView: View {

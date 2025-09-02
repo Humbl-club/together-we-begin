@@ -22,7 +22,14 @@ struct EventDetailView: View {
                                 Text("Free").font(.caption).foregroundColor(GCColors.success)
                             }
                         }
-                        if let loc = event.description, !loc.isEmpty { }
+                        if let loc = event.location, !loc.isEmpty {
+                            HStack(spacing: GCSpacing.sm) {
+                                Text("Location:").font(.caption).foregroundColor(GCColors.mutedText)
+                                Button(loc) { openInMaps(query: loc) }
+                                    .font(.caption)
+                                    .foregroundColor(GCColors.primary)
+                            }
+                        }
                     }
                 }.padding(.horizontal, GCSpacing.xl)
             }

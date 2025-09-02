@@ -21,10 +21,18 @@ struct EventsListView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: GCSpacing.lg) {
-                        Text("Events")
-                            .font(.system(size: 28, weight: .bold))
-                            .padding(.top, GCSpacing.xl)
-                            .padding(.horizontal, GCSpacing.xl)
+                        HStack {
+                            Text("Events")
+                                .font(.system(size: 28, weight: .bold))
+                            Spacer()
+                            if SessionStore.shared.isOrgAdmin {
+                                GCButton(title: "+ New", variant: .glass) {
+                                    presentCreate()
+                                }
+                            }
+                        }
+                        .padding(.top, GCSpacing.xl)
+                        .padding(.horizontal, GCSpacing.xl)
 
                         if loading {
                             ProgressView("Loading events…")
@@ -41,7 +49,9 @@ struct EventsListView: View {
                                                 GCBadge(text: isUpcoming(e) ? "Upcoming" : "Past", tint: isUpcoming(e) ? GCColors.primary : GCColors.mutedText)
                                                 Spacer()
                                             }
-                                            Text(e.title)
+                                            NavigationLink(destination: EventDetailView(event: e)) {
+                                                Text(e.title)
+                                            }
                                                 .font(.system(size: 18, weight: .semibold))
                                             if let desc = e.description {
                                                 Text(desc)
@@ -63,7 +73,14 @@ struct EventsListView: View {
                                             }
                                             HStack(spacing: GCSpacing.sm) {
                                                 GCButton(title: "Details", variant: .glass) {}
-                                                GCButton(title: "Register", variant: .primary, fullWidth: true) {}
+                                                if let cents = e.price_cents, cents > 0 {
+                                                    GCButton(title: "Register", variant: .primary, fullWidth: true) {
+                                                        // Present native PaymentSheet
+                                                        presentPayment(for: e)
+                                                    }
+                                                } else {
+                                                    GCButton(title: "Register", variant: .primary, fullWidth: true) {}
+                                                }
                                             }.padding(.top, GCSpacing.sm)
                                         }
                                     }
@@ -107,7 +124,22 @@ struct EventsListView: View {
     func isUpcoming(_ e: Event) -> Bool { isoDate(e.start_time) > Date() }
     func dateString(_ s: String) -> String {
         DateFormatter.localizedString(from: isoDate(s), dateStyle: .medium, timeStyle: .short)
+    
+
+    func presentPayment(for e: Event) {
+        let vc = UIHostingController(rootView: PaymentCheckout(eventId: e.id))
+        UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.keyWindow }.first?
+            .rootViewController?
+            .present(vc, animated: true)
     }
+
+    func presentCreate() {
+        let vc = UIHostingController(rootView: EventCreateView())
+        UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.keyWindow }.first?
+            .rootViewController?
+            .present(vc, animated: true)
+    }
+
 }
 
 #Preview {

@@ -27,6 +27,22 @@ serve(async (req) => {
           payouts_enabled: account.payouts_enabled,
         })
         .eq('stripe_account_id', account.id);
+    } else if (event.type === 'payment_intent.succeeded') {
+      const intent = event.data.object as Stripe.PaymentIntent;
+      const supabase = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'));
+      const eventId = (intent.metadata?.event_id as string) || null;
+      const userId = (intent.metadata?.user_id as string) || null;
+      if (eventId && userId) {
+        // Upsert registration
+        await supabase.from('event_registrations').upsert({
+          event_id: eventId,
+          user_id: userId,
+          payment_method: 'stripe',
+          stripe_session_id: intent.id,
+          payment_status: 'completed'
+        }, { onConflict: 'event_id,user_id' });
+        // Optionally increment capacity and loyalty points similar to verify-payment
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });

@@ -117,9 +117,15 @@ struct EventsListView: View {
                 self.events = items
                 self.loading = false
             }
+            CacheStore.save(items, to: "events.json")
         } catch {
             await MainActor.run {
-                self.error = error.localizedDescription
+                if let cached: [Event] = CacheStore.load([Event].self, from: "events.json") {
+                    self.events = cached
+                    self.error = "Loaded cached events (offline)"
+                } else {
+                    self.error = error.localizedDescription
+                }
                 self.loading = false
             }
         }

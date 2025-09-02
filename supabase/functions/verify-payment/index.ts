@@ -2,10 +2,13 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const envAllowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s => s.trim()).filter(Boolean);
+const defaultAllowed = ['http://localhost:5000', 'http://localhost:3000'];
+const allowedOrigins = envAllowed.length ? envAllowed : defaultAllowed;
+const corsHeaders = (origin: string | null) => ({
+  'Access-Control-Allow-Origin': origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0],
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+});
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -13,8 +16,10 @@ const logStep = (step: string, details?: any) => {
 };
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get('Origin');
+  const headers = corsHeaders(origin);
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers });
   }
 
   try {
@@ -91,14 +96,14 @@ serve(async (req) => {
         logStep("Registration completed", { eventId, userId, pointsEarned });
       }
 
-      return new Response(JSON.stringify({ success: true, status: "completed" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      return new Response(JSON.stringify({ success: true, status: 'completed' }), {
+        headers: { ...headers, 'Content-Type': 'application/json' },
         status: 200,
       });
     }
 
     return new Response(JSON.stringify({ success: false, status: session.payment_status }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, 'Content-Type': 'application/json' },
       status: 200,
     });
 
@@ -106,7 +111,7 @@ serve(async (req) => {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
     return new Response(JSON.stringify({ error: errorMessage }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, 'Content-Type': 'application/json' },
       status: 500,
     });
   }

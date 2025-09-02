@@ -2,19 +2,18 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-// Configure CORS for production - update with your actual domain
-const allowedOrigins = [
-  "http://localhost:5000",
-  "http://localhost:3000",
-  "https://ynqdddwponrqwhtqfepi.supabase.co",
-  // TODO: Add your production domain here
-  // "https://yourdomain.com"
+// Configure CORS via env: set ALLOWED_ORIGINS as comma-separated list in Supabase function secrets
+const envAllowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s => s.trim()).filter(Boolean);
+const defaultAllowed = [
+  'http://localhost:5000',
+  'http://localhost:3000'
 ];
+const allowedOrigins = envAllowed.length ? envAllowed : defaultAllowed;
 
 const corsHeaders = (origin: string | null) => ({
-  "Access-Control-Allow-Origin": origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0],
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  'Access-Control-Allow-Origin': origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0],
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 });
 
 const logStep = (step: string, details?: any) => {

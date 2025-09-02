@@ -423,6 +423,12 @@ const UltimateEventsPage = memo(() => {
       'transition-all duration-200',
       viewMode === 'grid' ? 'mb-4' : 'mb-3'
     )}>
+      {/* Paid events disabled badge for admins when Stripe not connected */}
+      {isAdmin && (event.price_cents || 0) > 0 && (!orgStripeStatus?.charges_enabled || !orgStripeStatus?.payouts_enabled) && (
+        <div className="mb-2 rounded-md border border-amber-200 bg-amber-50 text-amber-900 p-2 text-xs">
+          Paid events are disabled until Stripe is connected.
+        </div>
+      )}
       <EnhancedEventCard
         event={event}
         onRegister={handleRegister}
@@ -686,6 +692,16 @@ const UltimateEventsPage = memo(() => {
                     variant: "default"
                   }}
                 />
+                {isAdmin && (!orgStripeStatus?.charges_enabled || !orgStripeStatus?.payouts_enabled) && (
+                  <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-amber-900 text-sm">
+                    Want to host paid events? Connect your Stripe account to accept payments and receive payouts directly.
+                    <div className="mt-2 flex gap-2">
+                      <Button size="sm" onClick={() => connectWithStripe('onboarding')} disabled={stripeLinkLoading}>Connect with Stripe</Button>
+                      <Button size="sm" variant="outline" onClick={() => connectWithStripe('update')}>Update Details</Button>
+                      <Button size="sm" variant="secondary" onClick={refreshStripeStatus}>Refresh Status</Button>
+                    </div>
+                  </div>
+                )}
               ) : (
                 <div className="mobile:space-y-3 sm:space-y-4">
                   {/* Mobile-first event list */}

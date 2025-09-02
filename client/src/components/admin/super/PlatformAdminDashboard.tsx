@@ -20,6 +20,7 @@ import {
   Zap,
   Globe
 } from 'lucide-react';
+import { TrialsAndGrants } from './TrialsAndGrants';
 import { OrganizationsList } from './OrganizationsList';
 import { PlatformAnalytics } from './PlatformAnalytics';
 import { SystemHealthMonitor } from './SystemHealthMonitor';
@@ -250,7 +251,7 @@ export const PlatformAdminDashboard: React.FC = () => {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 lg:grid-cols-8 gap-2">
+        <TabsList className="grid grid-cols-4 lg:grid-cols-9 gap-2">
           <TabsTrigger value="overview" className="flex items-center gap-1">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden lg:inline">Overview</span>
@@ -274,6 +275,10 @@ export const PlatformAdminDashboard: React.FC = () => {
           <TabsTrigger value="features" className="flex items-center gap-1">
             <Zap className="h-4 w-4" />
             <span className="hidden lg:inline">Features</span>
+          </TabsTrigger>
+          <TabsTrigger value="trials" className="flex items-center gap-1">
+            <Settings className="h-4 w-4" />
+            <span className="hidden lg:inline">Trials</span>
           </TabsTrigger>
           <TabsTrigger value="moderation" className="flex items-center gap-1">
             <Shield className="h-4 w-4" />
@@ -311,6 +316,10 @@ export const PlatformAdminDashboard: React.FC = () => {
 
         <TabsContent value="features">
           <FeatureFlagManager />
+        </TabsContent>
+
+        <TabsContent value="trials">
+          <TrialsAndGrants />
         </TabsContent>
 
         <TabsContent value="moderation">

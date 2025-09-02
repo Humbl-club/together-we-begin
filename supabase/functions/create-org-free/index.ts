@@ -93,10 +93,42 @@ serve(async (req) => {
         .catch(() => {});
     }
 
+    // Apply global trial if enabled (for new orgs selecting free, trial may upgrade tier temporarily)
+    try {
+      const { data: setting } = await supabase
+        .from('platform_settings')
+        .select('value')
+        .eq('key', 'global_trial')
+        .maybeSingle();
+      const v = (setting?.value || {}) as any;
+      if (v.enabled && typeof v.days === 'number' && v.days > 0 && typeof v.default_tier === 'string') {
+        const ends = new Date();
+        ends.setDate(ends.getDate() + v.days);
+        // Update org to trial tier
+        await supabase
+          .from('organizations')
+          .update({ subscription_tier: v.default_tier, subscription_status: 'trialing' })
+          .eq('id', org.id);
+        // Record billing trial
+        await supabase
+          .from('platform_billing')
+          .insert({
+            organization_id: org.id,
+            subscription_tier: v.default_tier,
+            billing_cycle: 'monthly',
+            amount_cents: 0,
+            currency: 'USD',
+            status: 'trialing',
+            current_period_start: new Date().toISOString(),
+            current_period_end: ends.toISOString(),
+            trial_ends_at: ends.toISOString(),
+          });
+      }
+    } catch {}
+
     return new Response(JSON.stringify({ success: true, organization_id: org.id, slug: org.slug }), { headers, status: 200 });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return new Response(JSON.stringify({ error: msg }), { headers, status: 500 });
   }
 });
-

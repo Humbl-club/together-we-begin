@@ -70,10 +70,26 @@ serve(async (req) => {
       customerId = created.id;
     }
 
+    // Optional trial via platform settings
+    let trialDays: number | undefined = undefined;
+    try {
+      const supabaseSrv = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'));
+      const { data: setting } = await supabaseSrv
+        .from('platform_settings')
+        .select('value')
+        .eq('key', 'global_trial')
+        .maybeSingle();
+      const v = (setting?.value || {}) as any;
+      if (v.enabled && typeof v.days === 'number' && v.days > 0) {
+        trialDays = v.days;
+      }
+    } catch {}
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
+      subscription_data: trialDays ? { trial_period_days: trialDays } : undefined,
       allow_promotion_codes: true,
       success_url: successUrl,
       cancel_url: cancelUrl,
@@ -92,4 +108,3 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: message }), { headers, status: 500 });
   }
 });
-

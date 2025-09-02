@@ -50,7 +50,10 @@ supabase functions secrets set \
   STRIPE_PRICE_PRO_MONTHLY="${STRIPE_PRICE_PRO_MONTHLY}" \
   STRIPE_PRICE_BASIC_YEARLY="${STRIPE_PRICE_BASIC_YEARLY:-}" \
   STRIPE_PRICE_PRO_YEARLY="${STRIPE_PRICE_PRO_YEARLY:-}" \
-  ALLOWED_ORIGINS="${ALLOWED_ORIGINS:-}" || true
+  ALLOWED_ORIGINS="${ALLOWED_ORIGINS:-}" \
+  APP_URL="${APP_URL:-}" \
+  PLATFORM_FEE_BPS="${PLATFORM_FEE_BPS:-0}" \
+  STRIPE_CONNECT_WEBHOOK_SECRET="${STRIPE_CONNECT_WEBHOOK_SECRET:-}" || true
 
 echo "📦 Deploying functions"
 supabase functions deploy create-payment || true
@@ -59,5 +62,8 @@ supabase functions deploy create-org-subscription || true
 supabase functions deploy verify-org-subscription || true
 supabase functions deploy create-org-free || true
 supabase functions deploy grant-free-account || true
+supabase functions deploy stripe-connect || true
+supabase functions deploy stripe-sync-status || true
+supabase functions deploy stripe-connect-webhook || true
 
 echo "✅ Deployment complete"

@@ -18,6 +18,7 @@ import { Calendar, Plus, Grid3X3, List, LayoutGrid, Search, Filter } from 'lucid
 import { cn } from '@/lib/utils';
 import { MobileLoading } from '@/components/ui/mobile-loading';
 import { SEO } from '@/components/seo/SEO';
+import { useOrganization } from '@/contexts/OrganizationContext';
 import { PageSection } from '@/components/sections/PageSection';
 import { SectionHeader } from '@/components/sections/SectionHeader';
 import { supabase } from '@/integrations/supabase/client';
@@ -217,6 +218,16 @@ const UltimateEventsPage = memo(() => {
         price_cents: priceInput ? Math.round(parseFloat(priceInput) * 100) : null,
         max_capacity: typeof capacityInput === 'number' ? capacityInput : null,
       };
+
+      // Gate paid events on Stripe connect status
+      const priceCents = payload.price_cents || 0;
+      if (priceCents > 0) {
+        if (!orgStripeStatus?.charges_enabled || !orgStripeStatus?.payouts_enabled) {
+          toast({ title: 'Connect Stripe to enable paid events', description: 'Go to Organization Settings → Payments', variant: 'destructive' });
+          setSubmitting(false);
+          return;
+        }
+      }
 
       await createEvent(payload, user.id);
       toast({ title: 'Event created', description: 'Your event has been created.' });
@@ -732,6 +743,20 @@ const UltimateEventsPage = memo(() => {
         <div className="fixed mobile:bottom-4 sm:bottom-6 right-4 glass-modal p-2 rounded-lg mobile:text-xs sm:text-sm space-y-1 z-40 max-w-32">
           <div>Mobile: {isMobileOptimized ? '✓' : '✗'}</div>
           <div>View: {viewMode}</div>
+  const { currentOrganization } = useOrganization();
+  const [orgStripeStatus, setOrgStripeStatus] = useState<{ charges_enabled?: boolean; payouts_enabled?: boolean } | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      if (!currentOrganization?.id) return;
+      const { data } = await supabase
+        .from('organizations')
+        .select('charges_enabled, payouts_enabled')
+        .eq('id', currentOrganization.id)
+        .maybeSingle();
+      if (data) setOrgStripeStatus(data as any);
+    })();
+  }, [currentOrganization?.id]);
           <div>Events: {filteredEvents.length}/{events.length}</div>
         </div>
       )}

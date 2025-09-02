@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useOrganization } from '../../contexts/OrganizationContext';
 import { supabase } from '../../integrations/supabase/client';
 import { useMobileFirst } from '../../hooks/useMobileFirst';
+import { ExternalLink } from 'lucide-react';
 
 export const OrganizationSettings: React.FC = () => {
   const { isMobile } = useMobileFirst();
@@ -41,6 +42,15 @@ export const OrganizationSettings: React.FC = () => {
     settings: {}
   });
 
+  // Stripe connect state
+  const [stripeState, setStripeState] = useState<{
+    stripe_account_id?: string | null;
+    charges_enabled?: boolean;
+    payouts_enabled?: boolean;
+    default_fee_bps?: number;
+  }>({});
+  const [linkLoading, setLinkLoading] = useState(false);
+
   const [stats, setStats] = useState({
     memberCount: 0,
     activeEvents: 0,
@@ -57,6 +67,15 @@ export const OrganizationSettings: React.FC = () => {
         max_members: currentOrganization.max_members || 50,
         settings: currentOrganization.settings || {}
       });
+      // Load Stripe connection status
+      (async () => {
+        const { data } = await supabase
+          .from('organizations')
+          .select('stripe_account_id, charges_enabled, payouts_enabled, default_fee_bps')
+          .eq('id', currentOrganization.id)
+          .maybeSingle();
+        if (data) setStripeState(data as any);
+      })();
       loadOrganizationStats();
     }
   }, [currentOrganization]);
@@ -128,6 +147,7 @@ export const OrganizationSettings: React.FC = () => {
           subscription_tier: formData.subscription_tier,
           max_members: formData.max_members,
           settings: formData.settings,
+          default_fee_bps: stripeState.default_fee_bps ?? 0,
           updated_at: new Date().toISOString()
         })
         .eq('id', currentOrganization.id);
@@ -163,6 +183,37 @@ export const OrganizationSettings: React.FC = () => {
       case 'pro': return { members: '1,000', features: 'All features' };
       case 'basic': return { members: '200', features: 'Most features' };
       default: return { members: '50', features: 'Basic features' };
+    }
+  };
+
+  const connectWithStripe = async (mode: 'onboarding' | 'update' = 'onboarding') => {
+    try {
+      setLinkLoading(true);
+      const { data, error } = await supabase.functions.invoke('stripe-connect', { body: { mode } });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url as string;
+      }
+    } catch (e: any) {
+      setError(e?.message || 'Failed to create Stripe onboarding link');
+    } finally {
+      setLinkLoading(false);
+    }
+  };
+
+  const refreshStripeStatus = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('stripe-sync-status');
+      if (error) throw error;
+      const { data: updated } = await supabase
+        .from('organizations')
+        .select('stripe_account_id, charges_enabled, payouts_enabled, default_fee_bps')
+        .eq('id', currentOrganization!.id)
+        .maybeSingle();
+      if (updated) setStripeState(updated as any);
+      setSuccess('Stripe status refreshed');
+    } catch (e: any) {
+      setError(e?.message || 'Failed to refresh Stripe status');
     }
   };
 
@@ -354,6 +405,62 @@ export const OrganizationSettings: React.FC = () => {
                   Save Changes
                 </>
               )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payments / Stripe Connect */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Payments</CardTitle>
+          <CardDescription>Connect your Stripe account to accept paid event registrations</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 rounded-md border bg-gray-50">
+              <div className="text-sm text-gray-600">Stripe Account</div>
+              <div className="font-mono text-sm break-all">{stripeState.stripe_account_id || 'Not connected'}</div>
+            </div>
+            <div className="p-4 rounded-md border bg-gray-50">
+              <div className="text-sm text-gray-600">Charges Enabled</div>
+              <div className={`font-medium ${stripeState.charges_enabled ? 'text-green-600' : 'text-red-600'}`}>
+                {stripeState.charges_enabled ? 'Yes' : 'No'}
+              </div>
+            </div>
+            <div className="p-4 rounded-md border bg-gray-50">
+              <div className="text-sm text-gray-600">Payouts Enabled</div>
+              <div className={`font-medium ${stripeState.payouts_enabled ? 'text-green-600' : 'text-red-600'}`}>
+                {stripeState.payouts_enabled ? 'Yes' : 'No'}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="platformFee">Platform Fee (bps)</Label>
+              <Input
+                id="platformFee"
+                type="number"
+                min={0}
+                max={10000}
+                value={stripeState.default_fee_bps ?? 0}
+                onChange={(e) => setStripeState(s => ({ ...s, default_fee_bps: Math.max(0, Math.min(10000, parseInt(e.target.value || '0'))) }))}
+              />
+              <p className="text-xs text-gray-500">100 bps = 1% fee</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Button onClick={() => connectWithStripe('onboarding')} disabled={linkLoading}>
+              {linkLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ExternalLink className="w-4 h-4 mr-2" />} 
+              {stripeState.stripe_account_id ? 'Re-Open Onboarding' : 'Connect with Stripe'}
+            </Button>
+            <Button variant="outline" onClick={() => connectWithStripe('update')}>
+              <ExternalLink className="w-4 h-4 mr-2" /> Update Stripe Details
+            </Button>
+            <Button variant="secondary" onClick={refreshStripeStatus}>
+              Refresh Status
             </Button>
           </div>
         </CardContent>

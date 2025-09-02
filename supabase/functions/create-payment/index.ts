@@ -47,10 +47,10 @@ serve(async (req) => {
     const { eventId, usePoints } = await req.json();
     logStep("Request data received", { eventId, usePoints });
 
-    // Get event details
+    // Get event details (need created_by for org resolution)
     const { data: event, error: eventError } = await supabaseClient
       .from("events")
-      .select("*")
+      .select("*, created_by, organization_id")
       .eq("id", eventId)
       .single();
 
@@ -115,6 +115,36 @@ serve(async (req) => {
       });
     }
 
+    // Resolve destination account via organization
+    let destinationAccount: string | undefined = undefined;
+    let applicationFeeAmount: number | undefined = undefined;
+    try {
+      let organizationId = (event as any).organization_id as string | undefined;
+      if (!organizationId && event.created_by) {
+        const { data: prof } = await supabaseClient
+          .from('profiles')
+          .select('current_organization_id')
+          .eq('id', event.created_by)
+          .maybeSingle();
+        organizationId = prof?.current_organization_id || undefined;
+      }
+
+      if (organizationId) {
+        const { data: org } = await supabaseClient
+          .from('organizations')
+          .select('stripe_account_id, default_fee_bps, charges_enabled, payouts_enabled')
+          .eq('id', organizationId)
+          .maybeSingle();
+        if (org?.stripe_account_id && org.charges_enabled && org.payouts_enabled) {
+          destinationAccount = org.stripe_account_id as string;
+          const bps = (org.default_fee_bps as number | null) ?? 0;
+          if (bps > 0 && event.price_cents) {
+            applicationFeeAmount = Math.floor((event.price_cents * bps) / 10000);
+          }
+        }
+      }
+    } catch {}
+
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -136,6 +166,11 @@ serve(async (req) => {
       mode: "payment",
       success_url: `${req.headers.get("origin")}/events?payment=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/events?payment=cancelled`,
+      payment_intent_data: destinationAccount ? {
+        transfer_data: { destination: destinationAccount },
+        application_fee_amount: applicationFeeAmount,
+        on_behalf_of: destinationAccount,
+      } : undefined,
       metadata: {
         event_id: eventId,
         user_id: user.id,

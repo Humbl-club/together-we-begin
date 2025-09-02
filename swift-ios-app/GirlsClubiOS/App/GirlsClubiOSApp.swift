@@ -4,7 +4,7 @@ import SwiftUI
 struct GirlsClubiOSApp: App {
     var body: some Scene {
         WindowGroup {
-            EventsListView()
+            RootView()
         }
     }
 }
